@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.c,v 1.5 2007/09/12 18:34:43 rahrenbe Exp $
+ * $Id: streamer.c,v 1.6 2007/09/12 18:58:39 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -143,12 +143,12 @@ bool cIptvStreamer::Activate()
      return true;
      }
 
+  // Ensure that socket is valid
+  CheckAndCreateSocket(dataPort);
+
   // Start thread
   if (!Running())
      Start();
-
-  // Ensure that socket is valid
-  CheckAndCreateSocket(dataPort);
 
   // Join a new multicast group
   mreq.imr_multiaddr.s_addr = inet_addr(stream);
