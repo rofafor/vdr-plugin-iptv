@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.c,v 1.3 2007/09/12 18:30:50 rahrenbe Exp $
+ * $Id: streamer.c,v 1.4 2007/09/12 18:33:56 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -29,23 +29,12 @@ cIptvStreamer::cIptvStreamer(cRingBufferLinear* BufferPtr, cMutex* Mutex)
   socketActive(false),
   mcastActive(false)
 {
-  int yes = 1;
 
   debug("cIptvStreamer::cIptvStreamer()\n");
   memset(&stream, '\0', strlen(stream));
 
-  // Create socket
-  socketDesc = socket(PF_INET, SOCK_DGRAM, 0);
-  if (socketDesc < 0) {
-     char tmp[64];
-     error("ERROR: socket(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-     }
-
-  // Allow multiple sockets to use the same PORT number
-  if (setsockopt(socketDesc, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0) {
-     char tmp[64];
-     error("ERROR: setsockopt(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-     }
+  // Create the socket
+  CheckAndCreateSocket(dataPort);
 
   pReceiveBuffer = MALLOC(unsigned char, bufferSize);
   if (!pReceiveBuffer)
@@ -61,8 +50,8 @@ cIptvStreamer::~cIptvStreamer()
   if (pReceiveBuffer)
      free(pReceiveBuffer);
 
-  close(socketDesc);
-  socketActive = false;
+  // Close the socket
+  CloseSocket();
 }
 
 void cIptvStreamer::Action()
@@ -80,6 +69,62 @@ void cIptvStreamer::Action()
     mutex->Unlock();
     }
   debug("cIptvStreamer::Action(): Exiting\n");
+}
+
+bool cIptvStreamer::CheckAndCreateSocket(const int port)
+{
+  // If socket is there already and it is bound to a different port, it must
+  // be closed first
+  if (socketActive && port != dataPort) {
+     debug("Full tear-down of active socket\n");
+     CloseSocket();
+     }
+
+  // Bind to the socket if it is not active already
+  if (!socketActive) {
+
+     // Create socket
+     socketDesc = socket(PF_INET, SOCK_DGRAM, 0);
+     if (socketDesc < 0) {
+        char tmp[64];
+        error("ERROR: socket(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+        }
+
+     int yes = 1;     
+
+     // Allow multiple sockets to use the same PORT number
+     if (setsockopt(socketDesc, SOL_SOCKET, SO_REUSEADDR, &yes,
+		    sizeof(yes)) < 0) {
+        char tmp[64];
+        error("ERROR: setsockopt(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+        }
+
+     memset(&sa, '\0', sizeof(sa));
+     sa.sin_family = AF_INET;
+     sa.sin_port = htons(port);
+     sa.sin_addr.s_addr = htonl(INADDR_ANY);
+
+     int err = bind(socketDesc, (struct sockaddr *)&sa, sizeof(sa));
+     if (err < 0) {
+        char tmp[64];
+        error("ERROR: bind(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+        return false;
+        }
+
+     dataPort = port;
+     socketActive = true;
+     }
+
+  return true;
+
+}
+
+void cIptvStreamer::CloseSocket()
+{
+  if (socketActive) {
+    close(socketDesc);
+    socketActive = false;
+  }
 }
 
 bool cIptvStreamer::Activate()
@@ -101,6 +146,9 @@ bool cIptvStreamer::Activate()
   // Start thread
   if (!Running())
      Start();
+
+  // Ensure that socket is valid
+  CheckAndCreateSocket(dataPort);
 
   // Join a new multicast group
   mreq.imr_multiaddr.s_addr = inet_addr(stream);
@@ -149,34 +197,12 @@ bool cIptvStreamer::SetStream(const char* address, const int port, const int pro
 {
   debug("cIptvStreamer::SetChannel(): channel = %s:%d\n", address, port);
 
-  if (port != dataPort) {
-     error("ERROR: Support for full re-initialization is not implemented!\n");
-     return false;
-     }
-
-  // Bind to the socket if it is not active already
-  if (!socketActive) {
-     debug("cIptvStreamer::SetChannel(): Binding socket to %s:%d\n", address, port);
-     dataPort = port;
-
-     memset(&sa, '\0', sizeof(sa));
-     sa.sin_family = AF_INET;
-     sa.sin_port = htons(dataPort);
-     sa.sin_addr.s_addr = htonl(INADDR_ANY);
-
-     int err = bind(socketDesc, (struct sockaddr *)&sa, sizeof(sa));
-     if (err < 0) {
-        char tmp[64];
-        error("ERROR: bind(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-        return false;
-        }
-
-     socketActive = true;
-     }
-
   // De-activate the reception if it is running currently. Otherwise the
   // reception stream is overwritten and cannot be un-set after this
   Deactivate();
+
+  // Ensure that the socket is valid
+  CheckAndCreateSocket(port);
 
   // Check if the address fits into the buffer
   if (strlen(address) > sizeof(stream)) {

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.h,v 1.1 2007/09/12 17:28:59 rahrenbe Exp $
+ * $Id: streamer.h,v 1.2 2007/09/12 18:33:56 ajhseppa Exp $
  */
 
 #ifndef __IPTV_STREAMER_H
@@ -27,6 +27,9 @@ private:
   cMutex* mutex;
   bool socketActive;
   bool mcastActive;
+
+  bool CheckAndCreateSocket(const int port);
+  void CloseSocket();
 
 public:
   enum {
