@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.c,v 1.7 2007/09/12 21:14:51 rahrenbe Exp $
+ * $Id: streamer.c,v 1.8 2007/09/12 21:55:57 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -19,10 +19,10 @@
 #include "common.h"
 #include "streamer.h"
 
-cIptvStreamer::cIptvStreamer(cRingBufferLinear* BufferPtr, cMutex* Mutex)
+cIptvStreamer::cIptvStreamer(cRingBufferLinear* Buffer, cMutex* Mutex)
 : cThread("IPTV streamer"),
   dataPort(1234),
-  pRingBuffer(BufferPtr),
+  pRingBuffer(Buffer),
   bufferSize(TS_SIZE * 7),
   mutex(Mutex),
   socketActive(false),
@@ -58,7 +58,8 @@ void cIptvStreamer::Action()
   debug("cIptvStreamer::Action(): Entering\n");
   while (Running()) {
     socklen_t addrlen = sizeof(sa);
-    int length = recvfrom(socketDesc, pReceiveBuffer, bufferSize, 0, (struct sockaddr *)&sa, &addrlen);
+    int length = recvfrom(socketDesc, pReceiveBuffer, bufferSize, 0,
+                          (struct sockaddr *)&sa, &addrlen);
     mutex->Lock();
     int p = pRingBuffer->Put(pReceiveBuffer, bufferSize);
     if (p != length && Running()) {
@@ -87,6 +88,7 @@ bool cIptvStreamer::CheckAndCreateSocket(const int port)
      if (socketDesc < 0) {
         char tmp[64];
         error("ERROR: socket(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+        return false;
         }
 
      int yes = 1;     
@@ -96,6 +98,8 @@ bool cIptvStreamer::CheckAndCreateSocket(const int port)
 		    sizeof(yes)) < 0) {
         char tmp[64];
         error("ERROR: setsockopt(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+        close(socketDesc);
+        return false;
         }
 
      memset(&sa, '\0', sizeof(sa));
@@ -107,6 +111,7 @@ bool cIptvStreamer::CheckAndCreateSocket(const int port)
      if (err < 0) {
         char tmp[64];
         error("ERROR: bind(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+        close(socketDesc);
         return false;
         }
 
@@ -138,27 +143,28 @@ bool cIptvStreamer::Activate()
      } 
 
   if (mcastActive) {
-     debug("cIptvStreamer::Activate(): Already active!\n");
+     debug("cIptvStreamer::Activate(): Already active\n");
      return true;
      }
 
   // Ensure that socket is valid
   CheckAndCreateSocket(dataPort);
 
-  // Start thread
-  if (!Running())
-     Start();
-
   // Join a new multicast group
   mreq.imr_multiaddr.s_addr = inet_addr(stream);
   mreq.imr_interface.s_addr = htonl(INADDR_ANY);
 
-  int err = setsockopt(socketDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
+  int err = setsockopt(socketDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq,
+                       sizeof(mreq));
   if (err < 0) {
      char tmp[64];
      error("ERROR: setsockopt(): %s", strerror_r(errno, tmp, sizeof(tmp)));
      return false;
      }
+
+  // Start thread
+  if (!Running())
+     Start();
 
   mcastActive = true;
   return true;
@@ -166,15 +172,20 @@ bool cIptvStreamer::Activate()
 
 bool cIptvStreamer::Deactivate()
 {
-  debug("cIptvStreamer::Deactivate()\n");
-  if (stream && mcastActive) {
-     debug("cIptvStreamer::Deactivate(): stream = %s\n", stream);
+  debug("cIptvStreamer::Deactivate(): stream = %s\n", stream);
 
+  // Stop thread
+  if (Running())
+     Cancel(3);
+
+  if (stream && mcastActive) {
      struct ip_mreq mreq;
+     debug("cIptvStreamer::Deactivate(): Deactivating\n");
      mreq.imr_multiaddr.s_addr = inet_addr(stream);
      mreq.imr_interface.s_addr = htonl(INADDR_ANY);
     
-     int err = setsockopt(socketDesc, IPPROTO_IP, IP_DROP_MEMBERSHIP, &mreq, sizeof(mreq));
+     int err = setsockopt(socketDesc, IPPROTO_IP, IP_DROP_MEMBERSHIP, &mreq,
+                          sizeof(mreq));
      if (err < 0) {
         char tmp[64];
         error("ERROR: setsockopt(): %s", strerror_r(errno, tmp, sizeof(tmp)));
@@ -185,18 +196,14 @@ bool cIptvStreamer::Deactivate()
      mcastActive = false;
      }
 
-  // Stop thread
-  if (Running())
-     Cancel(3);
-
   return true;
 }
 
 bool cIptvStreamer::SetStream(const char* address, const int port, const char* protocol)
 {
-  debug("cIptvStreamer::SetChannel(): %s://%s:%d\n", protocol, address, port);
+  debug("cIptvStreamer::SetStream(): %s://%s:%d\n", protocol, address, port);
 
-  // De-activate the reception if it is running currently. Otherwise the
+  // Deactivate the reception if it is running currently. Otherwise the
   // reception stream is overwritten and cannot be un-set after this
   Deactivate();
 

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.h,v 1.3 2007/09/12 21:14:51 rahrenbe Exp $
+ * $Id: streamer.h,v 1.4 2007/09/12 21:55:57 rahrenbe Exp $
  */
 
 #ifndef __IPTV_STREAMER_H
@@ -32,7 +32,7 @@ private:
 
 public:
   cIptvStreamer();
-  cIptvStreamer(cRingBufferLinear* BufferPtr, cMutex* Mutex);
+  cIptvStreamer(cRingBufferLinear* Buffer, cMutex* Mutex);
   virtual ~cIptvStreamer();
   virtual void Action();
   bool SetStream(const char* address, const int port, const char* protocol);
