@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.c,v 1.2 2007/09/12 18:05:58 ajhseppa Exp $
+ * $Id: streamer.c,v 1.3 2007/09/12 18:30:50 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -56,8 +56,7 @@ cIptvStreamer::~cIptvStreamer()
 {
   debug("cIptvStreamer::~cIptvStreamer()\n");
 
-  if (Running())
-     Cancel(3);
+  Deactivate();
 
   if (pReceiveBuffer)
      free(pReceiveBuffer);
