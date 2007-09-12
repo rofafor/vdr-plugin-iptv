@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.c,v 1.1 2007/09/12 17:28:59 rahrenbe Exp $
+ * $Id: streamer.c,v 1.2 2007/09/12 18:05:58 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -174,6 +174,10 @@ bool cIptvStreamer::SetStream(const char* address, const int port, const int pro
 
      socketActive = true;
      }
+
+  // De-activate the reception if it is running currently. Otherwise the
+  // reception stream is overwritten and cannot be un-set after this
+  Deactivate();
 
   // Check if the address fits into the buffer
   if (strlen(address) > sizeof(stream)) {
