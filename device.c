@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.3 2007/09/12 21:14:51 rahrenbe Exp $
+ * $Id: device.c,v 1.4 2007/09/12 21:21:55 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -70,17 +70,14 @@ cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, cString 
 
   debug("cIptvDevice::GetChannelSettings(%d)\n", deviceIndex);
   if (sscanf(Param, "IPTV-UDP-%u.%u.%u.%u-%u", &a, &b, &c, &d, IpPort) == 5) {
-     debug("UDP channel detected\n");
      *Protocol = cString("udp", true);
      return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
      }
   else if (sscanf(Param, "IPTV-RTSP-%u.%u.%u.%u-%u", &a, &b, &c, &d, IpPort) == 5) {
-     debug("RTSP channel detected\n");
      *Protocol = cString("rtsp", true);
      return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
      }
   else if (sscanf(Param, "IPTV-HTTP-%u.%u.%u.%u-%u", &a, &b, &c, &d, IpPort) == 5) {
-     debug("HTTP channel detected\n");
      *Protocol = cString("http", true);
      return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
      }
