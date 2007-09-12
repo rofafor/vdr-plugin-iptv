@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.c,v 1.4 2007/09/12 18:33:56 ajhseppa Exp $
+ * $Id: streamer.c,v 1.5 2007/09/12 18:34:43 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -195,7 +195,7 @@ bool cIptvStreamer::Deactivate()
 
 bool cIptvStreamer::SetStream(const char* address, const int port, const int protocol)
 {
-  debug("cIptvStreamer::SetChannel(): channel = %s:%d\n", address, port);
+  debug("cIptvStreamer::SetChannel(): channel = %s:%d (%d)\n", address, port, protocol);
 
   // De-activate the reception if it is running currently. Otherwise the
   // reception stream is overwritten and cannot be un-set after this
