@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.1 2007/09/12 17:28:59 rahrenbe Exp $
+ * $Id: device.c,v 1.2 2007/09/12 18:55:31 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -21,7 +21,7 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   isOpenDvr(false),
   pIptvStreamer(NULL)
 {
-  debug("cIptvDevice::cIptvDevice()\n");
+  debug("cIptvDevice::cIptvDevice(%d)\n", deviceIndex);
   tsBuffer = new cRingBufferLinear(MEGABYTE(8), TS_SIZE, false, "IPTV");
   tsBuffer->SetTimeouts(100, 100);
   pIptvStreamer = new cIptvStreamer(tsBuffer, &mutex);
@@ -29,7 +29,7 @@ cIptvDevice::cIptvDevice(unsigned int Index)
 
 cIptvDevice::~cIptvDevice()
 {
-  debug("cIptvDevice::~cIptvDevice()\n");
+  debug("cIptvDevice::~cIptvDevice(%d)\n", deviceIndex);
   if (pIptvStreamer)
      delete pIptvStreamer;
   delete tsBuffer;
@@ -68,7 +68,7 @@ cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, int *Pro
 {
   unsigned int a, b, c, d;
 
-  debug("cIptvDevice::GetChannelSettings()\n");
+  debug("cIptvDevice::GetChannelSettings(%d)\n", deviceIndex);
   if (sscanf(Param, "IPTV-UDP-%u.%u.%u.%u-%u", &a, &b, &c, &d, IpPort) == 5) {
      debug("UDP channel detected\n");
      Protocol = (int*)(cIptvStreamer::PROTOCOL_UDP);
@@ -89,19 +89,19 @@ cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, int *Pro
 
 bool cIptvDevice::ProvidesIptv(const char *Param) const
 {
-  debug("cIptvDevice::ProvidesIptv()\n");
+  debug("cIptvDevice::ProvidesIptv(%d)\n", deviceIndex);
   return (strncmp(Param, "IPTV", 4) == 0);
 }
 
 bool cIptvDevice::ProvidesSource(int Source) const
 {
-  debug("cIptvDevice::ProvidesSource()\n");
+  debug("cIptvDevice::ProvidesSource(%d)\n", deviceIndex);
   return ((Source & cSource::st_Mask) == cSource::stPlug);
 }
 
 bool cIptvDevice::ProvidesTransponder(const cChannel *Channel) const
 {
-  debug("cIptvDevice::ProvidesTransponder()\n");
+  debug("cIptvDevice::ProvidesTransponder(%d)\n", deviceIndex);
   return (ProvidesSource(Channel->Source()) && ProvidesIptv(Channel->Param()));
 }
 
@@ -110,7 +110,7 @@ bool cIptvDevice::ProvidesChannel(const cChannel *Channel, int Priority, bool *N
   bool result = false;
   bool needsDetachReceivers = false;
 
-  debug("cIptvDevice::ProvidesChannel()\n");
+  debug("cIptvDevice::ProvidesChannel(%d)\n", deviceIndex);
   if (ProvidesTransponder(Channel))
      result = true;
   if (NeedsDetachReceivers)
@@ -123,7 +123,7 @@ bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
   int port, protocol;
   cString addr;
 
-  debug("cIptvDevice::SetChannelDevice()\n");
+  debug("cIptvDevice::SetChannelDevice(%d)\n", deviceIndex);
   addr = GetChannelSettings(Channel->Param(), &port, &protocol);
   if (addr)
      pIptvStreamer->SetStream(addr, port, protocol);
@@ -132,13 +132,13 @@ bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
 
 bool cIptvDevice::SetPid(cPidHandle *Handle, int Type, bool On)
 {
-  debug("cIptvDevice::SetPid()\n");
+  debug("cIptvDevice::SetPid(%d)\n", deviceIndex);
   return true;
 }
 
 bool cIptvDevice::OpenDvr(void)
 {
-  debug("cIptvDevice::OpenDvr()\n");
+  debug("cIptvDevice::OpenDvr(%d)\n", deviceIndex);
   mutex.Lock();
   isPacketDelivered = false;
   tsBuffer->Clear();
@@ -150,7 +150,7 @@ bool cIptvDevice::OpenDvr(void)
 
 void cIptvDevice::CloseDvr(void)
 {
-  debug("cIptvDevice::CloseDvr()\n");
+  debug("cIptvDevice::CloseDvr(%d)\n", deviceIndex);
   pIptvStreamer->Deactivate();
   isOpenDvr = false;
 }
@@ -158,7 +158,7 @@ void cIptvDevice::CloseDvr(void)
 bool cIptvDevice::GetTSPacket(uchar *&Data)
 {
   int Count = 0;
-  //debug("cIptvDevice::GetTSPacket()\n");
+  //debug("cIptvDevice::GetTSPacket(%d)\n", deviceIndex);
   if (isPacketDelivered) {
      tsBuffer->Del(TS_SIZE);
      isPacketDelivered = false;
