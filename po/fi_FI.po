@@ -1,0 +1,20 @@
+# VDR plugin language source file.
+# Copyright (C) 2007 Klaus Schmidinger <kls@cadsoft.de>
+# This file is distributed under the same license as the VDR package.
+# Rolf Ahrenberg
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: VDR 1.5.7\n"
+"Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
+"POT-Creation-Date: 2007-08-12 23:22+0300\n"
+"PO-Revision-Date: 2007-08-12 23:22+0300\n"
+"Last-Translator: Rolf Ahrenberg\n"
+"Language-Team: <vdr@linuxtv.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-15\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: iptv.c:15
+msgid "Experiment the IPTV"
+msgstr "Koe IPTV:n ihmeellinen maailma"

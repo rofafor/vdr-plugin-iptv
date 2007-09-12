@@ -1,0 +1,30 @@
+This is a IPTV for the Video Disk Recorder (VDR).
+
+Written by:                  R o l f . A h r e n b e r g @ s c i . f i
+                             A n t t i . S e p p a l a @ 
+
+Project's homepage:          http://www.saunalahti.fi/~rahrenbe/vdr/iptv/
+
+Latest version available at: http://www.saunalahti.fi/~rahrenbe/vdr/iptv/
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+See the file COPYING for more information.
+
+Description:
+
+TBD
+
+Channels.conf examples:
+
+TV1:1:IPTV-UDP-192.168.0.1-1234:P:27500:512:650:2321:0:17:8438:4097:0
+TV2:2:IPTV-UDP-192.168.0.2-1234:P:27500:513:660:2321:0:33:8438:4097:0
+    ^ ^    ^   ^           ^    ^
+    | |    |   |           |    Source type ("P")
+    | |    |   |           IP Port Number
+    | |    |   IP Address
+    | |    Protocol ("UDP")
+    | Plugin ID ("IPTV")
+    Unique enumeration
