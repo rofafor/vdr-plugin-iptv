@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.h,v 1.2 2007/09/12 18:33:56 ajhseppa Exp $
+ * $Id: streamer.h,v 1.3 2007/09/12 21:14:51 rahrenbe Exp $
  */
 
 #ifndef __IPTV_STREAMER_H
@@ -19,7 +19,6 @@ private:
   char stream[256];
   int socketDesc;
   int dataPort;
-  int dataProtocol;
   struct sockaddr_in sa;
   cRingBufferLinear* pRingBuffer;
   unsigned char* pReceiveBuffer;
@@ -32,16 +31,11 @@ private:
   void CloseSocket();
 
 public:
-  enum {
-    PROTOCOL_UDP,
-    PROTOCOL_RTSP,
-    PROTOCOL_HTTP
-  };
   cIptvStreamer();
   cIptvStreamer(cRingBufferLinear* BufferPtr, cMutex* Mutex);
   virtual ~cIptvStreamer();
   virtual void Action();
-  bool SetStream(const char* address, const int port, const int protocol);
+  bool SetStream(const char* address, const int port, const char* protocol);
   bool Activate();
   bool Deactivate();
 };

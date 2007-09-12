@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.2 2007/09/12 18:55:31 rahrenbe Exp $
+ * $Id: device.c,v 1.3 2007/09/12 21:14:51 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -64,24 +64,24 @@ cIptvDevice *cIptvDevice::Get(unsigned int DeviceIndex)
   return NULL;
 }
 
-cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, int *Protocol)
+cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, cString *Protocol)
 {
   unsigned int a, b, c, d;
 
   debug("cIptvDevice::GetChannelSettings(%d)\n", deviceIndex);
   if (sscanf(Param, "IPTV-UDP-%u.%u.%u.%u-%u", &a, &b, &c, &d, IpPort) == 5) {
      debug("UDP channel detected\n");
-     Protocol = (int*)(cIptvStreamer::PROTOCOL_UDP);
+     *Protocol = cString("udp", true);
      return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
      }
   else if (sscanf(Param, "IPTV-RTSP-%u.%u.%u.%u-%u", &a, &b, &c, &d, IpPort) == 5) {
      debug("RTSP channel detected\n");
-     Protocol = (int*)(cIptvStreamer::PROTOCOL_RTSP);
+     *Protocol = cString("rtsp", true);
      return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
      }
   else if (sscanf(Param, "IPTV-HTTP-%u.%u.%u.%u-%u", &a, &b, &c, &d, IpPort) == 5) {
      debug("HTTP channel detected\n");
-     Protocol = (int*)cIptvStreamer::PROTOCOL_HTTP;
+     *Protocol = cString("http", true);
      return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
      }
   return NULL;
@@ -120,8 +120,8 @@ bool cIptvDevice::ProvidesChannel(const cChannel *Channel, int Priority, bool *N
 
 bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
 {
-  int port, protocol;
-  cString addr;
+  int port;
+  cString protocol, addr;
 
   debug("cIptvDevice::SetChannelDevice(%d)\n", deviceIndex);
   addr = GetChannelSettings(Channel->Param(), &port, &protocol);

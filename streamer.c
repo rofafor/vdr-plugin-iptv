@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.c,v 1.6 2007/09/12 18:58:39 ajhseppa Exp $
+ * $Id: streamer.c,v 1.7 2007/09/12 21:14:51 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -22,7 +22,6 @@
 cIptvStreamer::cIptvStreamer(cRingBufferLinear* BufferPtr, cMutex* Mutex)
 : cThread("IPTV streamer"),
   dataPort(1234),
-  dataProtocol(PROTOCOL_UDP),
   pRingBuffer(BufferPtr),
   bufferSize(TS_SIZE * 7),
   mutex(Mutex),
@@ -193,9 +192,9 @@ bool cIptvStreamer::Deactivate()
   return true;
 }
 
-bool cIptvStreamer::SetStream(const char* address, const int port, const int protocol)
+bool cIptvStreamer::SetStream(const char* address, const int port, const char* protocol)
 {
-  debug("cIptvStreamer::SetChannel(): channel = %s:%d (%d)\n", address, port, protocol);
+  debug("cIptvStreamer::SetChannel(): %s://%s:%d\n", protocol, address, port);
 
   // De-activate the reception if it is running currently. Otherwise the
   // reception stream is overwritten and cannot be un-set after this
