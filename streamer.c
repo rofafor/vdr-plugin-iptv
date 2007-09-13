@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.c,v 1.8 2007/09/12 21:55:57 rahrenbe Exp $
+ * $Id: streamer.c,v 1.9 2007/09/13 14:10:37 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -56,18 +56,41 @@ cIptvStreamer::~cIptvStreamer()
 void cIptvStreamer::Action()
 {
   debug("cIptvStreamer::Action(): Entering\n");
+
+  // Create files necessary for selecting I/O from socket.
+  fd_set rfds;
+  FD_ZERO(&rfds);
+  FD_SET(socketDesc, &rfds);
+
   while (Running()) {
     socklen_t addrlen = sizeof(sa);
-    int length = recvfrom(socketDesc, pReceiveBuffer, bufferSize, 0,
-                          (struct sockaddr *)&sa, &addrlen);
-    mutex->Lock();
-    int p = pRingBuffer->Put(pReceiveBuffer, bufferSize);
-    if (p != length && Running()) {
-       pRingBuffer->ReportOverflow(length - p);
-       debug("Reporting overflow\n");
-       }
-    mutex->Unlock();
+
+    struct timeval tv;
+    tv.tv_sec = 0;
+    tv.tv_usec = 500000;
+
+    // Wait for data
+    int retval = select(socketDesc + 1, &rfds, NULL, NULL, &tv);
+
+    if (retval < 0) {
+      char tmp[64];
+      error("ERROR: select(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+    } else if(retval) {
+
+      // Read data from socket
+      int length = recvfrom(socketDesc, pReceiveBuffer, bufferSize,
+			    MSG_DONTWAIT, (struct sockaddr *)&sa, &addrlen);
+      mutex->Lock();
+      int p = pRingBuffer->Put(pReceiveBuffer, length);
+      if (p != length && Running()) {
+	pRingBuffer->ReportOverflow(length - p);
+        }
+      mutex->Unlock();
+
+    } else {
+      debug("Timeout waiting for data\n");
     }
+  }
   debug("cIptvStreamer::Action(): Exiting\n");
 }
 
@@ -88,6 +111,14 @@ bool cIptvStreamer::CheckAndCreateSocket(const int port)
      if (socketDesc < 0) {
         char tmp[64];
         error("ERROR: socket(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+        return false;
+        }
+
+     // Make it use non-blocking I/O to avoid stuck read -calls.
+     if (fcntl(socketDesc, F_SETFL, O_NONBLOCK)) {
+        char tmp[64];
+        error("ERROR: fcntl(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+        close(socketDesc);
         return false;
         }
 
@@ -128,6 +159,7 @@ void cIptvStreamer::CloseSocket()
   if (socketActive) {
     close(socketDesc);
     socketActive = false;
+    mcastActive = false;
   }
 }
 
