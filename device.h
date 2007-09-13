@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.2 2007/09/12 21:14:51 rahrenbe Exp $
+ * $Id: device.h,v 1.3 2007/09/13 18:14:41 rahrenbe Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -22,6 +22,11 @@ public:
 
   // private parts
 private:
+  enum tProtocol {
+     PROTOCOL_UDP,
+     PROTOCOL_RTSP,
+     PROTOCOL_HTTP
+  };
   unsigned int deviceIndex;
   bool isPacketDelivered;
   bool isOpenDvr;
@@ -36,7 +41,7 @@ public:
 
   // for channel parsing
 private:
-  cString GetChannelSettings(const char *Param, int *IpPort, cString *Protocol);
+  cString GetChannelSettings(const char *Param, int *IpPort, int *Protocol);
   bool ProvidesIptv(const char *Param) const;
 
   // for channel selection
