@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.h,v 1.4 2007/09/12 21:55:57 rahrenbe Exp $
+ * $Id: streamer.h,v 1.5 2007/09/13 16:58:22 rahrenbe Exp $
  */
 
 #ifndef __IPTV_STREAMER_H
@@ -16,28 +16,30 @@
 
 class cIptvStreamer : public cThread {
 private:
-  char stream[256];
+  char* streamAddr;
+  int streamPort;
   int socketDesc;
-  int dataPort;
-  struct sockaddr_in sa;
+  struct sockaddr_in sockAddr;
   cRingBufferLinear* pRingBuffer;
   unsigned char* pReceiveBuffer;
   unsigned int bufferSize;
   cMutex* mutex;
-  bool socketActive;
   bool mcastActive;
 
-  bool CheckAndCreateSocket(const int port);
-  void CloseSocket();
+private:
+  bool OpenSocket(const int port);
+  void CloseSocket(void);
+  bool JoinMulticast(void);
+  bool DropMulticast(void);
 
 public:
   cIptvStreamer();
   cIptvStreamer(cRingBufferLinear* Buffer, cMutex* Mutex);
   virtual ~cIptvStreamer();
-  virtual void Action();
+  virtual void Action(void);
   bool SetStream(const char* address, const int port, const char* protocol);
-  bool Activate();
-  bool Deactivate();
+  bool OpenStream(void);
+  bool CloseStream(void);
 };
 
 #endif // __IPTV_STREAMER_H

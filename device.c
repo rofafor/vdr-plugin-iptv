@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.4 2007/09/12 21:21:55 rahrenbe Exp $
+ * $Id: device.c,v 1.5 2007/09/13 16:58:22 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -140,7 +140,7 @@ bool cIptvDevice::OpenDvr(void)
   isPacketDelivered = false;
   tsBuffer->Clear();
   mutex.Unlock();
-  pIptvStreamer->Activate();
+  pIptvStreamer->OpenStream();
   isOpenDvr = true;
   return true;
 }
@@ -148,7 +148,7 @@ bool cIptvDevice::OpenDvr(void)
 void cIptvDevice::CloseDvr(void)
 {
   debug("cIptvDevice::CloseDvr(%d)\n", deviceIndex);
-  pIptvStreamer->Deactivate();
+  pIptvStreamer->CloseStream();
   isOpenDvr = false;
 }
 
