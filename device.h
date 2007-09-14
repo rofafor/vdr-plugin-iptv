@@ -3,13 +3,16 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.3 2007/09/13 18:14:41 rahrenbe Exp $
+ * $Id: device.h,v 1.4 2007/09/14 15:44:25 rahrenbe Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
 #define __IPTV_DEVICE_H
 
 #include <vdr/device.h>
+#include "protocoludp.h"
+//#include "protocolrtsp.h"
+//#include "protocolhttp.h"
 #include "streamer.h"
 
 class cIptvDevice : public cDevice {
@@ -22,15 +25,13 @@ public:
 
   // private parts
 private:
-  enum tProtocol {
-     PROTOCOL_UDP,
-     PROTOCOL_RTSP,
-     PROTOCOL_HTTP
-  };
   unsigned int deviceIndex;
   bool isPacketDelivered;
   bool isOpenDvr;
   cRingBufferLinear *tsBuffer;
+  cIptvProtocolUdp *pUdpProtocol;
+  //cIptvProtocolRtsp *pRtspProtocol;
+  //cIptvProtocolHttp *pHttpProtocol;
   cIptvStreamer *pIptvStreamer;
   cMutex mutex;
 
@@ -41,7 +42,7 @@ public:
 
   // for channel parsing
 private:
-  cString GetChannelSettings(const char *Param, int *IpPort, int *Protocol);
+  cString GetChannelSettings(const char *Param, int *IpPort, cIptvProtocolIf* *Protocol);
   bool ProvidesIptv(const char *Param) const;
 
   // for channel selection

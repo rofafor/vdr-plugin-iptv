@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.6 2007/09/13 18:14:41 rahrenbe Exp $
+ * $Id: device.c,v 1.7 2007/09/14 15:44:25 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -19,19 +19,23 @@ cIptvDevice::cIptvDevice(unsigned int Index)
 : deviceIndex(Index),
   isPacketDelivered(false),
   isOpenDvr(false),
-  pIptvStreamer(NULL)
+  mutex()
 {
   debug("cIptvDevice::cIptvDevice(%d)\n", deviceIndex);
   tsBuffer = new cRingBufferLinear(MEGABYTE(8), TS_SIZE, false, "IPTV");
   tsBuffer->SetTimeouts(100, 100);
+  pUdpProtocol = new cIptvProtocolUdp();
+  //pRtspProtocol = new cIptvProtocolRtsp();
+  //pHttpProtocol = new cIptvProtocolHttp();
   pIptvStreamer = new cIptvStreamer(tsBuffer, &mutex);
+  StartSectionHandler();
 }
 
 cIptvDevice::~cIptvDevice()
 {
   debug("cIptvDevice::~cIptvDevice(%d)\n", deviceIndex);
-  if (pIptvStreamer)
-     delete pIptvStreamer;
+  delete pIptvStreamer;
+  delete pUdpProtocol;
   delete tsBuffer;
 }
 
@@ -64,21 +68,21 @@ cIptvDevice *cIptvDevice::Get(unsigned int DeviceIndex)
   return NULL;
 }
 
-cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, int *Protocol)
+cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, cIptvProtocolIf* *Protocol)
 {
   unsigned int a, b, c, d;
 
   debug("cIptvDevice::GetChannelSettings(%d)\n", deviceIndex);
   if (sscanf(Param, "IPTV-UDP-%u.%u.%u.%u-%u", &a, &b, &c, &d, IpPort) == 5) {
-     *Protocol = PROTOCOL_UDP;
+     *Protocol = pUdpProtocol;
      return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
      }
   else if (sscanf(Param, "IPTV-RTSP-%u.%u.%u.%u-%u", &a, &b, &c, &d, IpPort) == 5) {
-     *Protocol = PROTOCOL_RTSP;
+     *Protocol = NULL; // pRtspProtocol;
      return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
      }
   else if (sscanf(Param, "IPTV-HTTP-%u.%u.%u.%u-%u", &a, &b, &c, &d, IpPort) == 5) {
-     *Protocol = PROTOCOL_HTTP;
+     *Protocol = NULL; // pHttpProtocol;
      return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
      }
   return NULL;
@@ -117,13 +121,14 @@ bool cIptvDevice::ProvidesChannel(const cChannel *Channel, int Priority, bool *N
 
 bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
 {
-  int port, protocol;
+  int port;
   cString addr;
+  cIptvProtocolIf *protocol;
 
   debug("cIptvDevice::SetChannelDevice(%d)\n", deviceIndex);
   addr = GetChannelSettings(Channel->Param(), &port, &protocol);
   if (addr)
-     pIptvStreamer->SetStream(addr, port, (protocol == PROTOCOL_UDP) ? "udp" : (protocol == PROTOCOL_RTSP) ? "rtsp" : "http");
+     pIptvStreamer->Set(addr, port, protocol);
   return true;
 }
 
@@ -140,7 +145,7 @@ bool cIptvDevice::OpenDvr(void)
   isPacketDelivered = false;
   tsBuffer->Clear();
   mutex.Unlock();
-  pIptvStreamer->OpenStream();
+  pIptvStreamer->Open();
   isOpenDvr = true;
   return true;
 }
@@ -148,7 +153,7 @@ bool cIptvDevice::OpenDvr(void)
 void cIptvDevice::CloseDvr(void)
 {
   debug("cIptvDevice::CloseDvr(%d)\n", deviceIndex);
-  pIptvStreamer->CloseStream();
+  pIptvStreamer->Close();
   isOpenDvr = false;
 }
 
