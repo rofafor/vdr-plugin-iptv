@@ -30,6 +30,7 @@ tar -xzf /put/your/path/here/vdr-iptv-X.Y.Z.tgz
 ln -s iptv-X.Y.Z iptv
 cd /put/your/path/here/VDR
 patch -p1 < PLUGINS/src/iptv/patches/vdr-1.5.x-iptv.patch
+cp sources.conf /path/to/vdrconf/
 make
 make plugins
 ./vdr -P iptv
