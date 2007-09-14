@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.10 2007/09/14 18:02:22 ajhseppa Exp $
+ * $Id: device.c,v 1.11 2007/09/14 21:36:05 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -77,14 +77,14 @@ cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, cIptvPro
      *Protocol = pUdpProtocol;
      return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
      }
-  else if (sscanf(Param, "IPTV-RTSP-%u.%u.%u.%u-%u", &a, &b, &c, &d, IpPort) == 5) {
-     *Protocol = NULL; // pRtspProtocol;
-     return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
-     }
-  else if (sscanf(Param, "IPTV-HTTP-%u.%u.%u.%u-%u", &a, &b, &c, &d, IpPort) == 5) {
-     *Protocol = NULL; // pHttpProtocol;
-     return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
-     }
+  //else if (sscanf(Param, "IPTV-RTSP-%u.%u.%u.%u-%u", &a, &b, &c, &d, IpPort) == 5) {
+  //   *Protocol = pRtspProtocol;
+  //   return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
+  //   }
+  //else if (sscanf(Param, "IPTV-HTTP-%u.%u.%u.%u-%u", &a, &b, &c, &d, IpPort) == 5) {
+  //   *Protocol = pHttpProtocol;
+  //   return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
+  //   }
   return NULL;
 }
 
@@ -127,32 +127,31 @@ bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
 
   debug("cIptvDevice::SetChannelDevice(%d)\n", deviceIndex);
   addr = GetChannelSettings(Channel->Param(), &port, &protocol);
-  if (addr)
-     pIptvStreamer->Set(addr, port, protocol);
+  if (isempty(addr)) {
+     error("ERROR: Unrecognized IPTV channel settings: %d", Channel->Param());
+     return false;
+     }
+  pIptvStreamer->Set(addr, port, protocol);
   return true;
 }
 
 bool cIptvDevice::SetPid(cPidHandle *Handle, int Type, bool On)
 {
-  debug("cIptvDevice::SetPid(%d)\n", deviceIndex);
+  debug("cIptvDevice::SetPid(%d) Type=%d On=%d\n", deviceIndex, Type, On);
   return true;
 }
 
 int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
 {
   int pipeDesc[2];
-
   debug("cIptvDevice::OpenFilter(): Pid=%d Tid=%02X Mask=%02X\n", Pid, Tid, Mask);
-
   // Create a pipe
   if (pipe(pipeDesc) < 0) {
-    char tmp[64];
-    error("ERROR: pipe(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-  }
-
+     char tmp[64];
+     error("ERROR: pipe(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+     }
   // Write pipe is used by the pid filtering class
-  // cReceiver Filter(pipeDesc[1], Pid, Tid, Mask)
-
+  // cIptvSectionFilter Filter(pipeDesc[1], Pid, Tid, Mask)
   // Give the read pipe to vdr
   return pipeDesc[0];
 }
