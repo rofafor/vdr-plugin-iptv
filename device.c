@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.9 2007/09/14 16:17:52 rahrenbe Exp $
+ * $Id: device.c,v 1.10 2007/09/14 18:02:22 ajhseppa Exp $
  */
 
 #include "common.h"
@@ -140,8 +140,21 @@ bool cIptvDevice::SetPid(cPidHandle *Handle, int Type, bool On)
 
 int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
 {
+  int pipeDesc[2];
+
   debug("cIptvDevice::OpenFilter(): Pid=%d Tid=%02X Mask=%02X\n", Pid, Tid, Mask);
-  return -1;
+
+  // Create a pipe
+  if (pipe(pipeDesc) < 0) {
+    char tmp[64];
+    error("ERROR: pipe(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+  }
+
+  // Write pipe is used by the pid filtering class
+  // cReceiver Filter(pipeDesc[1], Pid, Tid, Mask)
+
+  // Give the read pipe to vdr
+  return pipeDesc[0];
 }
 
 bool cIptvDevice::OpenDvr(void)
