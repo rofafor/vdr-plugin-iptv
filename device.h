@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.4 2007/09/14 15:44:25 rahrenbe Exp $
+ * $Id: device.h,v 1.5 2007/09/14 16:10:44 rahrenbe Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -59,6 +59,9 @@ protected:
   virtual bool OpenDvr(void);
   virtual void CloseDvr(void);
   virtual bool GetTSPacket(uchar *&Data);
+
+  // for section filtering
+  virtual int OpenFilter(u_short Pid, u_char Tid, u_char Mask);
 };
 
 #endif // __IPTV_DEVICE_H

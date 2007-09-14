@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.7 2007/09/14 15:44:25 rahrenbe Exp $
+ * $Id: device.c,v 1.8 2007/09/14 16:10:44 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -136,6 +136,12 @@ bool cIptvDevice::SetPid(cPidHandle *Handle, int Type, bool On)
 {
   debug("cIptvDevice::SetPid(%d)\n", deviceIndex);
   return true;
+}
+
+int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
+{
+  debug("cIptvDevice::OpenFilter(): Pid=%d Tid=%02X Mask=%02X\n", Pid, Tid, Mask);
+  return 0;
 }
 
 bool cIptvDevice::OpenDvr(void)
