@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.h,v 1.1 2007/09/14 15:44:25 rahrenbe Exp $
+ * $Id: protocoludp.h,v 1.2 2007/09/15 20:33:15 rahrenbe Exp $
  */
 
 #ifndef __IPTV_PROTOCOLUDP_H
@@ -17,6 +17,8 @@ private:
   char* streamAddr;
   int streamPort;
   int socketDesc;
+  unsigned char* readBuffer;
+  unsigned int readBufferLen;
   struct sockaddr_in sockAddr;
   bool mcastActive;
 
@@ -29,7 +31,7 @@ private:
 public:
   cIptvProtocolUdp();
   virtual ~cIptvProtocolUdp();
-  virtual int Read(unsigned char *Buffer, int Len);
+  virtual int Read(unsigned char *Buffer);
   virtual bool Set(const char* Address, const int Port);
   virtual bool Open(void);
   virtual bool Close(void);

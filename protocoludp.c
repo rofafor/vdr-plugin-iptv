@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.c,v 1.1 2007/09/14 15:44:25 rahrenbe Exp $
+ * $Id: protocoludp.c,v 1.2 2007/09/15 20:33:15 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -12,16 +12,23 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <vdr/device.h>
+
 #include "common.h"
 #include "protocoludp.h"
 
 cIptvProtocolUdp::cIptvProtocolUdp()
 : streamPort(1234),
   socketDesc(-1),
+  readBufferLen(TS_SIZE * 7),
   mcastActive(false)
 {
   debug("cIptvProtocolUdp::cIptvProtocolUdp()\n");
   streamAddr = strdup("");
+  // Allocate receive buffer
+  readBuffer = MALLOC(unsigned char, readBufferLen);
+  if (!readBuffer)
+     error("ERROR: MALLOC() failed in ProtocolUdp()");
 }
 
 cIptvProtocolUdp::~cIptvProtocolUdp()
@@ -31,6 +38,7 @@ cIptvProtocolUdp::~cIptvProtocolUdp()
   Close();
   // Free allocated memory
   free(streamAddr);
+  free(readBuffer);
 }
 
 bool cIptvProtocolUdp::OpenSocket(const int Port)
@@ -143,10 +151,11 @@ bool cIptvProtocolUdp::DropMulticast(void)
   return true;
 }
 
-int cIptvProtocolUdp::Read(unsigned char *Buffer, int Len)
+int cIptvProtocolUdp::Read(unsigned char *Buffer)
 {
   //debug("cIptvProtocolUdp::Read()\n");
   socklen_t addrlen = sizeof(sockAddr);
+  Buffer = readBuffer;
   // Wait for data
   struct timeval tv;
   tv.tv_sec = 0;
@@ -165,7 +174,7 @@ int cIptvProtocolUdp::Read(unsigned char *Buffer, int Len)
   // Check if data available
   else if (retval) {
      // Read data from socket
-     return recvfrom(socketDesc, Buffer, Len, MSG_DONTWAIT,
+     return recvfrom(socketDesc, readBuffer, readBufferLen, MSG_DONTWAIT,
                      (struct sockaddr *)&sockAddr, &addrlen);
      }
   return 0;
@@ -203,4 +212,3 @@ bool cIptvProtocolUdp::Set(const char* Address, const int Port)
     }
   return true;
 }
-
