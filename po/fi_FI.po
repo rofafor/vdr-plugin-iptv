@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.5.7\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2007-08-12 23:22+0300\n"
+"POT-Creation-Date: 2007-09-15 18:35+0300\n"
 "PO-Revision-Date: 2007-08-12 23:22+0300\n"
 "Last-Translator: Rolf Ahrenberg\n"
 "Language-Team: <vdr@linuxtv.org>\n"
@@ -15,6 +15,10 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-15\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: iptv.c:15
+#: iptv.c:17
 msgid "Experiment the IPTV"
 msgstr "Koe IPTV:n ihmeellinen maailma"
+
+#: setup.c:23
+msgid "Buffer size [MB]"
+msgstr "Puskurin koko [MB]"

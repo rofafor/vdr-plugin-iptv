@@ -3,10 +3,11 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.12 2007/09/15 15:02:33 rahrenbe Exp $
+ * $Id: device.c,v 1.13 2007/09/15 15:38:38 rahrenbe Exp $
  */
 
 #include "common.h"
+#include "config.h"
 #include "device.h"
 
 #define IPTV_MAX_DEVICES 8
@@ -22,7 +23,7 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   mutex()
 {
   debug("cIptvDevice::cIptvDevice(%d)\n", deviceIndex);
-  tsBuffer = new cRingBufferLinear(MEGABYTE(8), TS_SIZE * 2, false, "IPTV");
+  tsBuffer = new cRingBufferLinear(MEGABYTE(IptvConfig.GetBufferSizeMB()), TS_SIZE * 2, false, "IPTV");
   //tsBuffer->SetTimeouts(100, 100);
   pUdpProtocol = new cIptvProtocolUdp();
   //pRtspProtocol = new cIptvProtocolRtsp();

@@ -3,12 +3,14 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.2 2007/09/15 15:02:33 rahrenbe Exp $
+ * $Id: iptv.c,v 1.3 2007/09/15 15:38:38 rahrenbe Exp $
  */
 
 #include <getopt.h>
 #include <vdr/plugin.h>
 #include "common.h"
+#include "config.h"
+#include "setup.h"
 #include "device.h"
 
 static const char *VERSION        = "0.0.1";
@@ -145,14 +147,18 @@ cMenuSetupPage *cPluginIptv::SetupMenu(void)
 {
   debug("cPluginIptv::SetupMenu()\n");
   // Return a setup menu in case the plugin supports one.
-  return NULL;
+  return new cIptvPluginSetup();
 }
 
 bool cPluginIptv::SetupParse(const char *Name, const char *Value)
 {
   debug("cPluginIptv::SetupParse()\n");
   // Parse your own setup parameters and store their values.
-  return false;
+  if (!strcasecmp(Name, "BufferSize"))
+     IptvConfig.SetBufferSizeMB(atoi(Value));
+  else
+     return false;
+  return true;
 }
 
 bool cPluginIptv::Service(const char *Id, void *Data)
