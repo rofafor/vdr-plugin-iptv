@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.c,v 1.3 2007/09/15 21:27:00 rahrenbe Exp $
+ * $Id: protocoludp.c,v 1.4 2007/09/15 23:58:23 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -155,7 +155,8 @@ int cIptvProtocolUdp::Read(unsigned char* *BufferAddr)
 {
   //debug("cIptvProtocolUdp::Read()\n");
   socklen_t addrlen = sizeof(sockAddr);
-  BufferAddr = &readBuffer;
+  // Set argument point to read buffer
+  *BufferAddr = readBuffer;
   // Wait for data
   struct timeval tv;
   tv.tv_sec = 0;
@@ -182,7 +183,7 @@ int cIptvProtocolUdp::Read(unsigned char* *BufferAddr)
 
 bool cIptvProtocolUdp::Open(void)
 {
-  debug("cIptvProtocolUdp::Open(): streamAddr = %s\n", streamAddr);
+  debug("cIptvProtocolUdp::Open(): streamAddr=%s\n", streamAddr);
   // Join a new multicast group
   JoinMulticast();
   return true;
@@ -190,7 +191,7 @@ bool cIptvProtocolUdp::Open(void)
 
 bool cIptvProtocolUdp::Close(void)
 {
-  debug("cIptvProtocolUdp::Close(): streamAddr = %s\n", streamAddr);
+  debug("cIptvProtocolUdp::Close(): streamAddr=%s\n", streamAddr);
   // Drop the multicast group
   DropMulticast();
   // Close the socket

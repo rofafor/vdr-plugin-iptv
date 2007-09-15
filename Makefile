@@ -1,10 +1,10 @@
 #
 # Makefile for a Video Disk Recorder plugin
 #
-# $Id: Makefile,v 1.3 2007/09/15 15:38:38 rahrenbe Exp $
+# $Id: Makefile,v 1.4 2007/09/15 23:58:23 rahrenbe Exp $
 
 # Debugging on/off 
-IPTV_DEBUG = 1
+#IPTV_DEBUG = 1
 
 # Strip debug symbols?  Set eg. to /bin/true if not
 STRIP = strip

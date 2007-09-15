@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.2 2007/09/15 21:27:00 rahrenbe Exp $
+ * $Id: setup.c,v 1.3 2007/09/15 23:58:23 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -21,7 +21,7 @@ void cIptvPluginSetup::Setup(void)
 {
   int current = Current();
   Clear();
-  Add(new cMenuEditIntItem(tr("Buffer size [MB]"), &bufferSize, 0, 16));
+  Add(new cMenuEditIntItem(tr("Buffer size [MB]"), &bufferSize, 2, 16));
   Add(new cMenuEditIntItem(tr("Buffer prefill ratio [%]"), &bufferPrefill, 0, 40));
   SetCurrent(Get(current));
   Display();
