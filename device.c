@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.11 2007/09/14 21:36:05 rahrenbe Exp $
+ * $Id: device.c,v 1.12 2007/09/15 15:02:33 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -22,8 +22,8 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   mutex()
 {
   debug("cIptvDevice::cIptvDevice(%d)\n", deviceIndex);
-  tsBuffer = new cRingBufferLinear(MEGABYTE(8), TS_SIZE, false, "IPTV");
-  tsBuffer->SetTimeouts(100, 100);
+  tsBuffer = new cRingBufferLinear(MEGABYTE(8), TS_SIZE * 2, false, "IPTV");
+  //tsBuffer->SetTimeouts(100, 100);
   pUdpProtocol = new cIptvProtocolUdp();
   //pRtspProtocol = new cIptvProtocolRtsp();
   //pHttpProtocol = new cIptvProtocolHttp();
@@ -128,7 +128,7 @@ bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
   debug("cIptvDevice::SetChannelDevice(%d)\n", deviceIndex);
   addr = GetChannelSettings(Channel->Param(), &port, &protocol);
   if (isempty(addr)) {
-     error("ERROR: Unrecognized IPTV channel settings: %d", Channel->Param());
+     error("ERROR: Unrecognized IPTV channel settings: %s", Channel->Param());
      return false;
      }
   pIptvStreamer->Set(addr, port, protocol);
