@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.13 2007/09/15 15:38:38 rahrenbe Exp $
+ * $Id: device.c,v 1.14 2007/09/15 17:15:37 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -24,7 +24,7 @@ cIptvDevice::cIptvDevice(unsigned int Index)
 {
   debug("cIptvDevice::cIptvDevice(%d)\n", deviceIndex);
   tsBuffer = new cRingBufferLinear(MEGABYTE(IptvConfig.GetBufferSizeMB()), TS_SIZE * 2, false, "IPTV");
-  //tsBuffer->SetTimeouts(100, 100);
+  tsBuffer->SetTimeouts(100, 100);
   pUdpProtocol = new cIptvProtocolUdp();
   //pRtspProtocol = new cIptvProtocolRtsp();
   //pHttpProtocol = new cIptvProtocolHttp();
