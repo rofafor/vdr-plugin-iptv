@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.5 2007/09/14 16:10:44 rahrenbe Exp $
+ * $Id: device.h,v 1.6 2007/09/15 21:27:00 rahrenbe Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -29,6 +29,7 @@ private:
   bool isPacketDelivered;
   bool isOpenDvr;
   cRingBufferLinear *tsBuffer;
+  int tsBufferPrefill;
   cIptvProtocolUdp *pUdpProtocol;
   //cIptvProtocolRtsp *pRtspProtocol;
   //cIptvProtocolHttp *pHttpProtocol;

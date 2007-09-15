@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.c,v 1.2 2007/09/15 20:33:15 rahrenbe Exp $
+ * $Id: protocoludp.c,v 1.3 2007/09/15 21:27:00 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -151,11 +151,11 @@ bool cIptvProtocolUdp::DropMulticast(void)
   return true;
 }
 
-int cIptvProtocolUdp::Read(unsigned char *Buffer)
+int cIptvProtocolUdp::Read(unsigned char* *BufferAddr)
 {
   //debug("cIptvProtocolUdp::Read()\n");
   socklen_t addrlen = sizeof(sockAddr);
-  Buffer = readBuffer;
+  BufferAddr = &readBuffer;
   // Wait for data
   struct timeval tv;
   tv.tv_sec = 0;

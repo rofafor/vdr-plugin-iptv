@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.14 2007/09/15 17:15:37 rahrenbe Exp $
+ * $Id: device.c,v 1.15 2007/09/15 21:27:00 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -23,8 +23,14 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   mutex()
 {
   debug("cIptvDevice::cIptvDevice(%d)\n", deviceIndex);
-  tsBuffer = new cRingBufferLinear(MEGABYTE(IptvConfig.GetBufferSizeMB()), TS_SIZE * 2, false, "IPTV");
+  tsBuffer = new cRingBufferLinear(MEGABYTE(IptvConfig.GetBufferSizeMB()),
+                                  (TS_SIZE * 2), false, "IPTV");
   tsBuffer->SetTimeouts(100, 100);
+  // pad prefill to multiple of TS_SIZE
+  tsBufferPrefill = MEGABYTE(IptvConfig.GetBufferSizeMB()) *
+                    IptvConfig.GetBufferPrefillRatio() / 100;
+  tsBufferPrefill -= (tsBufferPrefill % TS_SIZE);
+  //debug("Buffer=%dMB Prefill=%B\n", IptvConfig.GetBufferSizeMB(), tsBufferPrefill);
   pUdpProtocol = new cIptvProtocolUdp();
   //pRtspProtocol = new cIptvProtocolRtsp();
   //pHttpProtocol = new cIptvProtocolHttp();
@@ -65,7 +71,7 @@ cIptvDevice *cIptvDevice::Get(unsigned int DeviceIndex)
 {
   debug("cIptvDevice::Get()\n");
   if ((DeviceIndex > 0) && (DeviceIndex <= IPTV_MAX_DEVICES))
-      return IptvDevices[DeviceIndex - 1];
+     return IptvDevices[DeviceIndex - 1];
   return NULL;
 }
 
@@ -132,6 +138,10 @@ bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
      error("ERROR: Unrecognized IPTV channel settings: %s", Channel->Param());
      return false;
      }
+  // pad prefill to multiple of TS_SIZE
+  tsBufferPrefill = MEGABYTE(IptvConfig.GetBufferSizeMB()) *
+                    IptvConfig.GetBufferPrefillRatio() / 100;
+  tsBufferPrefill -= (tsBufferPrefill % TS_SIZE);
   pIptvStreamer->Set(addr, port, protocol);
   return true;
 }
@@ -180,6 +190,10 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
 {
   int Count = 0;
   //debug("cIptvDevice::GetTSPacket(%d)\n", deviceIndex);
+  if (tsBufferPrefill && tsBuffer->Available() < tsBufferPrefill)
+     return false;
+  else
+     tsBufferPrefill = 0;
   if (isPacketDelivered) {
      tsBuffer->Del(TS_SIZE);
      isPacketDelivered = false;
