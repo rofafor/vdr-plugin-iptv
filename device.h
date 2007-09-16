@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.8 2007/09/16 12:18:15 ajhseppa Exp $
+ * $Id: device.h,v 1.9 2007/09/16 13:11:19 rahrenbe Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -32,9 +32,9 @@ private:
   cRingBufferLinear *tsBuffer;
   int tsBufferPrefill;
   cIptvProtocolUdp *pUdpProtocol;
-  //cIptvProtocolRtsp *pRtspProtocol;
   cIptvProtocolHttp *pHttpProtocol;
   cIptvProtocolFile *pFileProtocol;
+  //cIptvProtocolRtsp *pRtspProtocol;
   cIptvStreamer *pIptvStreamer;
   cMutex mutex;
 

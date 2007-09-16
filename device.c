@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.18 2007/09/16 12:18:15 ajhseppa Exp $
+ * $Id: device.c,v 1.19 2007/09/16 13:11:19 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -32,9 +32,9 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   tsBufferPrefill -= (tsBufferPrefill % TS_SIZE);
   //debug("Buffer=%d Prefill=%d\n", MEGABYTE(IptvConfig.GetBufferSizeMB()), tsBufferPrefill);
   pUdpProtocol = new cIptvProtocolUdp();
-  //pRtspProtocol = new cIptvProtocolRtsp();
   pHttpProtocol = new cIptvProtocolHttp();
   pFileProtocol = new cIptvProtocolFile();
+  //pRtspProtocol = new cIptvProtocolRtsp();
   pIptvStreamer = new cIptvStreamer(tsBuffer, &mutex);
   StartSectionHandler();
 }
@@ -78,21 +78,32 @@ cIptvDevice *cIptvDevice::Get(unsigned int DeviceIndex)
 
 cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, cIptvProtocolIf* *Protocol)
 {
-  unsigned int a, b, c, d;
-
   debug("cIptvDevice::GetChannelSettings(%d)\n", deviceIndex);
-  if (sscanf(Param, "IPTV-UDP-%u.%u.%u.%u-%u", &a, &b, &c, &d, IpPort) == 5) {
+  char *loc = NULL;
+  if (sscanf(Param, "IPTV|UDP|%a[^|]|%u", &loc, IpPort) == 5) {
+     cString addr(loc, true);
+     free(loc);
      *Protocol = pUdpProtocol;
-     return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
+     return addr;
      }
-  //else if (sscanf(Param, "IPTV-RTSP-%u.%u.%u.%u-%u", &a, &b, &c, &d, IpPort) == 5) {
-  //   *Protocol = pRtspProtocol;
-  //   return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
-  //   }
-  else if (sscanf(Param, "IPTV-HTTP-%u.%u.%u.%u-%u", &a, &b, &c, &d, IpPort) == 5) {
+  else if (sscanf(Param, "IPTV|HTTP|%a[^|]|%u", &loc, IpPort) == 5) {
+     cString addr(loc, true);
+     free(loc);
      *Protocol = pHttpProtocol;
-     return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
+     return addr;
      }
+  //else if (sscanf(Param, "IPTV|FILE|%a[^|]|%u", &loc, IpPort) == 5) {
+  //   cString addr(loc, true);
+  //   free(loc);
+  //   *Protocol = pFileProtocol;
+  //   return addr;
+  //   }
+  //else if (sscanf(Param, "IPTV|RTSP|%a[^|]|%u", &loc, IpPort) == 5) {
+  //   cString addr(loc, true);
+  //   free(loc);
+  //   *Protocol = pRtspProtocol;
+  //   return addr;
+  //   }
   return NULL;
 }
 
