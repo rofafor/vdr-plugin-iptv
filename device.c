@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.19 2007/09/16 13:11:19 rahrenbe Exp $
+ * $Id: device.c,v 1.20 2007/09/16 13:38:20 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -23,18 +23,17 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   mutex()
 {
   debug("cIptvDevice::cIptvDevice(%d)\n", deviceIndex);
-  tsBuffer = new cRingBufferLinear(MEGABYTE(IptvConfig.GetBufferSizeMB()),
+  tsBuffer = new cRingBufferLinear(MEGABYTE(IptvConfig.GetTsBufferSize()),
                                   (TS_SIZE * 2), false, "IPTV");
   tsBuffer->SetTimeouts(100, 100);
   // pad prefill to multiple of TS_SIZE
-  tsBufferPrefill = MEGABYTE(IptvConfig.GetBufferSizeMB()) *
-                    IptvConfig.GetBufferPrefillRatio() / 100;
+  tsBufferPrefill = MEGABYTE(IptvConfig.GetTsBufferSize()) *
+                    IptvConfig.GetTsBufferPrefillRatio() / 100;
   tsBufferPrefill -= (tsBufferPrefill % TS_SIZE);
-  //debug("Buffer=%d Prefill=%d\n", MEGABYTE(IptvConfig.GetBufferSizeMB()), tsBufferPrefill);
+  //debug("Buffer=%d Prefill=%d\n", MEGABYTE(IptvConfig.GetTsBufferSize()), tsBufferPrefill);
   pUdpProtocol = new cIptvProtocolUdp();
   pHttpProtocol = new cIptvProtocolHttp();
   pFileProtocol = new cIptvProtocolFile();
-  //pRtspProtocol = new cIptvProtocolRtsp();
   pIptvStreamer = new cIptvStreamer(tsBuffer, &mutex);
   StartSectionHandler();
 }
@@ -92,18 +91,12 @@ cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, cIptvPro
      *Protocol = pHttpProtocol;
      return addr;
      }
-  //else if (sscanf(Param, "IPTV|FILE|%a[^|]|%u", &loc, IpPort) == 5) {
-  //   cString addr(loc, true);
-  //   free(loc);
-  //   *Protocol = pFileProtocol;
-  //   return addr;
-  //   }
-  //else if (sscanf(Param, "IPTV|RTSP|%a[^|]|%u", &loc, IpPort) == 5) {
-  //   cString addr(loc, true);
-  //   free(loc);
-  //   *Protocol = pRtspProtocol;
-  //   return addr;
-  //   }
+  else if (sscanf(Param, "IPTV|FILE|%a[^|]|%u", &loc, IpPort) == 5) {
+     cString addr(loc, true);
+     free(loc);
+     *Protocol = pFileProtocol;
+     return addr;
+     }
   return NULL;
 }
 
@@ -151,8 +144,8 @@ bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
      return false;
      }
   // pad prefill to multiple of TS_SIZE
-  tsBufferPrefill = MEGABYTE(IptvConfig.GetBufferSizeMB()) *
-                    IptvConfig.GetBufferPrefillRatio() / 100;
+  tsBufferPrefill = MEGABYTE(IptvConfig.GetTsBufferSize()) *
+                    IptvConfig.GetTsBufferPrefillRatio() / 100;
   tsBufferPrefill -= (tsBufferPrefill % TS_SIZE);
   pIptvStreamer->Set(addr, port, protocol);
   return true;

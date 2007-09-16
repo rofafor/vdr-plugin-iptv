@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolfile.c,v 1.1 2007/09/16 12:18:15 ajhseppa Exp $
+ * $Id: protocolfile.c,v 1.2 2007/09/16 13:38:20 rahrenbe Exp $
  */
 
 #include <fcntl.h>
@@ -12,14 +12,16 @@
 #include <vdr/device.h>
 
 #include "common.h"
+#include "config.h"
 #include "protocolfile.h"
 
 cIptvProtocolFile::cIptvProtocolFile()
 : fileDesc(-1),
-  readBufferLen(TS_SIZE * 7),
+  readBufferLen(TS_SIZE * IptvConfig.GetFileBufferSize()),
   fileActive(false)
 {
-  debug("cIptvProtocolFile::cIptvProtocolFile()\n");
+  debug("cIptvProtocolFile::cIptvProtocolFile(): readBufferLen=%d (%d)\n",
+        readBufferLen, (readBufferLen / TS_SIZE));
   streamAddr = strdup("");
   // Allocate receive buffer
   readBuffer = MALLOC(unsigned char, readBufferLen);

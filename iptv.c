@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.4 2007/09/15 23:58:23 rahrenbe Exp $
+ * $Id: iptv.c,v 1.5 2007/09/16 13:38:20 rahrenbe Exp $
  */
 
 #include <getopt.h>
@@ -154,10 +154,16 @@ bool cPluginIptv::SetupParse(const char *Name, const char *Value)
 {
   debug("cPluginIptv::SetupParse()\n");
   // Parse your own setup parameters and store their values.
-  if (!strcasecmp(Name, "BufferSize"))
-     IptvConfig.SetBufferSizeMB(atoi(Value));
-  else if (!strcasecmp(Name, "BufferPrefill"))
-     IptvConfig.SetBufferPrefillRatio(atoi(Value));
+  if (!strcasecmp(Name, "TsBufferSize"))
+     IptvConfig.SetTsBufferSize(atoi(Value));
+  else if (!strcasecmp(Name, "TsBufferPrefill"))
+     IptvConfig.SetTsBufferPrefillRatio(atoi(Value));
+  else if (!strcasecmp(Name, "UdpBufferSize"))
+     IptvConfig.SetUdpBufferSize(atoi(Value));
+  else if (!strcasecmp(Name, "HttpBufferSize"))
+     IptvConfig.SetHttpBufferSize(atoi(Value));
+  else if (!strcasecmp(Name, "FileBufferSize"))
+     IptvConfig.SetFileBufferSize(atoi(Value));
   else
      return false;
   return true;

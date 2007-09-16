@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.c,v 1.4 2007/09/15 23:58:23 rahrenbe Exp $
+ * $Id: protocoludp.c,v 1.5 2007/09/16 13:38:20 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -15,15 +15,17 @@
 #include <vdr/device.h>
 
 #include "common.h"
+#include "config.h"
 #include "protocoludp.h"
 
 cIptvProtocolUdp::cIptvProtocolUdp()
 : streamPort(1234),
   socketDesc(-1),
-  readBufferLen(TS_SIZE * 7),
+  readBufferLen(TS_SIZE * IptvConfig.GetUdpBufferSize()),
   mcastActive(false)
 {
-  debug("cIptvProtocolUdp::cIptvProtocolUdp()\n");
+  debug("cIptvProtocolUdp::cIptvProtocolUdp(): readBufferLen=%d (%d)\n",
+        readBufferLen, (readBufferLen / TS_SIZE));
   streamAddr = strdup("");
   // Allocate receive buffer
   readBuffer = MALLOC(unsigned char, readBufferLen);

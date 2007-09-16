@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.1 2007/09/16 09:38:01 ajhseppa Exp $
+ * $Id: protocolhttp.c,v 1.2 2007/09/16 13:38:20 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -15,15 +15,17 @@
 #include <vdr/device.h>
 
 #include "common.h"
+#include "config.h"
 #include "protocolhttp.h"
 
 cIptvProtocolHttp::cIptvProtocolHttp()
 : streamPort(1234),
   socketDesc(-1),
-  readBufferLen(TS_SIZE * 7),
+  readBufferLen(TS_SIZE * IptvConfig.GetHttpBufferSize()),
   unicastActive(false)
 {
-  debug("cIptvProtocolHttp::cIptvProtocolHttp()\n");
+  debug("cIptvProtocolHttp::cIptvProtocolHttp(): readBufferLen=%d (%d)\n",
+        readBufferLen, (readBufferLen / TS_SIZE));
   streamAddr = strdup("");
   // Allocate receive buffer
   readBuffer = MALLOC(unsigned char, readBufferLen);
