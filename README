@@ -49,6 +49,11 @@ TV1;IPTV:1:IPTV|UDP|192.168.0.1|1234:P:27500:512:650:2321:0:17:8438:4097:0
 TV2;IPTV:2:IPTV|HTTP|127.0.0.1/TS/2|8080:P:27500:513:660:2321:0:33:8438:4097:0
 TV3;IPTV:2:IPTV|FILE|/media/video.ts|8080:P:27500:513:660:2321:0:33:8438:4097:0
 
-Notes:
 
-- Remember to open IGMP in the firewall for multicast streams
+Example UDP multicast configuration for iptables firewall:
+
+  # Multicast UDP -packets
+  iptables -A INPUT -i eth0 -p udp -d 224.0.0.0/4 --dport 1234 -j ACCEPT
+
+  # IGMP required by multicasts
+  iptables -A INPUT -i eth0 -p igmp -d 224.0.0.0/4 -j ACCEPT
