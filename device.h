@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.7 2007/09/16 09:38:01 ajhseppa Exp $
+ * $Id: device.h,v 1.8 2007/09/16 12:18:15 ajhseppa Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -13,6 +13,7 @@
 #include "protocoludp.h"
 //#include "protocolrtsp.h"
 #include "protocolhttp.h"
+#include "protocolfile.h"
 #include "streamer.h"
 
 class cIptvDevice : public cDevice {
@@ -33,6 +34,7 @@ private:
   cIptvProtocolUdp *pUdpProtocol;
   //cIptvProtocolRtsp *pRtspProtocol;
   cIptvProtocolHttp *pHttpProtocol;
+  cIptvProtocolFile *pFileProtocol;
   cIptvStreamer *pIptvStreamer;
   cMutex mutex;
 

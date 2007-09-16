@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.17 2007/09/16 09:38:01 ajhseppa Exp $
+ * $Id: device.c,v 1.18 2007/09/16 12:18:15 ajhseppa Exp $
  */
 
 #include "common.h"
@@ -34,6 +34,7 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   pUdpProtocol = new cIptvProtocolUdp();
   //pRtspProtocol = new cIptvProtocolRtsp();
   pHttpProtocol = new cIptvProtocolHttp();
+  pFileProtocol = new cIptvProtocolFile();
   pIptvStreamer = new cIptvStreamer(tsBuffer, &mutex);
   StartSectionHandler();
 }
