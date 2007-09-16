@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolfile.c,v 1.3 2007/09/16 14:47:01 ajhseppa Exp $
+ * $Id: protocolfile.c,v 1.4 2007/09/16 17:31:38 rahrenbe Exp $
  */
 
 #include <fcntl.h>
@@ -43,8 +43,7 @@ bool cIptvProtocolFile::OpenFile(void)
   debug("cIptvProtocolFile::OpenFile()\n");
   // Check that stream address is valid
   if (!fileActive && !isempty(streamAddr)) {
-
-    fileStream = fopen(streamAddr, "rb");
+     fileStream = fopen(streamAddr, "rb");
      if (ferror(fileStream) || !fileStream) {
         char tmp[64];
         error("ERROR: fopen(): %s", strerror_r(errno, tmp, sizeof(tmp)));
@@ -59,10 +58,10 @@ bool cIptvProtocolFile::OpenFile(void)
 void cIptvProtocolFile::CloseFile(void)
 {
   debug("cIptvProtocolFile::CloseFile()\n");
-  // Check that stream address is valid
+  // Check that file stream is valid
   if (fileActive && !isempty(streamAddr)) {
      fclose(fileStream);
-     // Update multicasting flag
+     // Update active flag
      fileActive = false;
      }
 }
@@ -71,21 +70,22 @@ int cIptvProtocolFile::Read(unsigned char* *BufferAddr)
 {
    //debug("cIptvProtocolFile::Read()\n");
    *BufferAddr = readBuffer;
-   if(ferror(fileStream)) {
-     debug("Read error\n");
-     return -1;
-   }
-   if(feof(fileStream)) {
-     rewind(fileStream);
-     return -1;
-   }
+   // Check errors
+   if (ferror(fileStream)) {
+      debug("Read error\n");
+      return -1;
+      }
+   // Rewind if EOF
+   if (feof(fileStream))
+      rewind(fileStream);
+   // Read the file stream
    return fread(readBuffer, sizeof(unsigned char), readBufferLen, fileStream);
 }
 
 bool cIptvProtocolFile::Open(void)
 {
   debug("cIptvProtocolFile::Open(): streamAddr=%s\n", streamAddr);
-  // Open the file for input
+  // Open the file stream
   OpenFile();
   return true;
 }
@@ -93,7 +93,7 @@ bool cIptvProtocolFile::Open(void)
 bool cIptvProtocolFile::Close(void)
 {
   debug("cIptvProtocolFile::Close(): streamAddr=%s\n", streamAddr);
-  // Close the file input
+  // Close the file stream
   CloseFile();
   return true;
 }
@@ -102,13 +102,13 @@ bool cIptvProtocolFile::Set(const char* Address, const int Port)
 {
   debug("cIptvProtocolFile::Set(): %s:%d\n", Address, Port);
   if (!isempty(Address)) {
-    // Close the file input
-    CloseFile();
-    // Update stream address and port
-    streamAddr = strcpyrealloc(streamAddr, Address);
-    streamPort = Port;
-    // Open the file for input
-    OpenFile();
-    }
+     // Close the file stream
+     CloseFile();
+     // Update stream address and port
+     streamAddr = strcpyrealloc(streamAddr, Address);
+     streamPort = Port;
+     // Open the file for input
+     OpenFile();
+     }
   return true;
 }
