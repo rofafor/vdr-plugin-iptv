@@ -3,13 +3,17 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.4 2007/09/16 13:38:20 rahrenbe Exp $
+ * $Id: setup.c,v 1.5 2007/09/16 13:49:35 rahrenbe Exp $
  */
 
 #include "common.h"
 #include "config.h"
 #include "setup.h"
 
+#ifndef trVDR
+#define trVDR(s) tr(s)
+#endif
+	
 cIptvPluginSetup::cIptvPluginSetup(void)
 {
   tsBufferSize = IptvConfig.GetTsBufferSize();
