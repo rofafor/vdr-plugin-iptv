@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.21 2007/09/16 13:44:09 rahrenbe Exp $
+ * $Id: device.c,v 1.22 2007/09/16 16:03:24 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -81,19 +81,16 @@ cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, cIptvPro
   char *loc = NULL;
   if (sscanf(Param, "IPTV|UDP|%a[^|]|%u", &loc, IpPort) == 2) {
      cString addr(loc, true);
-     free(loc);
      *Protocol = pUdpProtocol;
      return addr;
      }
   else if (sscanf(Param, "IPTV|HTTP|%a[^|]|%u", &loc, IpPort) == 2) {
      cString addr(loc, true);
-     free(loc);
      *Protocol = pHttpProtocol;
      return addr;
      }
   else if (sscanf(Param, "IPTV|FILE|%a[^|]|%u", &loc, IpPort) == 2) {
      cString addr(loc, true);
-     free(loc);
      *Protocol = pFileProtocol;
      return addr;
      }
