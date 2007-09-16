@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.16 2007/09/15 23:58:23 rahrenbe Exp $
+ * $Id: device.c,v 1.17 2007/09/16 09:38:01 ajhseppa Exp $
  */
 
 #include "common.h"
@@ -33,7 +33,7 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   //debug("Buffer=%d Prefill=%d\n", MEGABYTE(IptvConfig.GetBufferSizeMB()), tsBufferPrefill);
   pUdpProtocol = new cIptvProtocolUdp();
   //pRtspProtocol = new cIptvProtocolRtsp();
-  //pHttpProtocol = new cIptvProtocolHttp();
+  pHttpProtocol = new cIptvProtocolHttp();
   pIptvStreamer = new cIptvStreamer(tsBuffer, &mutex);
   StartSectionHandler();
 }
@@ -88,10 +88,10 @@ cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, cIptvPro
   //   *Protocol = pRtspProtocol;
   //   return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
   //   }
-  //else if (sscanf(Param, "IPTV-HTTP-%u.%u.%u.%u-%u", &a, &b, &c, &d, IpPort) == 5) {
-  //   *Protocol = pHttpProtocol;
-  //   return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
-  //   }
+  else if (sscanf(Param, "IPTV-HTTP-%u.%u.%u.%u-%u", &a, &b, &c, &d, IpPort) == 5) {
+     *Protocol = pHttpProtocol;
+     return cString::sprintf("%u.%u.%u.%u", a, b, c, d);
+     }
   return NULL;
 }
 
