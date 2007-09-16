@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolfile.c,v 1.2 2007/09/16 13:38:20 rahrenbe Exp $
+ * $Id: protocolfile.c,v 1.3 2007/09/16 14:47:01 ajhseppa Exp $
  */
 
 #include <fcntl.h>
@@ -16,8 +16,7 @@
 #include "protocolfile.h"
 
 cIptvProtocolFile::cIptvProtocolFile()
-: fileDesc(-1),
-  readBufferLen(TS_SIZE * IptvConfig.GetFileBufferSize()),
+: readBufferLen(TS_SIZE * IptvConfig.GetFileBufferSize()),
   fileActive(false)
 {
   debug("cIptvProtocolFile::cIptvProtocolFile(): readBufferLen=%d (%d)\n",
@@ -45,10 +44,10 @@ bool cIptvProtocolFile::OpenFile(void)
   // Check that stream address is valid
   if (!fileActive && !isempty(streamAddr)) {
 
-     fileDesc = open(streamAddr, O_RDONLY | O_NOCTTY | O_NONBLOCK);
-     if (fileDesc < 0) {
+    fileStream = fopen(streamAddr, "rb");
+     if (ferror(fileStream) || !fileStream) {
         char tmp[64];
-        error("ERROR: open(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+        error("ERROR: fopen(): %s", strerror_r(errno, tmp, sizeof(tmp)));
         return false;
         }
      // Update active flag
@@ -62,7 +61,7 @@ void cIptvProtocolFile::CloseFile(void)
   debug("cIptvProtocolFile::CloseFile()\n");
   // Check that stream address is valid
   if (fileActive && !isempty(streamAddr)) {
-     close(fileDesc);
+     fclose(fileStream);
      // Update multicasting flag
      fileActive = false;
      }
@@ -71,8 +70,16 @@ void cIptvProtocolFile::CloseFile(void)
 int cIptvProtocolFile::Read(unsigned char* *BufferAddr)
 {
    //debug("cIptvProtocolFile::Read()\n");
-
-   return read(fileDesc, readBuffer, readBufferLen);
+   *BufferAddr = readBuffer;
+   if(ferror(fileStream)) {
+     debug("Read error\n");
+     return -1;
+   }
+   if(feof(fileStream)) {
+     rewind(fileStream);
+     return -1;
+   }
+   return fread(readBuffer, sizeof(unsigned char), readBufferLen, fileStream);
 }
 
 bool cIptvProtocolFile::Open(void)

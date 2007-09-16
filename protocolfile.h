@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolfile.h,v 1.1 2007/09/16 12:18:15 ajhseppa Exp $
+ * $Id: protocolfile.h,v 1.2 2007/09/16 14:47:01 ajhseppa Exp $
  */
 
 #ifndef __IPTV_PROTOCOLFILE_H
@@ -16,7 +16,7 @@ class cIptvProtocolFile : public cIptvProtocolIf {
 private:
   char* streamAddr;
   int streamPort;
-  int fileDesc;
+  FILE* fileStream;
   unsigned char* readBuffer;
   unsigned int readBufferLen;
   bool fileActive;
