@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.22 2007/09/16 16:03:24 rahrenbe Exp $
+ * $Id: device.c,v 1.23 2007/09/18 18:48:10 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -106,13 +106,13 @@ bool cIptvDevice::ProvidesIptv(const char *Param) const
 bool cIptvDevice::ProvidesSource(int Source) const
 {
   debug("cIptvDevice::ProvidesSource(%d)\n", deviceIndex);
-  return ((Source & cSource::st_Mask) == cSource::stPlug);
+  return (cSource::IsPlug(Source));
 }
 
 bool cIptvDevice::ProvidesTransponder(const cChannel *Channel) const
 {
   debug("cIptvDevice::ProvidesTransponder(%d)\n", deviceIndex);
-  return (ProvidesSource(Channel->Source()) && ProvidesIptv(Channel->Param()));
+  return (ProvidesSource(Channel->Source()) && ProvidesIptv(Channel->PluginParam()));
 }
 
 bool cIptvDevice::ProvidesChannel(const cChannel *Channel, int Priority, bool *NeedsDetachReceivers) const
@@ -135,9 +135,9 @@ bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
   cIptvProtocolIf *protocol;
 
   debug("cIptvDevice::SetChannelDevice(%d)\n", deviceIndex);
-  addr = GetChannelSettings(Channel->Param(), &port, &protocol);
+  addr = GetChannelSettings(Channel->PluginParam(), &port, &protocol);
   if (isempty(addr)) {
-     error("ERROR: Unrecognized IPTV channel settings: %s", Channel->Param());
+     error("ERROR: Unrecognized IPTV channel settings: %s", Channel->PluginParam());
      return false;
      }
   // pad prefill to multiple of TS_SIZE
