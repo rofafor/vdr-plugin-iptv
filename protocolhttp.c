@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.2 2007/09/16 13:38:20 rahrenbe Exp $
+ * $Id: protocolhttp.c,v 1.3 2007/09/19 17:14:03 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -11,6 +11,7 @@
 #include <netdb.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <string.h>
 
 #include <vdr/device.h>
 
@@ -27,6 +28,7 @@ cIptvProtocolHttp::cIptvProtocolHttp()
   debug("cIptvProtocolHttp::cIptvProtocolHttp(): readBufferLen=%d (%d)\n",
         readBufferLen, (readBufferLen / TS_SIZE));
   streamAddr = strdup("");
+  streamPath = strdup("/");
   // Allocate receive buffer
   readBuffer = MALLOC(unsigned char, readBufferLen);
   if (!readBuffer)
@@ -39,6 +41,7 @@ cIptvProtocolHttp::~cIptvProtocolHttp()
   // Close the socket
   Close();
   // Free allocated memory
+  free(streamPath);
   free(streamAddr);
   free(readBuffer);
 }
@@ -106,11 +109,11 @@ bool cIptvProtocolHttp::Connect(void)
 {
   debug("cIptvProtocolHttp::Connect()\n");
   // Check that stream address is valid
-  if (!unicastActive && !isempty(streamAddr)) {
+  if (!unicastActive && !isempty(streamAddr) && !isempty(streamPath)) {
      // Ensure that socket is valid
      OpenSocket(streamPort);
 
-     // First try only the IP -address
+     // First try only the IP address
      sockAddr.sin_addr.s_addr = inet_addr(streamAddr);
      
      if (sockAddr.sin_addr.s_addr == INADDR_NONE) {
@@ -167,7 +170,7 @@ bool cIptvProtocolHttp::Connect(void)
         return false;
         }
 
-     // Formulate and send HTTP -request
+     // Formulate and send HTTP request
      char buffer[256];
      memset(buffer, '\0', sizeof(buffer));
      snprintf(buffer, sizeof(buffer),
@@ -176,10 +179,9 @@ bool cIptvProtocolHttp::Connect(void)
 	      "User-Agent: vdr-iptv\r\n"
 	      "Range: bytes=0-\r\n"
 	      "Connection: Close\r\n"
-	      "\r\n", "/", streamAddr); // Hardcoding of file name must go!
+	      "\r\n", streamPath, streamAddr);
 
-     debug("Sending http -request: %s\n", buffer);
-     
+     //debug("Sending http request: %s\n", buffer);
      err = send(socketDesc, buffer, strlen(buffer), 0);
      if (err < 0) {
         char tmp[64];
@@ -193,7 +195,6 @@ bool cIptvProtocolHttp::Connect(void)
      // Also parsing the reply headers should happen here to see if the
      // connection should be re-located etc.
 
-
      // Update active flag
      unicastActive = true;
      }
@@ -204,16 +205,9 @@ bool cIptvProtocolHttp::Disconnect(void)
 {
   debug("cIptvProtocolHttp::Disconnect()\n");
   // Check that stream address is valid
-  if (unicastActive && !isempty(streamAddr)) {
-      // Ensure that socket is valid
-      OpenSocket(streamPort);
-
-      int err = close(socketDesc);
-      if (err < 0) {
-         char tmp[64];
-         error("ERROR: close(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-         return false;
-         }
+  if (unicastActive) {
+      // Close the socket
+      CloseSocket();
       // Update active flag
       unicastActive = false;
      }
@@ -262,8 +256,6 @@ bool cIptvProtocolHttp::Close(void)
   debug("cIptvProtocolHttp::Close(): streamAddr=%s\n", streamAddr);
   // Disconnect the current stream
   Disconnect();
-  // Close the socket
-  CloseSocket();
   return true;
 }
 
@@ -273,9 +265,17 @@ bool cIptvProtocolHttp::Set(const char* Address, const int Port)
   if (!isempty(Address)) {
     // Disconnect the current socket
     Disconnect();
-    // Update stream address and port
+    // Update stream address, path and port
     streamAddr = strcpyrealloc(streamAddr, Address);
+    char *path = strstr(streamAddr, "/");
+    if (path) {
+       streamPath = strcpyrealloc(streamPath, path);
+       *path = 0;
+       }
+    else
+       streamPath = strcpyrealloc(streamPath, "/");
     streamPort = Port;
+    debug("iptv://%s:%d%s\n", streamAddr, streamPort, streamPath);
     // Re-connect the socket
     Connect();
     }

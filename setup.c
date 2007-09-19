@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.6 2007/09/18 18:48:11 rahrenbe Exp $
+ * $Id: setup.c,v 1.7 2007/09/19 17:14:03 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -132,7 +132,7 @@ void cIptvMenuEditChannel::GetChannelData(cChannel *Channel)
      strn0cpy(data.name, "IPTV", sizeof(data.name));
      strn0cpy(data.location, "127.0.0.1", sizeof(data.location));
      data.protocol = eProtocolUDP;
-     data.port = 0;
+     data.port = 1234;
      }
 }
 
@@ -225,8 +225,24 @@ eOSState cIptvMenuEditChannel::ProcessKey(eKeys Key)
            }
         }
      }
-  if ((Key != kNone) && (data.protocol != oldProtocol))
+  if ((Key != kNone) && (data.protocol != oldProtocol)) {
+     switch (data.protocol) {
+       case eProtocolFILE:
+            strn0cpy(data.location, "/tmp/video.ts", sizeof(data.location));
+            data.port = 0;
+            break;
+       case eProtocolHTTP:
+            strn0cpy(data.location, "127.0.0.1/TS/1", sizeof(data.location));
+            data.port = 3000;
+            break;
+       default:
+       case eProtocolUDP:
+            strn0cpy(data.location, "127.0.0.1", sizeof(data.location));
+            data.port = 1234;
+            break;
+       }
      Setup();
+     }
   return state;
 }
 
