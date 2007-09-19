@@ -1,6 +1,6 @@
 diff -Nru vdr-1.5.9-vanilla/channels.c vdr-1.5.9-iptv/channels.c
 --- vdr-1.5.9-vanilla/channels.c	2007-08-26 18:45:20.000000000 +0300
-+++ vdr-1.5.9-iptv/channels.c	2007-09-18 19:36:45.000000000 +0300
++++ vdr-1.5.9-iptv/channels.c	2007-09-19 21:39:32.000000000 +0300
 @@ -166,6 +166,7 @@
    shortName = strdup("");
    provider = strdup("");
@@ -105,6 +105,15 @@ diff -Nru vdr-1.5.9-vanilla/channels.c vdr-1.5.9-iptv/channels.c
          switch (toupper(*s)) {
            case 'B': s = ParseParameter(s, bandwidth, BandwidthValues); break;
            case 'C': s = ParseParameter(s, coderateH, CoderateValues); break;
+@@ -722,7 +756,7 @@
+         dpids[0] = 0;
+         ok = false;
+         if (parambuf && sourcebuf && vpidbuf && apidbuf) {
+-           ok = StringToParameters(parambuf) && (source = cSource::FromString(sourcebuf)) >= 0;
++           ok = ((source = cSource::FromString(sourcebuf)) >= 0) && StringToParameters(parambuf);
+ 
+            char *p = strchr(vpidbuf, '+');
+            if (p)
 @@ -813,6 +847,7 @@
             shortName = strcpyrealloc(shortName, p);
             }
@@ -115,7 +124,7 @@ diff -Nru vdr-1.5.9-vanilla/channels.c vdr-1.5.9-iptv/channels.c
          free(sourcebuf);
 diff -Nru vdr-1.5.9-vanilla/channels.h vdr-1.5.9-iptv/channels.h
 --- vdr-1.5.9-vanilla/channels.h	2007-08-26 18:45:20.000000000 +0300
-+++ vdr-1.5.9-iptv/channels.h	2007-09-18 19:36:24.000000000 +0300
++++ vdr-1.5.9-iptv/channels.h	2007-09-19 21:38:57.000000000 +0300
 @@ -114,6 +114,7 @@
    char *shortName;
    char *provider;
@@ -157,7 +166,7 @@ diff -Nru vdr-1.5.9-vanilla/channels.h vdr-1.5.9-iptv/channels.h
    void SetCaDescriptors(int Level);
 diff -Nru vdr-1.5.9-vanilla/menu.c vdr-1.5.9-iptv/menu.c
 --- vdr-1.5.9-vanilla/menu.c	2007-08-26 18:45:20.000000000 +0300
-+++ vdr-1.5.9-iptv/menu.c	2007-09-18 19:36:24.000000000 +0300
++++ vdr-1.5.9-iptv/menu.c	2007-09-19 21:38:57.000000000 +0300
 @@ -219,6 +219,7 @@
    cChannel *channel;
    cChannel data;
@@ -192,7 +201,7 @@ diff -Nru vdr-1.5.9-vanilla/menu.c vdr-1.5.9-iptv/menu.c
                isyslog("edited channel %d %s", channel->Number(), *data.ToText());
 diff -Nru vdr-1.5.9-vanilla/po/fi_FI.po vdr-1.5.9-iptv/po/fi_FI.po
 --- vdr-1.5.9-vanilla/po/fi_FI.po	2007-08-26 18:45:20.000000000 +0300
-+++ vdr-1.5.9-iptv/po/fi_FI.po	2007-09-18 19:36:24.000000000 +0300
++++ vdr-1.5.9-iptv/po/fi_FI.po	2007-09-19 21:38:57.000000000 +0300
 @@ -1271,3 +1271,7 @@
  #, c-format
  msgid "VDR will shut down in %s minutes"
@@ -203,7 +212,7 @@ diff -Nru vdr-1.5.9-vanilla/po/fi_FI.po vdr-1.5.9-iptv/po/fi_FI.po
 +msgstr "Parametrit"
 diff -Nru vdr-1.5.9-vanilla/sources.c vdr-1.5.9-iptv/sources.c
 --- vdr-1.5.9-vanilla/sources.c	2007-08-26 18:45:20.000000000 +0300
-+++ vdr-1.5.9-iptv/sources.c	2007-09-18 19:36:24.000000000 +0300
++++ vdr-1.5.9-iptv/sources.c	2007-09-19 21:38:57.000000000 +0300
 @@ -37,6 +37,7 @@
    char buffer[16];
    char *q = buffer;
@@ -222,7 +231,7 @@ diff -Nru vdr-1.5.9-vanilla/sources.c vdr-1.5.9-iptv/sources.c
      case 'T': type = stTerr;  break;
 diff -Nru vdr-1.5.9-vanilla/sources.conf vdr-1.5.9-iptv/sources.conf
 --- vdr-1.5.9-vanilla/sources.conf	2007-08-26 18:45:20.000000000 +0300
-+++ vdr-1.5.9-iptv/sources.conf	2007-09-18 19:36:24.000000000 +0300
++++ vdr-1.5.9-iptv/sources.conf	2007-09-19 21:38:57.000000000 +0300
 @@ -188,3 +188,7 @@
  # Terrestrial
  
@@ -233,7 +242,7 @@ diff -Nru vdr-1.5.9-vanilla/sources.conf vdr-1.5.9-iptv/sources.conf
 +P       Plugin
 diff -Nru vdr-1.5.9-vanilla/sources.h vdr-1.5.9-iptv/sources.h
 --- vdr-1.5.9-vanilla/sources.h	2007-08-26 18:45:20.000000000 +0300
-+++ vdr-1.5.9-iptv/sources.h	2007-09-18 19:36:24.000000000 +0300
++++ vdr-1.5.9-iptv/sources.h	2007-09-19 21:38:57.000000000 +0300
 @@ -16,10 +16,11 @@
  public:
    enum eSourceType {
