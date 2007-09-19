@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.9 2007/09/16 13:11:19 rahrenbe Exp $
+ * $Id: device.h,v 1.10 2007/09/19 15:14:32 ajhseppa Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -15,6 +15,16 @@
 #include "protocolhttp.h"
 #include "protocolfile.h"
 #include "streamer.h"
+
+#include "pidfilter.h"
+
+struct filterInfo {
+  bool active;
+  int fifoDesc;
+  char pipeName[128];
+  int lastProvided; 
+};
+    
 
 class cIptvDevice : public cDevice {
   // static ones
@@ -37,6 +47,8 @@ private:
   //cIptvProtocolRtsp *pRtspProtocol;
   cIptvStreamer *pIptvStreamer;
   cMutex mutex;
+  trans filter;
+  filterInfo filters[32];
 
   // constructor & destructor
 public:
