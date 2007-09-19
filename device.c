@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.24 2007/09/19 15:14:32 ajhseppa Exp $
+ * $Id: device.c,v 1.25 2007/09/19 18:02:38 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -170,50 +170,39 @@ bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
 
 bool cIptvDevice::SetPid(cPidHandle *Handle, int Type, bool On)
 {
-  debug("cIptvDevice::SetPid(%d) Type=%d On=%d\n", deviceIndex, Type, On);
+  debug("cIptvDevice::SetPid(%d) Pid=%d Type=%d On=%d\n", deviceIndex, Handle->pid, Type, On);
   return true;
 }
 
 int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
 {
-
   // Search the next free filter slot
-  for (int i = 0; i < 32; ++i) {
-    if(!filters[i].active) {
-
-      debug("cIptvDevice::OpenFilter(): Pid=0x%X Tid=%02X Mask=%02X, filterCount = %d\n", Pid, Tid, Mask, i);
-
-      uint8_t mask = Mask;
-      uint8_t filt = Tid;
-
-      int err = set_trans_filt(&filter, i, Pid, &mask, &filt, 0);
-      if (err < 0)
-	error("Cannot set filter %d\n", i);
-      
-      memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
-      snprintf(filters[i].pipeName, sizeof(filters[i].pipeName),
-	       "/tmp/iptvPipe.%d", i);
-      err = mknod(filters[i].pipeName, 0644 | S_IFIFO, 0);
-      if (err < 0) {
-	char tmp[64];
-	error("ERROR: mknod(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-	unlink(filters[i].pipeName);
-      }
-      
-      // Create descriptors
-      int fifoDescriptor   = open(filters[i].pipeName, O_RDWR | O_NONBLOCK);
-      int returnDescriptor = open(filters[i].pipeName, O_RDONLY | O_NONBLOCK);
-
-      // Store the write pipe and set active flag
-      filters[i].active = true;
-      filters[i].fifoDesc = fifoDescriptor;
-
-      //++filterCount;
-      return returnDescriptor;
-
-    }
-
-  }
+  for (unsigned int i = 0; i < (sizeof(filters) / sizeof(filters[0])); ++i) {
+      if (!filters[i].active) {
+        debug("cIptvDevice::OpenFilter(): Pid=0x%X Tid=%02X Mask=%02X, filterCount = %d\n", Pid, Tid, Mask, i);
+        uint8_t mask = Mask;
+        uint8_t filt = Tid;
+        int err = set_trans_filt(&filter, i, Pid, &mask, &filt, 0);
+        if (err < 0)
+           error("Cannot set filter %d\n", i);
+        memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
+        snprintf(filters[i].pipeName, sizeof(filters[i].pipeName),
+	         "/tmp/iptvPipe.%d", i);
+        err = mknod(filters[i].pipeName, 0644 | S_IFIFO, 0);
+        if (err < 0) {
+           char tmp[64];
+           error("ERROR: mknod(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+           unlink(filters[i].pipeName);
+           }
+        // Create descriptors
+        int fifoDescriptor   = open(filters[i].pipeName, O_RDWR | O_NONBLOCK);
+        int returnDescriptor = open(filters[i].pipeName, O_RDONLY | O_NONBLOCK);
+        // Store the write pipe and set active flag
+        filters[i].active = true;
+        filters[i].fifoDesc = fifoDescriptor;
+        return returnDescriptor;
+        }
+     }
   // No free filter slot found
   return -1;
 }
@@ -265,54 +254,47 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
      isPacketDelivered = true;
      Data = p;
      memcpy(filter.packet, p, sizeof(filter.packet));
-     trans_filt(p, 188, &filter);
-
-
-     for(int i = 0; i < 32; ++i) {
-
-       if(filters[i].active) {
-	 
-	 section *filtered = get_filt_sec(&filter, i);
-	 
-	 if (filtered->found) {
-	   
-	   // Select on the fifo emptyness. Using null timeout to return
-	   // immediately
-	   struct timeval tv;
-	   tv.tv_sec = 0;
-	   tv.tv_usec = 0;
-	   fd_set rfds;
-	   FD_ZERO(&rfds);
-	   FD_SET(filters[i].fifoDesc, &rfds);
-	   int retval = select(filters[i].fifoDesc + 1, &rfds, NULL, NULL,
-			       &tv);
-	   // Check if error
-	   if (retval < 0) {
-	     char tmp[64];
-	     error("ERROR: select(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-
-	     // VDR has probably closed the filter file descriptor.
-	     // Clear the filter
-	     close(filters[i].fifoDesc);
-	     unlink(filters[i].pipeName);
-	     memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
-	     filters[i].fifoDesc = -1;
-	     filters[i].active = false;
-	     clear_trans_filt(&filter, i);	     
-	   }
-	   // There is no data in the fifo, more can be written
-	   if (!retval) {
-	     int err = write(filters[i].fifoDesc, filtered->payload,
-			     filtered->length+3);
-	     if (err < 0) {
-	       char tmp[64];
-	       error("ERROR: write(): %s", strerror_r(errno, tmp,
-						      sizeof(tmp)));
-	     }
-	   }
-	 }
-       }
-     }
+     trans_filt(p, TS_SIZE, &filter);
+     for (unsigned int i = 0; i < (sizeof(filters) / sizeof(filters[0])); ++i) {
+         if (filters[i].active) {
+	    section *filtered = get_filt_sec(&filter, i);
+            if (filtered->found) {
+               // Select on the fifo emptyness. Using null timeout to return
+	       // immediately
+               struct timeval tv;
+               tv.tv_sec = 0;
+               tv.tv_usec = 0;
+               fd_set rfds;
+               FD_ZERO(&rfds);
+               FD_SET(filters[i].fifoDesc, &rfds);
+               int retval = select(filters[i].fifoDesc + 1, &rfds, NULL, NULL,
+                                   &tv);
+               // Check if error
+               if (retval < 0) {
+                  char tmp[64];
+                  error("ERROR: select(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+                  // VDR has probably closed the filter file descriptor, so
+                  // clear the filter
+                  close(filters[i].fifoDesc);
+                  unlink(filters[i].pipeName);
+                  memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
+                  filters[i].fifoDesc = -1;
+                  filters[i].active = false;
+                  clear_trans_filt(&filter, i);	     
+                  }
+               // There is no data in the fifo, more can be written
+               if (!retval) {
+                  int err = write(filters[i].fifoDesc, filtered->payload,
+                                  filtered->length+3);
+                  if (err < 0) {
+                     char tmp[64];
+                     error("ERROR: write(): %s", strerror_r(errno, tmp,
+                           sizeof(tmp)));
+                     }
+                 }
+               }
+            }
+         }
      return true;
      }
   Data = NULL;
