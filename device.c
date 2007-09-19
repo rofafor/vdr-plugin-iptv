@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.26 2007/09/19 18:17:30 rahrenbe Exp $
+ * $Id: device.c,v 1.27 2007/09/19 19:43:29 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -177,7 +177,7 @@ int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
   // Search the next free filter slot
   for (unsigned int i = 0; i < eMaxFilterCount; ++i) {
       if (!filters[i].active) {
-        debug("cIptvDevice::OpenFilter(): Pid=0x%X Tid=%02X Mask=%02X, filterCount=%d\n", Pid, Tid, Mask, i);
+        debug("cIptvDevice::OpenFilter(): Pid=%d Tid=%d Mask=%02X Count=%d\n", Pid, Tid, Mask, i);
         uint8_t mask = Mask;
         uint8_t filt = Tid;
         int err = set_trans_filt(&filter, i, Pid, &mask, &filt, 0);
