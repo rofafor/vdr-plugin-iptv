@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.25 2007/09/19 18:02:38 rahrenbe Exp $
+ * $Id: device.c,v 1.26 2007/09/19 18:17:30 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -38,12 +38,11 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   pFileProtocol = new cIptvProtocolFile();
   pIptvStreamer = new cIptvStreamer(tsBuffer, &mutex);
   StartSectionHandler();
-  
-  for(int i = 0; i < 32; ++i) {
-    filters[i].active = false;
-    filters[i].fifoDesc = -1;
-  }
-
+  // Initialize filters  
+  for (int i = 0; i < eMaxFilterCount; ++i) {
+      filters[i].active = false;
+      filters[i].fifoDesc = -1;
+      }
 }
 
 cIptvDevice::~cIptvDevice()
@@ -52,18 +51,17 @@ cIptvDevice::~cIptvDevice()
   delete pIptvStreamer;
   delete pUdpProtocol;
   delete tsBuffer;
-
   // Iterate over all filters and clear their settings 
-  for (int i = 0; i < 32; ++i) {
-    if (filters[i].active) {
-      close(filters[i].fifoDesc);
-      unlink(filters[i].pipeName);
-      memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
-      filters[i].fifoDesc = -1;
-      filters[i].active = false;
-      clear_trans_filt(&filter, i);
-    }
-  }
+  for (int i = 0; i < eMaxFilterCount; ++i) {
+      if (filters[i].active) {
+         close(filters[i].fifoDesc);
+         unlink(filters[i].pipeName);
+         memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
+         filters[i].fifoDesc = -1;
+         filters[i].active = false;
+         clear_trans_filt(&filter, i);
+         }
+      }
 }
 
 bool cIptvDevice::Initialize(unsigned int DeviceCount)
@@ -177,17 +175,16 @@ bool cIptvDevice::SetPid(cPidHandle *Handle, int Type, bool On)
 int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
 {
   // Search the next free filter slot
-  for (unsigned int i = 0; i < (sizeof(filters) / sizeof(filters[0])); ++i) {
+  for (unsigned int i = 0; i < eMaxFilterCount; ++i) {
       if (!filters[i].active) {
-        debug("cIptvDevice::OpenFilter(): Pid=0x%X Tid=%02X Mask=%02X, filterCount = %d\n", Pid, Tid, Mask, i);
+        debug("cIptvDevice::OpenFilter(): Pid=0x%X Tid=%02X Mask=%02X, filterCount=%d\n", Pid, Tid, Mask, i);
         uint8_t mask = Mask;
         uint8_t filt = Tid;
         int err = set_trans_filt(&filter, i, Pid, &mask, &filt, 0);
         if (err < 0)
            error("Cannot set filter %d\n", i);
         memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
-        snprintf(filters[i].pipeName, sizeof(filters[i].pipeName),
-	         "/tmp/iptvPipe.%d", i);
+        snprintf(filters[i].pipeName, sizeof(filters[i].pipeName), "/tmp/iptvPipe.%d", i);
         err = mknod(filters[i].pipeName, 0644 | S_IFIFO, 0);
         if (err < 0) {
            char tmp[64];
@@ -255,7 +252,7 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
      Data = p;
      memcpy(filter.packet, p, sizeof(filter.packet));
      trans_filt(p, TS_SIZE, &filter);
-     for (unsigned int i = 0; i < (sizeof(filters) / sizeof(filters[0])); ++i) {
+     for (unsigned int i = 0; i < eMaxFilterCount; ++i) {
          if (filters[i].active) {
 	    section *filtered = get_filt_sec(&filter, i);
             if (filtered->found) {
@@ -267,14 +264,13 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
                fd_set rfds;
                FD_ZERO(&rfds);
                FD_SET(filters[i].fifoDesc, &rfds);
-               int retval = select(filters[i].fifoDesc + 1, &rfds, NULL, NULL,
-                                   &tv);
+               int retval = select(filters[i].fifoDesc + 1, &rfds, NULL, NULL, &tv);
                // Check if error
                if (retval < 0) {
                   char tmp[64];
                   error("ERROR: select(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-                  // VDR has probably closed the filter file descriptor, so
-                  // clear the filter
+                  // VDR has probably closed the filter file descriptor, so clear
+                  // the filter
                   close(filters[i].fifoDesc);
                   unlink(filters[i].pipeName);
                   memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
@@ -283,13 +279,12 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
                   clear_trans_filt(&filter, i);	     
                   }
                // There is no data in the fifo, more can be written
-               if (!retval) {
+               else if (!retval) {
                   int err = write(filters[i].fifoDesc, filtered->payload,
-                                  filtered->length+3);
+                                  filtered->length + 3);
                   if (err < 0) {
                      char tmp[64];
-                     error("ERROR: write(): %s", strerror_r(errno, tmp,
-                           sizeof(tmp)));
+                     error("ERROR: write(): %s", strerror_r(errno, tmp, sizeof(tmp)));
                      }
                  }
                }

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.10 2007/09/19 15:14:32 ajhseppa Exp $
+ * $Id: device.h,v 1.11 2007/09/19 18:17:30 rahrenbe Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -24,7 +24,6 @@ struct filterInfo {
   char pipeName[128];
   int lastProvided; 
 };
-    
 
 class cIptvDevice : public cDevice {
   // static ones
@@ -36,6 +35,9 @@ public:
 
   // private parts
 private:
+  enum {
+    eMaxFilterCount = 32
+  };
   unsigned int deviceIndex;
   bool isPacketDelivered;
   bool isOpenDvr;
@@ -44,11 +46,10 @@ private:
   cIptvProtocolUdp *pUdpProtocol;
   cIptvProtocolHttp *pHttpProtocol;
   cIptvProtocolFile *pFileProtocol;
-  //cIptvProtocolRtsp *pRtspProtocol;
   cIptvStreamer *pIptvStreamer;
   cMutex mutex;
   trans filter;
-  filterInfo filters[32];
+  filterInfo filters[eMaxFilterCount];
 
   // constructor & destructor
 public:
