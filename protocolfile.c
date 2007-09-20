@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolfile.c,v 1.5 2007/09/16 18:04:15 ajhseppa Exp $
+ * $Id: protocolfile.c,v 1.6 2007/09/20 21:15:08 rahrenbe Exp $
  */
 
 #include <fcntl.h>
@@ -78,18 +78,14 @@ int cIptvProtocolFile::Read(unsigned char* *BufferAddr)
    // Rewind if EOF
    if (feof(fileStream))
       rewind(fileStream);
-
    // Sleep before reading the file stream to prevent aggressive busy looping
-   cCondWait::SleepMs(50);
-
+   cCondWait::SleepMs(1);
    // This check is to prevent a race condition where file may be switched off
    // during the sleep and buffers are disposed. Check here that the plugin is
    // still active before accessing the buffers
    if (fileActive)
-     return fread(readBuffer, sizeof(unsigned char), readBufferLen,
-		  fileStream);
-   else
-     return -1;
+      return fread(readBuffer, sizeof(unsigned char), readBufferLen, fileStream);
+   return -1;
 }
 
 bool cIptvProtocolFile::Open(void)

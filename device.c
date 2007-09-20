@@ -3,12 +3,14 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.27 2007/09/19 19:43:29 rahrenbe Exp $
+ * $Id: device.c,v 1.28 2007/09/20 21:15:08 rahrenbe Exp $
  */
 
 #include "common.h"
 #include "config.h"
 #include "device.h"
+
+#define IPTV_FILTER_FILENAME "/tmp/vdr-iptv%d.filter%d"
 
 #define IPTV_MAX_DEVICES 8
 
@@ -25,8 +27,6 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   debug("cIptvDevice::cIptvDevice(%d)\n", deviceIndex);
   tsBuffer = new cRingBufferLinear(MEGABYTE(IptvConfig.GetTsBufferSize()),
                                   (TS_SIZE * 2), false, "IPTV");
-  memset(&filter, '\0', sizeof(filter));
-  init_trans(&filter);
   tsBuffer->SetTimeouts(100, 100);
   // pad prefill to multiple of TS_SIZE
   tsBufferPrefill = MEGABYTE(IptvConfig.GetTsBufferSize()) *
@@ -37,12 +37,20 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   pHttpProtocol = new cIptvProtocolHttp();
   pFileProtocol = new cIptvProtocolFile();
   pIptvStreamer = new cIptvStreamer(tsBuffer, &mutex);
-  StartSectionHandler();
   // Initialize filters  
+  memset(&filter, '\0', sizeof(filter));
+  init_trans(&filter);
   for (int i = 0; i < eMaxFilterCount; ++i) {
-      filters[i].active = false;
+      struct stat sb;
+      snprintf(filters[i].pipeName, sizeof(filters[i].pipeName), IPTV_FILTER_FILENAME, deviceIndex, i);
+      stat(filters[i].pipeName, &sb);
+      if (S_ISFIFO(sb.st_mode))
+         unlink(filters[i].pipeName);
+      memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
       filters[i].fifoDesc = -1;
+      filters[i].active = false;
       }
+  StartSectionHandler();
 }
 
 cIptvDevice::~cIptvDevice()
@@ -177,29 +185,35 @@ int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
   // Search the next free filter slot
   for (unsigned int i = 0; i < eMaxFilterCount; ++i) {
       if (!filters[i].active) {
-        debug("cIptvDevice::OpenFilter(): Pid=%d Tid=%d Mask=%02X Count=%d\n", Pid, Tid, Mask, i);
-        uint8_t mask = Mask;
-        uint8_t filt = Tid;
-        int err = set_trans_filt(&filter, i, Pid, &mask, &filt, 0);
-        if (err < 0)
-           error("Cannot set filter %d\n", i);
-        memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
-        snprintf(filters[i].pipeName, sizeof(filters[i].pipeName), "/tmp/iptvPipe.%d", i);
-        err = mknod(filters[i].pipeName, 0644 | S_IFIFO, 0);
-        if (err < 0) {
-           char tmp[64];
-           error("ERROR: mknod(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-           unlink(filters[i].pipeName);
-           }
-        // Create descriptors
-        int fifoDescriptor   = open(filters[i].pipeName, O_RDWR | O_NONBLOCK);
-        int returnDescriptor = open(filters[i].pipeName, O_RDONLY | O_NONBLOCK);
-        // Store the write pipe and set active flag
-        filters[i].active = true;
-        filters[i].fifoDesc = fifoDescriptor;
-        return returnDescriptor;
-        }
-     }
+         debug("cIptvDevice::OpenFilter(%d): Pid=%d Tid=%02X Mask=%02X Count=%d\n", deviceIndex, Pid, Tid, Mask, i);
+         uint8_t mask[eMaxFilterMaskLen] = { 0 };
+         uint8_t filt[eMaxFilterMaskLen] = { 0 };
+         mask[0] = Mask;
+         filt[0] = Tid;
+         int err = set_trans_filt(&filter, i, Pid, &mask[0], &filt[0], 0);
+         if (err < 0)
+            error("Cannot set filter %d\n", i);
+         memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
+         snprintf(filters[i].pipeName, sizeof(filters[i].pipeName), IPTV_FILTER_FILENAME, deviceIndex, i);
+         struct stat sb;
+         stat(filters[i].pipeName, &sb);
+         if (S_ISFIFO(sb.st_mode))
+            unlink(filters[i].pipeName);
+         err = mknod(filters[i].pipeName, 0644 | S_IFIFO, 0);
+         if (err < 0) {
+            char tmp[64];
+            error("ERROR: mknod(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+            break;
+            }
+         // Create descriptors
+         int fifoDescriptor   = open(filters[i].pipeName, O_RDWR | O_NONBLOCK);
+         int returnDescriptor = open(filters[i].pipeName, O_RDONLY | O_NONBLOCK);
+         // Store the write pipe and set active flag
+         filters[i].fifoDesc = fifoDescriptor;
+         filters[i].active = true;
+         return returnDescriptor;
+         }
+      }
   // No free filter slot found
   return -1;
 }
@@ -220,6 +234,17 @@ void cIptvDevice::CloseDvr(void)
 {
   debug("cIptvDevice::CloseDvr(%d)\n", deviceIndex);
   pIptvStreamer->Close();
+  // Iterate over all filters and clear their settings
+  for (int i = 0; i < eMaxFilterCount; ++i) {
+      if (filters[i].active) {
+         close(filters[i].fifoDesc);
+         unlink(filters[i].pipeName);
+         memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
+         filters[i].fifoDesc = -1;
+         filters[i].active = false;
+         clear_trans_filt(&filter, i);
+         }
+      }
   isOpenDvr = false;
 }
 
@@ -280,8 +305,7 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
                   }
                // There is no data in the fifo, more can be written
                else if (!retval) {
-                  int err = write(filters[i].fifoDesc, filtered->payload,
-                                  filtered->length + 3);
+                  int err = write(filters[i].fifoDesc, filtered->payload, filtered->length + 3);
                   if (err < 0) {
                      char tmp[64];
                      error("ERROR: write(): %s", strerror_r(errno, tmp, sizeof(tmp)));

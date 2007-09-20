@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.11 2007/09/19 18:17:30 rahrenbe Exp $
+ * $Id: device.h,v 1.12 2007/09/20 21:15:08 rahrenbe Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -36,7 +36,8 @@ public:
   // private parts
 private:
   enum {
-    eMaxFilterCount = 32
+    eMaxFilterCount   = 32,
+    eMaxFilterMaskLen = 16
   };
   unsigned int deviceIndex;
   bool isPacketDelivered;
