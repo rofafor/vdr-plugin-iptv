@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolfile.c,v 1.6 2007/09/20 21:15:08 rahrenbe Exp $
+ * $Id: protocolfile.c,v 1.7 2007/09/20 21:45:51 rahrenbe Exp $
  */
 
 #include <fcntl.h>
@@ -16,14 +16,13 @@
 #include "protocolfile.h"
 
 cIptvProtocolFile::cIptvProtocolFile()
-: readBufferLen(TS_SIZE * IptvConfig.GetFileBufferSize()),
-  fileActive(false)
+: fileActive(false)
 {
-  debug("cIptvProtocolFile::cIptvProtocolFile(): readBufferLen=%d (%d)\n",
-        readBufferLen, (readBufferLen / TS_SIZE));
+  debug("cIptvProtocolFile::cIptvProtocolFile(): %d/%d packets\n",
+        IptvConfig.GetFileBufferSize(), IptvConfig.GetMaxBufferSize());
   streamAddr = strdup("");
   // Allocate receive buffer
-  readBuffer = MALLOC(unsigned char, readBufferLen);
+  readBuffer = MALLOC(unsigned char, (TS_SIZE * IptvConfig.GetMaxBufferSize()));
   if (!readBuffer)
      error("ERROR: MALLOC() failed in ProtocolFile()");
 }
@@ -84,7 +83,7 @@ int cIptvProtocolFile::Read(unsigned char* *BufferAddr)
    // during the sleep and buffers are disposed. Check here that the plugin is
    // still active before accessing the buffers
    if (fileActive)
-      return fread(readBuffer, sizeof(unsigned char), readBufferLen, fileStream);
+      return fread(readBuffer, sizeof(unsigned char), (TS_SIZE * IptvConfig.GetFileBufferSize()), fileStream);
    return -1;
 }
 

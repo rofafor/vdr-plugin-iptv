@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.7 2007/09/19 17:14:03 rahrenbe Exp $
+ * $Id: setup.c,v 1.8 2007/09/20 21:45:51 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -429,11 +429,11 @@ void cIptvPluginSetup::Setup(void)
 {
   int current = Current();
   Clear();
-  Add(new cMenuEditIntItem(tr("TS buffer size [MB]"), &tsBufferSize, 2, 16));
+  Add(new cMenuEditIntItem(tr("TS buffer size [MB]"),         &tsBufferSize,    2, 16));
   Add(new cMenuEditIntItem(tr("TS buffer prefill ratio [%]"), &tsBufferPrefill, 0, 40));
-  Add(new cMenuEditIntItem(tr("UDP buffer size [packets]"), &udpBufferSize, 1, 14));
-  Add(new cMenuEditIntItem(tr("HTTP buffer size [packets]"), &httpBufferSize, 1, 14));
-  Add(new cMenuEditIntItem(tr("FILE buffer size [packets]"), &fileBufferSize, 1, 14));
+  Add(new cMenuEditIntItem(tr("UDP buffer size [packets]"),   &udpBufferSize,   1, IptvConfig.GetMaxBufferSize()));
+  Add(new cMenuEditIntItem(tr("HTTP buffer size [packets]"),  &httpBufferSize,  1, IptvConfig.GetMaxBufferSize()));
+  Add(new cMenuEditIntItem(tr("FILE buffer size [packets]"),  &fileBufferSize,  1, IptvConfig.GetMaxBufferSize()));
   SetCurrent(Get(current));
   Display();
 }

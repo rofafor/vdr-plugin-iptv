@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.c,v 1.5 2007/09/16 13:38:20 rahrenbe Exp $
+ * $Id: protocoludp.c,v 1.6 2007/09/20 21:45:51 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -21,14 +21,13 @@
 cIptvProtocolUdp::cIptvProtocolUdp()
 : streamPort(1234),
   socketDesc(-1),
-  readBufferLen(TS_SIZE * IptvConfig.GetUdpBufferSize()),
   mcastActive(false)
 {
-  debug("cIptvProtocolUdp::cIptvProtocolUdp(): readBufferLen=%d (%d)\n",
-        readBufferLen, (readBufferLen / TS_SIZE));
+  debug("cIptvProtocolUdp::cIptvProtocolUdp(): %d/%d packets\n",
+        IptvConfig.GetUdpBufferSize(), IptvConfig.GetMaxBufferSize());
   streamAddr = strdup("");
   // Allocate receive buffer
-  readBuffer = MALLOC(unsigned char, readBufferLen);
+  readBuffer = MALLOC(unsigned char, (TS_SIZE * IptvConfig.GetMaxBufferSize()));
   if (!readBuffer)
      error("ERROR: MALLOC() failed in ProtocolUdp()");
 }
@@ -177,8 +176,8 @@ int cIptvProtocolUdp::Read(unsigned char* *BufferAddr)
   // Check if data available
   else if (retval) {
      // Read data from socket
-     return recvfrom(socketDesc, readBuffer, readBufferLen, MSG_DONTWAIT,
-                     (struct sockaddr *)&sockAddr, &addrlen);
+     return recvfrom(socketDesc, readBuffer, (TS_SIZE * IptvConfig.GetUdpBufferSize()),
+                     MSG_DONTWAIT, (struct sockaddr *)&sockAddr, &addrlen);
      }
   return 0;
 }

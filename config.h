@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: config.h,v 1.3 2007/09/16 13:38:20 rahrenbe Exp $
+ * $Id: config.h,v 1.4 2007/09/20 21:45:51 rahrenbe Exp $
  */
 
 #ifndef __IPTV_CONFIG_H
@@ -20,6 +20,7 @@ protected:
   unsigned int udpBufferSize;
   unsigned int httpBufferSize;
   unsigned int fileBufferSize;
+  unsigned int maxBufferSize;
 public:
   cIptvConfig();
   unsigned int GetTsBufferSize(void) { return tsBufferSize; }
@@ -27,6 +28,7 @@ public:
   unsigned int GetUdpBufferSize(void) { return udpBufferSize; }
   unsigned int GetHttpBufferSize(void) { return httpBufferSize; }
   unsigned int GetFileBufferSize(void) { return fileBufferSize; }
+  unsigned int GetMaxBufferSize(void) { return maxBufferSize; }
   void SetTsBufferSize(unsigned int Size) { tsBufferSize = Size; }
   void SetTsBufferPrefillRatio(unsigned int Ratio) { tsBufferPrefillRatio = Ratio; }
   void SetUdpBufferSize(unsigned int Size) { udpBufferSize = Size; }
