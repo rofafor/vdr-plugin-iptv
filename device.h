@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.12 2007/09/20 21:15:08 rahrenbe Exp $
+ * $Id: device.h,v 1.13 2007/09/20 22:01:42 rahrenbe Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -78,7 +78,12 @@ protected:
   virtual bool GetTSPacket(uchar *&Data);
 
   // for section filtering
+public:
   virtual int OpenFilter(u_short Pid, u_char Tid, u_char Mask);
+
+  // for transponder lock
+public:
+  virtual bool HasLock(int);
 };
 
 #endif // __IPTV_DEVICE_H

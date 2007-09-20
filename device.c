@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.28 2007/09/20 21:15:08 rahrenbe Exp $
+ * $Id: device.c,v 1.29 2007/09/20 22:01:42 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -248,14 +248,19 @@ void cIptvDevice::CloseDvr(void)
   isOpenDvr = false;
 }
 
+bool cIptvDevice::HasLock(int TimeoutMs)
+{
+  debug("cIptvDevice::HasLock(%d): %d\n", deviceIndex, TimeoutMs);
+  if (tsBufferPrefill && tsBuffer->Available() < tsBufferPrefill)
+     return false;
+  tsBufferPrefill = 0;
+  return true;
+}
+
 bool cIptvDevice::GetTSPacket(uchar *&Data)
 {
   int Count = 0;
   //debug("cIptvDevice::GetTSPacket(%d)\n", deviceIndex);
-  if (tsBufferPrefill && tsBuffer->Available() < tsBufferPrefill)
-     return false;
-  else
-     tsBufferPrefill = 0;
   if (isPacketDelivered) {
      tsBuffer->Del(TS_SIZE);
      isPacketDelivered = false;
