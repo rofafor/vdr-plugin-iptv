@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.13 2007/09/20 22:01:42 rahrenbe Exp $
+ * $Id: device.h,v 1.14 2007/09/21 21:50:52 rahrenbe Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -57,10 +57,12 @@ public:
   cIptvDevice(unsigned int DeviceIndex);
   virtual ~cIptvDevice();
 
-  // for channel parsing
+  // for channel parsing & buffering
 private:
   cString GetChannelSettings(const char *Param, int *IpPort, cIptvProtocolIf* *Protocol);
   bool ProvidesIptv(const char *Param) const;
+  void ResetBuffering(void);
+  bool IsBuffering(void);
 
   // for channel selection
 public:

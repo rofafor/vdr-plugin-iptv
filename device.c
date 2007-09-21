@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.29 2007/09/20 22:01:42 rahrenbe Exp $
+ * $Id: device.c,v 1.30 2007/09/21 21:50:52 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -26,13 +26,9 @@ cIptvDevice::cIptvDevice(unsigned int Index)
 {
   debug("cIptvDevice::cIptvDevice(%d)\n", deviceIndex);
   tsBuffer = new cRingBufferLinear(MEGABYTE(IptvConfig.GetTsBufferSize()),
-                                  (TS_SIZE * 2), false, "IPTV");
+                                  (TS_SIZE * 10), false, "IPTV");
   tsBuffer->SetTimeouts(100, 100);
-  // pad prefill to multiple of TS_SIZE
-  tsBufferPrefill = MEGABYTE(IptvConfig.GetTsBufferSize()) *
-                    IptvConfig.GetTsBufferPrefillRatio() / 100;
-  tsBufferPrefill -= (tsBufferPrefill % TS_SIZE);
-  //debug("Buffer=%d Prefill=%d\n", MEGABYTE(IptvConfig.GetTsBufferSize()), tsBufferPrefill);
+  ResetBuffering();
   pUdpProtocol = new cIptvProtocolUdp();
   pHttpProtocol = new cIptvProtocolHttp();
   pFileProtocol = new cIptvProtocolFile();
@@ -166,10 +162,6 @@ bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
      error("ERROR: Unrecognized IPTV channel settings: %s", Channel->PluginParam());
      return false;
      }
-  // pad prefill to multiple of TS_SIZE
-  tsBufferPrefill = MEGABYTE(IptvConfig.GetTsBufferSize()) *
-                    IptvConfig.GetTsBufferPrefillRatio() / 100;
-  tsBufferPrefill -= (tsBufferPrefill % TS_SIZE);
   pIptvStreamer->Set(addr, port, protocol);
   return true;
 }
@@ -225,6 +217,7 @@ bool cIptvDevice::OpenDvr(void)
   isPacketDelivered = false;
   tsBuffer->Clear();
   mutex.Unlock();
+  ResetBuffering();
   pIptvStreamer->Open();
   isOpenDvr = true;
   return true;
@@ -250,76 +243,92 @@ void cIptvDevice::CloseDvr(void)
 
 bool cIptvDevice::HasLock(int TimeoutMs)
 {
-  debug("cIptvDevice::HasLock(%d): %d\n", deviceIndex, TimeoutMs);
+  //debug("cIptvDevice::HasLock(%d): %d\n", deviceIndex, TimeoutMs);
+  return (!IsBuffering());
+}
+
+void cIptvDevice::ResetBuffering(void)
+{
+  debug("cIptvDevice::ResetBuffering(%d)\n", deviceIndex);
+  // pad prefill to multiple of TS_SIZE
+  tsBufferPrefill = MEGABYTE(IptvConfig.GetTsBufferSize()) *
+                    IptvConfig.GetTsBufferPrefillRatio() / 100;
+  tsBufferPrefill -= (tsBufferPrefill % TS_SIZE);
+}
+
+bool cIptvDevice::IsBuffering(void)
+{
+  //debug("cIptvDevice::IsBuffering(%d): %d\n", deviceIndex);
   if (tsBufferPrefill && tsBuffer->Available() < tsBufferPrefill)
-     return false;
-  tsBufferPrefill = 0;
-  return true;
+     return true;
+  else
+     tsBufferPrefill = 0;
+  return false;
 }
 
 bool cIptvDevice::GetTSPacket(uchar *&Data)
 {
   int Count = 0;
   //debug("cIptvDevice::GetTSPacket(%d)\n", deviceIndex);
-  if (isPacketDelivered) {
-     tsBuffer->Del(TS_SIZE);
-     isPacketDelivered = false;
-     }
-  uchar *p = tsBuffer->Get(Count);
-  if (p && Count >= TS_SIZE) {
-     if (*p != TS_SYNC_BYTE) {
-        for (int i = 1; i < Count; i++) {
-            if (p[i] == TS_SYNC_BYTE) {
-               Count = i;
-               break;
-               }
-            }
-        tsBuffer->Del(Count);
-        error("ERROR: skipped %d bytes to sync on TS packet\n", Count);
-        return false;
+  if (!IsBuffering()) {
+     if (isPacketDelivered) {
+        tsBuffer->Del(TS_SIZE);
+        isPacketDelivered = false;
         }
-     isPacketDelivered = true;
-     Data = p;
-     memcpy(filter.packet, p, sizeof(filter.packet));
-     trans_filt(p, TS_SIZE, &filter);
-     for (unsigned int i = 0; i < eMaxFilterCount; ++i) {
-         if (filters[i].active) {
-	    section *filtered = get_filt_sec(&filter, i);
-            if (filtered->found) {
-               // Select on the fifo emptyness. Using null timeout to return
-	       // immediately
-               struct timeval tv;
-               tv.tv_sec = 0;
-               tv.tv_usec = 0;
-               fd_set rfds;
-               FD_ZERO(&rfds);
-               FD_SET(filters[i].fifoDesc, &rfds);
-               int retval = select(filters[i].fifoDesc + 1, &rfds, NULL, NULL, &tv);
-               // Check if error
-               if (retval < 0) {
-                  char tmp[64];
-                  error("ERROR: select(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-                  // VDR has probably closed the filter file descriptor, so clear
-                  // the filter
-                  close(filters[i].fifoDesc);
-                  unlink(filters[i].pipeName);
-                  memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
-                  filters[i].fifoDesc = -1;
-                  filters[i].active = false;
-                  clear_trans_filt(&filter, i);	     
+     uchar *p = tsBuffer->Get(Count);
+     if (p && Count >= TS_SIZE) {
+        if (*p != TS_SYNC_BYTE) {
+           for (int i = 1; i < Count; i++) {
+               if (p[i] == TS_SYNC_BYTE) {
+                  Count = i;
+                  break;
                   }
-               // There is no data in the fifo, more can be written
-               else if (!retval) {
-                  int err = write(filters[i].fifoDesc, filtered->payload, filtered->length + 3);
-                  if (err < 0) {
+               }
+           tsBuffer->Del(Count);
+           error("ERROR: skipped %d bytes to sync on TS packet\n", Count);
+           return false;
+           }
+        isPacketDelivered = true;
+        Data = p;
+        memcpy(filter.packet, p, sizeof(filter.packet));
+        trans_filt(p, TS_SIZE, &filter);
+        for (unsigned int i = 0; i < eMaxFilterCount; ++i) {
+            if (filters[i].active) {
+               section *filtered = get_filt_sec(&filter, i);
+               if (filtered->found) {
+                  // Select on the fifo emptyness. Using null timeout to return immediately
+                  struct timeval tv;
+                  tv.tv_sec = 0;
+                  tv.tv_usec = 0;
+                  fd_set rfds;
+                  FD_ZERO(&rfds);
+                  FD_SET(filters[i].fifoDesc, &rfds);
+                  int retval = select(filters[i].fifoDesc + 1, &rfds, NULL, NULL, &tv);
+                  // Check if error
+                  if (retval < 0) {
                      char tmp[64];
-                     error("ERROR: write(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+                     error("ERROR: select(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+                     // VDR has probably closed the filter file descriptor, so clear the filter
+                     close(filters[i].fifoDesc);
+                     unlink(filters[i].pipeName);
+                     memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
+                     filters[i].fifoDesc = -1;
+                     filters[i].active = false;
+                     clear_trans_filt(&filter, i);
                      }
-                 }
+                  // There is no data in the fifo, more can be written
+                  else if (!retval) {
+                     int err = write(filters[i].fifoDesc, filtered->payload, filtered->length + 3);
+                     if (err < 0) {
+                        char tmp[64];
+                        error("ERROR: write(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+                        }
+                    }
+                  }
                }
             }
-         }
-     return true;
+        return true;
+        }
      }
   Data = NULL;
   return true;

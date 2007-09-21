@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.c,v 1.13 2007/09/15 21:27:00 rahrenbe Exp $
+ * $Id: streamer.c,v 1.14 2007/09/21 21:50:52 rahrenbe Exp $
  */
 
 #include <vdr/thread.h>
@@ -33,7 +33,7 @@ void cIptvStreamer::Action(void)
   debug("cIptvStreamer::Action(): Entering\n");
   // Do the thread loop
   while (Running()) {
-    if (ringBuffer && mutex && protocol) {
+    if (ringBuffer && mutex && protocol && ringBuffer->Free()) {
        unsigned char *buffer = NULL;
        int length = protocol->Read(&buffer);
        if (length >= 0) {
