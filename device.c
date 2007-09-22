@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.33 2007/09/22 10:36:30 rahrenbe Exp $
+ * $Id: device.c,v 1.34 2007/09/22 17:34:20 ajhseppa Exp $
  */
 
 #include "common.h"
@@ -249,8 +249,6 @@ void cIptvDevice::CloseDvr(void)
   debug("cIptvDevice::CloseDvr(%d)\n", deviceIndex);
   pIptvStreamer->Close();
   // Iterate over all filters and clear their settings
-  for (int i = 0; i < eMaxFilterCount; ++i)
-      DeleteFilter(i);
   isOpenDvr = false;
 }
 
