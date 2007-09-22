@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.14 2007/09/21 21:50:52 rahrenbe Exp $
+ * $Id: device.h,v 1.15 2007/09/22 08:17:35 ajhseppa Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -21,6 +21,7 @@
 struct filterInfo {
   bool active;
   int fifoDesc;
+  int readDesc;
   char pipeName[128];
   int lastProvided; 
 };
@@ -63,6 +64,7 @@ private:
   bool ProvidesIptv(const char *Param) const;
   void ResetBuffering(void);
   bool IsBuffering(void);
+  bool DeleteFilter(unsigned int Index);
 
   // for channel selection
 public:
@@ -82,6 +84,7 @@ protected:
   // for section filtering
 public:
   virtual int OpenFilter(u_short Pid, u_char Tid, u_char Mask);
+  virtual bool CloseFilter(int Handle);
 
   // for transponder lock
 public:

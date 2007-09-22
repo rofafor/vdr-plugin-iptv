@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.30 2007/09/21 21:50:52 rahrenbe Exp $
+ * $Id: device.c,v 1.31 2007/09/22 08:17:35 ajhseppa Exp $
  */
 
 #include "common.h"
@@ -44,6 +44,7 @@ cIptvDevice::cIptvDevice(unsigned int Index)
          unlink(filters[i].pipeName);
       memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
       filters[i].fifoDesc = -1;
+      filters[i].readDesc = -1;
       filters[i].active = false;
       }
   StartSectionHandler();
@@ -56,16 +57,8 @@ cIptvDevice::~cIptvDevice()
   delete pUdpProtocol;
   delete tsBuffer;
   // Iterate over all filters and clear their settings 
-  for (int i = 0; i < eMaxFilterCount; ++i) {
-      if (filters[i].active) {
-         close(filters[i].fifoDesc);
-         unlink(filters[i].pipeName);
-         memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
-         filters[i].fifoDesc = -1;
-         filters[i].active = false;
-         clear_trans_filt(&filter, i);
-         }
-      }
+  for (int i = 0; i < eMaxFilterCount; ++i)
+      DeleteFilter(i);
 }
 
 bool cIptvDevice::Initialize(unsigned int DeviceCount)
@@ -172,12 +165,29 @@ bool cIptvDevice::SetPid(cPidHandle *Handle, int Type, bool On)
   return true;
 }
 
+bool cIptvDevice::DeleteFilter(unsigned int Index)
+{
+  debug("cIptvDevice::DeleteFilter(%d) Index=%d\n", deviceIndex, Index);
+  if ((Index < eMaxFilterCount) && filters[Index].active) {
+     close(filters[Index].fifoDesc);
+     close(filters[Index].readDesc);
+     unlink(filters[Index].pipeName);
+     memset(filters[Index].pipeName, '\0', sizeof(filters[Index].pipeName));
+     filters[Index].fifoDesc = -1;
+     filters[Index].readDesc = -1;
+     filters[Index].active = false;
+     clear_trans_filt(&filter, Index);
+     return true;
+     }
+  return false;
+}
+
 int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
 {
   // Search the next free filter slot
   for (unsigned int i = 0; i < eMaxFilterCount; ++i) {
       if (!filters[i].active) {
-         debug("cIptvDevice::OpenFilter(%d): Pid=%d Tid=%02X Mask=%02X Count=%d\n", deviceIndex, Pid, Tid, Mask, i);
+         debug("cIptvDevice::OpenFilter(%d): Pid=%d Tid=%02X Mask=%02X Index=%d\n", deviceIndex, Pid, Tid, Mask, i);
          uint8_t mask[eMaxFilterMaskLen] = { 0 };
          uint8_t filt[eMaxFilterMaskLen] = { 0 };
          mask[0] = Mask;
@@ -198,16 +208,24 @@ int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
             break;
             }
          // Create descriptors
-         int fifoDescriptor   = open(filters[i].pipeName, O_RDWR | O_NONBLOCK);
-         int returnDescriptor = open(filters[i].pipeName, O_RDONLY | O_NONBLOCK);
-         // Store the write pipe and set active flag
-         filters[i].fifoDesc = fifoDescriptor;
+         filters[i].fifoDesc = open(filters[i].pipeName, O_RDWR | O_NONBLOCK);
+         filters[i].readDesc = open(filters[i].pipeName, O_RDONLY | O_NONBLOCK);
          filters[i].active = true;
-         return returnDescriptor;
+         return filters[i].readDesc;
          }
       }
   // No free filter slot found
   return -1;
+}
+
+bool cIptvDevice::CloseFilter(int Handle)
+{
+  debug("cIptvDevice::CloseFilter(%d): %d\n", deviceIndex, Handle);
+  for (unsigned int i = 0; i < eMaxFilterCount; ++i) {
+      if (Handle == filters[i].readDesc)
+         return DeleteFilter(i);
+      }
+  return false;
 }
 
 bool cIptvDevice::OpenDvr(void)
@@ -230,12 +248,7 @@ void cIptvDevice::CloseDvr(void)
   // Iterate over all filters and clear their settings
   for (int i = 0; i < eMaxFilterCount; ++i) {
       if (filters[i].active) {
-         close(filters[i].fifoDesc);
-         unlink(filters[i].pipeName);
-         memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
-         filters[i].fifoDesc = -1;
-         filters[i].active = false;
-         clear_trans_filt(&filter, i);
+         DeleteFilter(i);
          }
       }
   isOpenDvr = false;
@@ -308,13 +321,7 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
                   if (retval < 0) {
                      char tmp[64];
                      error("ERROR: select(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-                     // VDR has probably closed the filter file descriptor, so clear the filter
-                     close(filters[i].fifoDesc);
-                     unlink(filters[i].pipeName);
-                     memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
-                     filters[i].fifoDesc = -1;
-                     filters[i].active = false;
-                     clear_trans_filt(&filter, i);
+                     DeleteFilter(i);
                      }
                   // There is no data in the fifo, more can be written
                   else if (!retval) {
