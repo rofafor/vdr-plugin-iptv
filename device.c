@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.32 2007/09/22 10:23:54 rahrenbe Exp $
+ * $Id: device.c,v 1.33 2007/09/22 10:36:30 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -26,7 +26,8 @@ cIptvDevice::cIptvDevice(unsigned int Index)
 {
   debug("cIptvDevice::cIptvDevice(%d)\n", deviceIndex);
   tsBuffer = new cRingBufferLinear(MEGABYTE(IptvConfig.GetTsBufferSize()),
-                                  (TS_SIZE * 10), false, "IPTV");
+                                   (TS_SIZE * IptvConfig.GetMaxBufferSize()),
+                                   false, "IPTV");
   tsBuffer->SetTimeouts(100, 100);
   ResetBuffering();
   pUdpProtocol = new cIptvProtocolUdp();
@@ -38,7 +39,8 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   init_trans(&filter);
   for (int i = 0; i < eMaxFilterCount; ++i) {
       struct stat sb;
-      snprintf(filters[i].pipeName, sizeof(filters[i].pipeName), IPTV_FILTER_FILENAME, deviceIndex, i);
+      snprintf(filters[i].pipeName, sizeof(filters[i].pipeName),
+               IPTV_FILTER_FILENAME, deviceIndex, i);
       stat(filters[i].pipeName, &sb);
       if (S_ISFIFO(sb.st_mode))
          unlink(filters[i].pipeName);
@@ -196,7 +198,8 @@ int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
          if (err < 0)
             error("Cannot set filter %d\n", i);
          memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
-         snprintf(filters[i].pipeName, sizeof(filters[i].pipeName), IPTV_FILTER_FILENAME, deviceIndex, i);
+         snprintf(filters[i].pipeName, sizeof(filters[i].pipeName),
+                  IPTV_FILTER_FILENAME, deviceIndex, i);
          struct stat sb;
          stat(filters[i].pipeName, &sb);
          if (S_ISFIFO(sb.st_mode))
