@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.36 2007/09/24 13:03:38 ajhseppa Exp $
+ * $Id: device.c,v 1.37 2007/09/24 16:08:09 ajhseppa Exp $
  */
 
 #include "common.h"
@@ -184,7 +184,7 @@ bool cIptvDevice::CloseFilter(int Handle)
 {
   debug("cIptvDevice::CloseFilter(%d): %d\n", deviceIndex, Handle);
   for (unsigned int i = 0; i < eMaxFilterCount; ++i) {
-      if (Handle == secfilters[i]->GetReadDesc())
+      if (secfilters[i] && Handle == secfilters[i]->GetReadDesc())
          return DeleteFilter(i);
       }
   return false;

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.c,v 1.1 2007/09/24 13:03:38 ajhseppa Exp $
+ * $Id: sectionfilter.c,v 1.2 2007/09/24 16:08:09 ajhseppa Exp $
  */
 
 #include "sectionfilter.h"
@@ -65,7 +65,7 @@ cIptvSectionFilter::cIptvSectionFilter(int Index, int devInd,
 
 cIptvSectionFilter::~cIptvSectionFilter()
 {
-  debug("cIptvSectionFilter::~cIptvSectionfilter()\n");
+  debug("cIptvSectionFilter::~cIptvSectionfilter(%d)\n", id);
   close(fifoDescriptor);
   close(readDescriptor);
   unlink(pipeName);
