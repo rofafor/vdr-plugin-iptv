@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.37 2007/09/24 16:08:09 ajhseppa Exp $
+ * $Id: device.c,v 1.38 2007/09/24 16:10:19 ajhseppa Exp $
  */
 
 #include "common.h"
@@ -155,8 +155,8 @@ bool cIptvDevice::SetPid(cPidHandle *Handle, int Type, bool On)
 
 bool cIptvDevice::DeleteFilter(unsigned int Index)
 {
-  debug("cIptvDevice::DeleteFilter(%d) Index=%d\n", deviceIndex, Index);
   if ((Index < eMaxFilterCount) && secfilters[Index]) {
+     debug("cIptvDevice::DeleteFilter(%d) Index=%d\n", deviceIndex, Index);
      delete secfilters[Index];
      secfilters[Index] = NULL;
      return true;
