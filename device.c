@@ -3,14 +3,12 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.35 2007/09/22 17:37:57 rahrenbe Exp $
+ * $Id: device.c,v 1.36 2007/09/24 13:03:38 ajhseppa Exp $
  */
 
 #include "common.h"
 #include "config.h"
 #include "device.h"
-
-#define IPTV_FILTER_FILENAME "/tmp/vdr-iptv%d.filter%d"
 
 #define IPTV_MAX_DEVICES 8
 
@@ -34,21 +32,9 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   pHttpProtocol = new cIptvProtocolHttp();
   pFileProtocol = new cIptvProtocolFile();
   pIptvStreamer = new cIptvStreamer(tsBuffer, &mutex);
-  // Initialize filters  
-  memset(&filter, '\0', sizeof(filter));
-  init_trans(&filter);
-  for (int i = 0; i < eMaxFilterCount; ++i) {
-      struct stat sb;
-      snprintf(filters[i].pipeName, sizeof(filters[i].pipeName),
-               IPTV_FILTER_FILENAME, deviceIndex, i);
-      stat(filters[i].pipeName, &sb);
-      if (S_ISFIFO(sb.st_mode))
-         unlink(filters[i].pipeName);
-      memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
-      filters[i].fifoDesc = -1;
-      filters[i].readDesc = -1;
-      filters[i].active = false;
-      }
+  // Initialize filter pointers
+  memset(&secfilters, '\0', sizeof(secfilters));
+
   StartSectionHandler();
 }
 
@@ -58,7 +44,7 @@ cIptvDevice::~cIptvDevice()
   delete pIptvStreamer;
   delete pUdpProtocol;
   delete tsBuffer;
-  // Iterate over all filters and clear their settings 
+  // Destroy all filters
   for (int i = 0; i < eMaxFilterCount; ++i)
       DeleteFilter(i);
 }
@@ -170,15 +156,9 @@ bool cIptvDevice::SetPid(cPidHandle *Handle, int Type, bool On)
 bool cIptvDevice::DeleteFilter(unsigned int Index)
 {
   debug("cIptvDevice::DeleteFilter(%d) Index=%d\n", deviceIndex, Index);
-  if ((Index < eMaxFilterCount) && filters[Index].active) {
-     close(filters[Index].fifoDesc);
-     close(filters[Index].readDesc);
-     unlink(filters[Index].pipeName);
-     memset(filters[Index].pipeName, '\0', sizeof(filters[Index].pipeName));
-     filters[Index].fifoDesc = -1;
-     filters[Index].readDesc = -1;
-     filters[Index].active = false;
-     clear_trans_filt(&filter, Index);
+  if ((Index < eMaxFilterCount) && secfilters[Index]) {
+     delete secfilters[Index];
+     secfilters[Index] = NULL;
      return true;
      }
   return false;
@@ -188,33 +168,12 @@ int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
 {
   // Search the next free filter slot
   for (unsigned int i = 0; i < eMaxFilterCount; ++i) {
-      if (!filters[i].active) {
+      if (!secfilters[i]) {
          debug("cIptvDevice::OpenFilter(%d): Pid=%d Tid=%02X Mask=%02X Index=%d\n", deviceIndex, Pid, Tid, Mask, i);
-         uint8_t mask[eMaxFilterMaskLen] = { 0 };
-         uint8_t filt[eMaxFilterMaskLen] = { 0 };
-         mask[0] = Mask;
-         filt[0] = Tid;
-         int err = set_trans_filt(&filter, i, Pid, &mask[0], &filt[0], 0);
-         if (err < 0)
-            error("Cannot set filter %d\n", i);
-         memset(filters[i].pipeName, '\0', sizeof(filters[i].pipeName));
-         snprintf(filters[i].pipeName, sizeof(filters[i].pipeName),
-                  IPTV_FILTER_FILENAME, deviceIndex, i);
-         struct stat sb;
-         stat(filters[i].pipeName, &sb);
-         if (S_ISFIFO(sb.st_mode))
-            unlink(filters[i].pipeName);
-         err = mknod(filters[i].pipeName, 0644 | S_IFIFO, 0);
-         if (err < 0) {
-            char tmp[64];
-            error("ERROR: mknod(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-            break;
-            }
-         // Create descriptors
-         filters[i].fifoDesc = open(filters[i].pipeName, O_RDWR | O_NONBLOCK);
-         filters[i].readDesc = open(filters[i].pipeName, O_RDONLY | O_NONBLOCK);
-         filters[i].active = true;
-         return filters[i].readDesc;
+	 
+         secfilters[i] = new cIptvSectionFilter(i, deviceIndex, Pid, Tid,
+                                                Mask);
+         return secfilters[i]->GetReadDesc();
          }
       }
   // No free filter slot found
@@ -225,7 +184,7 @@ bool cIptvDevice::CloseFilter(int Handle)
 {
   debug("cIptvDevice::CloseFilter(%d): %d\n", deviceIndex, Handle);
   for (unsigned int i = 0; i < eMaxFilterCount; ++i) {
-      if (Handle == filters[i].readDesc)
+      if (Handle == secfilters[i]->GetReadDesc())
          return DeleteFilter(i);
       }
   return false;
@@ -300,35 +259,10 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
            }
         isPacketDelivered = true;
         Data = p;
-        memcpy(filter.packet, p, sizeof(filter.packet));
-        trans_filt(p, TS_SIZE, &filter);
+        // Run the data through all filters
         for (unsigned int i = 0; i < eMaxFilterCount; ++i) {
-            if (filters[i].active) {
-               section *filtered = get_filt_sec(&filter, i);
-               if (filtered->found) {
-                  // Select on the fifo emptyness. Using null timeout to return immediately
-                  struct timeval tv;
-                  tv.tv_sec = 0;
-                  tv.tv_usec = 0;
-                  fd_set rfds;
-                  FD_ZERO(&rfds);
-                  FD_SET(filters[i].fifoDesc, &rfds);
-                  int retval = select(filters[i].fifoDesc + 1, &rfds, NULL, NULL, &tv);
-                  // Check if error
-                  if (retval < 0) {
-                     char tmp[64];
-                     error("ERROR: select(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-                     DeleteFilter(i);
-                     }
-                  // There is no data in the fifo, more can be written
-                  else if (!retval) {
-                     int err = write(filters[i].fifoDesc, filtered->payload, filtered->length + 3);
-                     if (err < 0) {
-                        char tmp[64];
-                        error("ERROR: write(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-                        }
-                    }
-                  }
+            if (secfilters[i]) {
+               secfilters[i]->ProcessData(p);
                }
             }
         return true;
