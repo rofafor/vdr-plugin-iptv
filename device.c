@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.39 2007/09/24 17:20:58 rahrenbe Exp $
+ * $Id: device.c,v 1.40 2007/09/24 21:25:53 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -155,9 +155,10 @@ bool cIptvDevice::SetPid(cPidHandle *Handle, int Type, bool On)
 bool cIptvDevice::DeleteFilter(unsigned int Index)
 {
   if ((Index < eMaxSecFilterCount) && secfilters[Index]) {
-     debug("cIptvDevice::DeleteFilter(%d) Index=%d\n", deviceIndex, Index);
-     delete secfilters[Index];
+     //debug("cIptvDevice::DeleteFilter(%d) Index=%d\n", deviceIndex, Index);
+     cIptvSectionFilter *tmp = secfilters[Index];
      secfilters[Index] = NULL;
+     delete tmp;
      return true;
      }
   return false;
@@ -168,7 +169,7 @@ int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
   // Search the next free filter slot
   for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
       if (!secfilters[i]) {
-         debug("cIptvDevice::OpenFilter(%d): Pid=%d Tid=%02X Mask=%02X Index=%d\n", deviceIndex, Pid, Tid, Mask, i);
+         //debug("cIptvDevice::OpenFilter(%d): Pid=%d Tid=%02X Mask=%02X Index=%d\n", deviceIndex, Pid, Tid, Mask, i);
          secfilters[i] = new cIptvSectionFilter(i, deviceIndex, Pid, Tid, Mask);
          return secfilters[i]->GetReadDesc();
          }
@@ -179,10 +180,11 @@ int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
 
 bool cIptvDevice::CloseFilter(int Handle)
 {
-  debug("cIptvDevice::CloseFilter(%d): %d\n", deviceIndex, Handle);
   for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
-      if (secfilters[i] && Handle == secfilters[i]->GetReadDesc())
+      if (secfilters[i] && (Handle == secfilters[i]->GetReadDesc())) {
+         //debug("cIptvDevice::CloseFilter(%d): %d\n", deviceIndex, Handle);
          return DeleteFilter(i);
+         }
       }
   return false;
 }
