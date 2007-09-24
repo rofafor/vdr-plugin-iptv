@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.38 2007/09/24 16:10:19 ajhseppa Exp $
+ * $Id: device.c,v 1.39 2007/09/24 17:20:58 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -34,7 +34,6 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   pIptvStreamer = new cIptvStreamer(tsBuffer, &mutex);
   // Initialize filter pointers
   memset(&secfilters, '\0', sizeof(secfilters));
-
   StartSectionHandler();
 }
 
@@ -45,7 +44,7 @@ cIptvDevice::~cIptvDevice()
   delete pUdpProtocol;
   delete tsBuffer;
   // Destroy all filters
-  for (int i = 0; i < eMaxFilterCount; ++i)
+  for (int i = 0; i < eMaxSecFilterCount; ++i)
       DeleteFilter(i);
 }
 
@@ -155,7 +154,7 @@ bool cIptvDevice::SetPid(cPidHandle *Handle, int Type, bool On)
 
 bool cIptvDevice::DeleteFilter(unsigned int Index)
 {
-  if ((Index < eMaxFilterCount) && secfilters[Index]) {
+  if ((Index < eMaxSecFilterCount) && secfilters[Index]) {
      debug("cIptvDevice::DeleteFilter(%d) Index=%d\n", deviceIndex, Index);
      delete secfilters[Index];
      secfilters[Index] = NULL;
@@ -167,12 +166,10 @@ bool cIptvDevice::DeleteFilter(unsigned int Index)
 int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
 {
   // Search the next free filter slot
-  for (unsigned int i = 0; i < eMaxFilterCount; ++i) {
+  for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
       if (!secfilters[i]) {
          debug("cIptvDevice::OpenFilter(%d): Pid=%d Tid=%02X Mask=%02X Index=%d\n", deviceIndex, Pid, Tid, Mask, i);
-	 
-         secfilters[i] = new cIptvSectionFilter(i, deviceIndex, Pid, Tid,
-                                                Mask);
+         secfilters[i] = new cIptvSectionFilter(i, deviceIndex, Pid, Tid, Mask);
          return secfilters[i]->GetReadDesc();
          }
       }
@@ -183,7 +180,7 @@ int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
 bool cIptvDevice::CloseFilter(int Handle)
 {
   debug("cIptvDevice::CloseFilter(%d): %d\n", deviceIndex, Handle);
-  for (unsigned int i = 0; i < eMaxFilterCount; ++i) {
+  for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
       if (secfilters[i] && Handle == secfilters[i]->GetReadDesc())
          return DeleteFilter(i);
       }
@@ -260,10 +257,9 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
         isPacketDelivered = true;
         Data = p;
         // Run the data through all filters
-        for (unsigned int i = 0; i < eMaxFilterCount; ++i) {
-            if (secfilters[i]) {
+        for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
+            if (secfilters[i])
                secfilters[i]->ProcessData(p);
-               }
             }
         return true;
         }

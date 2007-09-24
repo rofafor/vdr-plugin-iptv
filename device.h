@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.16 2007/09/24 13:03:38 ajhseppa Exp $
+ * $Id: device.h,v 1.17 2007/09/24 17:20:58 rahrenbe Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -11,13 +11,10 @@
 
 #include <vdr/device.h>
 #include "protocoludp.h"
-//#include "protocolrtsp.h"
 #include "protocolhttp.h"
 #include "protocolfile.h"
 #include "streamer.h"
-
 #include "sectionfilter.h"
-
 
 class cIptvDevice : public cDevice {
   // static ones
@@ -30,7 +27,7 @@ public:
   // private parts
 private:
   enum {
-    eMaxFilterCount   = 32,
+    eMaxSecFilterCount = 32
   };
   unsigned int deviceIndex;
   bool isPacketDelivered;
@@ -42,7 +39,7 @@ private:
   cIptvProtocolFile *pFileProtocol;
   cIptvStreamer *pIptvStreamer;
   cMutex mutex;
-  cIptvSectionFilter* secfilters[eMaxFilterCount];
+  cIptvSectionFilter* secfilters[eMaxSecFilterCount];
 
   // constructor & destructor
 public:
@@ -83,4 +80,3 @@ public:
 };
 
 #endif // __IPTV_DEVICE_H
-

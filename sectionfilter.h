@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.h,v 1.1 2007/09/24 13:03:39 ajhseppa Exp $
+ * $Id: sectionfilter.h,v 1.2 2007/09/24 17:20:58 rahrenbe Exp $
  */
 
 #ifndef __IPTV_SECTIONFILTER_H
@@ -20,7 +20,6 @@
 #include <sys/ioctl.h>
 #include <libgen.h>
 #include <stdint.h>
-
 #include <sys/param.h>
 
 #include "common.h"
@@ -39,79 +38,76 @@
 #define DVB_DEMUX_MASK_MAX 18
 
 class cIptvSectionFilter {
-
 private:
-   enum dmx_success {
-      DMX_OK = 0, /* Received Ok */
-      DMX_LENGTH_ERROR, /* Incorrect length */
-      DMX_OVERRUN_ERROR, /* Receiver ring buffer overrun */
-      DMX_CRC_ERROR, /* Incorrect CRC */
-      DMX_FRAME_ERROR, /* Frame alignment error */
-      DMX_FIFO_ERROR, /* Receiver FIFO overrun */
-      DMX_MISSED_ERROR /* Receiver missed packet */
-   } ;
+  enum dmx_success {
+    DMX_OK = 0, /* Received Ok */
+    DMX_LENGTH_ERROR, /* Incorrect length */
+    DMX_OVERRUN_ERROR, /* Receiver ring buffer overrun */
+    DMX_CRC_ERROR, /* Incorrect CRC */
+    DMX_FRAME_ERROR, /* Frame alignment error */
+    DMX_FIFO_ERROR, /* Receiver FIFO overrun */
+    DMX_MISSED_ERROR /* Receiver missed packet */
+  };
 
-   int fifoDescriptor;
-   int readDescriptor;
+  int fifoDescriptor;
+  int readDescriptor;
 
-   int pusi_seen;
-   int feedcc;
-   int doneq;
+  int pusi_seen;
+  int feedcc;
+  int doneq;
 
-   uint8_t *secbuf;
-   uint8_t secbuf_base[DMX_MAX_SECFEED_SIZE];
-   uint16_t secbufp;
-   uint16_t seclen;
-   uint16_t tsfeedp;
-   uint32_t crc_val;
+  uint8_t *secbuf;
+  uint8_t secbuf_base[DMX_MAX_SECFEED_SIZE];
+  uint16_t secbufp;
+  uint16_t seclen;
+  uint16_t tsfeedp;
+  uint32_t crc_val;
 
-   uint16_t pid;
-   int id;
+  uint16_t pid;
+  int id;
 
-
-   uint8_t filter_value[DMX_MAX_FILTER_SIZE];
-   uint8_t filter_mask[DMX_MAX_FILTER_SIZE];
-   uint8_t filter_mode[DMX_MAX_FILTER_SIZE];
+  uint8_t filter_value[DMX_MAX_FILTER_SIZE];
+  uint8_t filter_mask[DMX_MAX_FILTER_SIZE];
+  uint8_t filter_mode[DMX_MAX_FILTER_SIZE];
    
-   uint8_t maskandmode[DMX_MAX_FILTER_SIZE];
-   uint8_t maskandnotmode[DMX_MAX_FILTER_SIZE];
+  uint8_t maskandmode[DMX_MAX_FILTER_SIZE];
+  uint8_t maskandnotmode[DMX_MAX_FILTER_SIZE];
 
-   char pipeName[128];
+  char pipeName[128];
 
-   inline uint16_t section_length(const uint8_t *buf);
-   inline uint16_t ts_pid(const uint8_t *buf);
-   inline uint8_t payload(const uint8_t *tsp);
+  inline uint16_t section_length(const uint8_t *buf);
+  inline uint16_t ts_pid(const uint8_t *buf);
+  inline uint8_t payload(const uint8_t *tsp);
 
-   int dvb_dmxdev_section_callback(const uint8_t *buffer1,
-                                   size_t buffer1_len,
-                                   const uint8_t *buffer2,
-                                   size_t buffer2_len,
-                                   enum dmx_success success);
+  int dvb_dmxdev_section_callback(const uint8_t *buffer1,
+                                  size_t buffer1_len,
+                                  const uint8_t *buffer2,
+                                  size_t buffer2_len,
+                                  enum dmx_success success);
 
-   void dvb_dmx_swfilter_section_new();
+  void dvb_dmx_swfilter_section_new();
 
-   int dvb_dmx_swfilter_sectionfilter();
+  int dvb_dmx_swfilter_sectionfilter();
 
-   inline int dvb_dmx_swfilter_section_feed();
+  inline int dvb_dmx_swfilter_section_feed();
 
-   int dvb_dmx_swfilter_section_copy_dump(const uint8_t *buf,
-                                          uint8_t len);
+  int dvb_dmx_swfilter_section_copy_dump(const uint8_t *buf,
+                                         uint8_t len);
 
-   int GetFifoDesc();
-   void ClearPipeName();
-   void SetPipeName(int deviceIndex);
+  int GetFifoDesc();
+  void ClearPipeName();
+  void SetPipeName(int deviceIndex);
 
 public:
-   // constructor & destructor
-   cIptvSectionFilter(int Index, int devInd, u_short Pid, u_char Tid,
-                      u_char Mask);
+  // constructor & destructor
+  cIptvSectionFilter(int Index, int devInd, u_short Pid, u_char Tid,
+                     u_char Mask);
 
-   virtual ~cIptvSectionFilter();
+  virtual ~cIptvSectionFilter();
 
-   void ProcessData(const uint8_t* buf);
+  void ProcessData(const uint8_t* buf);
 
-   int GetReadDesc();
+  int GetReadDesc();
 };
 
 #endif // __IPTV_SECTIONFILTER_H
-
