@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.c,v 1.4 2007/09/24 21:25:54 rahrenbe Exp $
+ * $Id: sectionfilter.c,v 1.5 2007/09/26 22:07:45 rahrenbe Exp $
  */
 
 #include "sectionfilter.h"
@@ -49,13 +49,13 @@ cIptvSectionFilter::cIptvSectionFilter(int Index, int devInd,
   struct stat sb;
   stat(pipeName, &sb);
   if (S_ISFIFO(sb.st_mode))
-    unlink(pipeName);
+     unlink(pipeName);
   int err = mknod(pipeName, 0644 | S_IFIFO, 0);
   if (err < 0) {
-    char tmp[64];
-    error("ERROR: mknod(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-    return;
-    }
+     char tmp[64];
+     error("ERROR: mknod(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+     return;
+     }
 
   // Create descriptors
   fifoDescriptor = open(pipeName, O_RDWR | O_NONBLOCK);

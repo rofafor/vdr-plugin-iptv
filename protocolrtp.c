@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolrtp.c,v 1.1 2007/09/26 19:49:35 rahrenbe Exp $
+ * $Id: protocolrtp.c,v 1.2 2007/09/26 22:07:45 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -178,12 +178,11 @@ int cIptvProtocolRtp::Read(unsigned char* *BufferAddr)
                      MSG_DONTWAIT, (struct sockaddr *)&sockAddr, &addrlen);
      if (len > 0) {
         // http://www.networksorcery.com/enp/rfc/rfc2250.txt
-        const unsigned int headerlen = 4 * sizeof(uint32_t);
-        uint8_t *header = readBuffer + sizeof(uint8_t);
+        const int headerlen = 4 * sizeof(uint32_t);
         // Check if payload type is MPEG2 TS and payload contains multiple of TS packet data
-        if (((*header & 0x7F) == 33) && (((len - headerlen) % TS_SIZE) == 0)) {
+        if (((readBuffer[1] & 0x7F) == 33) && (((len - headerlen) % TS_SIZE) == 0)) {
            // Set argument point to payload in read buffer
-           *BufferAddr = readBuffer + headerlen;
+           *BufferAddr = &readBuffer[headerlen];
            return (len - headerlen);
            }
         }
