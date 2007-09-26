@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.h,v 1.3 2007/09/20 21:45:51 rahrenbe Exp $
+ * $Id: protocolhttp.h,v 1.4 2007/09/26 19:49:35 rahrenbe Exp $
  */
 
 #ifndef __IPTV_PROTOCOLHTTP_H
@@ -20,7 +20,7 @@ private:
   int socketDesc;
   unsigned char* readBuffer;
   struct sockaddr_in sockAddr;
-  bool unicastActive;
+  bool isActive;
 
 private:
   bool OpenSocket(const int Port);

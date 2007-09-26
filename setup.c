@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.8 2007/09/20 21:45:51 rahrenbe Exp $
+ * $Id: setup.c,v 1.9 2007/09/26 19:49:35 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -26,6 +26,7 @@ class cIptvMenuEditChannel : public cOsdMenu
 private:
   enum {
     eProtocolUDP,
+    eProtocolRTP,
     eProtocolHTTP,
     eProtocolFILE,
     eProtocolCount
@@ -51,6 +52,7 @@ cIptvMenuEditChannel::cIptvMenuEditChannel(cChannel *Channel, bool New)
 :cOsdMenu(trVDR("Edit channel"), 16)
 {
   protocols[eProtocolUDP]  = tr("UDP");
+  protocols[eProtocolRTP]  = tr("RTP");
   protocols[eProtocolHTTP] = tr("HTTP");
   protocols[eProtocolFILE] = tr("FILE");
   channel = Channel;
@@ -70,6 +72,11 @@ cString cIptvMenuEditChannel::GetIptvSettings(const char *Param, int *Port, int 
   if (sscanf(Param, "IPTV|UDP|%a[^|]|%u", &loc, Port) == 2) {
      cString addr(loc, true);
      *Protocol = eProtocolUDP;
+     return addr;
+     }
+  else if (sscanf(Param, "IPTV|RTP|%a[^|]|%u", &loc, Port) == 2) {
+     cString addr(loc, true);
+     *Protocol = eProtocolRTP;
      return addr;
      }
   else if (sscanf(Param, "IPTV|HTTP|%a[^|]|%u", &loc, Port) == 2) {
@@ -148,6 +155,9 @@ void cIptvMenuEditChannel::SetChannelData(cChannel *Channel)
             break;
        case eProtocolHTTP:
             param = cString::sprintf("IPTV|HTTP|%s|%d", data.location, data.port);
+            break;
+       case eProtocolRTP:
+            param = cString::sprintf("IPTV|RTP|%s|%d", data.location, data.port);
             break;
        default:
        case eProtocolUDP:
@@ -236,6 +246,7 @@ eOSState cIptvMenuEditChannel::ProcessKey(eKeys Key)
             data.port = 3000;
             break;
        default:
+       case eProtocolRTP:
        case eProtocolUDP:
             strn0cpy(data.location, "127.0.0.1", sizeof(data.location));
             data.port = 1234;
@@ -419,6 +430,7 @@ cIptvPluginSetup::cIptvPluginSetup()
   tsBufferSize = IptvConfig.GetTsBufferSize();
   tsBufferPrefill = IptvConfig.GetTsBufferPrefillRatio();
   udpBufferSize = IptvConfig.GetUdpBufferSize();
+  rtpBufferSize = IptvConfig.GetRtpBufferSize();
   httpBufferSize = IptvConfig.GetHttpBufferSize();
   fileBufferSize = IptvConfig.GetFileBufferSize();
   Setup();
@@ -432,6 +444,7 @@ void cIptvPluginSetup::Setup(void)
   Add(new cMenuEditIntItem(tr("TS buffer size [MB]"),         &tsBufferSize,    2, 16));
   Add(new cMenuEditIntItem(tr("TS buffer prefill ratio [%]"), &tsBufferPrefill, 0, 40));
   Add(new cMenuEditIntItem(tr("UDP buffer size [packets]"),   &udpBufferSize,   1, IptvConfig.GetMaxBufferSize()));
+  Add(new cMenuEditIntItem(tr("RTP buffer size [packets]"),   &rtpBufferSize,   1, IptvConfig.GetMaxBufferSize()));
   Add(new cMenuEditIntItem(tr("HTTP buffer size [packets]"),  &httpBufferSize,  1, IptvConfig.GetMaxBufferSize()));
   Add(new cMenuEditIntItem(tr("FILE buffer size [packets]"),  &fileBufferSize,  1, IptvConfig.GetMaxBufferSize()));
   SetCurrent(Get(current));
@@ -463,12 +476,14 @@ void cIptvPluginSetup::Store(void)
   SetupStore("TsBufferSize", tsBufferSize);
   SetupStore("TsBufferPrefill", tsBufferPrefill);
   SetupStore("UdpBufferSize", udpBufferSize);
+  SetupStore("RtpBufferSize", rtpBufferSize);
   SetupStore("HttpBufferSize", httpBufferSize);
   SetupStore("FileBufferSize", fileBufferSize);
   // Update global config
   IptvConfig.SetTsBufferSize(tsBufferSize);
   IptvConfig.SetTsBufferPrefillRatio(tsBufferPrefill);
   IptvConfig.SetUdpBufferSize(udpBufferSize);
+  IptvConfig.SetUdpBufferSize(rtpBufferSize);
   IptvConfig.SetHttpBufferSize(httpBufferSize);
   IptvConfig.SetFileBufferSize(fileBufferSize);
 }

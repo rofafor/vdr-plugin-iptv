@@ -1,7 +1,7 @@
 #
 # Makefile for a Video Disk Recorder plugin
 #
-# $Id: Makefile,v 1.8 2007/09/24 13:03:38 ajhseppa Exp $
+# $Id: Makefile,v 1.9 2007/09/26 19:49:35 rahrenbe Exp $
 
 # Debugging on/off 
 #IPTV_DEBUG = 1
@@ -57,7 +57,8 @@ endif
 
 ### The object files (add further files here):
 
-OBJS = $(PLUGIN).o config.o setup.o device.o streamer.o protocoludp.o protocolhttp.o protocolfile.o sectionfilter.o
+OBJS = $(PLUGIN).o config.o setup.o device.o streamer.o protocoludp.o protocolrtp.o \
+	protocolhttp.o protocolfile.o sectionfilter.o
 
 ### The main target:
 

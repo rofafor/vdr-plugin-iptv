@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.h,v 1.4 2007/09/18 18:48:11 rahrenbe Exp $
+ * $Id: setup.h,v 1.5 2007/09/26 19:49:35 rahrenbe Exp $
  */
 
 #ifndef __IPTV_SETUP_H
@@ -17,6 +17,7 @@ private:
   int tsBufferSize;
   int tsBufferPrefill;
   int udpBufferSize;
+  int rtpBufferSize;
   int httpBufferSize;
   int fileBufferSize;
   eOSState EditChannel(void);

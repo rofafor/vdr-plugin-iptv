@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.4 2007/09/20 21:45:51 rahrenbe Exp $
+ * $Id: protocolhttp.c,v 1.5 2007/09/26 19:49:35 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -20,9 +20,9 @@
 #include "protocolhttp.h"
 
 cIptvProtocolHttp::cIptvProtocolHttp()
-: streamPort(1234),
+: streamPort(3000),
   socketDesc(-1),
-  unicastActive(false)
+  isActive(false)
 {
   debug("cIptvProtocolHttp::cIptvProtocolHttp(): %d/%d packets\n",
         IptvConfig.GetHttpBufferSize(), IptvConfig.GetMaxBufferSize());
@@ -108,7 +108,7 @@ bool cIptvProtocolHttp::Connect(void)
 {
   debug("cIptvProtocolHttp::Connect()\n");
   // Check that stream address is valid
-  if (!unicastActive && !isempty(streamAddr) && !isempty(streamPath)) {
+  if (!isActive && !isempty(streamAddr) && !isempty(streamPath)) {
      // Ensure that socket is valid
      OpenSocket(streamPort);
 
@@ -195,7 +195,7 @@ bool cIptvProtocolHttp::Connect(void)
      // connection should be re-located etc.
 
      // Update active flag
-     unicastActive = true;
+     isActive = true;
      }
   return true;
 }
@@ -204,11 +204,11 @@ bool cIptvProtocolHttp::Disconnect(void)
 {
   debug("cIptvProtocolHttp::Disconnect()\n");
   // Check that stream address is valid
-  if (unicastActive) {
+  if (isActive) {
       // Close the socket
       CloseSocket();
       // Update active flag
-      unicastActive = false;
+      isActive = false;
      }
   return true;
 }

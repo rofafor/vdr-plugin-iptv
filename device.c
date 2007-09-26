@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.40 2007/09/24 21:25:53 rahrenbe Exp $
+ * $Id: device.c,v 1.41 2007/09/26 19:49:35 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -29,6 +29,7 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   tsBuffer->SetTimeouts(100, 100);
   ResetBuffering();
   pUdpProtocol = new cIptvProtocolUdp();
+  pRtpProtocol = new cIptvProtocolRtp();
   pHttpProtocol = new cIptvProtocolHttp();
   pFileProtocol = new cIptvProtocolFile();
   pIptvStreamer = new cIptvStreamer(tsBuffer, &mutex);
@@ -84,6 +85,11 @@ cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, cIptvPro
   if (sscanf(Param, "IPTV|UDP|%a[^|]|%u", &loc, IpPort) == 2) {
      cString addr(loc, true);
      *Protocol = pUdpProtocol;
+     return addr;
+     }
+  else if (sscanf(Param, "IPTV|RTP|%a[^|]|%u", &loc, IpPort) == 2) {
+     cString addr(loc, true);
+     *Protocol = pRtpProtocol;
      return addr;
      }
   else if (sscanf(Param, "IPTV|HTTP|%a[^|]|%u", &loc, IpPort) == 2) {

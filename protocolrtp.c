@@ -1,9 +1,9 @@
 /*
- * protocoludp.c: IPTV plugin for the Video Disk Recorder
+ * protocolrtp.c: IPTV plugin for the Video Disk Recorder
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.c,v 1.7 2007/09/26 19:49:35 rahrenbe Exp $
+ * $Id: protocolrtp.c,v 1.1 2007/09/26 19:49:35 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -16,25 +16,25 @@
 
 #include "common.h"
 #include "config.h"
-#include "protocoludp.h"
+#include "protocolrtp.h"
 
-cIptvProtocolUdp::cIptvProtocolUdp()
+cIptvProtocolRtp::cIptvProtocolRtp()
 : streamPort(1234),
   socketDesc(-1),
   isActive(false)
 {
-  debug("cIptvProtocolUdp::cIptvProtocolUdp(): %d/%d packets\n",
-        IptvConfig.GetUdpBufferSize(), IptvConfig.GetMaxBufferSize());
+  debug("cIptvProtocolRtp::cIptvProtocolRtp(): %d/%d packets\n",
+        IptvConfig.GetRtpBufferSize(), IptvConfig.GetMaxBufferSize());
   streamAddr = strdup("");
   // Allocate receive buffer
   readBuffer = MALLOC(unsigned char, (TS_SIZE * IptvConfig.GetMaxBufferSize()));
   if (!readBuffer)
-     error("ERROR: MALLOC() failed in ProtocolUdp()");
+     error("ERROR: MALLOC() failed in ProtocolRtp()");
 }
 
-cIptvProtocolUdp::~cIptvProtocolUdp()
+cIptvProtocolRtp::~cIptvProtocolRtp()
 {
-  debug("cIptvProtocolUdp::~cIptvProtocolUdp()\n");
+  debug("cIptvProtocolRtp::~cIptvProtocolRtp()\n");
   // Drop the multicast group and close the socket
   Close();
   // Free allocated memory
@@ -42,13 +42,13 @@ cIptvProtocolUdp::~cIptvProtocolUdp()
   free(readBuffer);
 }
 
-bool cIptvProtocolUdp::OpenSocket(const int Port)
+bool cIptvProtocolRtp::OpenSocket(const int Port)
 {
-  debug("cIptvProtocolUdp::OpenSocket()\n");
+  debug("cIptvProtocolRtp::OpenSocket()\n");
   // If socket is there already and it is bound to a different port, it must
   // be closed first
   if (Port != streamPort) {
-     debug("cIptvProtocolUdp::OpenSocket(): Socket tear-down\n");
+     debug("cIptvProtocolRtp::OpenSocket(): Socket tear-down\n");
      CloseSocket();
      }
   // Bind to the socket if it is not active already
@@ -94,9 +94,9 @@ bool cIptvProtocolUdp::OpenSocket(const int Port)
   return true;
 }
 
-void cIptvProtocolUdp::CloseSocket(void)
+void cIptvProtocolRtp::CloseSocket(void)
 {
-  debug("cIptvProtocolUdp::CloseSocket()\n");
+  debug("cIptvProtocolRtp::CloseSocket()\n");
   // Check if socket exists
   if (socketDesc >= 0) {
      close(socketDesc);
@@ -104,9 +104,9 @@ void cIptvProtocolUdp::CloseSocket(void)
      }
 }
 
-bool cIptvProtocolUdp::JoinMulticast(void)
+bool cIptvProtocolRtp::JoinMulticast(void)
 {
-  debug("cIptvProtocolUdp::JoinMulticast()\n");
+  debug("cIptvProtocolRtp::JoinMulticast()\n");
   // Check that stream address is valid
   if (!isActive && !isempty(streamAddr)) {
      // Ensure that socket is valid
@@ -128,9 +128,9 @@ bool cIptvProtocolUdp::JoinMulticast(void)
   return true;
 }
 
-bool cIptvProtocolUdp::DropMulticast(void)
+bool cIptvProtocolRtp::DropMulticast(void)
 {
-  debug("cIptvProtocolUdp::DropMulticast()\n");
+  debug("cIptvProtocolRtp::DropMulticast()\n");
   // Check that stream address is valid
   if (isActive && !isempty(streamAddr)) {
       // Ensure that socket is valid
@@ -152,12 +152,10 @@ bool cIptvProtocolUdp::DropMulticast(void)
   return true;
 }
 
-int cIptvProtocolUdp::Read(unsigned char* *BufferAddr)
+int cIptvProtocolRtp::Read(unsigned char* *BufferAddr)
 {
-  //debug("cIptvProtocolUdp::Read()\n");
+  //debug("cIptvProtocolRtp::Read()\n");
   socklen_t addrlen = sizeof(sockAddr);
-  // Set argument point to read buffer
-  *BufferAddr = readBuffer;
   // Wait for data
   struct timeval tv;
   tv.tv_sec = 0;
@@ -176,23 +174,34 @@ int cIptvProtocolUdp::Read(unsigned char* *BufferAddr)
   // Check if data available
   else if (retval) {
      // Read data from socket
-     return recvfrom(socketDesc, readBuffer, (TS_SIZE * IptvConfig.GetUdpBufferSize()),
+     int len = recvfrom(socketDesc, readBuffer, (TS_SIZE * IptvConfig.GetRtpBufferSize()),
                      MSG_DONTWAIT, (struct sockaddr *)&sockAddr, &addrlen);
+     if (len > 0) {
+        // http://www.networksorcery.com/enp/rfc/rfc2250.txt
+        const unsigned int headerlen = 4 * sizeof(uint32_t);
+        uint8_t *header = readBuffer + sizeof(uint8_t);
+        // Check if payload type is MPEG2 TS and payload contains multiple of TS packet data
+        if (((*header & 0x7F) == 33) && (((len - headerlen) % TS_SIZE) == 0)) {
+           // Set argument point to payload in read buffer
+           *BufferAddr = readBuffer + headerlen;
+           return (len - headerlen);
+           }
+        }
      }
   return 0;
 }
 
-bool cIptvProtocolUdp::Open(void)
+bool cIptvProtocolRtp::Open(void)
 {
-  debug("cIptvProtocolUdp::Open(): streamAddr=%s\n", streamAddr);
+  debug("cIptvProtocolRtp::Open(): streamAddr=%s\n", streamAddr);
   // Join a new multicast group
   JoinMulticast();
   return true;
 }
 
-bool cIptvProtocolUdp::Close(void)
+bool cIptvProtocolRtp::Close(void)
 {
-  debug("cIptvProtocolUdp::Close(): streamAddr=%s\n", streamAddr);
+  debug("cIptvProtocolRtp::Close(): streamAddr=%s\n", streamAddr);
   // Drop the multicast group
   DropMulticast();
   // Close the socket
@@ -200,9 +209,9 @@ bool cIptvProtocolUdp::Close(void)
   return true;
 }
 
-bool cIptvProtocolUdp::Set(const char* Address, const int Port)
+bool cIptvProtocolRtp::Set(const char* Address, const int Port)
 {
-  debug("cIptvProtocolUdp::Set(): %s:%d\n", Address, Port);
+  debug("cIptvProtocolRtp::Set(): %s:%d\n", Address, Port);
   if (!isempty(Address)) {
     // Drop the multicast group
     DropMulticast();

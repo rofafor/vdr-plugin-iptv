@@ -38,11 +38,12 @@ make plugins
 Channels.conf examples:
 
 TV1;IPTV:1:IPTV|UDP|127.0.0.1|1234:P:0:512:650:2321:0:1:0:0:0
+TV1;IPTV:1:IPTV|RTP|127.0.0.1|1234:P:0:512:650:2321:0:1:0:0:0
          ^ ^    ^   ^         ^    ^
          | |    |   |         |    Source type ("P")
          | |    |   |         IP Port Number
          | |    |   IP Address or File Location
-         | |    Protocol ("UDP", "HTTP", "FILE")
+         | |    Protocol ("UDP", "RTP", "HTTP", "FILE")
          | Plugin ID ("IPTV")
          Unique enumeration
 
