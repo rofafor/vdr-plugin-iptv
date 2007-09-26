@@ -1,7 +1,7 @@
 #
 # Makefile for a Video Disk Recorder plugin
 #
-# $Id: Makefile,v 1.9 2007/09/26 19:49:35 rahrenbe Exp $
+# $Id: Makefile,v 1.10 2007/09/26 22:10:17 rahrenbe Exp $
 
 # Debugging on/off 
 #IPTV_DEBUG = 1
@@ -116,7 +116,7 @@ dist: clean
 	@-rm -rf $(TMPDIR)/$(ARCHIVE)
 	@mkdir $(TMPDIR)/$(ARCHIVE)
 	@cp -a * $(TMPDIR)/$(ARCHIVE)
-	@tar czf $(PACKAGE).tgz -C $(TMPDIR) $(ARCHIVE)
+	@tar czf $(PACKAGE).tgz -C $(TMPDIR) --exclude CVS $(ARCHIVE)
 	@-rm -rf $(TMPDIR)/$(ARCHIVE)
 	@echo Distribution package created as $(PACKAGE).tgz
 
