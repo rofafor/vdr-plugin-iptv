@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolrtp.c,v 1.2 2007/09/26 22:07:45 rahrenbe Exp $
+ * $Id: protocolrtp.c,v 1.3 2007/09/27 22:30:50 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -176,11 +176,17 @@ int cIptvProtocolRtp::Read(unsigned char* *BufferAddr)
      // Read data from socket
      int len = recvfrom(socketDesc, readBuffer, (TS_SIZE * IptvConfig.GetRtpBufferSize()),
                      MSG_DONTWAIT, (struct sockaddr *)&sockAddr, &addrlen);
-     if (len > 0) {
+     if (len > 3) {
         // http://www.networksorcery.com/enp/rfc/rfc2250.txt
-        const int headerlen = 4 * sizeof(uint32_t);
+        unsigned int v = (readBuffer[0] >> 6) & 0x03;
+        unsigned int x = (readBuffer[0] >> 4) & 0x01;
+        unsigned int cc = readBuffer[0] & 0x0F;
+        unsigned int pt = readBuffer[1] & 0x7F;
+        unsigned int headerlen = (3 + cc) * sizeof(uint32_t);
+        if (x)
+           headerlen += ((((readBuffer[headerlen + 2] & 0xFF) << 8) | (readBuffer[headerlen + 3] & 0xFF)) + 1) * sizeof(uint32_t);
         // Check if payload type is MPEG2 TS and payload contains multiple of TS packet data
-        if (((readBuffer[1] & 0x7F) == 33) && (((len - headerlen) % TS_SIZE) == 0)) {
+        if ((v == 2) && (pt == 33) && (((len - headerlen) % TS_SIZE) == 0)) {
            // Set argument point to payload in read buffer
            *BufferAddr = &readBuffer[headerlen];
            return (len - headerlen);

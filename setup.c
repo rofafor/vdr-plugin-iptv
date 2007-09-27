@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.9 2007/09/26 19:49:35 rahrenbe Exp $
+ * $Id: setup.c,v 1.10 2007/09/27 22:30:50 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -483,7 +483,7 @@ void cIptvPluginSetup::Store(void)
   IptvConfig.SetTsBufferSize(tsBufferSize);
   IptvConfig.SetTsBufferPrefillRatio(tsBufferPrefill);
   IptvConfig.SetUdpBufferSize(udpBufferSize);
-  IptvConfig.SetUdpBufferSize(rtpBufferSize);
+  IptvConfig.SetRtpBufferSize(rtpBufferSize);
   IptvConfig.SetHttpBufferSize(httpBufferSize);
   IptvConfig.SetFileBufferSize(fileBufferSize);
 }
