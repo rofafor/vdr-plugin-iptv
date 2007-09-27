@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.c,v 1.5 2007/09/26 22:07:45 rahrenbe Exp $
+ * $Id: sectionfilter.c,v 1.6 2007/09/27 11:48:28 ajhseppa Exp $
  */
 
 #include "sectionfilter.h"
@@ -34,8 +34,13 @@ cIptvSectionFilter::cIptvSectionFilter(int Index, int devInd,
 
   SetPipeName(devInd);
 
-  filter_value[0] = !Tid;
+  filter_value[0] = Tid;
   filter_mask[0] = Mask;
+
+  // Invert the filter
+  for (int i = 0; i < DVB_DEMUX_MASK_MAX; ++i) {
+      filter_value[i] ^= 0xff;
+  }
 
   uint8_t mask, mode, local_doneq = 0;
   for (int i = 0; i < DVB_DEMUX_MASK_MAX; i++) {
