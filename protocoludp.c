@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.c,v 1.8 2007/09/28 16:44:59 rahrenbe Exp $
+ * $Id: protocoludp.c,v 1.9 2007/09/28 18:48:07 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -185,14 +185,25 @@ int cIptvProtocolUdp::Read(unsigned char* *BufferAddr)
         }
      else if (len > 3) {
         // http://www.networksorcery.com/enp/rfc/rfc2250.txt
+        // version
         unsigned int v = (readBuffer[0] >> 6) & 0x03;
+        // extension bit
         unsigned int x = (readBuffer[0] >> 4) & 0x01;
+        // cscr count
         unsigned int cc = readBuffer[0] & 0x0F;
+        // payload type
         unsigned int pt = readBuffer[1] & 0x7F;
+        // header lenght
         unsigned int headerlen = (3 + cc) * sizeof(uint32_t);
-        if (x)
-           headerlen += ((((readBuffer[headerlen + 2] & 0xFF) << 8) | (readBuffer[headerlen + 3] & 0xFF)) + 1) * sizeof(uint32_t);
-        // Check if payload type is MPEG2 TS and payload contains multiple of TS packet data
+        // check if extension
+        if (x) {
+           // extension header length
+           unsigned int ehl = (((readBuffer[headerlen + 2] & 0xFF) << 8) | (readBuffer[headerlen + 3] & 0xFF));
+           // update header length
+           headerlen += (ehl + 1) * sizeof(uint32_t);
+           }
+        // Check that rtp is version 2, payload type is MPEG2 TS
+        // and payload contains multiple of TS packet data
         if ((v == 2) && (pt == 33) && (((len - headerlen) % TS_SIZE) == 0)) {
            // Set argument point to payload in read buffer
            *BufferAddr = &readBuffer[headerlen];
