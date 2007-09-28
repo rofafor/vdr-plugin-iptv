@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.5 2007/09/26 19:49:35 rahrenbe Exp $
+ * $Id: protocolhttp.c,v 1.6 2007/09/28 16:44:59 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -22,14 +22,14 @@
 cIptvProtocolHttp::cIptvProtocolHttp()
 : streamPort(3000),
   socketDesc(-1),
+  readBufferLen(TS_SIZE * IptvConfig.GetReadBufferTsCount()),
   isActive(false)
 {
-  debug("cIptvProtocolHttp::cIptvProtocolHttp(): %d/%d packets\n",
-        IptvConfig.GetHttpBufferSize(), IptvConfig.GetMaxBufferSize());
+  debug("cIptvProtocolHttp::cIptvProtocolHttp()\n");
   streamAddr = strdup("");
   streamPath = strdup("/");
   // Allocate receive buffer
-  readBuffer = MALLOC(unsigned char, (TS_SIZE * IptvConfig.GetMaxBufferSize()));
+  readBuffer = MALLOC(unsigned char, readBufferLen);
   if (!readBuffer)
      error("ERROR: MALLOC() failed in ProtocolHttp()");
 }
@@ -237,8 +237,8 @@ int cIptvProtocolHttp::Read(unsigned char* *BufferAddr)
   // Check if data available
   else if (retval) {
      // Read data from socket
-     return recvfrom(socketDesc, readBuffer, (TS_SIZE * IptvConfig.GetHttpBufferSize()),
-                     MSG_DONTWAIT, (struct sockaddr *)&sockAddr, &addrlen);
+     return recvfrom(socketDesc, readBuffer, readBufferLen, MSG_DONTWAIT,
+                     (struct sockaddr *)&sockAddr, &addrlen);
      }
   return 0;
 }

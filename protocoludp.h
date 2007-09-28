@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.h,v 1.5 2007/09/26 19:49:35 rahrenbe Exp $
+ * $Id: protocoludp.h,v 1.6 2007/09/28 16:44:59 rahrenbe Exp $
  */
 
 #ifndef __IPTV_PROTOCOLUDP_H
@@ -18,6 +18,7 @@ private:
   int streamPort;
   int socketDesc;
   unsigned char* readBuffer;
+  unsigned int readBufferLen;
   struct sockaddr_in sockAddr;
   bool isActive;
 

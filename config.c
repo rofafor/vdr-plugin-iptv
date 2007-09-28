@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: config.c,v 1.6 2007/09/27 22:30:50 rahrenbe Exp $
+ * $Id: config.c,v 1.7 2007/09/28 16:44:59 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -12,12 +12,9 @@
 cIptvConfig IptvConfig;
 
 cIptvConfig::cIptvConfig(void)
-: tsBufferSize(2),
+: readBufferTsCount(48),
+  tsBufferSize(2),
   tsBufferPrefillRatio(0),
-  udpBufferSize(20),
-  rtpBufferSize(20),
-  httpBufferSize(20),
-  fileBufferSize(20),
-  maxBufferSize(40) // must be bigger than protocol buffer sizes!
+  fileIdleTimeMs(5)
 {
 }

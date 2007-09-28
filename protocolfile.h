@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolfile.h,v 1.3 2007/09/20 21:45:51 rahrenbe Exp $
+ * $Id: protocolfile.h,v 1.4 2007/09/28 16:44:59 rahrenbe Exp $
  */
 
 #ifndef __IPTV_PROTOCOLFILE_H
@@ -18,7 +18,8 @@ private:
   int streamPort;
   FILE* fileStream;
   unsigned char* readBuffer;
-  bool fileActive;
+  unsigned int readBufferLen;
+  bool isActive;
 
 private:
   bool OpenFile(void);

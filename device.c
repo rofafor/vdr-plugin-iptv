@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.42 2007/09/28 14:49:10 ajhseppa Exp $
+ * $Id: device.c,v 1.43 2007/09/28 16:44:59 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -24,12 +24,11 @@ cIptvDevice::cIptvDevice(unsigned int Index)
 {
   debug("cIptvDevice::cIptvDevice(%d)\n", deviceIndex);
   tsBuffer = new cRingBufferLinear(MEGABYTE(IptvConfig.GetTsBufferSize()),
-                                   (TS_SIZE * IptvConfig.GetMaxBufferSize()),
+                                   (TS_SIZE * IptvConfig.GetReadBufferTsCount()),
                                    false, "IPTV");
   tsBuffer->SetTimeouts(100, 100);
   ResetBuffering();
   pUdpProtocol = new cIptvProtocolUdp();
-  pRtpProtocol = new cIptvProtocolRtp();
   pHttpProtocol = new cIptvProtocolHttp();
   pFileProtocol = new cIptvProtocolFile();
   pIptvStreamer = new cIptvStreamer(tsBuffer, &mutex);
@@ -85,11 +84,6 @@ cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, cIptvPro
   if (sscanf(Param, "IPTV|UDP|%a[^|]|%u", &loc, IpPort) == 2) {
      cString addr(loc, true);
      *Protocol = pUdpProtocol;
-     return addr;
-     }
-  else if (sscanf(Param, "IPTV|RTP|%a[^|]|%u", &loc, IpPort) == 2) {
-     cString addr(loc, true);
-     *Protocol = pRtpProtocol;
      return addr;
      }
   else if (sscanf(Param, "IPTV|HTTP|%a[^|]|%u", &loc, IpPort) == 2) {
@@ -173,17 +167,15 @@ bool cIptvDevice::DeleteFilter(unsigned int Index)
 bool cIptvDevice::IsBlackListed(u_short Pid, u_char Tid, u_char Mask)
 {
   //debug("cIptvDevice::IsBlackListed(%d) Pid=%d Tid=%02X Mask=%02X\n", deviceIndex, Pid, Tid, Mask);
-
   // Black list. Should maybe be configurable via plugin setup menu
-  switch(Pid) {
-
-  case 0x14: // TDT pid
-    return true;
-    
-  default:
-    break;
-  }
-
+  switch (Pid) {
+    case 0x10: // NIT (0x40)
+    case 0x11: // SDT (0x42)
+    case 0x14: // TDT (0x70)
+         return true;
+    default:
+         break;
+    }
   return false;
 }
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.5.7\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2007-09-26 20:00+0300\n"
+"POT-Creation-Date: 2007-09-28 18:57+0300\n"
 "PO-Revision-Date: 2007-08-12 23:22+0300\n"
 "Last-Translator: Rolf Ahrenberg\n"
 "Language-Team: <vdr@linuxtv.org>\n"
@@ -19,58 +19,42 @@ msgstr ""
 msgid "Experiment the IPTV"
 msgstr "Koe IPTV:n ihmeellinen maailma"
 
-#: setup.c:54
+#: setup.c:53
 msgid "UDP"
 msgstr "UDP"
 
-#: setup.c:55
-msgid "RTP"
-msgstr "RTP"
-
-#: setup.c:56
+#: setup.c:54
 msgid "HTTP"
 msgstr "HTTP"
 
-#: setup.c:57
+#: setup.c:55
 msgid "FILE"
 msgstr "FILE"
 
-#: setup.c:180
+#: setup.c:170
 msgid "Protocol"
 msgstr "Protokolla"
 
-#: setup.c:188
+#: setup.c:178
 msgid "Address"
 msgstr "Osoite"
 
-#: setup.c:189
+#: setup.c:179
 msgid "Port"
 msgstr "Portti"
 
-#: setup.c:307
+#: setup.c:296
 msgid "IPTV Channels"
 msgstr "IPTV-kanavat"
 
-#: setup.c:444
+#: setup.c:430
 msgid "TS buffer size [MB]"
 msgstr "TS-puskurin koko [MB]"
 
-#: setup.c:445
+#: setup.c:431
 msgid "TS buffer prefill ratio [%]"
 msgstr "TS-puskurin esitäyttöaste [%]"
 
-#: setup.c:446
-msgid "UDP buffer size [packets]"
-msgstr "UDP-puskurin koko [pakettia]"
-
-#: setup.c:447
-msgid "RTP buffer size [packets]"
-msgstr "RTP-puskurin koko [pakettia]"
-
-#: setup.c:448
-msgid "HTTP buffer size [packets]"
-msgstr "HTTP-puskurin koko [pakettia]"
-
-#: setup.c:449
-msgid "FILE buffer size [packets]"
-msgstr "FILE-puskurin koko [pakettia]"
+#: setup.c:432
+msgid "FILE protocol idle time [ms]"
+msgstr "FILE-prokollan joutoaika [ms]"

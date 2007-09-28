@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolfile.c,v 1.7 2007/09/20 21:45:51 rahrenbe Exp $
+ * $Id: protocolfile.c,v 1.8 2007/09/28 16:44:59 rahrenbe Exp $
  */
 
 #include <fcntl.h>
@@ -16,13 +16,13 @@
 #include "protocolfile.h"
 
 cIptvProtocolFile::cIptvProtocolFile()
-: fileActive(false)
+: readBufferLen(TS_SIZE * IptvConfig.GetReadBufferTsCount()),
+  isActive(false)
 {
-  debug("cIptvProtocolFile::cIptvProtocolFile(): %d/%d packets\n",
-        IptvConfig.GetFileBufferSize(), IptvConfig.GetMaxBufferSize());
+  debug("cIptvProtocolFile::cIptvProtocolFile()\n");
   streamAddr = strdup("");
   // Allocate receive buffer
-  readBuffer = MALLOC(unsigned char, (TS_SIZE * IptvConfig.GetMaxBufferSize()));
+  readBuffer = MALLOC(unsigned char, readBufferLen);
   if (!readBuffer)
      error("ERROR: MALLOC() failed in ProtocolFile()");
 }
@@ -41,7 +41,7 @@ bool cIptvProtocolFile::OpenFile(void)
 {
   debug("cIptvProtocolFile::OpenFile()\n");
   // Check that stream address is valid
-  if (!fileActive && !isempty(streamAddr)) {
+  if (!isActive && !isempty(streamAddr)) {
      fileStream = fopen(streamAddr, "rb");
      if (ferror(fileStream) || !fileStream) {
         char tmp[64];
@@ -49,7 +49,7 @@ bool cIptvProtocolFile::OpenFile(void)
         return false;
         }
      // Update active flag
-     fileActive = true;
+     isActive = true;
      }
   return true;
 }
@@ -58,10 +58,10 @@ void cIptvProtocolFile::CloseFile(void)
 {
   debug("cIptvProtocolFile::CloseFile()\n");
   // Check that file stream is valid
-  if (fileActive && !isempty(streamAddr)) {
+  if (isActive && !isempty(streamAddr)) {
      fclose(fileStream);
      // Update active flag
-     fileActive = false;
+     isActive = false;
      }
 }
 
@@ -78,12 +78,13 @@ int cIptvProtocolFile::Read(unsigned char* *BufferAddr)
    if (feof(fileStream))
       rewind(fileStream);
    // Sleep before reading the file stream to prevent aggressive busy looping
-   cCondWait::SleepMs(1);
+   // and prevent transfer ringbuffer overflows
+   cCondWait::SleepMs(IptvConfig.GetFileIdleTimeMs());
    // This check is to prevent a race condition where file may be switched off
    // during the sleep and buffers are disposed. Check here that the plugin is
    // still active before accessing the buffers
-   if (fileActive)
-      return fread(readBuffer, sizeof(unsigned char), (TS_SIZE * IptvConfig.GetFileBufferSize()), fileStream);
+   if (isActive)
+      return fread(readBuffer, sizeof(unsigned char), readBufferLen, fileStream);
    return -1;
 }
 

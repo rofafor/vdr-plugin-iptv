@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.c,v 1.7 2007/09/26 19:49:35 rahrenbe Exp $
+ * $Id: protocoludp.c,v 1.8 2007/09/28 16:44:59 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -21,13 +21,13 @@
 cIptvProtocolUdp::cIptvProtocolUdp()
 : streamPort(1234),
   socketDesc(-1),
+  readBufferLen(TS_SIZE * IptvConfig.GetReadBufferTsCount()),
   isActive(false)
 {
-  debug("cIptvProtocolUdp::cIptvProtocolUdp(): %d/%d packets\n",
-        IptvConfig.GetUdpBufferSize(), IptvConfig.GetMaxBufferSize());
+  debug("cIptvProtocolUdp::cIptvProtocolUdp()\n");
   streamAddr = strdup("");
   // Allocate receive buffer
-  readBuffer = MALLOC(unsigned char, (TS_SIZE * IptvConfig.GetMaxBufferSize()));
+  readBuffer = MALLOC(unsigned char, readBufferLen);
   if (!readBuffer)
      error("ERROR: MALLOC() failed in ProtocolUdp()");
 }
@@ -176,8 +176,29 @@ int cIptvProtocolUdp::Read(unsigned char* *BufferAddr)
   // Check if data available
   else if (retval) {
      // Read data from socket
-     return recvfrom(socketDesc, readBuffer, (TS_SIZE * IptvConfig.GetUdpBufferSize()),
-                     MSG_DONTWAIT, (struct sockaddr *)&sockAddr, &addrlen);
+     int len = recvfrom(socketDesc, readBuffer, readBufferLen, MSG_DONTWAIT,
+                        (struct sockaddr *)&sockAddr, &addrlen);
+     if ((len > 0) && (readBuffer[0] == 0x47)) {
+        // Set argument point to read buffer
+        *BufferAddr = &readBuffer[0];
+        return len;
+        }
+     else if (len > 3) {
+        // http://www.networksorcery.com/enp/rfc/rfc2250.txt
+        unsigned int v = (readBuffer[0] >> 6) & 0x03;
+        unsigned int x = (readBuffer[0] >> 4) & 0x01;
+        unsigned int cc = readBuffer[0] & 0x0F;
+        unsigned int pt = readBuffer[1] & 0x7F;
+        unsigned int headerlen = (3 + cc) * sizeof(uint32_t);
+        if (x)
+           headerlen += ((((readBuffer[headerlen + 2] & 0xFF) << 8) | (readBuffer[headerlen + 3] & 0xFF)) + 1) * sizeof(uint32_t);
+        // Check if payload type is MPEG2 TS and payload contains multiple of TS packet data
+        if ((v == 2) && (pt == 33) && (((len - headerlen) % TS_SIZE) == 0)) {
+           // Set argument point to payload in read buffer
+           *BufferAddr = &readBuffer[headerlen];
+           return (len - headerlen);
+           }
+        }
      }
   return 0;
 }
