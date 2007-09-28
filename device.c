@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.41 2007/09/26 19:49:35 rahrenbe Exp $
+ * $Id: device.c,v 1.42 2007/09/28 14:49:10 ajhseppa Exp $
  */
 
 #include "common.h"
@@ -170,8 +170,29 @@ bool cIptvDevice::DeleteFilter(unsigned int Index)
   return false;
 }
 
+bool cIptvDevice::IsBlackListed(u_short Pid, u_char Tid, u_char Mask)
+{
+  //debug("cIptvDevice::IsBlackListed(%d) Pid=%d Tid=%02X Mask=%02X\n", deviceIndex, Pid, Tid, Mask);
+
+  // Black list. Should maybe be configurable via plugin setup menu
+  switch(Pid) {
+
+  case 0x14: // TDT pid
+    return true;
+    
+  default:
+    break;
+  }
+
+  return false;
+}
+
 int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
 {
+  // Black-listing check, refuse certain filters
+  if (IsBlackListed(Pid, Tid, Mask))
+     return -1;
+
   // Search the next free filter slot
   for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
       if (!secfilters[i]) {

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.18 2007/09/26 19:49:35 rahrenbe Exp $
+ * $Id: device.h,v 1.19 2007/09/28 14:49:10 ajhseppa Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -55,6 +55,7 @@ private:
   void ResetBuffering(void);
   bool IsBuffering(void);
   bool DeleteFilter(unsigned int Index);
+  bool IsBlackListed(u_short Pid, u_char Tid, u_char Mask);
 
   // for channel selection
 public:
