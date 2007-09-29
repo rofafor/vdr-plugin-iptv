@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: config.c,v 1.9 2007/09/29 16:21:05 rahrenbe Exp $
+ * $Id: config.c,v 1.10 2007/09/29 18:15:31 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -14,7 +14,6 @@ cIptvConfig IptvConfig;
 cIptvConfig::cIptvConfig(void)
 : readBufferTsCount(48),
   tsBufferSize(2),
-  tsBufferPrefillRatio(25),
-  fileIdleTimeMs(5)
+  tsBufferPrefillRatio(0)
 {
 }

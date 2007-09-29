@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.7 2007/09/29 16:21:05 rahrenbe Exp $
+ * $Id: iptv.c,v 1.8 2007/09/29 18:15:31 rahrenbe Exp $
  */
 
 #include <getopt.h>
@@ -158,8 +158,6 @@ bool cPluginIptv::SetupParse(const char *Name, const char *Value)
      IptvConfig.SetTsBufferSize(atoi(Value));
   else if (!strcasecmp(Name, "TsBufferPrefill"))
      IptvConfig.SetTsBufferPrefillRatio(atoi(Value));
-  else if (!strcasecmp(Name, "FileIdleTimeMs"))
-     IptvConfig.SetFileIdleTimeMs(atoi(Value));
   else
      return false;
   return true;

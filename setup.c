@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.13 2007/09/29 16:21:05 rahrenbe Exp $
+ * $Id: setup.c,v 1.14 2007/09/29 18:15:31 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -144,7 +144,7 @@ void cIptvMenuEditChannel::SetChannelData(cChannel *Channel)
      char dlangs[MAXDPIDS][MAXLANGCODE2] = { "" };
      switch (data.protocol) {
        case eProtocolFILE:
-            param = cString::sprintf("IPTV|FILE|%s|0", data.location);
+            param = cString::sprintf("IPTV|FILE|%s|%d", data.location, data.port);
             break;
        case eProtocolHTTP:
             param = cString::sprintf("IPTV|HTTP|%s|%d", data.location, data.port);
@@ -170,13 +170,14 @@ void cIptvMenuEditChannel::Setup(void)
   Add(new cMenuEditStraItem(tr("Protocol"),    &data.protocol, 3, protocols));
   switch (data.protocol) {
     case eProtocolFILE:
-         Add(new cMenuEditStrItem(trVDR("File"), data.location, sizeof(data.location), trVDR(FileNameChars)));
+         Add(new cMenuEditStrItem(trVDR("File"),     data.location, sizeof(data.location), trVDR(FileNameChars)));
+         Add(new cMenuEditIntItem(tr("Delay (ms)"), &data.port,  0, 0xFFFF));
          break;
     case eProtocolHTTP:
     case eProtocolUDP:
     default:
-         Add(new cMenuEditStrItem(tr("Address"),data.location, sizeof(data.location), trVDR(FileNameChars)));
-         Add(new cMenuEditIntItem(tr("Port"),  &data.port,  0, 0xFFFF));
+         Add(new cMenuEditStrItem(tr("Address"), data.location, sizeof(data.location), trVDR(FileNameChars)));
+         Add(new cMenuEditIntItem(tr("Port"),   &data.port,  0, 0xFFFF));
          break;
     }
   // Normal settings
@@ -429,7 +430,6 @@ cIptvPluginSetup::cIptvPluginSetup()
 {
   tsBufferSize = IptvConfig.GetTsBufferSize();
   tsBufferPrefill = IptvConfig.GetTsBufferPrefillRatio();
-  fileIdleTimeMs = IptvConfig.GetFileIdleTimeMs();
   Setup();
   SetHelp(trVDR("Channels"), NULL, NULL, NULL);
 }
@@ -440,7 +440,6 @@ void cIptvPluginSetup::Setup(void)
   Clear();
   Add(new cMenuEditIntItem(tr("TS buffer size [MB]"),          &tsBufferSize,     2, 16));
   Add(new cMenuEditIntItem(tr("TS buffer prefill ratio [%]"),  &tsBufferPrefill,  0, 40));
-  Add(new cMenuEditIntItem(tr("FILE protocol idle time [ms]"), &fileIdleTimeMs,   1, 100));
   SetCurrent(Get(current));
   Display();
 }
@@ -469,10 +468,8 @@ void cIptvPluginSetup::Store(void)
   // Store values into setup.conf
   SetupStore("TsBufferSize", tsBufferSize);
   SetupStore("TsBufferPrefill", tsBufferPrefill);
-  SetupStore("FileIdleTimeMs", fileIdleTimeMs);
   // Update global config
   IptvConfig.SetTsBufferSize(tsBufferSize);
   IptvConfig.SetTsBufferPrefillRatio(tsBufferPrefill);
-  IptvConfig.SetFileIdleTimeMs(fileIdleTimeMs);
 }
 
