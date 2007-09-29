@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.6 2007/09/28 16:44:59 rahrenbe Exp $
+ * $Id: protocolhttp.c,v 1.7 2007/09/29 10:55:14 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -188,11 +188,9 @@ bool cIptvProtocolHttp::Connect(void)
         return false;
         }
 
-     // It would be a good idea to wait here for the reception to begin instead
-     // of blindly assuming that datastream is really active.
-
-     // Also parsing the reply headers should happen here to see if the
-     // connection should be re-located etc.
+     // Now process headers
+     if (!ProcessHeaders())
+       return false;
 
      // Update active flag
      isActive = true;
@@ -210,6 +208,105 @@ bool cIptvProtocolHttp::Disconnect(void)
       // Update active flag
       isActive = false;
      }
+  return true;
+}
+
+bool cIptvProtocolHttp::GetHeaderLine(char* dest, unsigned int destLen,
+				      unsigned int &recvLen)
+{
+  debug("cIptvProtocolHttp::GetHeaderLine()\n");
+
+  bool linefeed = false;
+  bool newline = false;
+  char buf[256];
+  //int bufferPosition = 0;
+  char *bufptr = buf;
+  memset(buf, '\0', sizeof(buf));
+  recvLen = 0;
+
+  while(!newline || !linefeed) {
+
+    socklen_t addrlen = sizeof(sockAddr);
+    // Set argument point to read buffer
+    // Wait for data
+    struct timeval tv;
+    tv.tv_sec = 0;
+    tv.tv_usec = 500000;
+    // Use select
+    fd_set rfds;
+    FD_ZERO(&rfds);
+    FD_SET(socketDesc, &rfds);
+    int retval = select(socketDesc + 1, &rfds, NULL, NULL, &tv);
+    // Check if error
+    if (retval < 0) {
+       char tmp[64];
+       error("ERROR: select(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+       return false;
+       }
+    // Check if data available
+    else if (retval) {
+       int retval = recvfrom(socketDesc, bufptr, 1, MSG_DONTWAIT,
+                             (struct sockaddr *)&sockAddr, &addrlen);
+
+       if (retval <= 0)
+          return false;
+      
+       // Parsing end conditions, if line ends with \r\n
+       if (linefeed && *bufptr == '\n') {
+          newline = true;
+       // First occurrence of \r seen
+       } else if (*bufptr == '\r')
+          linefeed = true;
+       // Saw just data or \r without \n
+       else {
+          linefeed = false;
+          ++recvLen;
+          }
+
+       ++bufptr;
+
+       // Check that buffers won't be exceeded
+       if (recvLen >= sizeof(buf) || recvLen >= destLen) {
+          error("Header wouldn't fit into buffer\n");
+          return false;
+          }
+	  
+    } else {
+       error("No HTTP response received\n");
+       return false;
+       }
+  }
+
+  memcpy(dest, buf, recvLen);
+  return true;
+
+}
+
+bool cIptvProtocolHttp::ProcessHeaders(void)
+{
+  debug("cIptvProtocolHttp::ProcessHeaders()\n");
+  unsigned int lineLength = 0;
+  int response = 0;
+  bool responseFound = false;
+  char buf[256];
+
+  while(!responseFound || lineLength != 0) {
+     memset(buf, '\0', sizeof(buf));
+     
+     if(!GetHeaderLine(buf, sizeof(buf), lineLength))
+        return false;
+     
+     if (!responseFound && sscanf(buf, "HTTP/1.%*i %i ",&response) != 1) {
+        error("Expected HTTP -header not found\n");
+        continue;
+     } else
+        responseFound = true;
+  
+     if (response != 200) {
+        error("ERROR: %s\n", buf);
+        return false;
+        }
+  }
   return true;
 }
 

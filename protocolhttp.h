@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.h,v 1.5 2007/09/28 16:44:59 rahrenbe Exp $
+ * $Id: protocolhttp.h,v 1.6 2007/09/29 10:55:14 ajhseppa Exp $
  */
 
 #ifndef __IPTV_PROTOCOLHTTP_H
@@ -28,6 +28,9 @@ private:
   void CloseSocket(void);
   bool Connect(void);
   bool Disconnect(void);
+  bool GetHeaderLine(char* dest, unsigned int destLen,
+		     unsigned int &recvLen);
+  bool ProcessHeaders(void);
 
 public:
   cIptvProtocolHttp();
