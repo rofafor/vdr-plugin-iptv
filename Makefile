@@ -1,7 +1,7 @@
 #
 # Makefile for a Video Disk Recorder plugin
 #
-# $Id: Makefile,v 1.12 2007/09/28 23:23:12 rahrenbe Exp $
+# $Id: Makefile,v 1.13 2007/09/29 16:21:04 rahrenbe Exp $
 
 # Debugging on/off 
 #IPTV_DEBUG = 1

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.8 2007/09/29 11:17:57 ajhseppa Exp $
+ * $Id: protocolhttp.c,v 1.9 2007/09/29 16:21:05 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -195,7 +195,7 @@ bool cIptvProtocolHttp::Connect(void)
      if (!ProcessHeaders()) {
         CloseSocket();
         return false;
-     }
+        }
 
      // Update active flag
      isActive = true;
@@ -220,17 +220,14 @@ bool cIptvProtocolHttp::GetHeaderLine(char* dest, unsigned int destLen,
 				      unsigned int &recvLen)
 {
   debug("cIptvProtocolHttp::GetHeaderLine()\n");
-
   bool linefeed = false;
   bool newline = false;
   char buf[256];
-  //int bufferPosition = 0;
   char *bufptr = buf;
   memset(buf, '\0', sizeof(buf));
   recvLen = 0;
 
-  while(!newline || !linefeed) {
-
+  while (!newline || !linefeed) {
     socklen_t addrlen = sizeof(sockAddr);
     // Set argument point to read buffer
     // Wait for data
@@ -252,39 +249,33 @@ bool cIptvProtocolHttp::GetHeaderLine(char* dest, unsigned int destLen,
     else if (retval) {
        int retval = recvfrom(socketDesc, bufptr, 1, MSG_DONTWAIT,
                              (struct sockaddr *)&sockAddr, &addrlen);
-
        if (retval <= 0)
           return false;
-      
        // Parsing end conditions, if line ends with \r\n
-       if (linefeed && *bufptr == '\n') {
+       if (linefeed && *bufptr == '\n')
           newline = true;
        // First occurrence of \r seen
-       } else if (*bufptr == '\r')
+       else if (*bufptr == '\r')
           linefeed = true;
        // Saw just data or \r without \n
        else {
           linefeed = false;
           ++recvLen;
           }
-
        ++bufptr;
-
        // Check that buffers won't be exceeded
        if (recvLen >= sizeof(buf) || recvLen >= destLen) {
           error("Header wouldn't fit into buffer\n");
           return false;
           }
-	  
-    } else {
+       }
+    else {
        error("No HTTP response received\n");
        return false;
        }
-  }
-
+    }
   memcpy(dest, buf, recvLen);
   return true;
-
 }
 
 bool cIptvProtocolHttp::ProcessHeaders(void)
@@ -295,23 +286,21 @@ bool cIptvProtocolHttp::ProcessHeaders(void)
   bool responseFound = false;
   char buf[256];
 
-  while(!responseFound || lineLength != 0) {
-     memset(buf, '\0', sizeof(buf));
-     
-     if(!GetHeaderLine(buf, sizeof(buf), lineLength))
-        return false;
-     
-     if (!responseFound && sscanf(buf, "HTTP/1.%*i %i ",&response) != 1) {
-        error("Expected HTTP -header not found\n");
-        continue;
-     } else
-        responseFound = true;
-  
-     if (response != 200) {
-        error("ERROR: %s\n", buf);
-        return false;
-        }
-  }
+  while (!responseFound || lineLength != 0) {
+    memset(buf, '\0', sizeof(buf));
+    if (!GetHeaderLine(buf, sizeof(buf), lineLength))
+       return false;
+    if (!responseFound && sscanf(buf, "HTTP/1.%*i %i ",&response) != 1) {
+       error("Expected HTTP header not found\n");
+       continue;
+       }
+    else
+       responseFound = true;
+    if (response != 200) {
+       error("ERROR: %s\n", buf);
+       return false;
+       }
+    }
   return true;
 }
 

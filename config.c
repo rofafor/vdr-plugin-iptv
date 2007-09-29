@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: config.c,v 1.8 2007/09/28 19:56:03 rahrenbe Exp $
+ * $Id: config.c,v 1.9 2007/09/29 16:21:05 rahrenbe Exp $
  */
 
 #include "common.h"

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolif.h,v 1.3 2007/09/15 21:27:00 rahrenbe Exp $
+ * $Id: protocolif.h,v 1.4 2007/09/29 16:21:05 rahrenbe Exp $
  */
 
 #ifndef __IPTV_PROTOCOLIF_H

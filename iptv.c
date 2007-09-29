@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.6 2007/09/28 16:44:59 rahrenbe Exp $
+ * $Id: iptv.c,v 1.7 2007/09/29 16:21:05 rahrenbe Exp $
  */
 
 #include <getopt.h>

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.44 2007/09/28 23:23:12 rahrenbe Exp $
+ * $Id: device.c,v 1.45 2007/09/29 16:21:05 rahrenbe Exp $
  */
 
 #include "common.h"

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.c,v 1.15 2007/09/29 11:17:57 ajhseppa Exp $
+ * $Id: streamer.c,v 1.16 2007/09/29 16:21:05 rahrenbe Exp $
  */
 
 #include <vdr/thread.h>

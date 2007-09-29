@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.5.7\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2007-09-28 18:57+0300\n"
+"POT-Creation-Date: 2007-09-29 19:09+0300\n"
 "PO-Revision-Date: 2007-08-12 23:22+0300\n"
 "Last-Translator: Rolf Ahrenberg\n"
 "Language-Team: <vdr@linuxtv.org>\n"
@@ -43,18 +43,18 @@ msgstr "Osoite"
 msgid "Port"
 msgstr "Portti"
 
-#: setup.c:296
+#: setup.c:297
 msgid "IPTV Channels"
 msgstr "IPTV-kanavat"
 
-#: setup.c:430
+#: setup.c:441
 msgid "TS buffer size [MB]"
 msgstr "TS-puskurin koko [MB]"
 
-#: setup.c:431
+#: setup.c:442
 msgid "TS buffer prefill ratio [%]"
 msgstr "TS-puskurin esitäyttöaste [%]"
 
-#: setup.c:432
+#: setup.c:443
 msgid "FILE protocol idle time [ms]"
 msgstr "FILE-prokollan joutoaika [ms]"

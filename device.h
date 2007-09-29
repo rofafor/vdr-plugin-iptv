@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.21 2007/09/28 23:23:12 rahrenbe Exp $
+ * $Id: device.h,v 1.22 2007/09/29 16:21:05 rahrenbe Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
