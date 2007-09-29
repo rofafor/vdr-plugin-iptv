@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.7 2007/09/29 10:55:14 ajhseppa Exp $
+ * $Id: protocolhttp.c,v 1.8 2007/09/29 11:17:57 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -137,6 +137,7 @@ bool cIptvProtocolHttp::Connect(void)
      if (err < 0 && errno != EINPROGRESS) {
         char tmp[64];
         error("ERROR: Connect(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+        CloseSocket();
         return false;
         }
 
@@ -166,6 +167,7 @@ bool cIptvProtocolHttp::Connect(void)
         error("Cannot connect to %s\n", streamAddr);
         char tmp[64];
         error("ERROR: %s", strerror_r(socketStatus, tmp, sizeof(tmp)));
+        CloseSocket();
         return false;
         }
 
@@ -185,12 +187,15 @@ bool cIptvProtocolHttp::Connect(void)
      if (err < 0) {
         char tmp[64];
         error("ERROR: send(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+        CloseSocket();
         return false;
         }
 
      // Now process headers
-     if (!ProcessHeaders())
-       return false;
+     if (!ProcessHeaders()) {
+        CloseSocket();
+        return false;
+     }
 
      // Update active flag
      isActive = true;

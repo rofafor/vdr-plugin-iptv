@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.c,v 1.14 2007/09/21 21:50:52 rahrenbe Exp $
+ * $Id: streamer.c,v 1.15 2007/09/29 11:17:57 ajhseppa Exp $
  */
 
 #include <vdr/thread.h>
@@ -57,7 +57,8 @@ bool cIptvStreamer::Open(void)
   debug("cIptvStreamer::Open()\n");
   // Open the protocol
   if (protocol)
-     protocol->Open();
+     if(!protocol->Open())
+       return false;
   // Start thread
   Start();
   return true;
