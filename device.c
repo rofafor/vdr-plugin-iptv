@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.45 2007/09/29 16:21:05 rahrenbe Exp $
+ * $Id: device.c,v 1.46 2007/09/29 19:09:10 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -36,7 +36,7 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   memset(&secfilters, '\0', sizeof(secfilters));
   StartSectionHandler();
   // Sid filter must be created after the section handler
-  sidFinder = NULL; //new cSidFinder;
+  sidFinder = new cSidFinder;
   if (sidFinder)
      AttachFilter(sidFinder);
 }
@@ -152,7 +152,7 @@ bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
      return false;
      }
   pIptvStreamer->Set(addr, port, protocol);
-  if (sidFinder)
+  if (sidFinder && (Setup.UpdateChannels >= 4))
      sidFinder->SetChannel(Channel);
   return true;
 }
@@ -228,7 +228,7 @@ bool cIptvDevice::OpenDvr(void)
   mutex.Unlock();
   ResetBuffering();
   pIptvStreamer->Open();
-  if (sidFinder)
+  if (sidFinder && (Setup.UpdateChannels >= 4))
      sidFinder->SetStatus(true);
   isOpenDvr = true;
   return true;
@@ -237,9 +237,8 @@ bool cIptvDevice::OpenDvr(void)
 void cIptvDevice::CloseDvr(void)
 {
   debug("cIptvDevice::CloseDvr(%d)\n", deviceIndex);
-  if (sidFinder) {
+  if (sidFinder && (Setup.UpdateChannels >= 4))
      sidFinder->SetStatus(false);
-     }
   pIptvStreamer->Close();
   isOpenDvr = false;
 }
