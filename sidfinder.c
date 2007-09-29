@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sidfinder.c,v 1.1 2007/09/28 23:23:12 rahrenbe Exp $
+ * $Id: sidfinder.c,v 1.2 2007/09/29 22:44:23 rahrenbe Exp $
  */
 
 #include <libsi/section.h>
@@ -49,10 +49,10 @@ void cSidFinder::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
          if (!assoc.isNITPid()) {
             if (assoc.getServiceId() != channel.Sid()) {
                debug("cSidFinder::Process(): Sid=%d\n", assoc.getServiceId());
-               if (!Channels.Lock(true, 10)) {
+               if (!Channels.Lock(true, 10))
                   return;
-                  }
-               channel.SetId(channel.Nid(), channel.Tid(), assoc.getServiceId(), channel.Rid());
+               cChannel *IptvChannel = Channels.GetByChannelID(channel.GetChannelID());
+               IptvChannel->SetId(IptvChannel->Nid(), IptvChannel->Tid(), assoc.getServiceId(), IptvChannel->Rid());
                Channels.Unlock();
                }
             SetChannel(NULL);
