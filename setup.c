@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.11 2007/09/28 16:44:59 rahrenbe Exp $
+ * $Id: setup.c,v 1.12 2007/09/29 12:33:48 ajhseppa Exp $
  */
 
 #include <string.h>
@@ -285,6 +285,7 @@ protected:
   eOSState Edit(void);
   eOSState New(void);
   eOSState Delete(void);
+  eOSState Switch(void);
 
 public:
   cIptvMenuChannels();
@@ -330,6 +331,16 @@ void cIptvMenuChannels::Propagate(void)
       ci->Set();
   Display();
   Channels.SetModified(true);
+}
+
+eOSState cIptvMenuChannels::Switch(void)
+{
+  if (HasSubMenu() || Count() == 0)
+     return osContinue;
+  cChannel *ch = GetChannel(Current());
+  if (ch)
+     return cDevice::PrimaryDevice()->SwitchChannel(ch, true) ? osEnd : osContinue;
+  return osEnd;
 }
 
 eOSState cIptvMenuChannels::Edit(void)
@@ -401,7 +412,7 @@ eOSState cIptvMenuChannels::ProcessKey(eKeys Key)
     default:
          if (state == osUnknown) {
             switch (Key) {
-              case kOk:
+              case kOk:     return Switch();
               case kRed:    return Edit();
               case kGreen:  return New();
               case kYellow: return Delete();
