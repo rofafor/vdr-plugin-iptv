@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.15 2007/09/30 17:34:13 ajhseppa Exp $
+ * $Id: setup.c,v 1.16 2007/09/30 21:38:31 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -204,22 +204,17 @@ eOSState cIptvMenuEditChannel::ProcessKey(eKeys Key)
      if (Key == kOk) {
         cChannel newchannel;
         SetChannelData(&newchannel);
-
         bool uniquityFailed = false;
-
         // Search for identical channels as these will be ignored by vdr
         for (cChannel *iteratorChannel = Channels.First(); iteratorChannel;
              iteratorChannel = Channels.Next(iteratorChannel)) {
-
            // This is one of the channels cause the uniquity check to fail
            if (!iteratorChannel->GroupSep() && iteratorChannel != channel
                && iteratorChannel->GetChannelID() == newchannel.GetChannelID()) {
-
               // See if it has unique Plugin param. If yes then increment
               // the corresponding Rid until it is unique
               if (strcmp(iteratorChannel->PluginParam(),
                          newchannel.PluginParam())) {
-
                  // If the channel RID is already at maximum, then fail the
                  // channel modification
                  if (iteratorChannel->Rid() >= 8192) {
@@ -227,26 +222,23 @@ eOSState cIptvMenuEditChannel::ProcessKey(eKeys Key)
                     uniquityFailed = true;
                     break;
                     }
-
                  debug("Incrementing conflicting channel RID\n");
                  iteratorChannel->SetId(iteratorChannel->Nid(),
                                         iteratorChannel->Tid(),
                                         iteratorChannel->Sid(),
                                         iteratorChannel->Rid() + 1);
-              
-                    // Re-set the search and start again
-                    iteratorChannel = Channels.First();
-                    continue;
-                    
-                    // Cannot work around by incrementing rid because channels
-                    // are actually copies of each other
-                 } else {
-                    uniquityFailed = true;
-                    break;
-                    }
+                 // Re-set the search and start again
+                 iteratorChannel = Channels.First();
+                 continue;
+                 // Cannot work around by incrementing rid because channels
+                 // are actually copies of each other
+                 }
+              else {
+                 uniquityFailed = true;
+                 break;
+                 }
               }
-            }
-
+           }
         if (!uniquityFailed) {
            if (channel) {
               SetChannelData(channel);
@@ -264,7 +256,7 @@ eOSState cIptvMenuEditChannel::ProcessKey(eKeys Key)
            Channels.SetModified(true);
            }     
         else {
-           Skins.Message(mtError, trVDR("Cannot find unique channel settings!"));
+           Skins.Message(mtError, tr("Cannot find unique channel settings!"));
            state = osContinue;
            }
         }
@@ -473,6 +465,8 @@ cIptvPluginSetup::cIptvPluginSetup()
 {
   tsBufferSize = IptvConfig.GetTsBufferSize();
   tsBufferPrefill = IptvConfig.GetTsBufferPrefillRatio();
+  sectionFiltering = IptvConfig.GetSectionFiltering();
+  sidScanning = IptvConfig.GetSidScanning();
   Setup();
   SetHelp(trVDR("Channels"), NULL, NULL, NULL);
 }
@@ -481,8 +475,11 @@ void cIptvPluginSetup::Setup(void)
 {
   int current = Current();
   Clear();
-  Add(new cMenuEditIntItem(tr("TS buffer size [MB]"),          &tsBufferSize,     2, 16));
-  Add(new cMenuEditIntItem(tr("TS buffer prefill ratio [%]"),  &tsBufferPrefill,  0, 40));
+  Add(new cMenuEditIntItem( tr("TS buffer size [MB]"),         &tsBufferSize,     2, 16));
+  Add(new cMenuEditIntItem( tr("TS buffer prefill ratio [%]"), &tsBufferPrefill,  0, 40));
+  Add(new cMenuEditBoolItem(tr("Use section filtering"),       &sectionFiltering));  
+  if (sectionFiltering)
+     Add(new cMenuEditBoolItem(tr("Scan Sid automatically"),   &sidScanning));
   SetCurrent(Get(current));
   Display();
 }
@@ -511,8 +508,12 @@ void cIptvPluginSetup::Store(void)
   // Store values into setup.conf
   SetupStore("TsBufferSize", tsBufferSize);
   SetupStore("TsBufferPrefill", tsBufferPrefill);
+  SetupStore("SectionFiltering", sectionFiltering);
+  SetupStore("SidScanning", sidScanning);
   // Update global config
   IptvConfig.SetTsBufferSize(tsBufferSize);
   IptvConfig.SetTsBufferPrefillRatio(tsBufferPrefill);
+  IptvConfig.SetSectionFiltering(sectionFiltering);
+  IptvConfig.SetSidScanning(sidScanning);
 }
 

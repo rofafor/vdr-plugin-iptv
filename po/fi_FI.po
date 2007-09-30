@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.5.7\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2007-09-29 21:11+0300\n"
+"POT-Creation-Date: 2007-10-01 00:37+0300\n"
 "PO-Revision-Date: 2007-08-12 23:22+0300\n"
 "Last-Translator: Rolf Ahrenberg\n"
 "Language-Team: <vdr@linuxtv.org>\n"
@@ -47,14 +47,26 @@ msgstr "Osoite"
 msgid "Port"
 msgstr "Portti"
 
-#: setup.c:298
+#: setup.c:259
+msgid "Cannot find unique channel settings!"
+msgstr "Yksilöllisiä kanava-asetuksia ei löydetä!"
+
+#: setup.c:333
 msgid "IPTV Channels"
 msgstr "IPTV-kanavat"
 
-#: setup.c:441
+#: setup.c:478
 msgid "TS buffer size [MB]"
 msgstr "TS-puskurin koko [MB]"
 
-#: setup.c:442
+#: setup.c:479
 msgid "TS buffer prefill ratio [%]"
 msgstr "TS-puskurin esitäyttöaste [%]"
+
+#: setup.c:480
+msgid "Use section filtering"
+msgstr "Käytä sektioiden suodatusta"
+
+#: setup.c:482
+msgid "Scan Sid automatically"
+msgstr "Etsi palvelu-ID automaattisesti"
