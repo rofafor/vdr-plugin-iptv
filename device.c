@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.46 2007/09/29 19:09:10 rahrenbe Exp $
+ * $Id: device.c,v 1.47 2007/09/30 17:32:43 ajhseppa Exp $
  */
 
 #include "common.h"
@@ -152,7 +152,7 @@ bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
      return false;
      }
   pIptvStreamer->Set(addr, port, protocol);
-  if (sidFinder && (Setup.UpdateChannels >= 4))
+  if (sidFinder && (Setup.UpdateChannels >= 2))
      sidFinder->SetChannel(Channel);
   return true;
 }
