@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sidfinder.c,v 1.2 2007/09/29 22:44:23 rahrenbe Exp $
+ * $Id: sidfinder.c,v 1.3 2007/09/30 17:33:02 ajhseppa Exp $
  */
 
 #include <libsi/section.h>
@@ -38,8 +38,8 @@ void cSidFinder::SetChannel(const cChannel *Channel)
 
 void cSidFinder::Process(u_short Pid, u_char Tid, const u_char *Data, int Length)
 {
-  debug("cSidFinder::Process()\n");
-  if ((Pid == 0x00) && (Tid == 0x00) && (channel.GetChannelID() == Channel()->GetChannelID())) {
+  //debug("cSidFinder::Process()\n");
+  if ((Pid == 0x00) && (Tid == 0x00) && channel.GetChannelID().Valid()) {
      debug("cSidFinder::Process(): Pid=%d Tid=%02X\n", Pid, Tid);
      SI::PAT pat(Data, false);
      if (!pat.CheckCRCAndParse())
