@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.16 2007/09/30 21:38:31 rahrenbe Exp $
+ * $Id: setup.c,v 1.17 2007/10/01 15:30:22 ajhseppa Exp $
  */
 
 #include <string.h>
@@ -205,6 +205,7 @@ eOSState cIptvMenuEditChannel::ProcessKey(eKeys Key)
         cChannel newchannel;
         SetChannelData(&newchannel);
         bool uniquityFailed = false;
+        bool firstIteration = true;
         // Search for identical channels as these will be ignored by vdr
         for (cChannel *iteratorChannel = Channels.First(); iteratorChannel;
              iteratorChannel = Channels.Next(iteratorChannel)) {
@@ -226,7 +227,13 @@ eOSState cIptvMenuEditChannel::ProcessKey(eKeys Key)
                  iteratorChannel->SetId(iteratorChannel->Nid(),
                                         iteratorChannel->Tid(),
                                         iteratorChannel->Sid(),
-                                        iteratorChannel->Rid() + 1);
+                                        firstIteration ?
+                                        0 : iteratorChannel->Rid() + 1);
+
+                 // The first iteration prevents Rid:s from creeping slowly
+                 // towards maximum value because they are always zeroed first
+                 firstIteration = false;
+
                  // Re-set the search and start again
                  iteratorChannel = Channels.First();
                  continue;
