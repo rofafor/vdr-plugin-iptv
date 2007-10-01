@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.18 2007/10/01 15:38:44 ajhseppa Exp $
+ * $Id: setup.c,v 1.19 2007/10/01 18:14:57 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -192,6 +192,7 @@ void cIptvMenuEditChannel::Setup(void)
   Add(new cMenuEditIntItem(trVDR("Tpid"),      &data.tpid,     0, 0x1FFF));
   Add(new cMenuEditIntItem(trVDR("CA"),        &data.caids[0], 0, 0xFFFF));
   Add(new cMenuEditIntItem(trVDR("Sid"),       &data.sid,      1, 0xFFFF));
+  Add(new cMenuEditIntItem(tr   ("Rid"),       &data.rid,      0, 0x1FFF));
   SetCurrent(Get(current));
   Display();
 }
@@ -218,7 +219,7 @@ eOSState cIptvMenuEditChannel::ProcessKey(eKeys Key)
                          newchannel.PluginParam())) {
                  // If the channel RID is already at maximum, then fail the
                  // channel modification
-                 if (iteratorChannel->Rid() >= 8192) {
+                 if (iteratorChannel->Rid() >= 0x1FFF) {
                     debug("Cannot increment RID over maximum value\n");
                     uniquityFailed = true;
                     break;
@@ -231,7 +232,7 @@ eOSState cIptvMenuEditChannel::ProcessKey(eKeys Key)
                                         0 : iteratorChannel->Rid() + 1);
 
                  // Try zero Rid:s at first increment. Prevents them from
-		 // creeping slowly towards their maximum value
+                 // creeping slowly towards their maximum value
                  firstIncrement = false;
 
                  // Re-set the search and start again
@@ -523,4 +524,3 @@ void cIptvPluginSetup::Store(void)
   IptvConfig.SetSectionFiltering(sectionFiltering);
   IptvConfig.SetSidScanning(sidScanning);
 }
-

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.48 2007/09/30 21:38:31 rahrenbe Exp $
+ * $Id: device.c,v 1.49 2007/10/01 18:14:57 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -34,23 +34,26 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   pIptvStreamer = new cIptvStreamer(tsBuffer, &mutex);
   // Initialize filter pointers
   memset(&secfilters, '\0', sizeof(secfilters));
+  // Start section handler for iptv device
   StartSectionHandler();
-  // Sid filter must be created after the section handler
-  sidFinder = new cSidFinder;
-  if (sidFinder)
-     AttachFilter(sidFinder);
+  // Sid scanner must be created after the section handler
+  pSidScanner = new cSidScanner;
+  if (pSidScanner)
+     AttachFilter(pSidScanner);
 }
 
 cIptvDevice::~cIptvDevice()
 {
   debug("cIptvDevice::~cIptvDevice(%d)\n", deviceIndex);
-  delete pIptvStreamer;
-  delete pUdpProtocol;
-  delete tsBuffer;
+  DELETENULL(pIptvStreamer);
+  DELETENULL(pUdpProtocol);
+  DELETENULL(pHttpProtocol);
+  DELETENULL(pFileProtocol);
+  DELETENULL(tsBuffer);
   // Detach and destroy sid filter
-  if (sidFinder) {
-     Detach(sidFinder);
-     delete sidFinder;
+  if (pSidScanner) {
+     Detach(pSidScanner);
+     DELETENULL(pSidScanner);
      }
   // Destroy all filters
   for (int i = 0; i < eMaxSecFilterCount; ++i)
@@ -152,8 +155,8 @@ bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
      return false;
      }
   pIptvStreamer->Set(addr, port, protocol);
-  if (sidFinder && IptvConfig.GetSidScanning())
-     sidFinder->SetChannel(Channel);
+  if (pSidScanner && IptvConfig.GetSectionFiltering() && IptvConfig.GetSidScanning())
+     pSidScanner->SetChannel(Channel);
   return true;
 }
 
@@ -232,8 +235,8 @@ bool cIptvDevice::OpenDvr(void)
   mutex.Unlock();
   ResetBuffering();
   pIptvStreamer->Open();
-  if (sidFinder && IptvConfig.GetSidScanning())
-     sidFinder->SetStatus(true);
+  if (pSidScanner && IptvConfig.GetSectionFiltering() && IptvConfig.GetSidScanning())
+     pSidScanner->SetStatus(true);
   isOpenDvr = true;
   return true;
 }
@@ -241,8 +244,8 @@ bool cIptvDevice::OpenDvr(void)
 void cIptvDevice::CloseDvr(void)
 {
   debug("cIptvDevice::CloseDvr(%d)\n", deviceIndex);
-  if (sidFinder && IptvConfig.GetSidScanning())
-     sidFinder->SetStatus(false);
+  if (pSidScanner && IptvConfig.GetSectionFiltering() && IptvConfig.GetSidScanning())
+     pSidScanner->SetStatus(false);
   pIptvStreamer->Close();
   isOpenDvr = false;
 }
