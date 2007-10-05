@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.c,v 1.2 2007/10/05 22:23:56 ajhseppa Exp $
+ * $Id: statistics.c,v 1.3 2007/10/05 22:30:14 ajhseppa Exp $
  */
 
 #include "common.h"
@@ -99,10 +99,10 @@ void cIptvDeviceStatistics::UpdateActivePids(u_short pid, long payload)
   if (mostActivePids[numberOfElements - 1].DataAmount < payload) {
      mostActivePids[numberOfElements - 1].pid = pid;
      mostActivePids[numberOfElements - 1].DataAmount = payload;
-     }
 
-  // Re-sort
-  qsort(&mostActivePids, numberOfElements, sizeof(pidStruct), SortFunc);
+     // Re-sort
+     qsort(&mostActivePids, numberOfElements, sizeof(pidStruct), SortFunc);
+     }
 }
 
 
