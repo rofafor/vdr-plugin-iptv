@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.h,v 1.3 2007/10/05 19:00:44 ajhseppa Exp $
+ * $Id: sectionfilter.h,v 1.4 2007/10/05 20:01:24 ajhseppa Exp $
  */
 
 #ifndef __IPTV_SECTIONFILTER_H
@@ -37,9 +37,6 @@
 #endif
 
 #define DVB_DEMUX_MASK_MAX 18
-
-uint16_t ts_pid(const uint8_t *buf);
-uint8_t payload(const uint8_t *tsp);
 
 class cIptvSectionFilter : public cIptvSectionStatistics {
 private:
