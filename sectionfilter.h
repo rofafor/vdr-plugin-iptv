@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.h,v 1.2 2007/09/24 17:20:58 rahrenbe Exp $
+ * $Id: sectionfilter.h,v 1.3 2007/10/05 19:00:44 ajhseppa Exp $
  */
 
 #ifndef __IPTV_SECTIONFILTER_H
@@ -23,6 +23,7 @@
 #include <sys/param.h>
 
 #include "common.h"
+#include "statistics.h"
 
 #ifndef DMX_MAX_FILTER_SIZE
 #define DMX_MAX_FILTER_SIZE 18
@@ -37,7 +38,10 @@
 
 #define DVB_DEMUX_MASK_MAX 18
 
-class cIptvSectionFilter {
+uint16_t ts_pid(const uint8_t *buf);
+uint8_t payload(const uint8_t *tsp);
+
+class cIptvSectionFilter : public cIptvSectionStatistics {
 private:
   enum dmx_success {
     DMX_OK = 0, /* Received Ok */
@@ -76,8 +80,6 @@ private:
   char pipeName[128];
 
   inline uint16_t section_length(const uint8_t *buf);
-  inline uint16_t ts_pid(const uint8_t *buf);
-  inline uint8_t payload(const uint8_t *tsp);
 
   int dvb_dmxdev_section_callback(const uint8_t *buffer1,
                                   size_t buffer1_len,

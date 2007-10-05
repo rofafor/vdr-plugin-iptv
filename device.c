@@ -3,12 +3,13 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.49 2007/10/01 18:14:57 rahrenbe Exp $
+ * $Id: device.c,v 1.50 2007/10/05 19:00:44 ajhseppa Exp $
  */
 
 #include "common.h"
 #include "config.h"
 #include "device.h"
+#include "sectionfilter.h"
 
 #define IPTV_MAX_DEVICES 8
 
@@ -299,6 +300,9 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
            }
         isPacketDelivered = true;
         Data = p;
+	// Increment statistics counter
+	dataBytes += Count;
+	UpdateActivePids(ts_pid(p), payload(p));
         // Run the data through all filters
         for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
             if (secfilters[i])
@@ -310,4 +314,3 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
   Data = NULL;
   return true;
 }
-
