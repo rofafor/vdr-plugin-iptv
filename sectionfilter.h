@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.h,v 1.5 2007/10/05 21:52:16 ajhseppa Exp $
+ * $Id: sectionfilter.h,v 1.6 2007/10/05 21:56:02 ajhseppa Exp $
  */
 
 #ifndef __IPTV_SECTIONFILTER_H
@@ -55,8 +55,6 @@ private:
   uint16_t secbufp;
   uint16_t seclen;
   uint16_t tsfeedp;
-  uint32_t crc_val;
-
   uint16_t pid;
   int id;
 

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.c,v 1.9 2007/10/05 21:52:16 ajhseppa Exp $
+ * $Id: sectionfilter.c,v 1.10 2007/10/05 21:56:02 ajhseppa Exp $
  */
 
 #include "sectionfilter.h"
@@ -20,7 +20,6 @@ cIptvSectionFilter::cIptvSectionFilter(int Index, int devInd,
   secbufp(0),
   seclen(0),
   tsfeedp(0),
-  crc_val(0),
   pid(Pid),
   id(Index)
 {
@@ -235,7 +234,6 @@ int cIptvSectionFilter::demux_swfilter_section_copy_dump(const uint8_t *buf, uin
       printf("Non-mismatching seclen! %d, limit = %d\n", seclen_local, limit);
 #endif
       seclen = seclen_local;
-      crc_val = ~0;
       /* dump [secbuf .. secbuf+seclen) */
       if (pusi_seen)
          demux_swfilter_section_feed();
