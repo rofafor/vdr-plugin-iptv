@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.h,v 1.4 2007/10/05 20:01:24 ajhseppa Exp $
+ * $Id: sectionfilter.h,v 1.5 2007/10/05 21:52:16 ajhseppa Exp $
  */
 
 #ifndef __IPTV_SECTIONFILTER_H
@@ -25,19 +25,6 @@
 #include "common.h"
 #include "statistics.h"
 
-#ifndef DMX_MAX_FILTER_SIZE
-#define DMX_MAX_FILTER_SIZE 18
-#endif
-
-#ifndef DMX_MAX_SECTION_SIZE
-#define DMX_MAX_SECTION_SIZE 4096
-#endif
-#ifndef DMX_MAX_SECFEED_SIZE
-#define DMX_MAX_SECFEED_SIZE (DMX_MAX_SECTION_SIZE + 188)
-#endif
-
-#define DVB_DEMUX_MASK_MAX 18
-
 class cIptvSectionFilter : public cIptvSectionStatistics {
 private:
   enum dmx_success {
@@ -48,6 +35,12 @@ private:
     DMX_FRAME_ERROR, /* Frame alignment error */
     DMX_FIFO_ERROR, /* Receiver FIFO overrun */
     DMX_MISSED_ERROR /* Receiver missed packet */
+  };
+
+  enum dmx_limits {
+    DMX_MAX_FILTER_SIZE  = 18,
+    DMX_MAX_SECTION_SIZE = 4096,
+    DMX_MAX_SECFEED_SIZE = (DMX_MAX_SECTION_SIZE + 188)
   };
 
   int fifoDescriptor;
@@ -78,20 +71,20 @@ private:
 
   inline uint16_t section_length(const uint8_t *buf);
 
-  int dvb_dmxdev_section_callback(const uint8_t *buffer1,
-                                  size_t buffer1_len,
-                                  const uint8_t *buffer2,
-                                  size_t buffer2_len,
-                                  enum dmx_success success);
+  int dmxdev_section_callback(const uint8_t *buffer1,
+                              size_t buffer1_len,
+                              const uint8_t *buffer2,
+                              size_t buffer2_len,
+                              enum dmx_success success);
 
-  void dvb_dmx_swfilter_section_new();
+  void demux_swfilter_section_new();
 
-  int dvb_dmx_swfilter_sectionfilter();
+  int demux_swfilter_sectionfilter();
 
-  inline int dvb_dmx_swfilter_section_feed();
+  inline int demux_swfilter_section_feed();
 
-  int dvb_dmx_swfilter_section_copy_dump(const uint8_t *buf,
-                                         uint8_t len);
+  int demux_swfilter_section_copy_dump(const uint8_t *buf,
+                                       uint8_t len);
 
   int GetFifoDesc();
   void ClearPipeName();

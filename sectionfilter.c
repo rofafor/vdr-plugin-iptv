@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.c,v 1.8 2007/10/05 20:01:24 ajhseppa Exp $
+ * $Id: sectionfilter.c,v 1.9 2007/10/05 21:52:16 ajhseppa Exp $
  */
 
 #include "sectionfilter.h"
@@ -39,12 +39,12 @@ cIptvSectionFilter::cIptvSectionFilter(int Index, int devInd,
   filter_mask[0] = Mask;
 
   // Invert the filter
-  for (int i = 0; i < DVB_DEMUX_MASK_MAX; ++i) {
+  for (int i = 0; i < DMX_MAX_FILTER_SIZE; ++i) {
       filter_value[i] ^= 0xff;
   }
 
   uint8_t mask, mode, local_doneq = 0;
-  for (int i = 0; i < DVB_DEMUX_MASK_MAX; i++) {
+  for (int i = 0; i < DMX_MAX_FILTER_SIZE; i++) {
     mode = filter_mode[i];
     mask = filter_mask[i];
     maskandmode[i] = mask & mode;
@@ -94,9 +94,9 @@ inline uint16_t cIptvSectionFilter::section_length(const uint8_t *buf)
   return 3 + ((buf[1] & 0x0f) << 8) + buf[2];
 }
 
-int cIptvSectionFilter::dvb_dmxdev_section_callback(const uint8_t *buffer1, size_t buffer1_len,
-                                                    const uint8_t *buffer2, size_t buffer2_len,
-                                                    enum dmx_success success)
+int cIptvSectionFilter::dmxdev_section_callback(const uint8_t *buffer1, size_t buffer1_len,
+                                                const uint8_t *buffer2, size_t buffer2_len,
+                                                enum dmx_success success)
 {
   struct timeval tv;
   tv.tv_sec = 0;
@@ -137,9 +137,9 @@ int cIptvSectionFilter::dvb_dmxdev_section_callback(const uint8_t *buffer1, size
 
 
 
-void cIptvSectionFilter::dvb_dmx_swfilter_section_new()
+void cIptvSectionFilter::demux_swfilter_section_new()
 {
-#ifdef DVB_DEMUX_SECTION_LOSS_LOG
+#ifdef DEMUX_SECTION_LOSS_LOG
   if (secbufp < tsfeedp) {
      int i, n = tsfeedp - secbufp;
      /*
@@ -148,9 +148,9 @@ void cIptvSectionFilter::dvb_dmx_swfilter_section_new()
       * but just first and last.
       */
      if (secbuf[0] != 0xff || secbuf[n - 1] != 0xff) {
-        printf("dvb_demux.c section ts padding loss: %d/%d\n",
+        printf("sectionfilter.c section ts padding loss: %d/%d\n",
                n, tsfeedp);
-        printf("dvb_demux.c pad data:");
+        printf("sectionfilter.c pad data:");
         for (i = 0; i < n; i++)
 	    printf(" %02x", secbuf[i]);
         printf("\n");
@@ -161,12 +161,12 @@ void cIptvSectionFilter::dvb_dmx_swfilter_section_new()
   secbuf = secbuf_base;
 }
 
-int cIptvSectionFilter::dvb_dmx_swfilter_sectionfilter()
+int cIptvSectionFilter::demux_swfilter_sectionfilter()
 {
   uint8_t neq = 0;
   int i;
 
-  for (i = 0; i < DVB_DEMUX_MASK_MAX; i++) {
+  for (i = 0; i < DMX_MAX_FILTER_SIZE; i++) {
       uint8_t local_xor = filter_value[i] ^ secbuf[i];
       if (maskandmode[i] & local_xor) {
 #ifdef DEBUG_PRINTF
@@ -183,18 +183,18 @@ int cIptvSectionFilter::dvb_dmx_swfilter_sectionfilter()
 #endif
      return 0;
      }
-  return dvb_dmxdev_section_callback(secbuf, seclen, NULL, 0, DMX_OK);
+  return dmxdev_section_callback(secbuf, seclen, NULL, 0, DMX_OK);
 }
 
-inline int cIptvSectionFilter::dvb_dmx_swfilter_section_feed()
+inline int cIptvSectionFilter::demux_swfilter_section_feed()
 {
-  if (dvb_dmx_swfilter_sectionfilter() < 0)
+  if (demux_swfilter_sectionfilter() < 0)
      return -1;
   seclen = 0;
   return 0;
 }
 
-int cIptvSectionFilter::dvb_dmx_swfilter_section_copy_dump(const uint8_t *buf, uint8_t len)
+int cIptvSectionFilter::demux_swfilter_section_copy_dump(const uint8_t *buf, uint8_t len)
 {
   uint16_t limit, seclen_local, n;
 
@@ -202,8 +202,8 @@ int cIptvSectionFilter::dvb_dmx_swfilter_section_copy_dump(const uint8_t *buf, u
      return 0;
 
   if (tsfeedp + len > DMX_MAX_SECFEED_SIZE) {
-#ifdef DVB_DEMUX_SECTION_LOSS_LOG
-     printf("dvb_demux.c section buffer full loss: %d/%d\n",
+#ifdef DEMUX_SECTION_LOSS_LOG
+     printf("sectionfilter.c section buffer full loss: %d/%d\n",
             tsfeedp + len - DMX_MAX_SECFEED_SIZE,
             DMX_MAX_SECFEED_SIZE);
 #endif
@@ -238,10 +238,10 @@ int cIptvSectionFilter::dvb_dmx_swfilter_section_copy_dump(const uint8_t *buf, u
       crc_val = ~0;
       /* dump [secbuf .. secbuf+seclen) */
       if (pusi_seen)
-         dvb_dmx_swfilter_section_feed();
-#ifdef DVB_DEMUX_SECTION_LOSS_LOG
+         demux_swfilter_section_feed();
+#ifdef DEMUX_SECTION_LOSS_LOG
       else
-         printf("dvb_demux.c pusi not seen, discarding section data\n");
+         printf("sectionfilter.c pusi not seen, discarding section data\n");
 #endif
       secbufp += seclen_local;	/* secbufp and secbuf moving together is */
       secbuf += seclen_local;	/* redundant but saves pointer arithmetic */
@@ -279,12 +279,12 @@ void cIptvSectionFilter::ProcessData(const uint8_t* buf)
      }
 
   if (!ccok || dc_i) {
-#ifdef DVB_DEMUX_SECTION_LOSS_LOG
-     printf("dvb_demux.c discontinuity detected %d bytes lost\n",
+#ifdef DEMUX_SECTION_LOSS_LOG
+     printf("sectionfilter.c discontinuity detected %d bytes lost\n",
             count);
      /*
       * those bytes under sume circumstances will again be reported
-      * in the following dvb_dmx_swfilter_section_new
+      * in the following demux_swfilter_section_new
       */
 #endif
      /*
@@ -292,7 +292,7 @@ void cIptvSectionFilter::ProcessData(const uint8_t* buf)
       * stop feeding of suspicious data until next PUSI=1 arrives
       */
      pusi_seen = 0;
-     dvb_dmx_swfilter_section_new();
+     demux_swfilter_section_new();
      }
 
   if (buf[1] & 0x40) {
@@ -306,19 +306,19 @@ void cIptvSectionFilter::ProcessData(const uint8_t* buf)
         const uint8_t *after = &before[before_len];
         uint8_t after_len = count - 1 - before_len;
 
-        dvb_dmx_swfilter_section_copy_dump(before, before_len);
+        demux_swfilter_section_copy_dump(before, before_len);
         /* before start of new section, set pusi_seen = 1 */
         pusi_seen = 1;
-        dvb_dmx_swfilter_section_new();
-        dvb_dmx_swfilter_section_copy_dump(after, after_len);
+        demux_swfilter_section_new();
+        demux_swfilter_section_copy_dump(after, after_len);
         }
-#ifdef DVB_DEMUX_SECTION_LOSS_LOG
+#ifdef DEMUX_SECTION_LOSS_LOG
      else if (count > 0)
-        printf("dvb_demux.c PUSI=1 but %d bytes lost\n", count);
+        printf("sectionfilter.c PUSI=1 but %d bytes lost\n", count);
 #endif
      }
   else {
      /* PUSI=0 (is not set), no section boundary */
-     dvb_dmx_swfilter_section_copy_dump(&buf[p], count);
+     demux_swfilter_section_copy_dump(&buf[p], count);
      }
 }
