@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.c,v 1.1 2007/10/05 19:00:44 ajhseppa Exp $
+ * $Id: statistics.c,v 1.2 2007/10/05 22:23:56 ajhseppa Exp $
  */
 
 #include "common.h"
@@ -14,12 +14,12 @@ cIptvSectionStatistics::cIptvSectionStatistics()
   : filteredData(0),
     numberOfCalls(0)
 {
-  debug("cIptvSectionStatistics::cIptvSectionStatistics()\n");
+  //debug("cIptvSectionStatistics::cIptvSectionStatistics()\n");
 }
 
 cIptvSectionStatistics::~cIptvSectionStatistics()
 {
-  debug("cIptvSectionStatistics::~cIptvSectionStatistics()\n");
+  //debug("cIptvSectionStatistics::~cIptvSectionStatistics()\n");
 }
 
 char* cIptvSectionStatistics::GetStatistic()
@@ -64,7 +64,7 @@ char* cIptvDeviceStatistics::GetStatistic()
 
 int SortFunc(const void* data1, const void* data2)
 {
-  debug("cIptvDeviceStatistics::SortFunc()\n");
+  //debug("cIptvDeviceStatistics::SortFunc()\n");
 
   pidStruct *comp1 = (pidStruct*)data1;
   pidStruct *comp2 = (pidStruct*)data2;
@@ -80,7 +80,7 @@ int SortFunc(const void* data1, const void* data2)
 
 void cIptvDeviceStatistics::UpdateActivePids(u_short pid, long payload)
 {
-  debug("cIptvDeviceStatistics::UpdateActivePids()\n");
+  //debug("cIptvDeviceStatistics::UpdateActivePids()\n");
 
   const int numberOfElements = sizeof(mostActivePids) / sizeof(pidStruct);
 
