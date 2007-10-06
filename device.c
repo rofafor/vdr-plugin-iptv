@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.53 2007/10/06 22:15:02 rahrenbe Exp $
+ * $Id: device.c,v 1.54 2007/10/06 22:25:49 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -98,7 +98,7 @@ cIptvDevice *cIptvDevice::GetIptvDevice(int CardIndex)
 
 cString cIptvDevice::GetInformation(void)
 {
-  return cString::sprintf("Device:\n%s\nStreamer:\n%s\nSection Filter:\n%s\n", *GetStatistic(),
+  return cString::sprintf("Device:\n%s\nStreamer:\n%s\nSection Filter 0:\n%s", *GetStatistic(),
                           pIptvStreamer ? *pIptvStreamer->GetStatistic() : "",
                           secfilters[0] ? *secfilters[0]->GetStatistic() : "");
 }
@@ -200,9 +200,9 @@ bool cIptvDevice::IsBlackListed(u_short Pid, u_char Tid, u_char Mask)
       int index = IptvConfig.GetDisabledFilters(i);
       // check if matches
       if ((index >= 0) && (index < SECTION_FILTER_TABLE_SIZE) &&
-          (section_filter_table[i].pid == Pid) && (section_filter_table[i].tid == Tid) &&
-          (section_filter_table[i].mask == Mask)) {
-         //debug("cIptvDevice::IsBlackListed(%d) Found=%s\n", deviceIndex, section_filter_table[i].description);
+          (section_filter_table[index].pid == Pid) && (section_filter_table[index].tid == Tid) &&
+          (section_filter_table[index].mask == Mask)) {
+         //debug("cIptvDevice::IsBlackListed(%d) Found=%s\n", deviceIndex, section_filter_table[index].description);
          return true;
          }
       }
