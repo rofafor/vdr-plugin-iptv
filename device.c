@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.52 2007/10/06 20:57:53 rahrenbe Exp $
+ * $Id: device.c,v 1.53 2007/10/06 22:15:02 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -98,11 +98,9 @@ cIptvDevice *cIptvDevice::GetIptvDevice(int CardIndex)
 
 cString cIptvDevice::GetInformation(void)
 {
-  char Text[25];
-  struct tm tm_r;
-  time_t t = time(NULL);
-  strftime(Text, sizeof(Text), "%T", localtime_r(&t, &tm_r));
-  return cString::sprintf("IPTV device: %d\nTime: %s\n", deviceIndex, Text);
+  return cString::sprintf("Device:\n%s\nStreamer:\n%s\nSection Filter:\n%s\n", *GetStatistic(),
+                          pIptvStreamer ? *pIptvStreamer->GetStatistic() : "",
+                          secfilters[0] ? *secfilters[0]->GetStatistic() : "");
 }
 
 cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, cIptvProtocolIf* *Protocol)

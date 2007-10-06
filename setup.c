@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.21 2007/10/06 20:57:53 rahrenbe Exp $
+ * $Id: setup.c,v 1.22 2007/10/06 22:15:02 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -477,7 +477,7 @@ private:
   enum {
     INFO_TIMEOUT = 2000
   };
-  char *text;
+  cString text;
   cTimeMs timeout;
   void UpdateInfo();
 
@@ -489,26 +489,22 @@ public:
 };
 
 cIptvMenuInfo::cIptvMenuInfo()
-:cOsdMenu(tr("IPTV Information")), text(NULL), timeout(INFO_TIMEOUT)
+:cOsdMenu(tr("IPTV Information")), text(""), timeout(INFO_TIMEOUT)
 {
   UpdateInfo();
 }
 
 cIptvMenuInfo::~cIptvMenuInfo()
 {
-  free(text);
 }
 
 void cIptvMenuInfo::UpdateInfo(void)
 {
   cIptvDevice *device = cIptvDevice::GetIptvDevice(cDevice::ActualDevice()->CardIndex());
-  char Text[64];
   if (device)
-     snprintf(Text, sizeof(Text), "%s", *device->GetInformation());
+     text = device->GetInformation();
   else
-     snprintf(Text, sizeof(Text), "%s", tr("IPTV information not available!"));
-  free(text);
-  text = Text ? strdup(Text) : NULL;
+     text = cString(tr("IPTV information not available!"));
   Display();
   timeout.Set(INFO_TIMEOUT);
 }
