@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.51 2007/10/06 00:02:50 rahrenbe Exp $
+ * $Id: device.c,v 1.52 2007/10/06 20:57:53 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -13,7 +13,7 @@
 
 #define IPTV_MAX_DEVICES 8
 
-cIptvDevice * IptvDevices[IPTV_MAX_DEVICES];
+cIptvDevice * IptvDevices[IPTV_MAX_DEVICES] = { NULL };
 
 unsigned int cIptvDevice::deviceCount = 0;
 
@@ -63,11 +63,13 @@ cIptvDevice::~cIptvDevice()
 
 bool cIptvDevice::Initialize(unsigned int DeviceCount)
 {
-  debug("cIptvDevice::Initialize()\n");
+  debug("cIptvDevice::Initialize(): DeviceCount=%d\n", DeviceCount);
   if (DeviceCount > IPTV_MAX_DEVICES)
      DeviceCount = IPTV_MAX_DEVICES;
   for (unsigned int i = 0; i < DeviceCount; ++i)
       IptvDevices[i] = new cIptvDevice(i);
+  for (unsigned int i = DeviceCount; i < IPTV_MAX_DEVICES; ++i)
+      IptvDevices[i] = NULL;
   return true;
 }
 
@@ -76,18 +78,31 @@ unsigned int cIptvDevice::Count(void)
   unsigned int count = 0;
   debug("cIptvDevice::Count()\n");
   for (unsigned int i = 0; i < IPTV_MAX_DEVICES; ++i) {
-      if (IptvDevices[i])
+      if (IptvDevices[i] != NULL)
          count++;
       }
   return count;
 }
 
-cIptvDevice *cIptvDevice::Get(unsigned int DeviceIndex)
+cIptvDevice *cIptvDevice::GetIptvDevice(int CardIndex)
 {
-  debug("cIptvDevice::Get()\n");
-  if ((DeviceIndex > 0) && (DeviceIndex <= IPTV_MAX_DEVICES))
-     return IptvDevices[DeviceIndex - 1];
+  //debug("cIptvDevice::GetIptvDevice(%d)\n", CardIndex);
+  for (unsigned int i = 0; i < IPTV_MAX_DEVICES; ++i) {
+      if ((IptvDevices[i] != NULL) && (IptvDevices[i]->CardIndex() == CardIndex)) {
+         //debug("cIptvDevice::GetIptvDevice(%d): FOUND!\n", CardIndex);
+         return IptvDevices[i];
+         }
+      }
   return NULL;
+}
+
+cString cIptvDevice::GetInformation(void)
+{
+  char Text[25];
+  struct tm tm_r;
+  time_t t = time(NULL);
+  strftime(Text, sizeof(Text), "%T", localtime_r(&t, &tm_r));
+  return cString::sprintf("IPTV device: %d\nTime: %s\n", deviceIndex, Text);
 }
 
 cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, cIptvProtocolIf* *Protocol)

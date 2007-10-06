@@ -3,16 +3,18 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.20 2007/10/06 00:02:50 rahrenbe Exp $
+ * $Id: setup.c,v 1.21 2007/10/06 20:57:53 rahrenbe Exp $
  */
 
 #include <string.h>
 
 #include <vdr/device.h>
 #include <vdr/interface.h>
+#include <vdr/status.h>
 
 #include "common.h"
 #include "config.h"
+#include "device.h"
 #include "setup.h"
 
 #ifndef trVDR
@@ -467,6 +469,88 @@ eOSState cIptvMenuChannels::ProcessKey(eKeys Key)
   return state;
 }
 
+// --- cIptvMenuInfo ---------------------------------------------------------
+
+class cIptvMenuInfo : public cOsdMenu
+{
+private:
+  enum {
+    INFO_TIMEOUT = 2000
+  };
+  char *text;
+  cTimeMs timeout;
+  void UpdateInfo();
+
+public:
+  cIptvMenuInfo();
+  virtual ~cIptvMenuInfo();
+  virtual void Display(void);
+  virtual eOSState ProcessKey(eKeys Key);
+};
+
+cIptvMenuInfo::cIptvMenuInfo()
+:cOsdMenu(tr("IPTV Information")), text(NULL), timeout(INFO_TIMEOUT)
+{
+  UpdateInfo();
+}
+
+cIptvMenuInfo::~cIptvMenuInfo()
+{
+  free(text);
+}
+
+void cIptvMenuInfo::UpdateInfo(void)
+{
+  cIptvDevice *device = cIptvDevice::GetIptvDevice(cDevice::ActualDevice()->CardIndex());
+  char Text[64];
+  if (device)
+     snprintf(Text, sizeof(Text), "%s", *device->GetInformation());
+  else
+     snprintf(Text, sizeof(Text), "%s", tr("IPTV information not available!"));
+  free(text);
+  text = Text ? strdup(Text) : NULL;
+  Display();
+  timeout.Set(INFO_TIMEOUT);
+}
+
+void cIptvMenuInfo::Display(void)
+{
+  cOsdMenu::Display();
+  DisplayMenu()->SetText(text, true);
+  if (text)
+     cStatus::MsgOsdTextItem(text);
+}
+
+eOSState cIptvMenuInfo::ProcessKey(eKeys Key)
+{
+  switch (Key) {
+    case kUp|k_Repeat:
+    case kUp:
+    case kDown|k_Repeat:
+    case kDown:
+    case kLeft|k_Repeat:
+    case kLeft:
+    case kRight|k_Repeat:
+    case kRight:
+                  DisplayMenu()->Scroll(NORMALKEY(Key) == kUp || NORMALKEY(Key) == kLeft, NORMALKEY(Key) == kLeft || NORMALKEY(Key) == kRight);
+                  cStatus::MsgOsdTextItem(NULL, NORMALKEY(Key) == kUp || NORMALKEY(Key) == kLeft);
+                  return osContinue;
+    default: break;
+    }
+
+  eOSState state = cOsdMenu::ProcessKey(Key);
+
+  if (state == osUnknown) {
+     switch (Key) {
+       case kOk: return osBack;
+       default:  if (timeout.TimedOut())
+                    UpdateInfo();
+                 return osContinue;
+       }
+     }
+  return state;
+}
+
 // --- cIptvPluginSetup ------------------------------------------------------
 
 cIptvPluginSetup::cIptvPluginSetup()
@@ -484,7 +568,7 @@ cIptvPluginSetup::cIptvPluginSetup()
       disabledFilterNames[i] = tr(section_filter_table[i].description);
       }
   Setup();
-  SetHelp(trVDR("Channels"), NULL, NULL, NULL);
+  SetHelp(trVDR("Channels"), NULL, NULL, trVDR("Button$Info"));
 }
 
 void cIptvPluginSetup::Setup(void)
@@ -514,6 +598,14 @@ eOSState cIptvPluginSetup::EditChannel(void)
   return AddSubMenu(new cIptvMenuChannels());
 }
 
+eOSState cIptvPluginSetup::ShowInfo(void)
+{
+  debug("cIptvPluginSetup::ShowInfo()\n");
+  if (HasSubMenu())
+     return osContinue;
+  return AddSubMenu(new cIptvMenuInfo());
+}
+
 eOSState cIptvPluginSetup::ProcessKey(eKeys Key)
 {
   int oldsectionFiltering = sectionFiltering;
@@ -521,8 +613,9 @@ eOSState cIptvPluginSetup::ProcessKey(eKeys Key)
   eOSState state = cMenuSetupPage::ProcessKey(Key);
   if (state == osUnknown) {
      switch (Key) {
-       case kRed: return EditChannel();
-       default:   break;
+       case kRed:  return EditChannel();
+       case kBlue: return ShowInfo();
+       default:    state = osContinue;
        }
      }
   if ((Key != kNone) && ((numDisabledFilters != oldNumDisabledFilters) || (sectionFiltering != oldsectionFiltering))) {

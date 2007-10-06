@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.5.7\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2007-10-06 02:54+0300\n"
+"POT-Creation-Date: 2007-10-06 23:51+0300\n"
 "PO-Revision-Date: 2007-08-12 23:22+0300\n"
 "Last-Translator: Rolf Ahrenberg\n"
 "Language-Team: <vdr@linuxtv.org>\n"
@@ -47,67 +47,75 @@ msgstr "TDT (0x70)"
 msgid "Experiment the IPTV"
 msgstr "Koe IPTV:n ihmeellinen maailma"
 
-#: setup.c:53
+#: setup.c:55
 msgid "UDP"
 msgstr "UDP"
 
-#: setup.c:54
+#: setup.c:56
 msgid "HTTP"
 msgstr "HTTP"
 
-#: setup.c:55
+#: setup.c:57
 msgid "FILE"
 msgstr "FILE"
 
-#: setup.c:170
+#: setup.c:172
 msgid "Protocol"
 msgstr "Protokolla"
 
-#: setup.c:174
+#: setup.c:176
 msgid "Delay (ms)"
 msgstr "Viive (ms)"
 
-#: setup.c:179
+#: setup.c:181
 msgid "Address"
 msgstr "Osoite"
 
-#: setup.c:180
+#: setup.c:182
 msgid "Port"
 msgstr "Portti"
 
-#: setup.c:195
+#: setup.c:197
 msgid "Rid"
 msgstr "Radio-ID"
 
-#: setup.c:267
+#: setup.c:269
 msgid "Cannot find unique channel settings!"
 msgstr "Yksilöllisiä kanava-asetuksia ei löydetä!"
 
-#: setup.c:341
+#: setup.c:343
 msgid "IPTV Channels"
 msgstr "IPTV-kanavat"
 
-#: setup.c:494
+#: setup.c:492
+msgid "IPTV Information"
+msgstr "IPTV-tiedot"
+
+#: setup.c:509
+msgid "IPTV information not available!"
+msgstr "IPTV-tietoja ei saatavilla!"
+
+#: setup.c:578
 msgid "TS buffer size [MB]"
 msgstr "TS-puskurin koko [MB]"
 
-#: setup.c:495
+#: setup.c:579
 msgid "TS buffer prefill ratio [%]"
 msgstr "TS-puskurin esitäyttöaste [%]"
 
-#: setup.c:496
+#: setup.c:580
 msgid "Use section filtering"
 msgstr "Käytä sektioiden suodatusta"
 
-#: setup.c:498
+#: setup.c:582
 msgid "Scan Sid automatically"
 msgstr "Etsi palvelu-ID automaattisesti"
 
-#: setup.c:499
+#: setup.c:583
 msgid "Disable filters"
 msgstr "Poista suodattimia käytöstä"
 
 #. TRANSLATORS: note the singular!
-#: setup.c:502
+#: setup.c:586
 msgid "Disable filter"
 msgstr "Poista suodatin käytöstä"

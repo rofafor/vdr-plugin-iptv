@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.10 2007/10/06 00:02:50 rahrenbe Exp $
+ * $Id: iptv.c,v 1.11 2007/10/06 20:57:53 rahrenbe Exp $
  */
 
 #include <getopt.h>
@@ -158,7 +158,7 @@ int cPluginIptv::ParseFilters(const char *Value, int *Filters)
   while (Value && *Value && (n < SECTION_FILTER_TABLE_SIZE)) {
         strn0cpy(buffer, Value, sizeof(buffer));
         int i = atoi(buffer);
-        debug("cPluginIptv::ParseFilters(): Filters[%d]=%d\n", n, i);
+        //debug("cPluginIptv::ParseFilters(): Filters[%d]=%d\n", n, i);
         if (i >= 0)
            Filters[n++] = i;
         if ((Value = strchr(Value, ' ')) != NULL)
@@ -206,8 +206,16 @@ const char **cPluginIptv::SVDRPHelpPages(void)
 
 cString cPluginIptv::SVDRPCommand(const char *Command, const char *Option, int &ReplyCode)
 {
-  //debug("cPluginIptv::SVDRPCommand()\n");
-  // Process SVDRP commands this plugin implements
+  debug("cPluginIptv::SVDRPCommand(): Command=%s Option=%s\n", Command, Option);
+  if (strcasecmp(Command, "INFO") == 0) {
+     cIptvDevice *device = cIptvDevice::GetIptvDevice(cDevice::ActualDevice()->CardIndex());
+     if (device)
+        return device->GetInformation();
+     else {
+        ReplyCode = 550; // Requested action not taken
+        return cString("IPTV information not available!");
+        }
+     }
   return NULL;
 }
 

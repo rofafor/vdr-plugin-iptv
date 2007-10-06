@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.24 2007/10/05 19:00:44 ajhseppa Exp $
+ * $Id: device.h,v 1.25 2007/10/06 20:57:53 rahrenbe Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -24,7 +24,7 @@ public:
   static unsigned int deviceCount;
   static bool Initialize(unsigned int DeviceCount);
   static unsigned int Count(void);
-  static cIptvDevice *Get(unsigned int DeviceIndex);
+  static cIptvDevice *GetIptvDevice(int CardIndex);
 
   // private parts
 private:
@@ -48,6 +48,7 @@ private:
 public:
   cIptvDevice(unsigned int DeviceIndex);
   virtual ~cIptvDevice();
+  cString GetInformation(void);
 
   // for channel parsing & buffering
 private:
