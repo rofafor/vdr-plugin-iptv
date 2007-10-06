@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.50 2007/10/05 19:00:44 ajhseppa Exp $
+ * $Id: device.c,v 1.51 2007/10/06 00:02:50 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -182,15 +182,17 @@ bool cIptvDevice::DeleteFilter(unsigned int Index)
 bool cIptvDevice::IsBlackListed(u_short Pid, u_char Tid, u_char Mask)
 {
   //debug("cIptvDevice::IsBlackListed(%d) Pid=%d Tid=%02X Mask=%02X\n", deviceIndex, Pid, Tid, Mask);
-  // Black list. Should maybe be configurable via plugin setup menu
-  switch (Pid) {
-    case 0x10: // NIT (0x40)
-    case 0x11: // SDT (0x42)
-    case 0x14: // TDT (0x70)
+  // loop through section filter table
+  for (int i = 0; i < SECTION_FILTER_TABLE_SIZE; ++i) {
+      int index = IptvConfig.GetDisabledFilters(i);
+      // check if matches
+      if ((index >= 0) && (index < SECTION_FILTER_TABLE_SIZE) &&
+          (section_filter_table[i].pid == Pid) && (section_filter_table[i].tid == Tid) &&
+          (section_filter_table[i].mask == Mask)) {
+         //debug("cIptvDevice::IsBlackListed(%d) Found=%s\n", deviceIndex, section_filter_table[i].description);
          return true;
-    default:
-         break;
-    }
+         }
+      }
   return false;
 }
 
@@ -199,11 +201,9 @@ int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
   // Check if disabled by user
   if (!IptvConfig.GetSectionFiltering())
      return -1;
-
-  // Black-listing check, refuse certain filters
+  // Blacklist check, refuse certain filters
   if (IsBlackListed(Pid, Tid, Mask))
      return -1;
-
   // Search the next free filter slot
   for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
       if (!secfilters[i]) {

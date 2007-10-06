@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.19 2007/10/01 18:14:57 rahrenbe Exp $
+ * $Id: setup.c,v 1.20 2007/10/06 00:02:50 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -471,10 +471,18 @@ eOSState cIptvMenuChannels::ProcessKey(eKeys Key)
 
 cIptvPluginSetup::cIptvPluginSetup()
 {
+  debug("cIptvPluginSetup::cIptvPluginSetup()\n");
   tsBufferSize = IptvConfig.GetTsBufferSize();
   tsBufferPrefill = IptvConfig.GetTsBufferPrefillRatio();
   sectionFiltering = IptvConfig.GetSectionFiltering();
   sidScanning = IptvConfig.GetSidScanning();
+  numDisabledFilters = IptvConfig.GetDisabledFiltersCount();
+  if (numDisabledFilters > SECTION_FILTER_TABLE_SIZE)
+     numDisabledFilters = SECTION_FILTER_TABLE_SIZE;
+  for (int i = 0; i < SECTION_FILTER_TABLE_SIZE; ++i) {
+      disabledFilterIndexes[i] = IptvConfig.GetDisabledFilters(i);
+      disabledFilterNames[i] = tr(section_filter_table[i].description);
+      }
   Setup();
   SetHelp(trVDR("Channels"), NULL, NULL, NULL);
 }
@@ -486,14 +494,21 @@ void cIptvPluginSetup::Setup(void)
   Add(new cMenuEditIntItem( tr("TS buffer size [MB]"),         &tsBufferSize,     2, 16));
   Add(new cMenuEditIntItem( tr("TS buffer prefill ratio [%]"), &tsBufferPrefill,  0, 40));
   Add(new cMenuEditBoolItem(tr("Use section filtering"),       &sectionFiltering));  
-  if (sectionFiltering)
+  if (sectionFiltering) {
      Add(new cMenuEditBoolItem(tr("Scan Sid automatically"),   &sidScanning));
+     Add(new cMenuEditIntItem( tr("Disable filters"),          &numDisabledFilters, 0, SECTION_FILTER_TABLE_SIZE));
+     for (int i = 0; i < numDisabledFilters; ++i) {
+         // TRANSLATORS: note the singular!
+         Add(new cMenuEditStraItem(tr("Disable filter"),       &disabledFilterIndexes[i], SECTION_FILTER_TABLE_SIZE, disabledFilterNames));
+         }
+     }
   SetCurrent(Get(current));
   Display();
 }
 
 eOSState cIptvPluginSetup::EditChannel(void)
 {
+  debug("cIptvPluginSetup::EditChannel()\n");
   if (HasSubMenu())
      return osContinue;
   return AddSubMenu(new cIptvMenuChannels());
@@ -501,6 +516,8 @@ eOSState cIptvPluginSetup::EditChannel(void)
 
 eOSState cIptvPluginSetup::ProcessKey(eKeys Key)
 {
+  int oldsectionFiltering = sectionFiltering;
+  int oldNumDisabledFilters = numDisabledFilters;
   eOSState state = cMenuSetupPage::ProcessKey(Key);
   if (state == osUnknown) {
      switch (Key) {
@@ -508,7 +525,31 @@ eOSState cIptvPluginSetup::ProcessKey(eKeys Key)
        default:   break;
        }
      }
+  if ((Key != kNone) && ((numDisabledFilters != oldNumDisabledFilters) || (sectionFiltering != oldsectionFiltering))) {
+     while (numDisabledFilters && (numDisabledFilters < oldNumDisabledFilters))
+           disabledFilterIndexes[--oldNumDisabledFilters] = -1;
+     Setup();
+     }
   return state;
+}
+
+void cIptvPluginSetup::StoreFilters(const char *Name, int *Values)
+{
+  char buffer[SECTION_FILTER_TABLE_SIZE * 4];
+  char *q = buffer;
+  for (int i = 0; i < SECTION_FILTER_TABLE_SIZE; ++i) {
+      char s[3];
+      if (Values[i] < 0)
+         break;
+      if (q > buffer)
+         *q++ = ' ';
+      snprintf(s, sizeof(s), "%d", Values[i]);
+      strncpy(q, s, strlen(s));
+      q += strlen(s);
+      }
+  *q = 0;
+  debug("cIptvPluginSetup::StoreFilters(): %s=%s\n", Name, buffer);
+  SetupStore(Name, buffer);
 }
 
 void cIptvPluginSetup::Store(void)
@@ -518,9 +559,12 @@ void cIptvPluginSetup::Store(void)
   SetupStore("TsBufferPrefill", tsBufferPrefill);
   SetupStore("SectionFiltering", sectionFiltering);
   SetupStore("SidScanning", sidScanning);
+  StoreFilters("DisabledFilters", disabledFilterIndexes);
   // Update global config
   IptvConfig.SetTsBufferSize(tsBufferSize);
   IptvConfig.SetTsBufferPrefillRatio(tsBufferPrefill);
   IptvConfig.SetSectionFiltering(sectionFiltering);
   IptvConfig.SetSidScanning(sidScanning);
+  for (int i = 0; i < SECTION_FILTER_TABLE_SIZE; ++i)
+      IptvConfig.SetDisabledFilters(i, disabledFilterIndexes[i]);
 }

@@ -3,11 +3,12 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: common.c,v 1.1 2007/10/05 20:01:24 ajhseppa Exp $
+ * $Id: common.c,v 1.2 2007/10/06 00:02:50 rahrenbe Exp $
  */
 
-
+#include <vdr/i18n.h>
 #include <vdr/tools.h>
+#include "common.h"
 
 uint16_t ts_pid(const uint8_t *buf)
 {
@@ -28,3 +29,16 @@ uint8_t payload(const uint8_t *tsp)
 
   return 184;
 }
+
+const section_filter_table_type section_filter_table[SECTION_FILTER_TABLE_SIZE] =
+{
+  /* description              pid   tid   mask */
+  {trNOOP("PAT (0x00)"),      0x00, 0x00, 0xFF},
+  {trNOOP("NIT (0x40)"),      0x10, 0x40, 0xFF},
+  {trNOOP("SDT (0x42)"),      0x11, 0x42, 0xFF},
+  {trNOOP("EIT (0x4E/0x4F)"), 0x12, 0x4E, 0xFE},
+  {trNOOP("EIT (0x5X)"),      0x12, 0x50, 0xF0},
+  {trNOOP("EIT (0x6X)"),      0x12, 0x60, 0xF0},
+  {trNOOP("TDT (0x70)"),      0x14, 0x70, 0xFF},
+};
+

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.9 2007/09/30 21:38:31 rahrenbe Exp $
+ * $Id: iptv.c,v 1.10 2007/10/06 00:02:50 rahrenbe Exp $
  */
 
 #include <getopt.h>
@@ -18,8 +18,8 @@ static const char *DESCRIPTION    = trNOOP("Experiment the IPTV");
 
 class cPluginIptv : public cPlugin {
 private:
-  // Add any member variables or functions you may need here.
   unsigned int deviceCount;
+  int ParseFilters(const char *Value, int *Values);
 public:
   cPluginIptv(void);
   virtual ~cPluginIptv();
@@ -150,6 +150,23 @@ cMenuSetupPage *cPluginIptv::SetupMenu(void)
   return new cIptvPluginSetup();
 }
 
+int cPluginIptv::ParseFilters(const char *Value, int *Filters)
+{
+  debug("cPluginIptv::ParseFilters(): Value=%s\n", Value);
+  char buffer[256];
+  int n = 0;
+  while (Value && *Value && (n < SECTION_FILTER_TABLE_SIZE)) {
+        strn0cpy(buffer, Value, sizeof(buffer));
+        int i = atoi(buffer);
+        debug("cPluginIptv::ParseFilters(): Filters[%d]=%d\n", n, i);
+        if (i >= 0)
+           Filters[n++] = i;
+        if ((Value = strchr(Value, ' ')) != NULL)
+           Value++;
+        }
+  return n;
+}
+
 bool cPluginIptv::SetupParse(const char *Name, const char *Value)
 {
   debug("cPluginIptv::SetupParse()\n");
@@ -162,6 +179,12 @@ bool cPluginIptv::SetupParse(const char *Name, const char *Value)
      IptvConfig.SetSectionFiltering(atoi(Value));
   else if (!strcasecmp(Name, "SidScanning"))
      IptvConfig.SetSidScanning(atoi(Value));
+  else if (!strcasecmp(Name, "DisabledFilters")) {
+     int DisabledFilters[SECTION_FILTER_TABLE_SIZE] = { -1 };
+     int DisabledFiltersCount = ParseFilters(Value, DisabledFilters);
+     for (int i = 0; i < DisabledFiltersCount; ++i)
+         IptvConfig.SetDisabledFilters(i, DisabledFilters[i]);
+     }
   else
      return false;
   return true;

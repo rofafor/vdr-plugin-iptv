@@ -3,13 +3,14 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.h,v 1.9 2007/09/30 21:38:31 rahrenbe Exp $
+ * $Id: setup.h,v 1.10 2007/10/06 00:02:50 rahrenbe Exp $
  */
 
 #ifndef __IPTV_SETUP_H
 #define __IPTV_SETUP_H
 
 #include <vdr/menuitems.h>
+#include "common.h"
 
 class cIptvPluginSetup : public cMenuSetupPage
 {
@@ -18,8 +19,13 @@ private:
   int tsBufferPrefill;
   int sectionFiltering;
   int sidScanning;
+  int numDisabledFilters;
+  int disabledFilterIndexes[SECTION_FILTER_TABLE_SIZE];
+  const char *disabledFilterNames[SECTION_FILTER_TABLE_SIZE];
+
   eOSState EditChannel(void);
   virtual void Setup(void);
+  void StoreFilters(const char *Name, int *Values);
 
 protected:
   virtual eOSState ProcessKey(eKeys Key);
