@@ -3,10 +3,9 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: config.c,v 1.13 2007/10/07 19:06:33 ajhseppa Exp $
+ * $Id: config.c,v 1.14 2007/10/07 20:08:44 rahrenbe Exp $
  */
 
-#include "common.h"
 #include "config.h"
 
 cIptvConfig IptvConfig;
@@ -15,10 +14,9 @@ cIptvConfig::cIptvConfig(void)
 : readBufferTsCount(48),
   tsBufferSize(2),
   tsBufferPrefillRatio(0),
+  statsUnit(IPTV_STATS_UNIT_IN_KBYTES),
   sectionFiltering(1),
-  sidScanning(1),
-  statsInKilos(1),
-  statsInBytes(1)
+  sidScanning(1)
 {
   for (unsigned int i = 0; i < sizeof(disabledFilters); ++i)
       disabledFilters[i] = -1;

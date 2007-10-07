@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.c,v 1.8 2007/10/07 19:29:09 ajhseppa Exp $
+ * $Id: statistics.c,v 1.9 2007/10/07 20:08:45 rahrenbe Exp $
  */
 
 #include <limits.h>
@@ -35,14 +35,14 @@ cString cIptvSectionStatistics::GetStatistic()
   elapsed ? : elapsed = 1;
   float divider = elapsed / 1000;
   char unit[] = { ' ', 'B', '/', 's', '\0' };
-  if (IptvConfig.GetStatsInKilos()) {
+  if (IptvConfig.IsStatsUnitInKilos()) {
      divider *= KILOBYTE(1);
      unit[0] = 'k';
-  }
-  if (!IptvConfig.GetStatsInBytes()) {
+     }
+  if (!IptvConfig.IsStatsUnitInBytes()) {
      divider /= sizeof(unsigned short) * 8;
      unit[1] = 'b';
-  }
+     }
   long tmpFilteredData = filteredData;
   long tmpNumberOfCalls = numberOfCalls;
   filteredData = numberOfCalls = 0;
@@ -76,14 +76,14 @@ cString cIptvDeviceStatistics::GetStatistic()
   elapsed ? : elapsed = 1;
   float divider = elapsed / 1000;
   char unit[] = { ' ', 'B', '/', 's', '\0' };
-  if (IptvConfig.GetStatsInKilos()) {
+  if (IptvConfig.IsStatsUnitInKilos()) {
      divider *= KILOBYTE(1);
      unit[0] = 'k';
-  }
-  if (!IptvConfig.GetStatsInBytes()) {
+     }
+  if (!IptvConfig.IsStatsUnitInBytes()) {
      divider /= sizeof(unsigned short) * 8;
      unit[1] = 'b';
-  }
+     }
   dataBytes = 0;
   memcpy(&tmpMostActivePids, &mostActivePids, sizeof(tmpMostActivePids));
   memset(&mostActivePids, '\0', sizeof(mostActivePids));
@@ -160,14 +160,14 @@ cString cIptvStreamerStatistics::GetStatistic()
   elapsed ? : elapsed = 1;
   float divider = elapsed / 1000;
   char unit[] = { ' ', 'B', '/', 's', '\0' };
-  if (IptvConfig.GetStatsInKilos()) {
+  if (IptvConfig.IsStatsUnitInKilos()) {
      divider *= KILOBYTE(1);
      unit[0] = 'k';
-  }
-  if (!IptvConfig.GetStatsInBytes()) {
+     }
+  if (!IptvConfig.IsStatsUnitInBytes()) {
      divider /= sizeof(unsigned short) * 8;
      unit[1] = 'b';
-  }
+     }
   long tmpDataBytes = (long)(dataBytes / divider);
   dataBytes = 0;
   return cString::sprintf("Stream data bytes: %ld %s\n", tmpDataBytes, unit);

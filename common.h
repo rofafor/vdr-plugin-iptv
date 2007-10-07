@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: common.h,v 1.4 2007/10/06 00:02:50 rahrenbe Exp $
+ * $Id: common.h,v 1.5 2007/10/07 20:08:44 rahrenbe Exp $
  */
 
 #ifndef __IPTV_COMMON_H
@@ -21,6 +21,12 @@ uint8_t payload(const uint8_t *tsp);
 #define debug(x...) ;
 #define error(x...) esyslog("IPTV: " x);
 #endif
+
+#define IPTV_STATS_UNIT_IN_BYTES  0
+#define IPTV_STATS_UNIT_IN_KBYTES 1
+#define IPTV_STATS_UNIT_IN_BITS   2
+#define IPTV_STATS_UNIT_IN_KBITS  3
+#define IPTV_STATS_UNIT_COUNT     4
 
 #define SECTION_FILTER_TABLE_SIZE 7
 

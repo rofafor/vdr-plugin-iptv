@@ -50,6 +50,9 @@ Setup parameters:
                                    stream ringbuffer before data is
                                    transferred to VDR.
                                    The valid range: 0...40
+- Show statistics in = 0           Defines unit (bytes, kbytes, bits, kbits)
+                                   used in statistics menu.
+                                   The valid range: 0...3
 - Use section filtering = 1        Defines whether section filtering shall
                                    be used.
                                    The valid range: 0...1

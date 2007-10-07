@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.25 2007/10/07 19:06:33 ajhseppa Exp $
+ * $Id: setup.c,v 1.26 2007/10/07 20:08:44 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -554,6 +554,13 @@ cIptvPluginSetup::cIptvPluginSetup()
   debug("cIptvPluginSetup::cIptvPluginSetup()\n");
   tsBufferSize = IptvConfig.GetTsBufferSize();
   tsBufferPrefill = IptvConfig.GetTsBufferPrefillRatio();
+  statsUnit = IptvConfig.GetStatsUnit();
+  if (statsUnit > IPTV_STATS_UNIT_COUNT)
+     statsUnit = IPTV_STATS_UNIT_IN_BYTES;
+  statsUnitNames[IPTV_STATS_UNIT_IN_BYTES]  = tr("bytes");
+  statsUnitNames[IPTV_STATS_UNIT_IN_KBYTES] = tr("kbytes");
+  statsUnitNames[IPTV_STATS_UNIT_IN_BITS]   = tr("bits");
+  statsUnitNames[IPTV_STATS_UNIT_IN_KBITS]  = tr("kbits");
   sectionFiltering = IptvConfig.GetSectionFiltering();
   sidScanning = IptvConfig.GetSidScanning();
   numDisabledFilters = IptvConfig.GetDisabledFiltersCount();
@@ -563,8 +570,6 @@ cIptvPluginSetup::cIptvPluginSetup()
       disabledFilterIndexes[i] = IptvConfig.GetDisabledFilters(i);
       disabledFilterNames[i] = tr(section_filter_table[i].description);
       }
-  statsInKilos = IptvConfig.GetStatsInKilos();
-  statsInBytes = IptvConfig.GetStatsInBytes();
   Setup();
   SetHelp(trVDR("Channels"), NULL, NULL, trVDR("Button$Info"));
 }
@@ -573,8 +578,9 @@ void cIptvPluginSetup::Setup(void)
 {
   int current = Current();
   Clear();
-  Add(new cMenuEditIntItem( tr("TS buffer size [MB]"),         &tsBufferSize,     2, 16));
-  Add(new cMenuEditIntItem( tr("TS buffer prefill ratio [%]"), &tsBufferPrefill,  0, 40));
+  Add(new cMenuEditIntItem( tr("TS buffer size [MB]"),         &tsBufferSize, 2, 16));
+  Add(new cMenuEditIntItem( tr("TS buffer prefill ratio [%]"), &tsBufferPrefill, 0, 40));
+  Add(new cMenuEditStraItem(tr("Show statistics in"),          &statsUnit, IPTV_STATS_UNIT_COUNT, statsUnitNames));
   Add(new cMenuEditBoolItem(tr("Use section filtering"),       &sectionFiltering));  
   if (sectionFiltering) {
      Add(new cMenuEditBoolItem(tr("Scan Sid automatically"),   &sidScanning));
@@ -584,8 +590,6 @@ void cIptvPluginSetup::Setup(void)
          Add(new cMenuEditStraItem(tr("Disable filter"),       &disabledFilterIndexes[i], SECTION_FILTER_TABLE_SIZE, disabledFilterNames));
          }
      }
-  Add(new cMenuEditBoolItem(tr("Show statistics in Kilos"),       &statsInKilos));
-  Add(new cMenuEditBoolItem(tr("Show statistics in Bytes"),       &statsInBytes));
   SetCurrent(Get(current));
   Display();
 }
@@ -650,18 +654,16 @@ void cIptvPluginSetup::Store(void)
   // Store values into setup.conf
   SetupStore("TsBufferSize", tsBufferSize);
   SetupStore("TsBufferPrefill", tsBufferPrefill);
+  SetupStore("StatsUnit", statsUnit);
   SetupStore("SectionFiltering", sectionFiltering);
   SetupStore("SidScanning", sidScanning);
-  SetupStore("StatsInKilos", statsInKilos);
-  SetupStore("StatsInBytes", statsInBytes);
   StoreFilters("DisabledFilters", disabledFilterIndexes);
   // Update global config
   IptvConfig.SetTsBufferSize(tsBufferSize);
   IptvConfig.SetTsBufferPrefillRatio(tsBufferPrefill);
+  IptvConfig.SetStatsUnit(statsUnit);
   IptvConfig.SetSectionFiltering(sectionFiltering);
   IptvConfig.SetSidScanning(sidScanning);
-  IptvConfig.SetStatsInKilos(statsInKilos);
-  IptvConfig.SetStatsInBytes(statsInBytes);
   for (int i = 0; i < SECTION_FILTER_TABLE_SIZE; ++i)
       IptvConfig.SetDisabledFilters(i, disabledFilterIndexes[i]);
 }
