@@ -41,7 +41,7 @@ make
 make plugins
 ./vdr -P iptv
 
-Setup parameters:
+Setup menu:
 
 - TS buffer size [MB] = 2          Defines ringbuffer size for transport
                                    stream in MB.
@@ -67,6 +67,8 @@ Setup parameters:
                                    contain that many "Disable filter" options
                                    which allow you to disable the individual
                                    section filters.
+- [Red]                            Opens IPTV channel editor.
+- [Blue]                           Opens IPTV information/statistics menu.
 
 Configuration:
 
