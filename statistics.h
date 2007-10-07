@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.h,v 1.2 2007/10/06 22:15:02 rahrenbe Exp $
+ * $Id: statistics.h,v 1.3 2007/10/07 10:13:45 ajhseppa Exp $
  */
 
 #ifndef __IPTV_STATISTICS_H
@@ -26,7 +26,7 @@ public:
   cIptvSectionStatistics();
   virtual ~cIptvSectionStatistics();
 
-  cString GetStatistic();
+  cString GetStatistic(uint64_t elapsed, const char* unit, int unitdivider);
 };
 
 // Device statistics
@@ -38,7 +38,7 @@ public:
   cIptvDeviceStatistics();
   virtual ~cIptvDeviceStatistics();
 
-  cString GetStatistic();
+  cString GetStatistic(uint64_t elapsed, const char* unit, int unitdivider);
 
 protected:
   void UpdateActivePids(u_short pid, long payload);
@@ -56,7 +56,7 @@ public:
   cIptvStreamerStatistics();
   virtual ~cIptvStreamerStatistics();
 
-  cString GetStatistic();
+  cString GetStatistic(uint64_t elapsed, const char* unit, int unitdivider);
 };
 
 #endif // __IPTV_STATISTICS_H

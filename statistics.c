@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.c,v 1.5 2007/10/07 08:46:34 ajhseppa Exp $
+ * $Id: statistics.c,v 1.6 2007/10/07 10:13:45 ajhseppa Exp $
  */
 
 #include "common.h"
@@ -22,13 +22,17 @@ cIptvSectionStatistics::~cIptvSectionStatistics()
   //debug("cIptvSectionStatistics::~cIptvSectionStatistics()\n");
 }
 
-cString cIptvSectionStatistics::GetStatistic()
+cString cIptvSectionStatistics::GetStatistic(uint64_t elapsed, const char* unit, int unitdivider)
 {
   debug("cIptvSectionStatistics::GetStatistic()\n");
+  // Prevent a divide-by-zero error
+  elapsed ? : elapsed = 1;
+  unitdivider ? : unitdivider = 1;
   long tmpFilteredData = filteredData;
   long tmpNumberOfCalls = numberOfCalls;
+  float divider = unitdivider * elapsed / 1000;
   filteredData = numberOfCalls = 0;
-  return cString::sprintf("Filtered data: %ld\nData packets passed: %ld\n", tmpFilteredData, tmpNumberOfCalls);
+  return cString::sprintf("Filtered data: %ld %s\nData packets passed: %ld\n", (long)(tmpFilteredData / divider), unit, tmpNumberOfCalls);
 }
 
 // --- cIptvDeviceStatistics -------------------------------------------------
@@ -46,19 +50,30 @@ cIptvDeviceStatistics::~cIptvDeviceStatistics()
   debug("cIptvDeviceStatistics::~cIptvDeviceStatistics()\n");
 }
 
-cString cIptvDeviceStatistics::GetStatistic(void)
+cString cIptvDeviceStatistics::GetStatistic(uint64_t elapsed, const char* unit, int unitdivider)
 {
   debug("cIptvDeviceStatistics::GetStatistic()\n");
   pidStruct tmpMostActivePids[10];
   long tmpDataBytes = dataBytes;
+  // Prevent a divide-by-zero error
+  elapsed ? : elapsed = 1;
+  unitdivider ? : unitdivider = 1;
+  float divider = unitdivider * elapsed / 1000;
   dataBytes = 0;
   memcpy(&tmpMostActivePids, &mostActivePids, sizeof(tmpMostActivePids));
   memset(&mostActivePids, '\0', sizeof(mostActivePids));
-  return cString::sprintf("Stream data bytes: %ld\n1. Active Pid: %d %ld\n2. Active Pid: %d %ld\n3. Active Pid: %d %ld\n",
-                          tmpDataBytes,
-                          tmpMostActivePids[0].pid, tmpMostActivePids[0].DataAmount,
-                          tmpMostActivePids[1].pid, tmpMostActivePids[1].DataAmount,
-                          tmpMostActivePids[2].pid, tmpMostActivePids[2].DataAmount);
+  return cString::sprintf("Stream data bytes: %ld %s\n"
+			  "  1. Active Pid: %d %ld %s\n"
+			  "  2. Active Pid: %d %ld %s\n"
+			  "  3. Active Pid: %d %ld %s\n"
+			  "  4. Active Pid: %d %ld %s\n"
+			  "  5. Active Pid: %d %ld %s\n",
+                          (long)(tmpDataBytes / divider), unit,
+                          tmpMostActivePids[0].pid, (long)(tmpMostActivePids[0].DataAmount / divider), unit,
+                          tmpMostActivePids[1].pid, (long)(tmpMostActivePids[1].DataAmount / divider), unit,
+                          tmpMostActivePids[2].pid, (long)(tmpMostActivePids[2].DataAmount / divider), unit,
+                          tmpMostActivePids[3].pid, (long)(tmpMostActivePids[3].DataAmount / divider), unit,
+                          tmpMostActivePids[4].pid, (long)(tmpMostActivePids[4].DataAmount / divider), unit);
 }
 
 int SortFunc(const void* data1, const void* data2)
@@ -110,10 +125,14 @@ cIptvStreamerStatistics::~cIptvStreamerStatistics()
   debug("cIptvStreamerStatistics::~cIptvStreamerStatistics()\n");
 }
 
-cString cIptvStreamerStatistics::GetStatistic(void)
+cString cIptvStreamerStatistics::GetStatistic(uint64_t elapsed, const char* unit, int unitdivider)
 {
   debug("cIptvStreamerStatistics::GetStatistic()\n");
-  long tmpDataBytes = dataBytes;
+  // Prevent a divide-by-zero error
+  elapsed ? : elapsed = 1;
+  unitdivider ? : unitdivider = 1;
+  float divider = unitdivider * elapsed / 1000;
+  long tmpDataBytes = (long)(dataBytes / divider);
   dataBytes = 0;
-  return cString::sprintf("Stream data bytes: %ld\n", tmpDataBytes);
+  return cString::sprintf("Stream data bytes: %ld %s\n", tmpDataBytes, unit);
 }

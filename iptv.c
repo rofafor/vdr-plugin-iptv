@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.11 2007/10/06 20:57:53 rahrenbe Exp $
+ * $Id: iptv.c,v 1.12 2007/10/07 10:13:45 ajhseppa Exp $
  */
 
 #include <getopt.h>
@@ -210,7 +210,7 @@ cString cPluginIptv::SVDRPCommand(const char *Command, const char *Option, int &
   if (strcasecmp(Command, "INFO") == 0) {
      cIptvDevice *device = cIptvDevice::GetIptvDevice(cDevice::ActualDevice()->CardIndex());
      if (device)
-        return device->GetInformation();
+        return device->GetInformation(0, "", 0);
      else {
         ReplyCode = 550; // Requested action not taken
         return cString("IPTV information not available!");

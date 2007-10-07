@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.22 2007/10/06 22:15:02 rahrenbe Exp $
+ * $Id: setup.c,v 1.23 2007/10/07 10:13:45 ajhseppa Exp $
  */
 
 #include <string.h>
@@ -479,7 +479,7 @@ private:
   };
   cString text;
   cTimeMs timeout;
-  void UpdateInfo();
+  void UpdateInfo(uint64_t elapsed, const char* unit, const int unitdivider);
 
 public:
   cIptvMenuInfo();
@@ -491,18 +491,18 @@ public:
 cIptvMenuInfo::cIptvMenuInfo()
 :cOsdMenu(tr("IPTV Information")), text(""), timeout(INFO_TIMEOUT)
 {
-  UpdateInfo();
+  UpdateInfo(0, "kbytes", 1024);
 }
 
 cIptvMenuInfo::~cIptvMenuInfo()
 {
 }
 
-void cIptvMenuInfo::UpdateInfo(void)
+void cIptvMenuInfo::UpdateInfo(uint64_t elapsed, const char* unit, const int unitdivider)
 {
   cIptvDevice *device = cIptvDevice::GetIptvDevice(cDevice::ActualDevice()->CardIndex());
   if (device)
-     text = device->GetInformation();
+     text = device->GetInformation(elapsed, unit, unitdivider);
   else
      text = cString(tr("IPTV information not available!"));
   Display();
@@ -539,9 +539,10 @@ eOSState cIptvMenuInfo::ProcessKey(eKeys Key)
   if (state == osUnknown) {
      switch (Key) {
        case kOk: return osBack;
-       default:  if (timeout.TimedOut())
-                    UpdateInfo();
+     default:  if (timeout.TimedOut()) {
+                    UpdateInfo(INFO_TIMEOUT, "kb/s", 1024);
                  return osContinue;
+     }
        }
      }
   return state;
