@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.h,v 1.6 2007/09/29 10:55:14 ajhseppa Exp $
+ * $Id: protocolhttp.h,v 1.7 2007/10/07 22:54:09 rahrenbe Exp $
  */
 
 #ifndef __IPTV_PROTOCOLHTTP_H
@@ -39,6 +39,7 @@ public:
   virtual bool Set(const char* Address, const int Port);
   virtual bool Open(void);
   virtual bool Close(void);
+  virtual cString GetInformation(void);
 };
 
 #endif // __IPTV_PROTOCOLHTTP_H

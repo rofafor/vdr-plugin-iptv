@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.h,v 1.7 2007/09/29 16:21:05 rahrenbe Exp $
+ * $Id: protocoludp.h,v 1.8 2007/10/07 22:54:09 rahrenbe Exp $
  */
 
 #ifndef __IPTV_PROTOCOLUDP_H
@@ -35,6 +35,7 @@ public:
   virtual bool Set(const char* Address, const int Port);
   virtual bool Open(void);
   virtual bool Close(void);
+  virtual cString GetInformation(void);
 };
 
 #endif // __IPTV_PROTOCOLUDP_H

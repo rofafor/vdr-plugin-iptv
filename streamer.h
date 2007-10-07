@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.h,v 1.8 2007/10/05 19:00:44 ajhseppa Exp $
+ * $Id: streamer.h,v 1.9 2007/10/07 22:54:09 rahrenbe Exp $
  */
 
 #ifndef __IPTV_STREAMER_H
@@ -32,6 +32,7 @@ public:
   bool Set(const char* Address, const int Port, cIptvProtocolIf* Protocol);
   bool Open(void);
   bool Close(void);
+  cString GetInformation(void);
 };
 
 #endif // __IPTV_STREAMER_H

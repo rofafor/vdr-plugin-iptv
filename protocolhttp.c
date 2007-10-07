@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.9 2007/09/29 16:21:05 rahrenbe Exp $
+ * $Id: protocolhttp.c,v 1.10 2007/10/07 22:54:09 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -365,9 +365,15 @@ bool cIptvProtocolHttp::Set(const char* Address, const int Port)
     else
        streamPath = strcpyrealloc(streamPath, "/");
     streamPort = Port;
-    debug("iptv://%s:%d%s\n", streamAddr, streamPort, streamPath);
+    debug("http://%s:%d%s\n", streamAddr, streamPort, streamPath);
     // Re-connect the socket
     Connect();
     }
   return true;
+}
+
+cString cIptvProtocolHttp::GetInformation(void)
+{
+  //debug("cIptvProtocolHttp::GetInformation()");
+  return cString::sprintf("http://%s:%d%s", streamAddr, streamPort, streamPath);
 }

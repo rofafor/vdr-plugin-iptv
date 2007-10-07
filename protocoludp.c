@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.c,v 1.10 2007/09/29 16:21:05 rahrenbe Exp $
+ * $Id: protocoludp.c,v 1.11 2007/10/07 22:54:09 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -245,4 +245,10 @@ bool cIptvProtocolUdp::Set(const char* Address, const int Port)
     JoinMulticast();
     }
   return true;
+}
+
+cString cIptvProtocolUdp::GetInformation(void)
+{
+  //debug("cIptvProtocolUdp::GetInformation()");
+  return cString::sprintf("udp://%s:%d", streamAddr, streamPort);
 }

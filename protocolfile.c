@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolfile.c,v 1.9 2007/09/29 18:15:31 rahrenbe Exp $
+ * $Id: protocolfile.c,v 1.10 2007/10/07 22:54:09 rahrenbe Exp $
  */
 
 #include <fcntl.h>
@@ -118,4 +118,10 @@ bool cIptvProtocolFile::Set(const char* Address, const int Port)
      OpenFile();
      }
   return true;
+}
+
+cString cIptvProtocolFile::GetInformation(void)
+{
+  //debug("cIptvProtocolFile::GetInformation()");
+  return cString::sprintf("file://%s:%d", streamAddr, streamPort);
 }

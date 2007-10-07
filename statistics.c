@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.c,v 1.9 2007/10/07 20:08:45 rahrenbe Exp $
+ * $Id: statistics.c,v 1.10 2007/10/07 22:54:09 rahrenbe Exp $
  */
 
 #include <limits.h>
@@ -28,11 +28,9 @@ cIptvSectionStatistics::~cIptvSectionStatistics()
 
 cString cIptvSectionStatistics::GetStatistic()
 {
-  debug("cIptvSectionStatistics::GetStatistic()\n");
+  //debug("cIptvSectionStatistics::GetStatistic()\n");
   uint64_t elapsed = timer.Elapsed();
   timer.Set();
-  // Prevent a divide-by-zero error
-  elapsed ? : elapsed = 1;
   float divider = elapsed / 1000;
   char unit[] = { ' ', 'B', '/', 's', '\0' };
   if (IptvConfig.IsStatsUnitInKilos()) {
@@ -43,10 +41,10 @@ cString cIptvSectionStatistics::GetStatistic()
      divider /= sizeof(unsigned short) * 8;
      unit[1] = 'b';
      }
-  long tmpFilteredData = filteredData;
-  long tmpNumberOfCalls = numberOfCalls;
+  cString info = cString::sprintf("%4ld (%4ld %s)", numberOfCalls, divider ?
+                                  (long)(filteredData / divider) : 0L, unit);
   filteredData = numberOfCalls = 0;
-  return cString::sprintf("Filtered data: %ld %s\nData packets passed: %ld\n", (long)(tmpFilteredData / divider), unit, tmpNumberOfCalls);
+  return info;
 }
 
 // --- cIptvDeviceStatistics -------------------------------------------------
@@ -67,13 +65,10 @@ cIptvDeviceStatistics::~cIptvDeviceStatistics()
 
 cString cIptvDeviceStatistics::GetStatistic()
 {
-  debug("cIptvDeviceStatistics::GetStatistic()\n");
-  pidStruct tmpMostActivePids[10];
+  //debug("cIptvDeviceStatistics::GetStatistic()\n");
   long tmpDataBytes = dataBytes;
   uint64_t elapsed = timer.Elapsed();
   timer.Set();
-  // Prevent a divide-by-zero error
-  elapsed ? : elapsed = 1;
   float divider = elapsed / 1000;
   char unit[] = { ' ', 'B', '/', 's', '\0' };
   if (IptvConfig.IsStatsUnitInKilos()) {
@@ -84,24 +79,21 @@ cString cIptvDeviceStatistics::GetStatistic()
      divider /= sizeof(unsigned short) * 8;
      unit[1] = 'b';
      }
+  cString info = cString::sprintf("Bitrate: %ld %s\n", divider ?
+                                  (long)(tmpDataBytes / divider) : 0L, unit);
+  for (unsigned int i = 0; i < IPTV_STATS_ACTIVE_PIDS_COUNT; ++i) {
+      if (mostActivePids[i].pid)
+         info = cString::sprintf("%sPid %d: %4d (%4ld %s)%c", *info, i,
+                                 mostActivePids[i].pid,
+                                 (long)(mostActivePids[i].DataAmount / divider),
+                                 unit, ((i + 1) % 2) ? '\t' : '\n');
+      }
   dataBytes = 0;
-  memcpy(&tmpMostActivePids, &mostActivePids, sizeof(tmpMostActivePids));
   memset(&mostActivePids, '\0', sizeof(mostActivePids));
-  return cString::sprintf("Stream data bytes: %ld %s\n"
-                          "  1. Active Pid: %d %ld %s\n"
-                          "  2. Active Pid: %d %ld %s\n"
-                          "  3. Active Pid: %d %ld %s\n"
-                          "  4. Active Pid: %d %ld %s\n"
-                          "  5. Active Pid: %d %ld %s\n",
-                          (long)(tmpDataBytes / divider), unit,
-                          tmpMostActivePids[0].pid, (long)(tmpMostActivePids[0].DataAmount / divider), unit,
-                          tmpMostActivePids[1].pid, (long)(tmpMostActivePids[1].DataAmount / divider), unit,
-                          tmpMostActivePids[2].pid, (long)(tmpMostActivePids[2].DataAmount / divider), unit,
-                          tmpMostActivePids[3].pid, (long)(tmpMostActivePids[3].DataAmount / divider), unit,
-                          tmpMostActivePids[4].pid, (long)(tmpMostActivePids[4].DataAmount / divider), unit);
+  return info;
 }
 
-int SortFunc(const void* data1, const void* data2)
+static int SortFunc(const void* data1, const void* data2)
 {
   //debug("cIptvDeviceStatistics::SortFunc()\n");
   pidStruct *comp1 = (pidStruct*)data1;
@@ -153,11 +145,9 @@ cIptvStreamerStatistics::~cIptvStreamerStatistics()
 
 cString cIptvStreamerStatistics::GetStatistic()
 {
-  debug("cIptvStreamerStatistics::GetStatistic()\n");
+  //debug("cIptvStreamerStatistics::GetStatistic()\n");
   uint64_t elapsed = timer.Elapsed();
   timer.Set();
-  // Prevent a divide-by-zero error
-  elapsed ? : elapsed = 1;
   float divider = elapsed / 1000;
   char unit[] = { ' ', 'B', '/', 's', '\0' };
   if (IptvConfig.IsStatsUnitInKilos()) {
@@ -168,7 +158,7 @@ cString cIptvStreamerStatistics::GetStatistic()
      divider /= sizeof(unsigned short) * 8;
      unit[1] = 'b';
      }
-  long tmpDataBytes = (long)(dataBytes / divider);
+  long tmpDataBytes = divider ? (long)(dataBytes / divider) : 0L;
   dataBytes = 0;
-  return cString::sprintf("Stream data bytes: %ld %s\n", tmpDataBytes, unit);
+  return cString::sprintf("Streamer: %ld %s", tmpDataBytes, unit);
 }

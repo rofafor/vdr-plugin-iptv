@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.h,v 1.4 2007/10/07 19:06:33 ajhseppa Exp $
+ * $Id: statistics.h,v 1.5 2007/10/07 22:54:09 rahrenbe Exp $
  */
 
 #ifndef __IPTV_STATISTICS_H
@@ -47,7 +47,7 @@ protected:
   void UpdateActivePids(u_short pid, long payload);
 
 private:
-  pidStruct mostActivePids[10];
+  pidStruct mostActivePids[IPTV_STATS_ACTIVE_PIDS_COUNT];
   cTimeMs timer;
 };
 
