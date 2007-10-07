@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.c,v 1.7 2007/10/07 19:06:33 ajhseppa Exp $
+ * $Id: statistics.c,v 1.8 2007/10/07 19:29:09 ajhseppa Exp $
  */
 
 #include <limits.h>
@@ -40,7 +40,7 @@ cString cIptvSectionStatistics::GetStatistic()
      unit[0] = 'k';
   }
   if (!IptvConfig.GetStatsInBytes()) {
-     divider /= sizeof(unsigned short);
+     divider /= sizeof(unsigned short) * 8;
      unit[1] = 'b';
   }
   long tmpFilteredData = filteredData;
@@ -81,7 +81,7 @@ cString cIptvDeviceStatistics::GetStatistic()
      unit[0] = 'k';
   }
   if (!IptvConfig.GetStatsInBytes()) {
-     divider /= sizeof(unsigned short);
+     divider /= sizeof(unsigned short) * 8;
      unit[1] = 'b';
   }
   dataBytes = 0;
@@ -165,7 +165,7 @@ cString cIptvStreamerStatistics::GetStatistic()
      unit[0] = 'k';
   }
   if (!IptvConfig.GetStatsInBytes()) {
-     divider /= sizeof(unsigned short);
+     divider /= sizeof(unsigned short) * 8;
      unit[1] = 'b';
   }
   long tmpDataBytes = (long)(dataBytes / divider);
