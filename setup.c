@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.23 2007/10/07 10:13:45 ajhseppa Exp $
+ * $Id: setup.c,v 1.24 2007/10/07 15:13:48 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -475,7 +475,7 @@ class cIptvMenuInfo : public cOsdMenu
 {
 private:
   enum {
-    INFO_TIMEOUT = 2000
+    INFO_TIMEOUT_MS = 2000
   };
   cString text;
   cTimeMs timeout;
@@ -489,7 +489,7 @@ public:
 };
 
 cIptvMenuInfo::cIptvMenuInfo()
-:cOsdMenu(tr("IPTV Information")), text(""), timeout(INFO_TIMEOUT)
+:cOsdMenu(tr("IPTV Information")), text(""), timeout(INFO_TIMEOUT_MS)
 {
   UpdateInfo(0, "kbytes", 1024);
 }
@@ -506,7 +506,7 @@ void cIptvMenuInfo::UpdateInfo(uint64_t elapsed, const char* unit, const int uni
   else
      text = cString(tr("IPTV information not available!"));
   Display();
-  timeout.Set(INFO_TIMEOUT);
+  timeout.Set(INFO_TIMEOUT_MS);
 }
 
 void cIptvMenuInfo::Display(void)
@@ -539,10 +539,9 @@ eOSState cIptvMenuInfo::ProcessKey(eKeys Key)
   if (state == osUnknown) {
      switch (Key) {
        case kOk: return osBack;
-     default:  if (timeout.TimedOut()) {
-                    UpdateInfo(INFO_TIMEOUT, "kb/s", 1024);
+       default:  if (timeout.TimedOut())
+                    UpdateInfo(INFO_TIMEOUT_MS, "kb/s", 1024);
                  return osContinue;
-     }
        }
      }
   return state;
