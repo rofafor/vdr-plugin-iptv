@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.26 2007/10/07 10:13:45 ajhseppa Exp $
+ * $Id: device.h,v 1.27 2007/10/07 19:06:33 ajhseppa Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -48,7 +48,7 @@ private:
 public:
   cIptvDevice(unsigned int DeviceIndex);
   virtual ~cIptvDevice();
-  cString GetInformation(uint64_t, const char* unit, const int unitdivider);
+  cString GetInformation();
 
   // for channel parsing & buffering
 private:

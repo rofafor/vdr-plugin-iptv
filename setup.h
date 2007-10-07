@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.h,v 1.11 2007/10/06 20:57:53 rahrenbe Exp $
+ * $Id: setup.h,v 1.12 2007/10/07 19:06:33 ajhseppa Exp $
  */
 
 #ifndef __IPTV_SETUP_H
@@ -19,6 +19,8 @@ private:
   int tsBufferPrefill;
   int sectionFiltering;
   int sidScanning;
+  int statsInKilos;
+  int statsInBytes;
   int numDisabledFilters;
   int disabledFilterIndexes[SECTION_FILTER_TABLE_SIZE];
   const char *disabledFilterNames[SECTION_FILTER_TABLE_SIZE];

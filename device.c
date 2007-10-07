@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.55 2007/10/07 10:13:45 ajhseppa Exp $
+ * $Id: device.c,v 1.56 2007/10/07 19:06:33 ajhseppa Exp $
  */
 
 #include "common.h"
@@ -96,11 +96,11 @@ cIptvDevice *cIptvDevice::GetIptvDevice(int CardIndex)
   return NULL;
 }
 
-cString cIptvDevice::GetInformation(uint64_t elapsed, const char* unit, const int unitdivider)
+cString cIptvDevice::GetInformation()
 {
-  return cString::sprintf("Device:\n%s\nStreamer:\n%s\nSection Filter 0:\n%s", *GetStatistic(elapsed, unit, unitdivider),
-                          pIptvStreamer ? *pIptvStreamer->GetStatistic(elapsed, unit, unitdivider) : "",
-                          secfilters[0] ? *secfilters[0]->GetStatistic(elapsed, unit, unitdivider) : "");
+  return cString::sprintf("Device:\n%s\nStreamer:\n%s\nSection Filter 0:\n%s", *GetStatistic(),
+                          pIptvStreamer ? *pIptvStreamer->GetStatistic() : "",
+                          secfilters[0] ? *secfilters[0]->GetStatistic() : "");
 }
 
 cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, cIptvProtocolIf* *Protocol)
