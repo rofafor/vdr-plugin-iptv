@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.c,v 1.4 2007/10/06 22:15:02 rahrenbe Exp $
+ * $Id: statistics.c,v 1.5 2007/10/07 08:46:34 ajhseppa Exp $
  */
 
 #include "common.h"
@@ -67,9 +67,9 @@ int SortFunc(const void* data1, const void* data2)
   pidStruct *comp1 = (pidStruct*)data1;
   pidStruct *comp2 = (pidStruct*)data2;
   if (comp1->DataAmount > comp2->DataAmount)
-     return 1;
-  if (comp1->DataAmount < comp2->DataAmount)
      return -1;
+  if (comp1->DataAmount < comp2->DataAmount)
+     return 1;
   return 0;
 }
 
