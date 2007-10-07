@@ -1,7 +1,7 @@
 This is a IPTV for the Video Disk Recorder (VDR).
 
 Written by:  Rolf Ahrenberg  R o l f . A h r e n b e r g @ s c i . f i
-             Antti Sepp√§l√§   a j h s e p p a @ n i k s u l a . h u t . f i
+             Antti Sepp‰l‰   a j h s e p p a @ n i k s u l a . h u t . f i
 
 Project's homepage:          http://www.saunalahti.fi/~rahrenbe/vdr/iptv/
 
@@ -15,13 +15,18 @@ See the file COPYING for more information.
 
 Requirements:
 
-IPTV patched VDR-1.5.9+ and multicast IPTV transport streams
+IPTV patched VDR-1.5.9+ and multicast/unicast transport streams
 
 Description:
 
 This plugin integrates multicast IPTV transport streams seamlessly into
 VDR. You can use any IPTV channel like any other normal DVB channel for
 live viewing, recording, ...
+
+Currently the IPTV plugin supports multicast UDP/RTP and unicast HTTP
+streams. Also a file input method is supported, but file delay must be
+selected individually to prevent VDR's transfer buffer over/underflow.
+Therefore it should be considered as a testing feature only.
 
 Installation:
 
@@ -35,21 +40,46 @@ make
 make plugins
 ./vdr -P iptv
 
-Channels.conf examples:
+Setup parameters:
 
-TV1;IPTV:1:IPTV|UDP|127.0.0.1|1234:P:0:512:650:2321:0:1:0:0:0
-         ^ ^    ^   ^         ^    ^
-         | |    |   |         |    Source type ("P")
-         | |    |   |         IP Port Number or File delay (ms)
-         | |    |   IP Address or File Location
-         | |    Protocol ("UDP", "HTTP", "FILE")
-         | Plugin ID ("IPTV")
-         Unique enumeration
+- TS buffer size [MB] = 2          Defines ringbuffer size for transport
+                                   stream in MB.
+                                   The valid range: 1...16
+- TS buffer prefill ratio [%] = 0  Defines prefill ratio for transport
+                                   stream ringbuffer before data is
+                                   transferred to VDR.
+                                   The valid range: 0...40
+- Use section filtering = 1        Defines whether section filtering shall
+                                   be used.
+                                   The valid range: 0...1
+- Scan Sid automatically = 1       Defines whether service id shall be
+                                   scanned automatically. Requires section
+                                   filtering.
+                                   The valid range: 0...1
+- Disable filters = 0              Certain section filters might have some
+                                   unwanted behaviour. This option allows you
+                                   to blacklist them. If this option is set
+                                   to a non-zero value, the menu page will
+                                   contain that many "Disable filter" options
+                                   which allow you to disable the individual
+                                   section filters.
 
-TV2;IPTV:2:IPTV|HTTP|127.0.0.1/TS/2|3000:P:0:513:660:2321:0:2:0:0:0
-TV3;IPTV:3:IPTV|FILE|/media/video.ts|5:P:0:514:670:2321:0:3:0:0:0
+Configuration:
 
-Example UDP multicast configuration for iptables firewall:
+- channels.conf
+
+  TV3;IPTV:3:IPTV|FILE|/media/video.ts|5:P:0:514:670:2321:0:3:0:0:0
+  TV2;IPTV:2:IPTV|HTTP|127.0.0.1/TS/2|3000:P:0:513:660:2321:0:2:0:0:0
+  TV1;IPTV:1:IPTV|UDP|127.0.0.1|1234:P:0:512:650:2321:0:1:0:0:0
+           ^ ^    ^   ^         ^    ^
+           | |    |   |         |    Source type ("P")
+           | |    |   |         IP Port Number or File delay (ms)
+           | |    |   IP Address or File Location
+           | |    Protocol ("UDP", "HTTP", "FILE")
+           | Plugin ID ("IPTV")
+           Unique enumeration
+
+- UDP multicast rules for iptables firewall
 
   # Multicast UDP -packets
   iptables -A INPUT -i eth0 -p udp -d 224.0.0.0/4 --dport 1234 -j ACCEPT
