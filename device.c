@@ -3,13 +3,11 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.60 2007/10/08 18:35:10 rahrenbe Exp $
+ * $Id: device.c,v 1.61 2007/10/08 23:51:58 rahrenbe Exp $
  */
 
-#include "common.h"
 #include "config.h"
 #include "device.h"
-#include "sectionfilter.h"
 
 #define IPTV_MAX_DEVICES 8
 
@@ -96,25 +94,73 @@ cIptvDevice *cIptvDevice::GetIptvDevice(int CardIndex)
   return NULL;
 }
 
-cString cIptvDevice::GetInformation()
+cString cIptvDevice::GetGeneralInformation(void)
 {
+  //debug("cIptvDevice::GetGeneralInformation(%d)\n", deviceIndex);
+  return cString::sprintf("IPTV device #%d (CardIndex: %d)\n%s\n%s",
+                          deviceIndex, CardIndex(), pIptvStreamer ?
+                          *pIptvStreamer->GetInformation() : "",
+                          pIptvStreamer ? *pIptvStreamer->GetStatistic() : "");
+}
+
+cString cIptvDevice::GetPidsInformation(void)
+{
+  //debug("cIptvDevice::GetPidsInformation(%d)\n", deviceIndex);
+  cString info("Most active pids:\n");
+  info = cString::sprintf("%s%s", *info, *GetStatistic());
+  return info;
+}
+
+cString cIptvDevice::GetFiltersInformation(void)
+{
+  //debug("cIptvDevice::GetFiltersInformation(%d)\n", deviceIndex);
+  unsigned int count = 0;
+  cString info("Active section filters:\n");
   // loop through active section filters
-  cString filterInfo("\n");
   for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
-      if (secfilters[i])
-         filterInfo = cString::sprintf("%sSec %d: %s%c", *filterInfo, i,
-                                       *secfilters[i]->GetStatistic(),
-                                       ((i + 1) % 2) ? '\t' : '\n');
+      if (secfilters[i]) {
+         info = cString::sprintf("%sFilter %d: %s Pid=%d\n", *info, i,
+                                 *secfilters[i]->GetStatistic(), secfilters[i]->GetPid());
+         if (++count > IPTV_STATS_ACTIVE_FILTERS_COUNT)
+            break;
+         }
       }
-  // make sure it ends with linefeed
-  if (!endswith(*filterInfo, "\n"))
-     filterInfo = cString::sprintf("%s%c", *filterInfo, '\n');
+  return info;
+}
+
+cString cIptvDevice::GetBuffersInformation(void)
+{
+  //debug("cIptvDevice::GetBuffersInformation(%d)\n", deviceIndex);
+  cString info("Buffers information is not yet implemented!\n");
+  return info;
+}
+
+cString cIptvDevice::GetInformation(unsigned int Page)
+{
   // generate information string
-  return cString::sprintf("IPTV device #%d (CardIndex: %d)\nSource: %s\n%s%s%s",
-                          deviceIndex, CardIndex(), pIptvStreamer ? 
-                          *pIptvStreamer->GetInformation() : "", *GetStatistic(),
-                          pIptvStreamer ? *pIptvStreamer->GetStatistic() : "",
-                          *filterInfo);
+  cString info;
+  switch (Page) {
+    case IPTV_DEVICE_INFO_GENERAL:
+         info = GetGeneralInformation();
+         break;
+    case IPTV_DEVICE_INFO_PIDS:
+         info = GetPidsInformation();
+         break;
+    case IPTV_DEVICE_INFO_FILTERS:
+         info = GetFiltersInformation();
+         break;
+    case IPTV_DEVICE_INFO_BUFFERS:
+         info = GetBuffersInformation();
+         break;
+    default:
+         info = cString::sprintf("%s%s%s%s",
+                                 *GetGeneralInformation(),
+                                 *GetPidsInformation(),
+                                 *GetFiltersInformation(),
+                                 *GetBuffersInformation());
+         break;
+    }
+  return info;
 }
 
 cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, cIptvProtocolIf* *Protocol)

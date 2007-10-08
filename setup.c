@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.26 2007/10/07 20:08:44 rahrenbe Exp $
+ * $Id: setup.c,v 1.27 2007/10/08 23:51:58 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -479,6 +479,7 @@ private:
   };
   cString text;
   cTimeMs timeout;
+  unsigned int page;
   void UpdateInfo();
 
 public:
@@ -489,9 +490,10 @@ public:
 };
 
 cIptvMenuInfo::cIptvMenuInfo()
-:cOsdMenu(tr("IPTV Information")), text(""), timeout(INFO_TIMEOUT_MS)
+:cOsdMenu(tr("IPTV Information")), text(""), timeout(INFO_TIMEOUT_MS), page(IPTV_DEVICE_INFO_GENERAL)
 {
   UpdateInfo();
+  SetHelp(tr("General"), tr("Pids"), tr("Filters"), tr("Buffers"));
 }
 
 cIptvMenuInfo::~cIptvMenuInfo()
@@ -502,7 +504,7 @@ void cIptvMenuInfo::UpdateInfo()
 {
   cIptvDevice *device = cIptvDevice::GetIptvDevice(cDevice::ActualDevice()->CardIndex());
   if (device)
-     text = device->GetInformation();
+     text = device->GetInformation(page);
   else
      text = cString(tr("IPTV information not available!"));
   Display();
@@ -538,10 +540,23 @@ eOSState cIptvMenuInfo::ProcessKey(eKeys Key)
 
   if (state == osUnknown) {
      switch (Key) {
-       case kOk: return osBack;
-       default:  if (timeout.TimedOut())
-                    UpdateInfo();
-                 return osContinue;
+       case kOk:     return osBack;
+       case kRed:    page = IPTV_DEVICE_INFO_GENERAL;
+                     UpdateInfo();
+                     break;
+       case kGreen:  page = IPTV_DEVICE_INFO_PIDS;
+                     UpdateInfo();
+                     break;
+       case kYellow: page = IPTV_DEVICE_INFO_FILTERS;
+                     UpdateInfo();
+                     break;
+       case kBlue:   page = IPTV_DEVICE_INFO_BUFFERS;
+                     UpdateInfo();
+                     break;
+       default:      if (timeout.TimedOut())
+                        UpdateInfo();
+                     state = osContinue;
+                     break;
        }
      }
   return state;
@@ -554,13 +569,7 @@ cIptvPluginSetup::cIptvPluginSetup()
   debug("cIptvPluginSetup::cIptvPluginSetup()\n");
   tsBufferSize = IptvConfig.GetTsBufferSize();
   tsBufferPrefill = IptvConfig.GetTsBufferPrefillRatio();
-  statsUnit = IptvConfig.GetStatsUnit();
-  if (statsUnit > IPTV_STATS_UNIT_COUNT)
-     statsUnit = IPTV_STATS_UNIT_IN_BYTES;
-  statsUnitNames[IPTV_STATS_UNIT_IN_BYTES]  = tr("bytes");
-  statsUnitNames[IPTV_STATS_UNIT_IN_KBYTES] = tr("kbytes");
-  statsUnitNames[IPTV_STATS_UNIT_IN_BITS]   = tr("bits");
-  statsUnitNames[IPTV_STATS_UNIT_IN_KBITS]  = tr("kbits");
+  useBytes = IptvConfig.GetUseBytes();
   sectionFiltering = IptvConfig.GetSectionFiltering();
   sidScanning = IptvConfig.GetSidScanning();
   numDisabledFilters = IptvConfig.GetDisabledFiltersCount();
@@ -580,8 +589,8 @@ void cIptvPluginSetup::Setup(void)
   Clear();
   Add(new cMenuEditIntItem( tr("TS buffer size [MB]"),         &tsBufferSize, 2, 16));
   Add(new cMenuEditIntItem( tr("TS buffer prefill ratio [%]"), &tsBufferPrefill, 0, 40));
-  Add(new cMenuEditStraItem(tr("Show statistics in"),          &statsUnit, IPTV_STATS_UNIT_COUNT, statsUnitNames));
-  Add(new cMenuEditBoolItem(tr("Use section filtering"),       &sectionFiltering));  
+  Add(new cMenuEditBoolItem(tr("Use bytes in statistics"),     &useBytes));
+  Add(new cMenuEditBoolItem(tr("Use section filtering"),       &sectionFiltering));
   if (sectionFiltering) {
      Add(new cMenuEditBoolItem(tr("Scan Sid automatically"),   &sidScanning));
      Add(new cMenuEditIntItem( tr("Disable filters"),          &numDisabledFilters, 0, SECTION_FILTER_TABLE_SIZE));
@@ -654,14 +663,14 @@ void cIptvPluginSetup::Store(void)
   // Store values into setup.conf
   SetupStore("TsBufferSize", tsBufferSize);
   SetupStore("TsBufferPrefill", tsBufferPrefill);
-  SetupStore("StatsUnit", statsUnit);
+  SetupStore("UseBytes", useBytes);
   SetupStore("SectionFiltering", sectionFiltering);
   SetupStore("SidScanning", sidScanning);
   StoreFilters("DisabledFilters", disabledFilterIndexes);
   // Update global config
   IptvConfig.SetTsBufferSize(tsBufferSize);
   IptvConfig.SetTsBufferPrefillRatio(tsBufferPrefill);
-  IptvConfig.SetStatsUnit(statsUnit);
+  IptvConfig.SetUseBytes(useBytes);
   IptvConfig.SetSectionFiltering(sectionFiltering);
   IptvConfig.SetSidScanning(sidScanning);
   for (int i = 0; i < SECTION_FILTER_TABLE_SIZE; ++i)

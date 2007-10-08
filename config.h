@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: config.h,v 1.12 2007/10/07 20:08:44 rahrenbe Exp $
+ * $Id: config.h,v 1.13 2007/10/08 23:51:58 rahrenbe Exp $
  */
 
 #ifndef __IPTV_CONFIG_H
@@ -19,7 +19,7 @@ protected:
   unsigned int readBufferTsCount;
   unsigned int tsBufferSize;
   unsigned int tsBufferPrefillRatio;
-  unsigned int statsUnit;
+  unsigned int useBytes;
   unsigned int sectionFiltering;
   unsigned int sidScanning;
   int disabledFilters[SECTION_FILTER_TABLE_SIZE];
@@ -29,18 +29,14 @@ public:
   unsigned int GetReadBufferTsCount(void) { return readBufferTsCount; }
   unsigned int GetTsBufferSize(void) { return tsBufferSize; }
   unsigned int GetTsBufferPrefillRatio(void) { return tsBufferPrefillRatio; }
-  unsigned int GetStatsUnit(void) { return statsUnit; }
-  unsigned int IsStatsUnitInBytes(void) { return ((statsUnit == IPTV_STATS_UNIT_IN_BYTES) ||
-                                                  (statsUnit == IPTV_STATS_UNIT_IN_KBYTES)); }
-  unsigned int IsStatsUnitInKilos(void) { return ((statsUnit == IPTV_STATS_UNIT_IN_KBYTES) ||
-                                                  (statsUnit == IPTV_STATS_UNIT_IN_KBITS)); }
+  unsigned int GetUseBytes(void) { return useBytes; }
   unsigned int GetSectionFiltering(void) { return sectionFiltering; }
   unsigned int GetSidScanning(void) { return sidScanning; }
   unsigned int GetDisabledFiltersCount(void);
   int GetDisabledFilters(unsigned int Index);
   void SetTsBufferSize(unsigned int Size) { tsBufferSize = Size; }
   void SetTsBufferPrefillRatio(unsigned int Ratio) { tsBufferPrefillRatio = Ratio; }
-  void SetStatsUnit(unsigned int Unit) { statsUnit = Unit; }
+  void SetUseBytes(unsigned int On) { useBytes = On; }
   void SetSectionFiltering(unsigned int On) { sectionFiltering = On; }
   void SetSidScanning(unsigned int On) { sidScanning = On; }
   void SetDisabledFilters(unsigned int Index, int Number);

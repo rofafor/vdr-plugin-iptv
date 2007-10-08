@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: config.c,v 1.14 2007/10/07 20:08:44 rahrenbe Exp $
+ * $Id: config.c,v 1.15 2007/10/08 23:51:58 rahrenbe Exp $
  */
 
 #include "config.h"
@@ -14,7 +14,7 @@ cIptvConfig::cIptvConfig(void)
 : readBufferTsCount(48),
   tsBufferSize(2),
   tsBufferPrefillRatio(0),
-  statsUnit(IPTV_STATS_UNIT_IN_KBYTES),
+  useBytes(1),
   sectionFiltering(1),
   sidScanning(1)
 {

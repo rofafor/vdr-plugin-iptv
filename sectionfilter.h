@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.h,v 1.6 2007/10/05 21:56:02 ajhseppa Exp $
+ * $Id: sectionfilter.h,v 1.7 2007/10/08 23:51:58 rahrenbe Exp $
  */
 
 #ifndef __IPTV_SECTIONFILTER_H
@@ -98,6 +98,7 @@ public:
   void ProcessData(const uint8_t* buf);
 
   int GetReadDesc();
+  uint16_t GetPid() { return pid; }
 };
 
 #endif // __IPTV_SECTIONFILTER_H

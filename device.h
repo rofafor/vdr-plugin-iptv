@@ -3,13 +3,14 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.27 2007/10/07 19:06:33 ajhseppa Exp $
+ * $Id: device.h,v 1.28 2007/10/08 23:51:58 rahrenbe Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
 #define __IPTV_DEVICE_H
 
 #include <vdr/device.h>
+#include "common.h"
 #include "protocoludp.h"
 #include "protocolhttp.h"
 #include "protocolfile.h"
@@ -48,7 +49,14 @@ private:
 public:
   cIptvDevice(unsigned int DeviceIndex);
   virtual ~cIptvDevice();
-  cString GetInformation();
+  cString GetInformation(unsigned int Page = IPTV_DEVICE_INFO_ALL);
+
+  // for statistics and general information
+private:
+  cString GetGeneralInformation(void);
+  cString GetPidsInformation(void);
+  cString GetFiltersInformation(void);
+  cString GetBuffersInformation(void);
 
   // for channel parsing & buffering
 private:
