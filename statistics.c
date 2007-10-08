@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.c,v 1.11 2007/10/08 12:25:30 rahrenbe Exp $
+ * $Id: statistics.c,v 1.12 2007/10/08 12:30:53 rahrenbe Exp $
  */
 
 #include <limits.h>
@@ -88,6 +88,8 @@ cString cIptvDeviceStatistics::GetStatistic()
                                  (long)(mostActivePids[i].DataAmount / divider),
                                  unit, ((i + 1) % 2) ? '\t' : '\n');
       }
+  if (!endswith(*info, "\n"))
+     info = cString::sprintf("%s%c", *info, '\n');
   dataBytes = 0;
   memset(&mostActivePids, '\0', sizeof(mostActivePids));
   return info;
