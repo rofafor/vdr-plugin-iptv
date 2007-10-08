@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.c,v 1.13 2007/10/08 16:24:48 rahrenbe Exp $
+ * $Id: statistics.c,v 1.14 2007/10/08 18:31:44 ajhseppa Exp $
  */
 
 #include <limits.h>
@@ -138,6 +138,7 @@ void cIptvDeviceStatistics::AddStatistic(long Bytes, u_short pid, long payload)
          mostActivePids[i].DataAmount += payload;
          // Now re-sort the array and quit
          qsort(&mostActivePids, numberOfElements, sizeof(pidStruct), SortPids);
+         mutex.Unlock();
          return;
          }
       }
