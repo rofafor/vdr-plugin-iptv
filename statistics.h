@@ -3,18 +3,13 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.h,v 1.5 2007/10/07 22:54:09 rahrenbe Exp $
+ * $Id: statistics.h,v 1.6 2007/10/08 12:25:30 rahrenbe Exp $
  */
 
 #ifndef __IPTV_STATISTICS_H
 #define __IPTV_STATISTICS_H
 
 #include "statisticif.h"
-
-struct pidStruct {
-  u_short pid;
-  long DataAmount;
-};
 
 // Section statistics
 class cIptvSectionStatistics : public cIptvStatisticIf {
@@ -47,8 +42,14 @@ protected:
   void UpdateActivePids(u_short pid, long payload);
 
 private:
+  struct pidStruct {
+    u_short pid;
+    long DataAmount;
+  };
   pidStruct mostActivePids[IPTV_STATS_ACTIVE_PIDS_COUNT];
   cTimeMs timer;
+
+  static int SortPids(const void* data1, const void* data2);
 };
 
 // Streamer statistics

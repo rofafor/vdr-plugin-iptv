@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.c,v 1.10 2007/10/07 22:54:09 rahrenbe Exp $
+ * $Id: statistics.c,v 1.11 2007/10/08 12:25:30 rahrenbe Exp $
  */
 
 #include <limits.h>
@@ -93,9 +93,9 @@ cString cIptvDeviceStatistics::GetStatistic()
   return info;
 }
 
-static int SortFunc(const void* data1, const void* data2)
+int cIptvDeviceStatistics::SortPids(const void* data1, const void* data2)
 {
-  //debug("cIptvDeviceStatistics::SortFunc()\n");
+  //debug("cIptvDeviceStatistics::SortPids()\n");
   pidStruct *comp1 = (pidStruct*)data1;
   pidStruct *comp2 = (pidStruct*)data2;
   if (comp1->DataAmount > comp2->DataAmount)
@@ -114,7 +114,7 @@ void cIptvDeviceStatistics::UpdateActivePids(u_short pid, long payload)
       if (mostActivePids[i].pid == pid) {
          mostActivePids[i].DataAmount += payload;
          // Now re-sort the array and quit
-         qsort(&mostActivePids, numberOfElements, sizeof(pidStruct), SortFunc);
+         qsort(&mostActivePids, numberOfElements, sizeof(pidStruct), SortPids);
          return;
          }
       }
@@ -124,7 +124,7 @@ void cIptvDeviceStatistics::UpdateActivePids(u_short pid, long payload)
       mostActivePids[numberOfElements - 1].pid = pid;
       mostActivePids[numberOfElements - 1].DataAmount = payload;
      // Re-sort
-     qsort(&mostActivePids, numberOfElements, sizeof(pidStruct), SortFunc);
+     qsort(&mostActivePids, numberOfElements, sizeof(pidStruct), SortPids);
      }
 }
 
