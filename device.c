@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.59 2007/10/08 16:24:48 rahrenbe Exp $
+ * $Id: device.c,v 1.60 2007/10/08 18:35:10 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -110,7 +110,7 @@ cString cIptvDevice::GetInformation()
   if (!endswith(*filterInfo, "\n"))
      filterInfo = cString::sprintf("%s%c", *filterInfo, '\n');
   // generate information string
-  return cString::sprintf("IPTV device #%d (CardIndex: %d)\nSource: %s\n%s\n%s%s",
+  return cString::sprintf("IPTV device #%d (CardIndex: %d)\nSource: %s\n%s%s%s",
                           deviceIndex, CardIndex(), pIptvStreamer ? 
                           *pIptvStreamer->GetInformation() : "", *GetStatistic(),
                           pIptvStreamer ? *pIptvStreamer->GetStatistic() : "",
