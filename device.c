@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.58 2007/10/08 12:30:53 rahrenbe Exp $
+ * $Id: device.c,v 1.59 2007/10/08 16:24:48 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -327,9 +327,8 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
            }
         isPacketDelivered = true;
         Data = p;
-	// Increment statistics counter
-	dataBytes += Count;
-	UpdateActivePids(ts_pid(p), payload(p));
+	// Update statistics 
+	AddStatistic(Count, ts_pid(p), payload(p));
         // Run the data through all filters
         for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
             if (secfilters[i])
