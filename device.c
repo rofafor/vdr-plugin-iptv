@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.63 2007/10/09 17:58:17 ajhseppa Exp $
+ * $Id: device.c,v 1.64 2007/10/09 17:59:12 ajhseppa Exp $
  */
 
 #include "config.h"
@@ -97,7 +97,7 @@ cIptvDevice *cIptvDevice::GetIptvDevice(int CardIndex)
 cString cIptvDevice::GetGeneralInformation(void)
 {
   //debug("cIptvDevice::GetGeneralInformation(%d)\n", deviceIndex);
-  return cString::sprintf("IPTV device #%d (CardIndex: %d)\n%s\n%s\nTSBuffer: %s\nStreamBuffer: %s\n",
+  return cString::sprintf("IPTV device #%d (CardIndex: %d)\n%s\n%s\nTS Buffer: %s\nStream Buffer: %s\n",
                           deviceIndex, CardIndex(), pIptvStreamer ?
                           *pIptvStreamer->GetInformation() : "",
                           pIptvStreamer ? *pIptvStreamer->cIptvStreamerStatistics::GetStatistic() : "",
