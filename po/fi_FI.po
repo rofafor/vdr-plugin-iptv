@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.5.7\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2007-10-09 02:46+0300\n"
+"POT-Creation-Date: 2007-10-09 18:24+0300\n"
 "PO-Revision-Date: 2007-08-12 23:22+0300\n"
 "Last-Translator: Rolf Ahrenberg\n"
 "Language-Team: <vdr@linuxtv.org>\n"
@@ -92,8 +92,8 @@ msgid "IPTV Information"
 msgstr "IPTV-tiedot"
 
 #: setup.c:496
-msgid "Buffers"
-msgstr "Puskurit"
+msgid "Bits/bytes"
+msgstr "Bitit/tavut"
 
 #: setup.c:496
 msgid "Filters"
@@ -111,31 +111,27 @@ msgstr "Pidit"
 msgid "IPTV information not available!"
 msgstr "IPTV-tietoja ei saatavilla!"
 
-#: setup.c:590
+#: setup.c:589
 msgid "TS buffer size [MB]"
 msgstr "TS-puskurin koko [MB]"
 
-#: setup.c:591
+#: setup.c:590
 msgid "TS buffer prefill ratio [%]"
 msgstr "TS-puskurin esitäyttöaste [%]"
 
-#: setup.c:592
-msgid "Use bytes in statistics"
-msgstr "Käytä tavuja tilastotiedoissa"
-
-#: setup.c:593
+#: setup.c:591
 msgid "Use section filtering"
 msgstr "Käytä sektioiden suodatusta"
 
-#: setup.c:595
+#: setup.c:593
 msgid "Scan Sid automatically"
 msgstr "Etsi palvelu-ID automaattisesti"
 
-#: setup.c:596
+#: setup.c:594
 msgid "Disable filters"
 msgstr "Poista suodattimia käytöstä"
 
 #. TRANSLATORS: note the singular!
-#: setup.c:599
+#: setup.c:597
 msgid "Disable filter"
 msgstr "Poista suodatin käytöstä"

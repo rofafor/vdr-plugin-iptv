@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.15 2007/10/08 23:51:58 rahrenbe Exp $
+ * $Id: iptv.c,v 1.16 2007/10/09 16:37:16 rahrenbe Exp $
  */
 
 #include <getopt.h>
@@ -175,8 +175,6 @@ bool cPluginIptv::SetupParse(const char *Name, const char *Value)
      IptvConfig.SetTsBufferSize(atoi(Value));
   else if (!strcasecmp(Name, "TsBufferPrefill"))
      IptvConfig.SetTsBufferPrefillRatio(atoi(Value));
-  else if (!strcasecmp(Name, "UseBytes"))
-     IptvConfig.SetUseBytes(atoi(Value));
   else if (!strcasecmp(Name, "SectionFiltering"))
      IptvConfig.SetSectionFiltering(atoi(Value));
   else if (!strcasecmp(Name, "SidScanning"))
@@ -201,9 +199,15 @@ bool cPluginIptv::Service(const char *Id, void *Data)
 
 const char **cPluginIptv::SVDRPHelpPages(void)
 {
-  //debug("cPluginIptv::SVDRPHelpPages()\n");
-  // Return help text for SVDRP commands this plugin implements
-  return NULL;
+  debug("cPluginIptv::SVDRPHelpPages()\n");
+  static const char *HelpPages[] = {
+    "INFO [ <option> ]\n"
+    "    Print IPTV device information and statistics.\n"
+    "    The data can be shown either in bits or bytes\n"
+    "    according the given option (bits=0; bytes=1).\n",
+    NULL
+    };
+  return HelpPages;
 }
 
 cString cPluginIptv::SVDRPCommand(const char *Command, const char *Option, int &ReplyCode)
@@ -212,7 +216,7 @@ cString cPluginIptv::SVDRPCommand(const char *Command, const char *Option, int &
   if (strcasecmp(Command, "INFO") == 0) {
      cIptvDevice *device = cIptvDevice::GetIptvDevice(cDevice::ActualDevice()->CardIndex());
      if (device)
-        return device->GetInformation();
+        return device->GetInformation((atoi(Option) == 0));
      else {
         ReplyCode = 550; // Requested action not taken
         return cString("IPTV information not available!");

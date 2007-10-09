@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.27 2007/10/08 23:51:58 rahrenbe Exp $
+ * $Id: setup.c,v 1.28 2007/10/09 16:37:16 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -493,7 +493,7 @@ cIptvMenuInfo::cIptvMenuInfo()
 :cOsdMenu(tr("IPTV Information")), text(""), timeout(INFO_TIMEOUT_MS), page(IPTV_DEVICE_INFO_GENERAL)
 {
   UpdateInfo();
-  SetHelp(tr("General"), tr("Pids"), tr("Filters"), tr("Buffers"));
+  SetHelp(tr("General"), tr("Pids"), tr("Filters"), tr("Bits/bytes"));
 }
 
 cIptvMenuInfo::~cIptvMenuInfo()
@@ -550,7 +550,7 @@ eOSState cIptvMenuInfo::ProcessKey(eKeys Key)
        case kYellow: page = IPTV_DEVICE_INFO_FILTERS;
                      UpdateInfo();
                      break;
-       case kBlue:   page = IPTV_DEVICE_INFO_BUFFERS;
+       case kBlue:   IptvConfig.SetUseBytes(!IptvConfig.GetUseBytes());
                      UpdateInfo();
                      break;
        default:      if (timeout.TimedOut())
@@ -569,7 +569,6 @@ cIptvPluginSetup::cIptvPluginSetup()
   debug("cIptvPluginSetup::cIptvPluginSetup()\n");
   tsBufferSize = IptvConfig.GetTsBufferSize();
   tsBufferPrefill = IptvConfig.GetTsBufferPrefillRatio();
-  useBytes = IptvConfig.GetUseBytes();
   sectionFiltering = IptvConfig.GetSectionFiltering();
   sidScanning = IptvConfig.GetSidScanning();
   numDisabledFilters = IptvConfig.GetDisabledFiltersCount();
@@ -589,7 +588,6 @@ void cIptvPluginSetup::Setup(void)
   Clear();
   Add(new cMenuEditIntItem( tr("TS buffer size [MB]"),         &tsBufferSize, 2, 16));
   Add(new cMenuEditIntItem( tr("TS buffer prefill ratio [%]"), &tsBufferPrefill, 0, 40));
-  Add(new cMenuEditBoolItem(tr("Use bytes in statistics"),     &useBytes));
   Add(new cMenuEditBoolItem(tr("Use section filtering"),       &sectionFiltering));
   if (sectionFiltering) {
      Add(new cMenuEditBoolItem(tr("Scan Sid automatically"),   &sidScanning));
@@ -663,14 +661,12 @@ void cIptvPluginSetup::Store(void)
   // Store values into setup.conf
   SetupStore("TsBufferSize", tsBufferSize);
   SetupStore("TsBufferPrefill", tsBufferPrefill);
-  SetupStore("UseBytes", useBytes);
   SetupStore("SectionFiltering", sectionFiltering);
   SetupStore("SidScanning", sidScanning);
   StoreFilters("DisabledFilters", disabledFilterIndexes);
   // Update global config
   IptvConfig.SetTsBufferSize(tsBufferSize);
   IptvConfig.SetTsBufferPrefillRatio(tsBufferPrefill);
-  IptvConfig.SetUseBytes(useBytes);
   IptvConfig.SetSectionFiltering(sectionFiltering);
   IptvConfig.SetSidScanning(sidScanning);
   for (int i = 0; i < SECTION_FILTER_TABLE_SIZE; ++i)

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.61 2007/10/08 23:51:58 rahrenbe Exp $
+ * $Id: device.c,v 1.62 2007/10/09 16:37:16 rahrenbe Exp $
  */
 
 #include "config.h"
@@ -97,10 +97,12 @@ cIptvDevice *cIptvDevice::GetIptvDevice(int CardIndex)
 cString cIptvDevice::GetGeneralInformation(void)
 {
   //debug("cIptvDevice::GetGeneralInformation(%d)\n", deviceIndex);
-  return cString::sprintf("IPTV device #%d (CardIndex: %d)\n%s\n%s",
+  return cString::sprintf("IPTV device #%d (CardIndex: %d)\n%s\n%s\nTS buffer usage: %d%%\n",
                           deviceIndex, CardIndex(), pIptvStreamer ?
                           *pIptvStreamer->GetInformation() : "",
-                          pIptvStreamer ? *pIptvStreamer->GetStatistic() : "");
+                          pIptvStreamer ? *pIptvStreamer->GetStatistic() : "",
+                          ((MEGABYTE(IptvConfig.GetTsBufferSize()) - tsBuffer->Free()) /
+                          MEGABYTE(IptvConfig.GetTsBufferSize())));
 }
 
 cString cIptvDevice::GetPidsInformation(void)
@@ -128,13 +130,6 @@ cString cIptvDevice::GetFiltersInformation(void)
   return info;
 }
 
-cString cIptvDevice::GetBuffersInformation(void)
-{
-  //debug("cIptvDevice::GetBuffersInformation(%d)\n", deviceIndex);
-  cString info("Buffers information is not yet implemented!\n");
-  return info;
-}
-
 cString cIptvDevice::GetInformation(unsigned int Page)
 {
   // generate information string
@@ -149,15 +144,11 @@ cString cIptvDevice::GetInformation(unsigned int Page)
     case IPTV_DEVICE_INFO_FILTERS:
          info = GetFiltersInformation();
          break;
-    case IPTV_DEVICE_INFO_BUFFERS:
-         info = GetBuffersInformation();
-         break;
     default:
-         info = cString::sprintf("%s%s%s%s",
+         info = cString::sprintf("%s%s%s",
                                  *GetGeneralInformation(),
                                  *GetPidsInformation(),
-                                 *GetFiltersInformation(),
-                                 *GetBuffersInformation());
+                                 *GetFiltersInformation());
          break;
     }
   return info;

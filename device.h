@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.28 2007/10/08 23:51:58 rahrenbe Exp $
+ * $Id: device.h,v 1.29 2007/10/09 16:37:16 rahrenbe Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -56,7 +56,6 @@ private:
   cString GetGeneralInformation(void);
   cString GetPidsInformation(void);
   cString GetFiltersInformation(void);
-  cString GetBuffersInformation(void);
 
   // for channel parsing & buffering
 private:

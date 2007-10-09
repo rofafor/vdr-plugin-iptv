@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.h,v 1.14 2007/10/08 23:51:58 rahrenbe Exp $
+ * $Id: setup.h,v 1.15 2007/10/09 16:37:16 rahrenbe Exp $
  */
 
 #ifndef __IPTV_SETUP_H
@@ -17,7 +17,6 @@ class cIptvPluginSetup : public cMenuSetupPage
 private:
   int tsBufferSize;
   int tsBufferPrefill;
-  int useBytes;
   int sectionFiltering;
   int sidScanning;
   int numDisabledFilters;

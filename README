@@ -50,9 +50,6 @@ Setup menu:
                                    stream ringbuffer before data is
                                    transferred to VDR.
                                    The valid range: 0...40
-- Show statistics in = 0           Defines unit (bytes, kbytes, bits, kbits)
-                                   used in statistics menu.
-                                   The valid range: 0...3
 - Use section filtering = 1        Defines whether section filtering shall
                                    be used.
                                    The valid range: 0...1
@@ -67,8 +64,19 @@ Setup menu:
                                    contain that many "Disable filter" options
                                    which allow you to disable the individual
                                    section filters.
-- [Red]                            Opens IPTV channel editor.
-- [Blue]                           Opens IPTV information/statistics menu.
+- [Red:Channels]                   Opens IPTV channel editor.
+- [Blue:Info]                      Opens IPTV information/statistics menu.
+
+Channel editor menu:
+
+- Read VDR's MANUAL for detailed information.
+
+Information menu:
+
+- [Red:General]                    Opens the general information page.
+- [Green:Pids]                     Opens the pid statistics page.
+- [Yellow:Filters]                 Opens the section filter statistics page.
+- [Blue:Bits/bytes]                Toggles between bits and bytes mode.
 
 Configuration:
 
