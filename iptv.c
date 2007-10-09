@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.16 2007/10/09 16:37:16 rahrenbe Exp $
+ * $Id: iptv.c,v 1.17 2007/10/09 22:12:17 rahrenbe Exp $
  */
 
 #include <getopt.h>
@@ -201,10 +201,12 @@ const char **cPluginIptv::SVDRPHelpPages(void)
 {
   debug("cPluginIptv::SVDRPHelpPages()\n");
   static const char *HelpPages[] = {
-    "INFO [ <option> ]\n"
+    "INFO [ <page> ]\n"
     "    Print IPTV device information and statistics.\n"
-    "    The data can be shown either in bits or bytes\n"
-    "    according the given option (bits=0; bytes=1).\n",
+    "    The output can be narrowed using optional \"page\""
+    "    option: 1=general 2=pids 3=section filters.\n",
+    "MODE\n"
+    "    Toggles between bit or byte information mode.\n",
     NULL
     };
   return HelpPages;
@@ -215,12 +217,24 @@ cString cPluginIptv::SVDRPCommand(const char *Command, const char *Option, int &
   debug("cPluginIptv::SVDRPCommand(): Command=%s Option=%s\n", Command, Option);
   if (strcasecmp(Command, "INFO") == 0) {
      cIptvDevice *device = cIptvDevice::GetIptvDevice(cDevice::ActualDevice()->CardIndex());
-     if (device)
-        return device->GetInformation((atoi(Option) == 0));
+     if (device) {
+        int page = IPTV_DEVICE_INFO_ALL;
+        if (Option) {
+           page = atoi(Option);
+           if ((page < IPTV_DEVICE_INFO_ALL) || (page > IPTV_DEVICE_INFO_FILTERS))
+              page = IPTV_DEVICE_INFO_ALL;
+           }
+        return device->GetInformation(page);
+        }
      else {
         ReplyCode = 550; // Requested action not taken
         return cString("IPTV information not available!");
         }
+     }
+  else if (strcasecmp(Command, "MODE") == 0) {
+     unsigned int mode = !IptvConfig.GetUseBytes();
+     IptvConfig.SetUseBytes(mode);
+     return cString::sprintf("IPTV information mode is: %s\n", mode ? "bytes" : "bits");
      }
   return NULL;
 }

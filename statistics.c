@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.c,v 1.16 2007/10/09 17:58:17 ajhseppa Exp $
+ * $Id: statistics.c,v 1.17 2007/10/09 22:12:17 rahrenbe Exp $
  */
 
 #include <limits.h>
@@ -31,11 +31,9 @@ cString cIptvSectionStatistics::GetStatistic()
 {
   //debug("cIptvSectionStatistics::GetStatistic()\n");
   cMutexLock MutexLock(&mutex);
-  long bitrate = 0;
   uint64_t elapsed = timer.Elapsed(); /* in milliseconds */
   timer.Set();
-  if (elapsed)
-     bitrate = (long)(1000.0 * filteredData / elapsed / KILOBYTE(1));
+  long bitrate = elapsed ? (long)((float)1000 / KILOBYTE(1) * filteredData / elapsed) : 0L;
   if (!IptvConfig.GetUseBytes())
      bitrate *= 8;
   // no trailing linefeed here!
@@ -53,39 +51,32 @@ void cIptvSectionStatistics::AddStatistic(long Bytes, long Calls)
   numberOfCalls += Calls;
 }
 
-// --- cIptvDeviceStatistics -------------------------------------------------
+// --- cIptvPidStatistics ----------------------------------------------------
 
 // Device statistic class
-cIptvDeviceStatistics::cIptvDeviceStatistics()
-: dataBytes(0),
-  timer(),
+cIptvPidStatistics::cIptvPidStatistics()
+: timer(),
   mutex()
 {
-  debug("cIptvDeviceStatistics::cIptvDeviceStatistics()\n");
+  debug("cIptvPidStatistics::cIptvPidStatistics()\n");
   memset(mostActivePids, '\0', sizeof(mostActivePids));
 }
 
-cIptvDeviceStatistics::~cIptvDeviceStatistics()
+cIptvPidStatistics::~cIptvPidStatistics()
 {
-  debug("cIptvDeviceStatistics::~cIptvDeviceStatistics()\n");
+  debug("cIptvPidStatistics::~cIptvPidStatistics()\n");
 }
 
-cString cIptvDeviceStatistics::GetStatistic()
+cString cIptvPidStatistics::GetStatistic()
 {
-  //debug("cIptvDeviceStatistics::GetStatistic()\n");
+  //debug("cIptvPidStatistics::GetStatistic()\n");
   cMutexLock MutexLock(&mutex);
-  long bitrate = 0L;
   uint64_t elapsed = timer.Elapsed(); /* in milliseconds */
   timer.Set();
-  if (elapsed)
-     bitrate = (long)(1000.0 * dataBytes / elapsed / KILOBYTE(1));
-  if (!IptvConfig.GetUseBytes())
-     bitrate *= 8;
-  cString info = cString::sprintf("Bitrate: %ld k%s/s\n", bitrate,
-                                  IptvConfig.GetUseBytes() ? "B" : "bit");
+  cString info("Active pids:\n");
   for (unsigned int i = 0; i < IPTV_STATS_ACTIVE_PIDS_COUNT; ++i) {
       if (mostActivePids[i].pid) {
-         bitrate = (long)(1000.0 * mostActivePids[i].DataAmount / elapsed / KILOBYTE(1));
+         long bitrate = elapsed ? (long)((float)1000 / KILOBYTE(1) * mostActivePids[i].DataAmount / elapsed) : 0L;
          if (!IptvConfig.GetUseBytes())
             bitrate *= 8;
          info = cString::sprintf("%sPid %d: %4d (%4ld k%s/s)\n", *info, i,
@@ -93,14 +84,13 @@ cString cIptvDeviceStatistics::GetStatistic()
                                  IptvConfig.GetUseBytes() ? "B" : "bit");
          }
       }
-  dataBytes = 0;
   memset(&mostActivePids, '\0', sizeof(mostActivePids));
   return info;
 }
 
-int cIptvDeviceStatistics::SortPids(const void* data1, const void* data2)
+int cIptvPidStatistics::SortPids(const void* data1, const void* data2)
 {
-  //debug("cIptvDeviceStatistics::SortPids()\n");
+  //debug("cIptvPidStatistics::SortPids()\n");
   pidStruct *comp1 = (pidStruct*)data1;
   pidStruct *comp2 = (pidStruct*)data2;
   if (comp1->DataAmount > comp2->DataAmount)
@@ -110,16 +100,15 @@ int cIptvDeviceStatistics::SortPids(const void* data1, const void* data2)
   return 0;
 }
 
-void cIptvDeviceStatistics::AddStatistic(long Bytes, u_short pid, long payload)
+void cIptvPidStatistics::AddStatistic(u_short Pid, long Payload)
 {
-  //debug("cIptvDeviceStatistics::AddStatistic(Bytes=%ld, pid=%ld, payload=%ld)\n", Bytes, pid, payload);
+  //debug("cIptvPidStatistics::AddStatistic(pid=%ld, payload=%ld)\n", Pid, Payload);
   cMutexLock MutexLock(&mutex);
-  dataBytes += Bytes;
   const int numberOfElements = sizeof(mostActivePids) / sizeof(pidStruct);
   // If our statistic already is in the array, update it and quit
   for (int i = 0; i < numberOfElements; ++i) {
-      if (mostActivePids[i].pid == pid) {
-         mostActivePids[i].DataAmount += payload;
+      if (mostActivePids[i].pid == Pid) {
+         mostActivePids[i].DataAmount += Payload;
          // Now re-sort the array and quit
          qsort(&mostActivePids, numberOfElements, sizeof(pidStruct), SortPids);
          return;
@@ -127,9 +116,9 @@ void cIptvDeviceStatistics::AddStatistic(long Bytes, u_short pid, long payload)
       }
   // Apparently our pid isn't in the array. Replace the last element with this
   // one if new payload is greater
-  if (mostActivePids[numberOfElements - 1].DataAmount < payload) {
-      mostActivePids[numberOfElements - 1].pid = pid;
-      mostActivePids[numberOfElements - 1].DataAmount = payload;
+  if (mostActivePids[numberOfElements - 1].DataAmount < Payload) {
+      mostActivePids[numberOfElements - 1].pid = Pid;
+      mostActivePids[numberOfElements - 1].DataAmount = Payload;
      // Re-sort
      qsort(&mostActivePids, numberOfElements, sizeof(pidStruct), SortPids);
      }
@@ -155,14 +144,12 @@ cString cIptvStreamerStatistics::GetStatistic()
 {
   //debug("cIptvStreamerStatistics::GetStatistic()\n");
   cMutexLock MutexLock(&mutex);
-  long bitrate = 0;
   uint64_t elapsed = timer.Elapsed(); /* in milliseconds */
   timer.Set();
-  if (elapsed)
-     bitrate = (long)(1000.0 * dataBytes / elapsed / KILOBYTE(1));
+  long bitrate = elapsed ? (long)((float)1000 / KILOBYTE(1) * dataBytes / elapsed) : 0L;
   if (!IptvConfig.GetUseBytes())
      bitrate *= 8;
-  cString info = cString::sprintf("Streamer: %ld k%s/s\n", bitrate, IptvConfig.GetUseBytes() ? "B" : "bit");
+  cString info = cString::sprintf("Stream bitrate: %ld k%s/s\n", bitrate, IptvConfig.GetUseBytes() ? "B" : "bit");
   dataBytes = 0;
   return info;
 }
@@ -177,7 +164,8 @@ void cIptvStreamerStatistics::AddStatistic(long Bytes)
 
 // Buffer statistic class
 cIptvBufferStatistics::cIptvBufferStatistics()
-: freeSpace(0),
+: dataBytes(0),
+  freeSpace(0),
   usedSpace(0),
   timer(),
   mutex()
@@ -194,21 +182,29 @@ cString cIptvBufferStatistics::GetStatistic()
 {
   //debug("cIptvBufferStatistics::GetStatistic()\n");
   cMutexLock MutexLock(&mutex);
-  float percentage = (float)((1-(float)freeSpace / (float)(usedSpace + freeSpace)) * 100);
-  long usedKilos = (long)(usedSpace / KILOBYTE(1));
-  long freeKilos = (long)(freeSpace / KILOBYTE(1));
+  uint64_t elapsed = timer.Elapsed(); /* in milliseconds */
+  timer.Set();
+  long bitrate = elapsed ? (long)((float)1000 / KILOBYTE(1) * dataBytes / elapsed) : 0L;
+  float percentage = (float)((1 - (float)freeSpace / (float)(usedSpace + freeSpace)) * 100);
+  long usedKilos = usedSpace / KILOBYTE(1);
+  long freeKilos = freeSpace / KILOBYTE(1);
   if (!IptvConfig.GetUseBytes()) {
+     bitrate *= 8;
      freeKilos *= 8;
      usedKilos *= 8;
      }
-  cString info = cString::sprintf("%ld/%ld k%s (%2.1f%%)", usedKilos, freeKilos, IptvConfig.GetUseBytes() ? "B" : "bit", percentage);
+  cString info = cString::sprintf("Buffer bitrate: %ld k%s/s\nBuffer usage: %ld/%ld k%s (%2.1f%%)\n", bitrate,
+                                  IptvConfig.GetUseBytes() ? "B" : "bit", usedKilos, freeKilos,
+                                  IptvConfig.GetUseBytes() ? "B" : "bit", percentage);
+  dataBytes = 0;
   return info;
 }
 
-void cIptvBufferStatistics::AddStatistic(long used, long free)
+void cIptvBufferStatistics::AddStatistic(long Bytes, long Used, long Free)
 {
-  //debug("cIptvBufferStatistics::AddStatistic(Bytes=%ld)\n", Bytes);
+  //debug("cIptvBufferStatistics::AddStatistic(Bytes=%ld, Used=%ld, Free=%ld)\n", Bytes, Used, Free);
   cMutexLock MutexLock(&mutex);
-  freeSpace = free;
-  usedSpace = used;  
+  dataBytes += Bytes;
+  freeSpace = Free;
+  usedSpace = Used;  
 }

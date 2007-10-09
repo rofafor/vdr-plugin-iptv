@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.h,v 1.8 2007/10/09 17:58:17 ajhseppa Exp $
+ * $Id: statistics.h,v 1.9 2007/10/09 22:12:17 rahrenbe Exp $
  */
 
 #ifndef __IPTV_STATISTICS_H
@@ -30,15 +30,15 @@ private:
   cMutex mutex;
 };
 
-// Device statistics
-class cIptvDeviceStatistics : public cIptvStatisticIf {
+// Pid statistics
+class cIptvPidStatistics : public cIptvStatisticIf {
 public:
-  cIptvDeviceStatistics();
-  virtual ~cIptvDeviceStatistics();
+  cIptvPidStatistics();
+  virtual ~cIptvPidStatistics();
   cString GetStatistic();
 
 protected:
-  void AddStatistic(long Bytes, u_short pid, long payload);
+  void AddStatistic(u_short Pid, long Payload);
 
 private:
   struct pidStruct {
@@ -46,7 +46,6 @@ private:
     long DataAmount;
   };
   pidStruct mostActivePids[IPTV_STATS_ACTIVE_PIDS_COUNT];
-  long dataBytes;
   cTimeMs timer;
   cMutex mutex;
 
@@ -78,9 +77,10 @@ public:
   cString GetStatistic();
 
 protected:
-  void AddStatistic(long used, long free);
+  void AddStatistic(long Bytes, long Used, long Free);
 
 private:
+  long dataBytes;
   long freeSpace;
   long usedSpace;
   cTimeMs timer;
@@ -88,4 +88,3 @@ private:
 };
 
 #endif // __IPTV_STATISTICS_H
-
