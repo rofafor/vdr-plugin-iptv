@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.c,v 1.15 2007/10/08 23:51:58 rahrenbe Exp $
+ * $Id: statistics.c,v 1.16 2007/10/09 17:58:17 ajhseppa Exp $
  */
 
 #include <limits.h>
@@ -172,4 +172,43 @@ void cIptvStreamerStatistics::AddStatistic(long Bytes)
   //debug("cIptvStreamerStatistics::AddStatistic(Bytes=%ld)\n", Bytes);
   cMutexLock MutexLock(&mutex);
   dataBytes += Bytes;
+}
+
+
+// Buffer statistic class
+cIptvBufferStatistics::cIptvBufferStatistics()
+: freeSpace(0),
+  usedSpace(0),
+  timer(),
+  mutex()
+{
+  debug("cIptvBufferStatistics::cIptvBufferStatistics()\n");
+}
+
+cIptvBufferStatistics::~cIptvBufferStatistics()
+{
+  debug("cIptvBufferStatistics::~cIptvBufferStatistics()\n");
+}
+
+cString cIptvBufferStatistics::GetStatistic()
+{
+  //debug("cIptvBufferStatistics::GetStatistic()\n");
+  cMutexLock MutexLock(&mutex);
+  float percentage = (float)((1-(float)freeSpace / (float)(usedSpace + freeSpace)) * 100);
+  long usedKilos = (long)(usedSpace / KILOBYTE(1));
+  long freeKilos = (long)(freeSpace / KILOBYTE(1));
+  if (!IptvConfig.GetUseBytes()) {
+     freeKilos *= 8;
+     usedKilos *= 8;
+     }
+  cString info = cString::sprintf("%ld/%ld k%s (%2.1f%%)", usedKilos, freeKilos, IptvConfig.GetUseBytes() ? "B" : "bit", percentage);
+  return info;
+}
+
+void cIptvBufferStatistics::AddStatistic(long used, long free)
+{
+  //debug("cIptvBufferStatistics::AddStatistic(Bytes=%ld)\n", Bytes);
+  cMutexLock MutexLock(&mutex);
+  freeSpace = free;
+  usedSpace = used;  
 }

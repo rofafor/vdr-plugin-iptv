@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.29 2007/10/09 16:37:16 rahrenbe Exp $
+ * $Id: device.h,v 1.30 2007/10/09 17:58:17 ajhseppa Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -19,7 +19,7 @@
 #include "sidscanner.h"
 #include "statistics.h"
 
-class cIptvDevice : public cDevice, public cIptvDeviceStatistics {
+class cIptvDevice : public cDevice, public cIptvDeviceStatistics, public cIptvBufferStatistics {
   // static ones
 public:
   static unsigned int deviceCount;

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.h,v 1.7 2007/10/08 16:24:48 rahrenbe Exp $
+ * $Id: statistics.h,v 1.8 2007/10/09 17:58:17 ajhseppa Exp $
  */
 
 #ifndef __IPTV_STATISTICS_H
@@ -66,6 +66,23 @@ protected:
 
 private:
   long dataBytes;
+  cTimeMs timer;
+  cMutex mutex;
+};
+
+// Buffer statistics
+class cIptvBufferStatistics : public cIptvStatisticIf {
+public:
+  cIptvBufferStatistics();
+  virtual ~cIptvBufferStatistics();
+  cString GetStatistic();
+
+protected:
+  void AddStatistic(long used, long free);
+
+private:
+  long freeSpace;
+  long usedSpace;
   cTimeMs timer;
   cMutex mutex;
 };

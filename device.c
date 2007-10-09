@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.62 2007/10/09 16:37:16 rahrenbe Exp $
+ * $Id: device.c,v 1.63 2007/10/09 17:58:17 ajhseppa Exp $
  */
 
 #include "config.h"
@@ -97,19 +97,19 @@ cIptvDevice *cIptvDevice::GetIptvDevice(int CardIndex)
 cString cIptvDevice::GetGeneralInformation(void)
 {
   //debug("cIptvDevice::GetGeneralInformation(%d)\n", deviceIndex);
-  return cString::sprintf("IPTV device #%d (CardIndex: %d)\n%s\n%s\nTS buffer usage: %d%%\n",
+  return cString::sprintf("IPTV device #%d (CardIndex: %d)\n%s\n%s\nTSBuffer: %s\nStreamBuffer: %s\n",
                           deviceIndex, CardIndex(), pIptvStreamer ?
                           *pIptvStreamer->GetInformation() : "",
-                          pIptvStreamer ? *pIptvStreamer->GetStatistic() : "",
-                          ((MEGABYTE(IptvConfig.GetTsBufferSize()) - tsBuffer->Free()) /
-                          MEGABYTE(IptvConfig.GetTsBufferSize())));
+                          pIptvStreamer ? *pIptvStreamer->cIptvStreamerStatistics::GetStatistic() : "",
+			  *cIptvBufferStatistics::GetStatistic(),
+                          pIptvStreamer ? *pIptvStreamer->cIptvBufferStatistics::GetStatistic() : "");
 }
 
 cString cIptvDevice::GetPidsInformation(void)
 {
   //debug("cIptvDevice::GetPidsInformation(%d)\n", deviceIndex);
   cString info("Most active pids:\n");
-  info = cString::sprintf("%s%s", *info, *GetStatistic());
+  info = cString::sprintf("%s%s", *info, *cIptvDeviceStatistics::GetStatistic());
   return info;
 }
 
@@ -365,7 +365,8 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
         isPacketDelivered = true;
         Data = p;
 	// Update statistics 
-	AddStatistic(Count, ts_pid(p), payload(p));
+	cIptvDeviceStatistics::AddStatistic(TS_SIZE, ts_pid(p), payload(p));
+	cIptvBufferStatistics::AddStatistic(tsBuffer->Available(), tsBuffer->Free());
         // Run the data through all filters
         for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
             if (secfilters[i])

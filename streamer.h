@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.h,v 1.9 2007/10/07 22:54:09 rahrenbe Exp $
+ * $Id: streamer.h,v 1.10 2007/10/09 17:58:17 ajhseppa Exp $
  */
 
 #ifndef __IPTV_STREAMER_H
@@ -17,7 +17,7 @@
 #include "protocolif.h"
 #include "statistics.h"
 
-class cIptvStreamer : public cThread, public cIptvStreamerStatistics {
+class cIptvStreamer : public cThread, public cIptvStreamerStatistics, public cIptvBufferStatistics {
 private:
   cRingBufferLinear* ringBuffer;
   cMutex* mutex;
