@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.28 2007/10/09 16:37:16 rahrenbe Exp $
+ * $Id: setup.c,v 1.29 2007/10/10 20:54:58 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -630,7 +630,7 @@ eOSState cIptvPluginSetup::ProcessKey(eKeys Key)
        }
      }
   if ((Key != kNone) && ((numDisabledFilters != oldNumDisabledFilters) || (sectionFiltering != oldsectionFiltering))) {
-     while (numDisabledFilters && (numDisabledFilters < oldNumDisabledFilters))
+     while ((numDisabledFilters < oldNumDisabledFilters) && (oldNumDisabledFilters > 0))
            disabledFilterIndexes[--oldNumDisabledFilters] = -1;
      Setup();
      }
