@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.65 2007/10/09 22:12:17 rahrenbe Exp $
+ * $Id: device.c,v 1.66 2007/10/10 19:41:10 rahrenbe Exp $
  */
 
 #include "config.h"
@@ -97,7 +97,7 @@ cIptvDevice *cIptvDevice::GetIptvDevice(int CardIndex)
 cString cIptvDevice::GetGeneralInformation(void)
 {
   //debug("cIptvDevice::GetGeneralInformation(%d)\n", deviceIndex);
-  return cString::sprintf("IPTV device #%d (CardIndex: %d)\n%s\n%s%s",
+  return cString::sprintf("IPTV device: %d\nCardIndex: %d\n%s\n%s%s",
                           deviceIndex, CardIndex(), pIptvStreamer ?
                           *pIptvStreamer->GetInformation() : "",
                           pIptvStreamer ? *pIptvStreamer->GetStatistic() : "",
@@ -118,8 +118,9 @@ cString cIptvDevice::GetFiltersInformation(void)
   // loop through active section filters
   for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
       if (secfilters[i]) {
-         info = cString::sprintf("%sFilter %d: %s Pid=%d\n", *info, i,
-                                 *secfilters[i]->GetStatistic(), secfilters[i]->GetPid());
+         info = cString::sprintf("%sFilter %d: %s Pid=0x%02X (%s)\n", *info, i,
+                                 *secfilters[i]->GetStatistic(), secfilters[i]->GetPid(),
+                                 id_pid(secfilters[i]->GetPid()));
          if (++count > IPTV_STATS_ACTIVE_FILTERS_COUNT)
             break;
          }

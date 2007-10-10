@@ -3,16 +3,13 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: common.h,v 1.8 2007/10/09 16:37:16 rahrenbe Exp $
+ * $Id: common.h,v 1.9 2007/10/10 19:41:10 rahrenbe Exp $
  */
 
 #ifndef __IPTV_COMMON_H
 #define __IPTV_COMMON_H
 
 #include <vdr/tools.h>
-
-uint16_t ts_pid(const uint8_t *buf);
-uint8_t payload(const uint8_t *tsp);
 
 #ifdef DEBUG
 #define debug(x...) dsyslog("IPTV: " x);
@@ -32,12 +29,17 @@ uint8_t payload(const uint8_t *tsp);
 
 #define SECTION_FILTER_TABLE_SIZE       7
 
-typedef struct _section_filter_table_type {
+uint16_t ts_pid(const uint8_t *buf);
+uint8_t payload(const uint8_t *tsp);
+const char *id_pid(const u_short Pid);
+
+struct section_filter_table_type {
   const char *description;
+  const char *tag;
   u_short pid;
   u_char tid;
   u_char mask;
-} section_filter_table_type;
+};
 
 extern const section_filter_table_type section_filter_table[SECTION_FILTER_TABLE_SIZE];
 

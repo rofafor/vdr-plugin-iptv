@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.5.7\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2007-10-09 18:24+0300\n"
+"POT-Creation-Date: 2007-10-10 22:27+0300\n"
 "PO-Revision-Date: 2007-08-12 23:22+0300\n"
 "Last-Translator: Rolf Ahrenberg\n"
 "Language-Team: <vdr@linuxtv.org>\n"
@@ -15,31 +15,31 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-15\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: common.c:36
+#: common.c:45
 msgid "PAT (0x00)"
 msgstr "PAT (0x00)"
 
-#: common.c:37
+#: common.c:46
 msgid "NIT (0x40)"
 msgstr "NIT (0x40)"
 
-#: common.c:38
+#: common.c:47
 msgid "SDT (0x42)"
 msgstr "SDT (0x42)"
 
-#: common.c:39
+#: common.c:48
 msgid "EIT (0x4E/0x4F)"
 msgstr "EIT (0x4E/0x4F)"
 
-#: common.c:40
+#: common.c:49
 msgid "EIT (0x5X)"
 msgstr "EIT (0x5X)"
 
-#: common.c:41
+#: common.c:50
 msgid "EIT (0x6X)"
 msgstr "EIT (0x6X)"
 
-#: common.c:42
+#: common.c:51
 msgid "TDT (0x70)"
 msgstr "TDT (0x70)"
 
