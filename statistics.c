@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.c,v 1.17 2007/10/09 22:12:17 rahrenbe Exp $
+ * $Id: statistics.c,v 1.18 2007/10/10 20:08:25 rahrenbe Exp $
  */
 
 #include <limits.h>
@@ -194,7 +194,7 @@ cString cIptvBufferStatistics::GetStatistic()
      usedKilos *= 8;
      }
   cString info = cString::sprintf("Buffer bitrate: %ld k%s/s\nBuffer usage: %ld/%ld k%s (%2.1f%%)\n", bitrate,
-                                  IptvConfig.GetUseBytes() ? "B" : "bit", usedKilos, freeKilos,
+                                  IptvConfig.GetUseBytes() ? "B" : "bit", usedKilos, usedKilos + freeKilos,
                                   IptvConfig.GetUseBytes() ? "B" : "bit", percentage);
   dataBytes = 0;
   return info;
