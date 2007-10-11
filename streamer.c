@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.c,v 1.21 2007/10/09 22:12:17 rahrenbe Exp $
+ * $Id: streamer.c,v 1.22 2007/10/11 21:05:35 rahrenbe Exp $
  */
 
 #include <vdr/thread.h>
@@ -99,7 +99,8 @@ bool cIptvStreamer::Set(const char* Address, const int Port, cIptvProtocolIf* Pr
 cString cIptvStreamer::GetInformation(void)
 {
   //debug("cIptvStreamer::GetInformation()");
+  cString info("Stream:");
   if (protocol)
-     return protocol->GetInformation();
+     return cString::sprintf("%s %s", *info, *protocol->GetInformation());
   return NULL;
 }
