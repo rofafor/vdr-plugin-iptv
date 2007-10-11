@@ -45,7 +45,7 @@ Setup menu:
 
 - TS buffer size [MB] = 2          Defines ringbuffer size for transport
                                    stream in MB.
-                                   The valid range: 1...16
+                                   The valid range: 1...4
 - TS buffer prefill ratio [%] = 0  Defines prefill ratio for transport
                                    stream ringbuffer before data is
                                    transferred to VDR.
@@ -64,6 +64,7 @@ Setup menu:
                                    contain that many "Disable filter" options
                                    which allow you to disable the individual
                                    section filters.
+                                   The valid range: 0...7
 - [Red:Channels]                   Opens IPTV channel editor.
 - [Blue:Info]                      Opens IPTV information/statistics menu.
 

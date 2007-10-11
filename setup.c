@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.29 2007/10/10 20:54:58 rahrenbe Exp $
+ * $Id: setup.c,v 1.30 2007/10/11 19:54:20 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -586,7 +586,7 @@ void cIptvPluginSetup::Setup(void)
 {
   int current = Current();
   Clear();
-  Add(new cMenuEditIntItem( tr("TS buffer size [MB]"),         &tsBufferSize, 2, 16));
+  Add(new cMenuEditIntItem( tr("TS buffer size [MB]"),         &tsBufferSize, 1, 4));
   Add(new cMenuEditIntItem( tr("TS buffer prefill ratio [%]"), &tsBufferPrefill, 0, 40));
   Add(new cMenuEditBoolItem(tr("Use section filtering"),       &sectionFiltering));
   if (sectionFiltering) {
