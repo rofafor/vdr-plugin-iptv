@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.c,v 1.18 2007/10/10 20:08:25 rahrenbe Exp $
+ * $Id: statistics.c,v 1.19 2007/10/11 19:44:46 ajhseppa Exp $
  */
 
 #include <limits.h>
@@ -197,6 +197,8 @@ cString cIptvBufferStatistics::GetStatistic()
                                   IptvConfig.GetUseBytes() ? "B" : "bit", usedKilos, usedKilos + freeKilos,
                                   IptvConfig.GetUseBytes() ? "B" : "bit", percentage);
   dataBytes = 0;
+  freeSpace = 0;
+  usedSpace = 0;
   return info;
 }
 
@@ -205,6 +207,8 @@ void cIptvBufferStatistics::AddStatistic(long Bytes, long Used, long Free)
   //debug("cIptvBufferStatistics::AddStatistic(Bytes=%ld, Used=%ld, Free=%ld)\n", Bytes, Used, Free);
   cMutexLock MutexLock(&mutex);
   dataBytes += Bytes;
-  freeSpace = Free;
-  usedSpace = Used;  
+  if (Used > usedSpace) {
+     freeSpace = Free;
+     usedSpace = Used;
+     }
 }
