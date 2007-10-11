@@ -101,3 +101,12 @@ Configuration:
 
   # IGMP required by multicasts
   iptables -A INPUT -i eth0 -p igmp -d 224.0.0.0/4 -j ACCEPT
+
+Notes:
+
+- Working EIT requires correct Nid/Tid/Sid values as the NIT filter cannot
+  determine the type (satellite/cable/terrestrial) of the IPTV transport
+  stream.
+
+- The following section filters are recommended to be disabled:
+  "NIT (0x40)", "SDT (0x42)", "TDT (0x70)"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.5.7\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2007-10-10 22:27+0300\n"
+"POT-Creation-Date: 2007-10-12 02:23+0300\n"
 "PO-Revision-Date: 2007-08-12 23:22+0300\n"
 "Last-Translator: Rolf Ahrenberg\n"
 "Language-Team: <vdr@linuxtv.org>\n"
@@ -76,62 +76,70 @@ msgid "Port"
 msgstr "Portti"
 
 #: setup.c:197
+msgid "Nid"
+msgstr "Verkko-ID"
+
+#: setup.c:198
+msgid "Tid"
+msgstr "Lähete-ID"
+
+#: setup.c:199
 msgid "Rid"
 msgstr "Radio-ID"
 
-#: setup.c:269
+#: setup.c:271
 msgid "Cannot find unique channel settings!"
 msgstr "Yksilöllisiä kanava-asetuksia ei löydetä!"
 
-#: setup.c:343
+#: setup.c:345
 msgid "IPTV Channels"
 msgstr "IPTV-kanavat"
 
-#: setup.c:493
+#: setup.c:495
 msgid "IPTV Information"
 msgstr "IPTV-tiedot"
 
-#: setup.c:496
+#: setup.c:498
 msgid "Bits/bytes"
 msgstr "Bitit/tavut"
 
-#: setup.c:496
+#: setup.c:498
 msgid "Filters"
 msgstr "Suodattimet"
 
-#: setup.c:496
+#: setup.c:498
 msgid "General"
 msgstr "Yleiset"
 
-#: setup.c:496
+#: setup.c:498
 msgid "Pids"
 msgstr "Pidit"
 
-#: setup.c:509
+#: setup.c:511
 msgid "IPTV information not available!"
 msgstr "IPTV-tietoja ei saatavilla!"
 
-#: setup.c:589
+#: setup.c:591
 msgid "TS buffer size [MB]"
 msgstr "TS-puskurin koko [MB]"
 
-#: setup.c:590
+#: setup.c:592
 msgid "TS buffer prefill ratio [%]"
 msgstr "TS-puskurin esitäyttöaste [%]"
 
-#: setup.c:591
+#: setup.c:593
 msgid "Use section filtering"
 msgstr "Käytä sektioiden suodatusta"
 
-#: setup.c:593
+#: setup.c:595
 msgid "Scan Sid automatically"
 msgstr "Etsi palvelu-ID automaattisesti"
 
-#: setup.c:594
+#: setup.c:596
 msgid "Disable filters"
 msgstr "Poista suodattimia käytöstä"
 
 #. TRANSLATORS: note the singular!
-#: setup.c:597
+#: setup.c:599
 msgid "Disable filter"
 msgstr "Poista suodatin käytöstä"

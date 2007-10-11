@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.30 2007/10/11 19:54:20 rahrenbe Exp $
+ * $Id: setup.c,v 1.31 2007/10/11 23:34:27 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -194,6 +194,8 @@ void cIptvMenuEditChannel::Setup(void)
   Add(new cMenuEditIntItem(trVDR("Tpid"),      &data.tpid,     0, 0x1FFF));
   Add(new cMenuEditIntItem(trVDR("CA"),        &data.caids[0], 0, 0xFFFF));
   Add(new cMenuEditIntItem(trVDR("Sid"),       &data.sid,      1, 0xFFFF));
+  Add(new cMenuEditIntItem(tr   ("Nid"),       &data.nid,      0, 0xFFFF));
+  Add(new cMenuEditIntItem(tr   ("Tid"),       &data.tid,      0, 0xFFFF));
   Add(new cMenuEditIntItem(tr   ("Rid"),       &data.rid,      0, 0x1FFF));
   SetCurrent(Get(current));
   Display();
