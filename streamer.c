@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.c,v 1.22 2007/10/11 21:05:35 rahrenbe Exp $
+ * $Id: streamer.c,v 1.23 2007/10/11 23:06:49 rahrenbe Exp $
  */
 
 #include <vdr/thread.h>
@@ -101,6 +101,6 @@ cString cIptvStreamer::GetInformation(void)
   //debug("cIptvStreamer::GetInformation()");
   cString info("Stream:");
   if (protocol)
-     return cString::sprintf("%s %s", *info, *protocol->GetInformation());
-  return NULL;
+     info = cString::sprintf("%s %s", *info, *protocol->GetInformation());
+  return cString::sprintf("%s\n", *info);
 }

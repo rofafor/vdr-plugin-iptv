@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.h,v 1.9 2007/10/09 22:12:17 rahrenbe Exp $
+ * $Id: statistics.h,v 1.10 2007/10/11 23:06:49 rahrenbe Exp $
  */
 
 #ifndef __IPTV_STATISTICS_H
@@ -77,7 +77,7 @@ public:
   cString GetStatistic();
 
 protected:
-  void AddStatistic(long Bytes, long Used, long Free);
+  void AddStatistic(long Bytes, long Used);
 
 private:
   long dataBytes;

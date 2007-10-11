@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.66 2007/10/10 19:41:10 rahrenbe Exp $
+ * $Id: device.c,v 1.67 2007/10/11 23:06:49 rahrenbe Exp $
  */
 
 #include "config.h"
@@ -97,11 +97,12 @@ cIptvDevice *cIptvDevice::GetIptvDevice(int CardIndex)
 cString cIptvDevice::GetGeneralInformation(void)
 {
   //debug("cIptvDevice::GetGeneralInformation(%d)\n", deviceIndex);
-  return cString::sprintf("IPTV device: %d\nCardIndex: %d\n%s\n%s%s",
-                          deviceIndex, CardIndex(), pIptvStreamer ?
-                          *pIptvStreamer->GetInformation() : "",
+  return cString::sprintf("IPTV device: %d\nCardIndex: %d\n%s%s%sChannel: %s",
+                          deviceIndex, CardIndex(),
+                          pIptvStreamer ? *pIptvStreamer->GetInformation() : "",
                           pIptvStreamer ? *pIptvStreamer->GetStatistic() : "",
-			  *cIptvBufferStatistics::GetStatistic());
+			  *cIptvBufferStatistics::GetStatistic(),
+                          *Channels.GetByNumber(cDevice::CurrentChannel())->ToText());
 }
 
 cString cIptvDevice::GetPidsInformation(void)
@@ -347,7 +348,7 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
         tsBuffer->Del(TS_SIZE);
         isPacketDelivered = false;
         // Update buffer statistics
-        cIptvBufferStatistics::AddStatistic(TS_SIZE, tsBuffer->Available(), tsBuffer->Free());
+        cIptvBufferStatistics::AddStatistic(TS_SIZE, tsBuffer->Available());
         }
      uchar *p = tsBuffer->Get(Count);
      if (p && Count >= TS_SIZE) {

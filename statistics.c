@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.c,v 1.19 2007/10/11 19:44:46 ajhseppa Exp $
+ * $Id: statistics.c,v 1.20 2007/10/11 23:06:49 rahrenbe Exp $
  */
 
 #include <limits.h>
@@ -165,7 +165,6 @@ void cIptvStreamerStatistics::AddStatistic(long Bytes)
 // Buffer statistic class
 cIptvBufferStatistics::cIptvBufferStatistics()
 : dataBytes(0),
-  freeSpace(0),
   usedSpace(0),
   timer(),
   mutex()
@@ -185,30 +184,28 @@ cString cIptvBufferStatistics::GetStatistic()
   uint64_t elapsed = timer.Elapsed(); /* in milliseconds */
   timer.Set();
   long bitrate = elapsed ? (long)((float)1000 / KILOBYTE(1) * dataBytes / elapsed) : 0L;
-  float percentage = (float)((1 - (float)freeSpace / (float)(usedSpace + freeSpace)) * 100);
+  long totalSpace = MEGABYTE(IptvConfig.GetTsBufferSize());
+  float percentage = (float)((float)usedSpace / (float)totalSpace * 100.0);
+  long totalKilos = totalSpace / KILOBYTE(1);
   long usedKilos = usedSpace / KILOBYTE(1);
-  long freeKilos = freeSpace / KILOBYTE(1);
   if (!IptvConfig.GetUseBytes()) {
      bitrate *= 8;
-     freeKilos *= 8;
+     totalKilos *= 8;
      usedKilos *= 8;
      }
   cString info = cString::sprintf("Buffer bitrate: %ld k%s/s\nBuffer usage: %ld/%ld k%s (%2.1f%%)\n", bitrate,
-                                  IptvConfig.GetUseBytes() ? "B" : "bit", usedKilos, usedKilos + freeKilos,
+                                  IptvConfig.GetUseBytes() ? "B" : "bit", usedKilos, totalKilos,
                                   IptvConfig.GetUseBytes() ? "B" : "bit", percentage);
   dataBytes = 0;
-  freeSpace = 0;
   usedSpace = 0;
   return info;
 }
 
-void cIptvBufferStatistics::AddStatistic(long Bytes, long Used, long Free)
+void cIptvBufferStatistics::AddStatistic(long Bytes, long Used)
 {
-  //debug("cIptvBufferStatistics::AddStatistic(Bytes=%ld, Used=%ld, Free=%ld)\n", Bytes, Used, Free);
+  //debug("cIptvBufferStatistics::AddStatistic(Bytes=%ld, Used=%ld)\n", Bytes, Used);
   cMutexLock MutexLock(&mutex);
   dataBytes += Bytes;
-  if (Used > usedSpace) {
-     freeSpace = Free;
+  if (Used > usedSpace)
      usedSpace = Used;
-     }
 }
