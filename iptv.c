@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.17 2007/10/09 22:12:17 rahrenbe Exp $
+ * $Id: iptv.c,v 1.18 2007/10/12 21:43:18 ajhseppa Exp $
  */
 
 #include <getopt.h>
@@ -14,7 +14,7 @@
 #include "device.h"
 
 static const char *VERSION        = "0.0.1";
-static const char *DESCRIPTION    = trNOOP("Experiment the IPTV");
+static const char *DESCRIPTION    = trNOOP("Experience the IPTV");
 
 class cPluginIptv : public cPlugin {
 private:

@@ -25,13 +25,15 @@ Description:
 
 This plugin integrates multicast IPTV transport streams seamlessly into
 VDR. You can use any IPTV channel like any other normal DVB channel for
-live viewing, recording, ...
+live viewing, recording, etc. The plugin also features full section
+filtering capabilities which allow for example EIT -information to be
+extracted from the incoming stream.
 
 Currently the IPTV plugin supports both multicast UDP/RTP and unicast
 HTTP MPEG1/2 transport streams. Also a file input method is supported,
 but a file delay must be selected individually to prevent VDR's transfer
-buffer over/underflow. Therefore it should be considered as a testing
-feature only.
+buffer over/underflow. Therefore file input should be considered as a
+testing feature only.
 
 Installation:
 
@@ -50,30 +52,39 @@ Setup menu:
 
 - TS buffer size [MB] = 2          Defines ringbuffer size for transport
                                    stream in MB.
-                                   The valid range: 1...4
+                                   Valid range: 1...4
 - TS buffer prefill ratio [%] = 0  Defines prefill ratio for transport
                                    stream ringbuffer before data is
                                    transferred to VDR.
                                    The valid range: 0...40
 - Use section filtering = 1        Defines whether section filtering shall
                                    be used.
-                                   The valid range: 0...1
+                                   Valid range: 0...1
 - Scan Sid automatically = 1       Defines whether service id shall be
                                    scanned automatically. Requires section
                                    filtering.
-                                   The valid range: 0...1
-- Disable filters = 0              Certain section filters might have some
-                                   unwanted behaviour. This option allows you
-                                   to blacklist them. If this option is set
-                                   to a non-zero value, the menu page will
+                                   Valid range: 0...1
+- Disable filters = 0              Certain section filters might cause some
+                                   unwanted behaviour to vdr such as time
+                                   being falsely synchronized etc. This
+                                   option allows creation of blacklists of
+                                   ill-behaving filters. If this option is
+                                   set to a non-zero value, the menu page will
                                    contain that many "Disable filter" options
                                    which allow you to disable the individual
                                    section filters.
-                                   The valid range: 0...7
+                                   Valid range: 0...7
 - [Red:Channels]                   Opens IPTV channel editor.
 - [Blue:Info]                      Opens IPTV information/statistics menu.
 
 Channel editor menu:
+
+Because of the different nature and content the VDR channel editor is not
+best suited for editing of IPTV -channels. Therefore an alternative editor
+is provided which allows more IPTV -centric editing of channel information.
+IPTV channel editor is accessible via Setup -> Plugins -> IPTV and pressing
+Red button. The channel editor is functionally similar to VDR's built-in
+channel editor.
 
 - Read VDR's MANUAL for detailed information.
 
