@@ -1,10 +1,10 @@
 This is a IPTV for the Video Disk Recorder (VDR).
 
-Written by:                  Rolf Ahrenberg,
-                             R o l f . A h r e n b e r g @ s c i . f i
+Written by:                  Rolf Ahrenberg
+                             < R o l f . A h r e n b e r g @ s c i . f i >
 
-                             Antti Seppälä,
-                             a j h s e p p a @ n i k s u l a . h u t . f i
+                             Antti Seppälä
+                             <a j h s e p p a @ n i k s u l a . h u t . f i >
 
 Project's homepage:          http://www.saunalahti.fi/~rahrenbe/vdr/iptv/
 
@@ -18,8 +18,8 @@ See the file COPYING for more information.
 
 Requirements:
 
-An IPTV patched VDR-1.5.9 (or later) setup and multicast/unicast MPEG-2
-transport streams.
+An IPTV patched VDR-1.5.9 (or later) setup and DVB compatible MPEG1/2
+network video streams.
 
 Description:
 
@@ -27,9 +27,9 @@ This plugin integrates multicast IPTV transport streams seamlessly into
 VDR. You can use any IPTV channel like any other normal DVB channel for
 live viewing, recording, ...
 
-Currently the IPTV plugin supports multicast UDP/RTP and unicast HTTP
-MPEG-2 transport streams. Also a file input method is supported, but
-file delay must be selected individually to prevent VDR's transfer
+Currently the IPTV plugin supports both multicast UDP/RTP and unicast
+HTTPM MPEG1/2 transport streams. Also a file input method is supported,
+but a file delay must be selected individually to prevent VDR's transfer
 buffer over/underflow. Therefore it should be considered as a testing
 feature only.
 
