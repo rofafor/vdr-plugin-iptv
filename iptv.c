@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.18 2007/10/12 21:43:18 ajhseppa Exp $
+ * $Id: iptv.c,v 1.19 2007/10/12 23:06:33 rahrenbe Exp $
  */
 
 #include <getopt.h>
@@ -62,9 +62,7 @@ const char *cPluginIptv::CommandLineHelp(void)
 {
   debug("cPluginIptv::CommandLineHelp()\n");
   // Return a string that describes all known command line options.
-  return cString::sprintf(
-         "  -d <number> --devices=<number> number of devices to be created (default: %d)\n",
-         deviceCount);
+  return "  -d <num>, --devices=<number> number of devices to be created (default: 1)\n";
 }
 
 bool cPluginIptv::ProcessArgs(int argc, char *argv[])
