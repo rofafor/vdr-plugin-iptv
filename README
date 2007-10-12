@@ -26,14 +26,14 @@ Description:
 This plugin integrates multicast IPTV transport streams seamlessly into
 VDR. You can use any IPTV channel like any other normal DVB channel for
 live viewing, recording, etc. The plugin also features full section
-filtering capabilities which allow for example EIT -information to be
+filtering capabilities which allow for example EIT information to be
 extracted from the incoming stream.
 
 Currently the IPTV plugin supports both multicast UDP/RTP and unicast
 HTTP MPEG1/2 transport streams. Also a file input method is supported,
 but a file delay must be selected individually to prevent VDR's transfer
-buffer over/underflow. Therefore file input should be considered as a
-testing feature only.
+buffer over/underflow. Therefore the file input should be considered
+as a testing feature only.
 
 Installation:
 
@@ -65,28 +65,26 @@ Setup menu:
                                    filtering.
                                    Valid range: 0...1
 - Disable filters = 0              Certain section filters might cause some
-                                   unwanted behaviour to vdr such as time
+                                   unwanted behaviour to VDR such as time
                                    being falsely synchronized etc. This
                                    option allows creation of blacklists of
                                    ill-behaving filters. If this option is
-                                   set to a non-zero value, the menu page will
-                                   contain that many "Disable filter" options
-                                   which allow you to disable the individual
-                                   section filters.
+                                   set to a non-zero value, the menu page
+                                   will contain that many "Disable filter"
+                                   options which allow you to disable the
+                                   individual section filters.
                                    Valid range: 0...7
 - [Red:Channels]                   Opens IPTV channel editor.
 - [Blue:Info]                      Opens IPTV information/statistics menu.
 
 Channel editor menu:
 
-Because of the different nature and content the VDR channel editor is not
-best suited for editing of IPTV -channels. Therefore an alternative editor
-is provided which allows more IPTV -centric editing of channel information.
-IPTV channel editor is accessible via Setup -> Plugins -> IPTV and pressing
-Red button. The channel editor is functionally similar to VDR's built-in
-channel editor.
-
-- Read VDR's MANUAL for detailed information.
+- Because of the different nature and content the VDR channel editor is not
+  best suited for editing of IPTV channels. Therefore an alternative editor
+  is provided which allows more IPTV centric editing of channel information.
+  An IPTV channel editor is accessible via "Setup -> Plugins -> IPTV" and
+  pressing the Red button. The channel editor is functionally similar to
+  VDR's built-in channel editor.
 
 Information menu:
 
