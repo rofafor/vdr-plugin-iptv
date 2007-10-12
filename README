@@ -28,7 +28,7 @@ VDR. You can use any IPTV channel like any other normal DVB channel for
 live viewing, recording, ...
 
 Currently the IPTV plugin supports both multicast UDP/RTP and unicast
-HTTPM MPEG1/2 transport streams. Also a file input method is supported,
+HTTP MPEG1/2 transport streams. Also a file input method is supported,
 but a file delay must be selected individually to prevent VDR's transfer
 buffer over/underflow. Therefore it should be considered as a testing
 feature only.
