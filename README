@@ -11,9 +11,8 @@ Project's homepage:          http://www.saunalahti.fi/~rahrenbe/vdr/iptv/
 Latest version available at: http://www.saunalahti.fi/~rahrenbe/vdr/iptv/
 
 This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+it under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
 See the file COPYING for more information.
 
 Requirements:
@@ -124,3 +123,7 @@ Notes:
 
 - The following section filters are recommended to be disabled:
   "NIT (0x40)", "SDT (0x42)", "TDT (0x70)"
+
+Acknowledgements:
+
+- The IPTV section filtering code is derived from Linux kernel.
