@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.31 2007/10/11 23:34:27 rahrenbe Exp $
+ * $Id: setup.c,v 1.32 2007/10/14 18:45:34 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -144,6 +144,7 @@ void cIptvMenuEditChannel::SetChannelData(cChannel *Channel)
      cString param;
      char alangs[MAXAPIDS][MAXLANGCODE2] = { "" };
      char dlangs[MAXDPIDS][MAXLANGCODE2] = { "" };
+     char slangs[MAXSPIDS][MAXLANGCODE2] = { "" };
      switch (data.protocol) {
        case eProtocolFILE:
             param = cString::sprintf("IPTV|FILE|%s|%d", data.location, data.port);
@@ -156,7 +157,7 @@ void cIptvMenuEditChannel::SetChannelData(cChannel *Channel)
             param = cString::sprintf("IPTV|UDP|%s|%d", data.location, data.port);
             break;
        }
-     Channel->SetPids(data.vpid, data.ppid, data.apid, alangs, data.dpid, dlangs, data.tpid);
+     Channel->SetPids(data.vpid, data.ppid, data.apid, alangs, data.dpid, dlangs, data.spid, slangs, data.tpid);
      Channel->SetCaIds(data.caids);
      Channel->SetId(data.nid, data.tid, data.sid, data.rid);
      Channel->SetName(data.name, "", "IPTV");

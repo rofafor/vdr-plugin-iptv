@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.67 2007/10/11 23:06:49 rahrenbe Exp $
+ * $Id: device.c,v 1.68 2007/10/14 18:45:34 rahrenbe Exp $
  */
 
 #include "config.h"
@@ -279,15 +279,15 @@ int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
   return -1;
 }
 
-bool cIptvDevice::CloseFilter(int Handle)
+void cIptvDevice::CloseFilter(int Handle)
 {
   for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
       if (secfilters[i] && (Handle == secfilters[i]->GetReadDesc())) {
          //debug("cIptvDevice::CloseFilter(%d): %d\n", deviceIndex, Handle);
-         return DeleteFilter(i);
+         DeleteFilter(i);
+         break;
          }
       }
-  return false;
 }
 
 bool cIptvDevice::OpenDvr(void)

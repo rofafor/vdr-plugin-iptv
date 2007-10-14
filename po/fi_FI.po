@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.5.7\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2007-10-13 01:55+0300\n"
+"POT-Creation-Date: 2007-10-14 21:42+0300\n"
 "PO-Revision-Date: 2007-08-12 23:22+0300\n"
 "Last-Translator: Rolf Ahrenberg\n"
 "Language-Team: <vdr@linuxtv.org>\n"
@@ -15,131 +15,99 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-15\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: common.c:45
 msgid "PAT (0x00)"
 msgstr "PAT (0x00)"
 
-#: common.c:46
 msgid "NIT (0x40)"
 msgstr "NIT (0x40)"
 
-#: common.c:47
 msgid "SDT (0x42)"
 msgstr "SDT (0x42)"
 
-#: common.c:48
 msgid "EIT (0x4E/0x4F)"
 msgstr "EIT (0x4E/0x4F)"
 
-#: common.c:49
 msgid "EIT (0x5X)"
 msgstr "EIT (0x5X)"
 
-#: common.c:50
 msgid "EIT (0x6X)"
 msgstr "EIT (0x6X)"
 
-#: common.c:51
 msgid "TDT (0x70)"
 msgstr "TDT (0x70)"
 
-#: iptv.c:17
 msgid "Experience the IPTV"
 msgstr "Koe IPTV:n ihmeellinen maailma"
 
-#: setup.c:55
 msgid "UDP"
 msgstr "UDP"
 
-#: setup.c:56
 msgid "HTTP"
 msgstr "HTTP"
 
-#: setup.c:57
 msgid "FILE"
 msgstr "FILE"
 
-#: setup.c:172
 msgid "Protocol"
 msgstr "Protokolla"
 
-#: setup.c:176
 msgid "Delay (ms)"
 msgstr "Viive (ms)"
 
-#: setup.c:181
 msgid "Address"
 msgstr "Osoite"
 
-#: setup.c:182
 msgid "Port"
 msgstr "Portti"
 
-#: setup.c:197
 msgid "Nid"
 msgstr "Verkko-ID"
 
-#: setup.c:198
 msgid "Tid"
 msgstr "Lähete-ID"
 
-#: setup.c:199
 msgid "Rid"
 msgstr "Radio-ID"
 
-#: setup.c:271
 msgid "Cannot find unique channel settings!"
 msgstr "Yksilöllisiä kanava-asetuksia ei löydetä!"
 
-#: setup.c:345
 msgid "IPTV Channels"
 msgstr "IPTV-kanavat"
 
-#: setup.c:495
 msgid "IPTV Information"
 msgstr "IPTV-tiedot"
 
-#: setup.c:498
-msgid "Bits/bytes"
-msgstr "Bitit/tavut"
-
-#: setup.c:498
-msgid "Filters"
-msgstr "Suodattimet"
-
-#: setup.c:498
 msgid "General"
 msgstr "Yleiset"
 
-#: setup.c:498
 msgid "Pids"
 msgstr "Pidit"
 
-#: setup.c:511
+msgid "Filters"
+msgstr "Suodattimet"
+
+msgid "Bits/bytes"
+msgstr "Bitit/tavut"
+
 msgid "IPTV information not available!"
 msgstr "IPTV-tietoja ei saatavilla!"
 
-#: setup.c:591
 msgid "TS buffer size [MB]"
 msgstr "TS-puskurin koko [MB]"
 
-#: setup.c:592
 msgid "TS buffer prefill ratio [%]"
 msgstr "TS-puskurin esitäyttöaste [%]"
 
-#: setup.c:593
 msgid "Use section filtering"
 msgstr "Käytä sektioiden suodatusta"
 
-#: setup.c:595
 msgid "Scan Sid automatically"
 msgstr "Etsi palvelu-ID automaattisesti"
 
-#: setup.c:596
 msgid "Disable filters"
 msgstr "Poista suodattimia käytöstä"
 
 #. TRANSLATORS: note the singular!
-#: setup.c:599
 msgid "Disable filter"
 msgstr "Poista suodatin käytöstä"

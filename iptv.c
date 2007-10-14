@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.19 2007/10/12 23:06:33 rahrenbe Exp $
+ * $Id: iptv.c,v 1.20 2007/10/14 18:45:34 rahrenbe Exp $
  */
 
 #include <getopt.h>
@@ -12,6 +12,10 @@
 #include "config.h"
 #include "setup.h"
 #include "device.h"
+
+#if defined(APIVERSNUM) && APIVERSNUM < 10510
+#error "VDR-1.5.10 API version or greater is required!"
+#endif
 
 static const char *VERSION        = "0.0.1";
 static const char *DESCRIPTION    = trNOOP("Experience the IPTV");

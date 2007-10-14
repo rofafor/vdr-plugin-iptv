@@ -1,7 +1,7 @@
 #
 # Makefile for a Video Disk Recorder plugin
 #
-# $Id: Makefile,v 1.17 2007/10/05 20:25:58 rahrenbe Exp $
+# $Id: Makefile,v 1.18 2007/10/14 18:45:34 rahrenbe Exp $
 
 # Debugging on/off 
 #IPTV_DEBUG = 1
@@ -92,12 +92,12 @@ I18Npot   = $(PODIR)/$(PLUGIN).pot
 	msgfmt -c -o $@ $<
 
 $(I18Npot): $(wildcard *.c)
-	xgettext -C -cTRANSLATORS --no-wrap -F -k -ktr -ktrNOOP --msgid-bugs-address='Rolf Ahrenberg' -o $@ $(wildcard *.c)
+	xgettext -C -cTRANSLATORS --no-wrap --no-location -k -ktr -ktrNOOP --msgid-bugs-address='Rolf Ahrenberg' -o $@ $(wildcard *.c)
 
 $(I18Npo): $(I18Npot)
-	msgmerge -U --no-wrap -F --backup=none -q $@ $<
+	msgmerge -U --no-wrap --no-location --backup=none -q $@ $<
 
-i18n: $(I18Nmo)
+i18n: $(I18Npot) $(I18Nmo)
 	@mkdir -p $(LOCALEDIR)
 	for i in $(I18Ndirs); do\
 	    mkdir -p $(LOCALEDIR)/$$i/LC_MESSAGES;\
