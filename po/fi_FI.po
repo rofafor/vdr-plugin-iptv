@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.5.7\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2007-10-14 21:42+0300\n"
+"POT-Creation-Date: 2007-10-16 00:00+0300\n"
 "PO-Revision-Date: 2007-08-12 23:22+0300\n"
 "Last-Translator: Rolf Ahrenberg\n"
 "Language-Team: <vdr@linuxtv.org>\n"
@@ -47,6 +47,9 @@ msgstr "HTTP"
 
 msgid "FILE"
 msgstr "FILE"
+
+msgid "EXT"
+msgstr "EXT"
 
 msgid "Protocol"
 msgstr "Protokolla"

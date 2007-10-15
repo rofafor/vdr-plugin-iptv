@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.33 2007/10/14 18:51:21 rahrenbe Exp $
+ * $Id: setup.c,v 1.34 2007/10/15 21:03:45 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -30,6 +30,7 @@ private:
     eProtocolUDP,
     eProtocolHTTP,
     eProtocolFILE,
+    eProtocolEXT,
     eProtocolCount
   };
   struct tIptvChannel {
@@ -55,6 +56,7 @@ cIptvMenuEditChannel::cIptvMenuEditChannel(cChannel *Channel, bool New)
   protocols[eProtocolUDP]  = tr("UDP");
   protocols[eProtocolHTTP] = tr("HTTP");
   protocols[eProtocolFILE] = tr("FILE");
+  protocols[eProtocolEXT] = tr("EXT");
   channel = Channel;
   GetChannelData(channel);
   if (New) {
@@ -82,6 +84,11 @@ cString cIptvMenuEditChannel::GetIptvSettings(const char *Param, int *Port, int 
   else if (sscanf(Param, "IPTV|FILE|%a[^|]|%u", &loc, Port) == 2) {
      cString addr(loc, true);
      *Protocol = eProtocolFILE;
+     return addr;
+     }
+  else if (sscanf(Param, "IPTV|EXT|%a[^|]|%u", &loc, Port) == 2) {
+     cString addr(loc, true);
+     *Protocol = eProtocolEXT;
      return addr;
      }
   return NULL;
@@ -146,6 +153,9 @@ void cIptvMenuEditChannel::SetChannelData(cChannel *Channel)
      char dlangs[MAXDPIDS][MAXLANGCODE2] = { "" };
      char slangs[MAXSPIDS][MAXLANGCODE2] = { "" };
      switch (data.protocol) {
+       case eProtocolEXT:
+            param = cString::sprintf("IPTV|EXT|%s|%d", data.location, data.port);
+            break;
        case eProtocolFILE:
             param = cString::sprintf("IPTV|FILE|%s|%d", data.location, data.port);
             break;
@@ -176,6 +186,7 @@ void cIptvMenuEditChannel::Setup(void)
          Add(new cMenuEditStrItem(trVDR("File"),     data.location, sizeof(data.location), trVDR(FileNameChars)));
          Add(new cMenuEditIntItem(tr("Delay (ms)"), &data.port,  0, 0xFFFF));
          break;
+    case eProtocolEXT:
     case eProtocolHTTP:
     case eProtocolUDP:
     default:
@@ -287,6 +298,7 @@ eOSState cIptvMenuEditChannel::ProcessKey(eKeys Key)
             data.port = 3000;
             break;
        default:
+       case eProtocolEXT:
        case eProtocolUDP:
             strn0cpy(data.location, "127.0.0.1", sizeof(data.location));
             data.port = 1234;
