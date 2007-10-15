@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.68 2007/10/14 18:45:34 rahrenbe Exp $
+ * $Id: device.c,v 1.69 2007/10/15 20:06:38 ajhseppa Exp $
  */
 
 #include "config.h"
@@ -30,6 +30,7 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   pUdpProtocol = new cIptvProtocolUdp();
   pHttpProtocol = new cIptvProtocolHttp();
   pFileProtocol = new cIptvProtocolFile();
+  pExtProtocol = new cIptvProtocolExt();
   pIptvStreamer = new cIptvStreamer(tsBuffer, &mutex);
   // Initialize filter pointers
   memset(&secfilters, '\0', sizeof(secfilters));
@@ -48,6 +49,7 @@ cIptvDevice::~cIptvDevice()
   DELETENULL(pUdpProtocol);
   DELETENULL(pHttpProtocol);
   DELETENULL(pFileProtocol);
+  DELETENULL(pExtProtocol);
   DELETENULL(tsBuffer);
   // Detach and destroy sid filter
   if (pSidScanner) {
@@ -170,6 +172,11 @@ cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, cIptvPro
   else if (sscanf(Param, "IPTV|FILE|%a[^|]|%u", &loc, IpPort) == 2) {
      cString addr(loc, true);
      *Protocol = pFileProtocol;
+     return addr;
+     }
+  else if (sscanf(Param, "IPTV|EXT|%a[^|]|%u", &loc, IpPort) == 2) {
+     cString addr(loc, true);
+     *Protocol = pExtProtocol;
      return addr;
      }
   return NULL;
