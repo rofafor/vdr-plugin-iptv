@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.34 2007/10/15 21:03:45 rahrenbe Exp $
+ * $Id: setup.c,v 1.35 2007/10/16 22:13:44 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -187,6 +187,9 @@ void cIptvMenuEditChannel::Setup(void)
          Add(new cMenuEditIntItem(tr("Delay (ms)"), &data.port,  0, 0xFFFF));
          break;
     case eProtocolEXT:
+         Add(new cMenuEditStrItem(trVDR("File"),     data.location, sizeof(data.location), trVDR(FileNameChars)));
+         Add(new cMenuEditIntItem(tr("Port"),       &data.port,  0, 0xFFFF));
+         break;
     case eProtocolHTTP:
     case eProtocolUDP:
     default:

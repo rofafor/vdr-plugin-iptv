@@ -95,6 +95,7 @@ Configuration:
 
 - channels.conf
 
+  TV4;IPTV:4:IPTV|EXT|/video/iptvradio.sh|4321:P:0:0:680:0:0:4:0:0:0
   TV3;IPTV:3:IPTV|FILE|/media/video.ts|5:P:0:514:670:2321:0:3:0:0:0
   TV2;IPTV:2:IPTV|HTTP|127.0.0.1/TS/2|3000:P:0:513:660:2321:0:2:0:0:0
   TV1;IPTV:1:IPTV|UDP|127.0.0.1|1234:P:0:512:650:2321:0:1:0:0:0
@@ -102,7 +103,7 @@ Configuration:
            | |    |   |         |    Source type ("P")
            | |    |   |         IP Port Number or File delay (ms)
            | |    |   IP Address or File Location
-           | |    Protocol ("UDP", "HTTP", "FILE")
+           | |    Protocol ("UDP", "HTTP", "FILE", "EXT")
            | Plugin ID ("IPTV")
            Unique enumeration
 

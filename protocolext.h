@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.h,v 1.1 2007/10/15 20:06:38 ajhseppa Exp $
+ * $Id: protocolext.h,v 1.2 2007/10/16 22:13:44 rahrenbe Exp $
  */
 
 #ifndef __IPTV_PROTOCOLEXT_H
@@ -17,7 +17,6 @@ private:
   char* listenAddr;
   int listenPort;
   char* streamAddr;
-  int streamPort;
   int socketDesc;
   unsigned char* readBuffer;
   unsigned int readBufferLen;
@@ -25,7 +24,7 @@ private:
   bool isActive;
 
 private:
-  bool OpenSocket(const int Port);
+  bool OpenSocket(void);
   void CloseSocket(void);
 
 public:

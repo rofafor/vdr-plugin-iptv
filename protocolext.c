@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.c,v 1.2 2007/10/16 20:03:59 ajhseppa Exp $
+ * $Id: protocolext.c,v 1.3 2007/10/16 22:13:44 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -21,7 +21,6 @@
 
 cIptvProtocolExt::cIptvProtocolExt()
 : listenPort(4321),
-  streamPort(1234),
   socketDesc(-1),
   readBufferLen(TS_SIZE * IptvConfig.GetReadBufferTsCount()),
   isActive(false)
@@ -46,7 +45,7 @@ cIptvProtocolExt::~cIptvProtocolExt()
   free(readBuffer);
 }
 
-bool cIptvProtocolExt::OpenSocket(const int Port)
+bool cIptvProtocolExt::OpenSocket(void)
 {
   debug("cIptvProtocolExt::OpenSocket()\n");
   // Bind to the socket if it is not active already
@@ -172,11 +171,10 @@ bool cIptvProtocolExt::Open(void)
       return false;
 
   // Create the listening socket
-  OpenSocket(streamPort);
+  OpenSocket();
   if (!isActive) {
     char* cmd = NULL;
-    asprintf(&cmd, "%s/%s start", cPlugin::ConfigDirectory("iptv"),
-	     streamAddr);
+    asprintf(&cmd, "%s start", streamAddr);
     int retval = SystemExec(cmd);
     free(cmd);
     if (!retval)
@@ -192,8 +190,7 @@ bool cIptvProtocolExt::Close(void)
   CloseSocket();
   if (isActive) {
     char* cmd = NULL;
-    asprintf(&cmd, "%s/%s stop",
-	     cPlugin::ConfigDirectory("iptv"), streamAddr);
+    asprintf(&cmd, "%s stop", streamAddr);
     int retval = SystemExec(cmd);
     free(cmd);
     if (!retval)
@@ -209,17 +206,13 @@ bool cIptvProtocolExt::Set(const char* Address, const int Port)
   if (!isempty(Address)) {
     // Update stream address and port
     streamAddr = strcpyrealloc(streamAddr, Address);
-    streamPort = Port;
+    listenPort = Port;
     }
-#if 0 // Are these needed or not?
-  Close();
-  Open();
-#endif
   return true;
 }
 
 cString cIptvProtocolExt::GetInformation(void)
 {
   //debug("cIptvProtocolExt::GetInformation()");
-  return cString::sprintf("ext://%s:%d", streamAddr, streamPort);
+  return cString::sprintf("ext://%s:%d", streamAddr, listenPort);
 }
