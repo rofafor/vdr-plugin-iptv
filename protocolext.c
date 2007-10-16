@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.c,v 1.1 2007/10/15 20:06:38 ajhseppa Exp $
+ * $Id: protocolext.c,v 1.2 2007/10/16 20:03:59 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -13,6 +13,7 @@
 #include <unistd.h>
 
 #include <vdr/device.h>
+#include <vdr/plugin.h>
 
 #include "common.h"
 #include "config.h"
@@ -48,12 +49,6 @@ cIptvProtocolExt::~cIptvProtocolExt()
 bool cIptvProtocolExt::OpenSocket(const int Port)
 {
   debug("cIptvProtocolExt::OpenSocket()\n");
-  // If socket is there already and it is bound to a different port, it must
-  // be closed first
-  if (Port != listenPort) {
-     debug("cIptvProtocolExt::OpenSocket(): Socket tear-down\n");
-     CloseSocket();
-     }
   // Bind to the socket if it is not active already
   if (socketDesc < 0) {
      int yes = 1;     
@@ -82,7 +77,7 @@ bool cIptvProtocolExt::OpenSocket(const int Port)
      // Bind socket
      memset(&sockAddr, '\0', sizeof(sockAddr));
      sockAddr.sin_family = AF_INET;
-     sockAddr.sin_port = htons(Port);
+     sockAddr.sin_port = htons(listenPort);
      sockAddr.sin_addr.s_addr = htonl(INADDR_ANY);
      int err = bind(socketDesc, (struct sockaddr *)&sockAddr, sizeof(sockAddr));
      if (err < 0) {
@@ -91,8 +86,6 @@ bool cIptvProtocolExt::OpenSocket(const int Port)
         CloseSocket();
         return false;
         }
-     // Update stream port
-     streamPort = Port;
      }
   return true;
 }
@@ -174,14 +167,22 @@ bool cIptvProtocolExt::Open(void)
 {
   debug("cIptvProtocolExt::Open(): streamAddr=%s\n", streamAddr);
 
-  // Here process execution is forked to prepare for script execution
-  // pid_t PID = fork();
+  // Reject completely empty stream addresses
+  if (!strlen(streamAddr))
+      return false;
 
-  // Now run the script with the forked process
-  // if (pid != 0)
-     // execve(...)
-  
-  return true;
+  // Create the listening socket
+  OpenSocket(streamPort);
+  if (!isActive) {
+    char* cmd = NULL;
+    asprintf(&cmd, "%s/%s start", cPlugin::ConfigDirectory("iptv"),
+	     streamAddr);
+    int retval = SystemExec(cmd);
+    free(cmd);
+    if (!retval)
+      isActive = true;
+  }
+  return isActive;
 }
 
 bool cIptvProtocolExt::Close(void)
@@ -189,14 +190,17 @@ bool cIptvProtocolExt::Close(void)
   debug("cIptvProtocolExt::Close(): streamAddr=%s\n", streamAddr);
   // Close the socket
   CloseSocket();
+  if (isActive) {
+    char* cmd = NULL;
+    asprintf(&cmd, "%s/%s stop",
+	     cPlugin::ConfigDirectory("iptv"), streamAddr);
+    int retval = SystemExec(cmd);
+    free(cmd);
+    if (!retval)
+      isActive = false;
+  }
 
-  // Now the executed process should be terminated if it still exists
-  // exit();
-
-  // Wait for child termination
-  // wait();
-
-  return true;
+  return !isActive;
 }
 
 bool cIptvProtocolExt::Set(const char* Address, const int Port)
@@ -207,6 +211,10 @@ bool cIptvProtocolExt::Set(const char* Address, const int Port)
     streamAddr = strcpyrealloc(streamAddr, Address);
     streamPort = Port;
     }
+#if 0 // Are these needed or not?
+  Close();
+  Open();
+#endif
   return true;
 }
 
