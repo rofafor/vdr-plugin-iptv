@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.h,v 1.2 2007/10/16 22:13:44 rahrenbe Exp $
+ * $Id: protocolext.h,v 1.3 2007/10/18 19:33:15 rahrenbe Exp $
  */
 
 #ifndef __IPTV_PROTOCOLEXT_H
@@ -14,6 +14,7 @@
 
 class cIptvProtocolExt : public cIptvProtocolIf {
 private:
+  int pid;
   char* listenAddr;
   int listenPort;
   char* streamAddr;
@@ -26,6 +27,8 @@ private:
 private:
   bool OpenSocket(void);
   void CloseSocket(void);
+  void TerminateCommand(void);
+  void ExecuteCommand(void);
 
 public:
   cIptvProtocolExt();

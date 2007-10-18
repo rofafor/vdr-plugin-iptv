@@ -3,9 +3,10 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.c,v 1.3 2007/10/16 22:13:44 rahrenbe Exp $
+ * $Id: protocolext.c,v 1.4 2007/10/18 19:33:15 rahrenbe Exp $
  */
 
+#include <sys/wait.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -20,7 +21,8 @@
 #include "protocolext.h"
 
 cIptvProtocolExt::cIptvProtocolExt()
-: listenPort(4321),
+: pid(-1),
+  listenPort(4321),
   socketDesc(-1),
   readBufferLen(TS_SIZE * IptvConfig.GetReadBufferTsCount()),
   isActive(false)
@@ -99,6 +101,62 @@ void cIptvProtocolExt::CloseSocket(void)
      }
 }
 
+void cIptvProtocolExt::ExecuteCommand(void)
+{
+  debug("cIptvProtocolExt::ExecuteCommand()\n");
+  // Let's fork
+  if ((pid = fork()) == -1) {
+     char tmp[64];
+     error("ERROR: fork(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+     return;
+     }
+
+  // Check if child process
+  if (pid == 0) {
+     // Close all dup'ed filedescriptors
+     int MaxPossibleFileDescriptors = getdtablesize();
+     for (int i = STDERR_FILENO + 1; i < MaxPossibleFileDescriptors; i++)
+         close(i);
+     // Execute the external script
+     char* cmd = NULL;
+     asprintf(&cmd, "%s %d", streamAddr, listenPort);
+     debug("cIptvProtocolExt::ExecuteCommand(child): %s\n", cmd);
+     if (execl("/bin/sh", "sh", "-c", cmd, NULL) == -1) {
+        free(cmd);
+        error("ERROR: Command failed: %s", streamAddr);
+        _exit(-1);
+        }
+     free(cmd);
+     _exit(0);
+     }
+  else {
+     isActive = true;
+     debug("cIptvProtocolExt::ExecuteCommand(): pid=%d\n", pid);
+     }
+}
+
+void cIptvProtocolExt::TerminateCommand(void)
+{
+  debug("cIptvProtocolExt::TerminateCommand(): pid=%d\n", pid);
+  if (pid > 0) {
+     const unsigned int timeoutms = 100;
+     unsigned int waitms = 0;
+     // signal and wait for termination
+     kill(pid, SIGTERM);
+     while (waitpid(pid, NULL, WNOHANG) == 0) {
+           waitms += timeoutms;
+           // Signal kill every 2 seconds
+           if ((waitms % 2000) == 0) {
+              error("ERROR: Script '%s' won't terminate - killing it", streamAddr);
+              kill(pid, SIGKILL);
+              }
+           // Sleep for awhile
+           cCondWait::SleepMs(timeoutms);
+           }
+     pid = -1;
+     isActive = false;
+     }
+}
 
 int cIptvProtocolExt::Read(unsigned char* *BufferAddr)
 {
@@ -164,22 +222,14 @@ int cIptvProtocolExt::Read(unsigned char* *BufferAddr)
 
 bool cIptvProtocolExt::Open(void)
 {
-  debug("cIptvProtocolExt::Open(): streamAddr=%s\n", streamAddr);
-
+  debug("cIptvProtocolExt::Open(): streamAddr=%s listenPort=%d\n", streamAddr, listenPort);
   // Reject completely empty stream addresses
   if (!strlen(streamAddr))
       return false;
-
   // Create the listening socket
   OpenSocket();
-  if (!isActive) {
-    char* cmd = NULL;
-    asprintf(&cmd, "%s start", streamAddr);
-    int retval = SystemExec(cmd);
-    free(cmd);
-    if (!retval)
-      isActive = true;
-  }
+  if (!isActive)
+    ExecuteCommand();
   return isActive;
 }
 
@@ -188,15 +238,8 @@ bool cIptvProtocolExt::Close(void)
   debug("cIptvProtocolExt::Close(): streamAddr=%s\n", streamAddr);
   // Close the socket
   CloseSocket();
-  if (isActive) {
-    char* cmd = NULL;
-    asprintf(&cmd, "%s stop", streamAddr);
-    int retval = SystemExec(cmd);
-    free(cmd);
-    if (!retval)
-      isActive = false;
-  }
-
+  if (isActive)
+     TerminateCommand();
   return !isActive;
 }
 
