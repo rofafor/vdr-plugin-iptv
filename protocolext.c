@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.c,v 1.9 2007/10/19 22:54:03 rahrenbe Exp $
+ * $Id: protocolext.c,v 1.10 2007/10/19 22:56:25 rahrenbe Exp $
  */
 
 #include <sys/wait.h>
@@ -278,7 +278,7 @@ bool cIptvProtocolExt::Set(const char* Location, const int Parameter, const int 
      free(scriptFile);
      asprintf(&scriptFile, "%s/%s", IptvConfig.GetConfigDirectory(), Location);
      if ((stat(scriptFile, &stbuf) != 0) || (strstr(scriptFile, "..") != 0)) {
-        error("ERROR: Non-existent script '%s'", scriptFile);
+        error("ERROR: Non-existent or relative path script '%s'", scriptFile);
         return false;
         }
      scriptParameter = Parameter;
