@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.c,v 1.4 2007/10/18 19:33:15 rahrenbe Exp $
+ * $Id: protocolext.c,v 1.5 2007/10/19 18:03:19 ajhseppa Exp $
  */
 
 #include <sys/wait.h>
@@ -141,18 +141,42 @@ void cIptvProtocolExt::TerminateCommand(void)
   if (pid > 0) {
      const unsigned int timeoutms = 100;
      unsigned int waitms = 0;
+     siginfo_t waitStatus;
+     int retval = 0;
+     bool waitOver = false;
      // signal and wait for termination
-     kill(pid, SIGTERM);
-     while (waitpid(pid, NULL, WNOHANG) == 0) {
-           waitms += timeoutms;
-           // Signal kill every 2 seconds
-           if ((waitms % 2000) == 0) {
-              error("ERROR: Script '%s' won't terminate - killing it", streamAddr);
-              kill(pid, SIGKILL);
-              }
-           // Sleep for awhile
-           cCondWait::SleepMs(timeoutms);
-           }
+     kill(pid, SIGINT);
+
+     do {
+       retval = 0;
+       waitms += timeoutms;
+       if ((waitms % 2000) == 0) {
+          error("ERROR: Script '%s' won't terminate - killing it", streamAddr);
+          kill(pid, SIGKILL);
+          }
+       // Clear wait status to make sure child exit status is accessible
+       memset(&waitStatus, '\0', sizeof(waitStatus));
+       // Wait for child termination
+       retval = waitid(P_PID, pid, &waitStatus, WNOHANG | WEXITED);
+       if (retval < 0) {
+          char tmp[64];
+          error("ERROR: select(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+          waitOver = true;
+          }
+       // These are the acceptable conditions under which child exit is
+       // regarded as successful
+       if (!retval && waitStatus.si_pid && waitStatus.si_pid == pid
+           && (waitStatus.si_code == CLD_EXITED
+               || waitStatus.si_code == CLD_KILLED)) {
+          debug("Child (%d) exited as expected\n", pid);
+          waitOver = true;
+          }
+
+       // Unsuccessful wait, avoid busy looping
+       if (!waitOver)
+          cCondWait::SleepMs(timeoutms);
+     } while (!waitOver);
+     
      pid = -1;
      isActive = false;
      }
