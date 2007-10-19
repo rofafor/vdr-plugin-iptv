@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.37 2007/10/19 17:49:35 rahrenbe Exp $
+ * $Id: setup.c,v 1.38 2007/10/19 21:36:28 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -34,14 +34,14 @@ private:
     eProtocolCount
   };
   struct tIptvChannel {
-    int frequency, source, protocol, port, vpid, ppid, tpid, sid, nid, tid, rid;
+    int frequency, source, protocol, parameter, vpid, ppid, tpid, sid, nid, tid, rid;
     int apid[MAXAPIDS + 1], dpid[MAXDPIDS + 1], spid[MAXSPIDS + 1], caids[MAXCAIDS + 1];
     char name[256], location[256];
   } data;
   cChannel *channel;
   const char *protocols[eProtocolCount];
   void Setup(void);
-  cString GetIptvSettings(const char *Param, int *Port, int *Protocol);
+  cString GetIptvSettings(const char *Param, int *Parameter, int *Protocol);
   void GetChannelData(cChannel *Channel);
   void SetChannelData(cChannel *Channel);
 
@@ -68,25 +68,25 @@ cIptvMenuEditChannel::cIptvMenuEditChannel(cChannel *Channel, bool New)
   Setup();
 }
 
-cString cIptvMenuEditChannel::GetIptvSettings(const char *Param, int *Port, int *Protocol)
+cString cIptvMenuEditChannel::GetIptvSettings(const char *Param, int *Parameter, int *Protocol)
 {
   char *loc = NULL;
-  if (sscanf(Param, "IPTV|UDP|%a[^|]|%u", &loc, Port) == 2) {
+  if (sscanf(Param, "IPTV|UDP|%a[^|]|%u", &loc, Parameter) == 2) {
      cString addr(loc, true);
      *Protocol = eProtocolUDP;
      return addr;
      }
-  else if (sscanf(Param, "IPTV|HTTP|%a[^|]|%u", &loc, Port) == 2) {
+  else if (sscanf(Param, "IPTV|HTTP|%a[^|]|%u", &loc, Parameter) == 2) {
      cString addr(loc, true);
      *Protocol = eProtocolHTTP;
      return addr;
      }
-  else if (sscanf(Param, "IPTV|FILE|%a[^|]|%u", &loc, Port) == 2) {
+  else if (sscanf(Param, "IPTV|FILE|%a[^|]|%u", &loc, Parameter) == 2) {
      cString addr(loc, true);
      *Protocol = eProtocolFILE;
      return addr;
      }
-  else if (sscanf(Param, "IPTV|EXT|%a[^|]|%u", &loc, Port) == 2) {
+  else if (sscanf(Param, "IPTV|EXT|%a[^|]|%u", &loc, Parameter) == 2) {
      cString addr(loc, true);
      *Protocol = eProtocolEXT;
      return addr;
@@ -97,7 +97,7 @@ cString cIptvMenuEditChannel::GetIptvSettings(const char *Param, int *Port, int 
 void cIptvMenuEditChannel::GetChannelData(cChannel *Channel)
 {
   if (Channel) {
-     int port, protocol;
+     int parameter, protocol;
      data.frequency = Channel->Frequency();
      data.source = Channel->Source();
      data.vpid = Channel->Vpid();
@@ -116,9 +116,9 @@ void cIptvMenuEditChannel::GetChannelData(cChannel *Channel)
      data.tid = Channel->Tid();
      data.rid = Channel->Rid();
      strn0cpy(data.name, Channel->Name(), sizeof(data.name));
-     strn0cpy(data.location, *GetIptvSettings(Channel->PluginParam(), &port, &protocol), sizeof(data.location));
+     strn0cpy(data.location, *GetIptvSettings(Channel->PluginParam(), &parameter, &protocol), sizeof(data.location));
      data.protocol = protocol;
-     data.port = port;
+     data.parameter = parameter;
      }
   else {
      data.frequency = 1;
@@ -141,7 +141,7 @@ void cIptvMenuEditChannel::GetChannelData(cChannel *Channel)
      strn0cpy(data.name, "IPTV", sizeof(data.name));
      strn0cpy(data.location, "127.0.0.1", sizeof(data.location));
      data.protocol = eProtocolUDP;
-     data.port = 1234;
+     data.parameter = 1234;
      }
 }
 
@@ -154,17 +154,17 @@ void cIptvMenuEditChannel::SetChannelData(cChannel *Channel)
      char slangs[MAXSPIDS][MAXLANGCODE2] = { "" };
      switch (data.protocol) {
        case eProtocolEXT:
-            param = cString::sprintf("IPTV|EXT|%s|%d", data.location, data.port);
+            param = cString::sprintf("IPTV|EXT|%s|%d", data.location, data.parameter);
             break;
        case eProtocolFILE:
-            param = cString::sprintf("IPTV|FILE|%s|%d", data.location, data.port);
+            param = cString::sprintf("IPTV|FILE|%s|%d", data.location, data.parameter);
             break;
        case eProtocolHTTP:
-            param = cString::sprintf("IPTV|HTTP|%s|%d", data.location, data.port);
+            param = cString::sprintf("IPTV|HTTP|%s|%d", data.location, data.parameter);
             break;
        default:
        case eProtocolUDP:
-            param = cString::sprintf("IPTV|UDP|%s|%d", data.location, data.port);
+            param = cString::sprintf("IPTV|UDP|%s|%d", data.location, data.parameter);
             break;
        }
      Channel->SetPids(data.vpid, data.ppid, data.apid, alangs, data.dpid, dlangs, data.spid, slangs, data.tpid);
@@ -185,17 +185,17 @@ void cIptvMenuEditChannel::Setup(void)
   switch (data.protocol) {
     case eProtocolFILE:
          Add(new cMenuEditStrItem(trVDR("File"),     data.location, sizeof(data.location), trVDR(FileNameChars)));
-         Add(new cMenuEditIntItem(tr("Delay (ms)"), &data.port,  0, 0xFFFF));
+         Add(new cMenuEditIntItem(tr("Delay (ms)"), &data.parameter,  0, 0xFFFF));
          break;
     case eProtocolEXT:
-         Add(new cMenuEditStrItem(trVDR("File"),     data.location, sizeof(data.location), trVDR(FileNameChars)));
-         Add(new cMenuEditIntItem(tr("Port"),       &data.port,  0, 0xFFFF));
+         Add(new cMenuEditStrItem(tr("Script"),     data.location, sizeof(data.location), trVDR(FileNameChars)));
+         Add(new cMenuEditIntItem(tr("Parameter"), &data.parameter,  0, 0xFFFF));
          break;
     case eProtocolHTTP:
     case eProtocolUDP:
     default:
          Add(new cMenuEditStrItem(tr("Address"), data.location, sizeof(data.location), trVDR(FileNameChars)));
-         Add(new cMenuEditIntItem(tr("Port"),   &data.port,  0, 0xFFFF));
+         Add(new cMenuEditIntItem(tr("Port"),   &data.parameter,  0, 0xFFFF));
          break;
     }
   // Normal settings
@@ -295,20 +295,20 @@ eOSState cIptvMenuEditChannel::ProcessKey(eKeys Key)
      switch (data.protocol) {
        case eProtocolEXT:
             strn0cpy(data.location, "/video/iptvstream.sh", sizeof(data.location));
-            data.port = 0;
+            data.parameter = 0;
             break;
        case eProtocolFILE:
             strn0cpy(data.location, "/tmp/video.ts", sizeof(data.location));
-            data.port = 0;
+            data.parameter = 0;
             break;
        case eProtocolHTTP:
             strn0cpy(data.location, "127.0.0.1/TS/1", sizeof(data.location));
-            data.port = 3000;
+            data.parameter = 3000;
             break;
        default:
        case eProtocolUDP:
             strn0cpy(data.location, "127.0.0.1", sizeof(data.location));
-            data.port = 1234;
+            data.parameter = 1234;
             break;
        }
      Setup();

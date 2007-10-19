@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.33 2007/10/15 21:03:45 rahrenbe Exp $
+ * $Id: device.h,v 1.34 2007/10/19 21:36:28 rahrenbe Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -61,7 +61,7 @@ private:
 
   // for channel parsing & buffering
 private:
-  cString GetChannelSettings(const char *Param, int *IpPort, cIptvProtocolIf* *Protocol);
+  cString GetChannelSettings(const char *IptvParam, int *Parameter, cIptvProtocolIf* *Protocol);
   bool ProvidesIptv(const char *Param) const;
   void ResetBuffering(void);
   bool IsBuffering(void);

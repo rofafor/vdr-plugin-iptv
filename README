@@ -101,8 +101,8 @@ Configuration:
   TV1;IPTV:1:IPTV|UDP|127.0.0.1|1234:P:0:512:650:2321:0:1:0:0:0
            ^ ^    ^   ^         ^    ^
            | |    |   |         |    Source type ("P")
-           | |    |   |         IP Port Number or File delay (ms)
-           | |    |   IP Address or File Location
+           | |    |   |         IP Port Number, File delay (ms), Script parameter
+           | |    |   IP Address, File location, Script location
            | |    Protocol ("UDP", "HTTP", "FILE", "EXT")
            | Plugin ID ("IPTV")
            Unique enumeration

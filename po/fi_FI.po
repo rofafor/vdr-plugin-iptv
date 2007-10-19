@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.5.7\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2007-10-17 00:19+0300\n"
+"POT-Creation-Date: 2007-10-19 23:10+0300\n"
 "PO-Revision-Date: 2007-08-12 23:22+0300\n"
 "Last-Translator: Rolf Ahrenberg\n"
 "Language-Team: <vdr@linuxtv.org>\n"
@@ -57,11 +57,17 @@ msgstr "Protokolla"
 msgid "Delay (ms)"
 msgstr "Viive (ms)"
 
-msgid "Port"
-msgstr "Portti"
+msgid "Script"
+msgstr "Skripti"
+
+msgid "Parameter"
+msgstr "Parametri"
 
 msgid "Address"
 msgstr "Osoite"
+
+msgid "Port"
+msgstr "Portti"
 
 msgid "Nid"
 msgstr "Verkko-ID"

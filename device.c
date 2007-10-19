@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.69 2007/10/15 20:06:38 ajhseppa Exp $
+ * $Id: device.c,v 1.70 2007/10/19 21:36:27 rahrenbe Exp $
  */
 
 #include "config.h"
@@ -155,26 +155,26 @@ cString cIptvDevice::GetInformation(unsigned int Page)
   return info;
 }
 
-cString cIptvDevice::GetChannelSettings(const char *Param, int *IpPort, cIptvProtocolIf* *Protocol)
+cString cIptvDevice::GetChannelSettings(const char *IptvParam, int *Parameter, cIptvProtocolIf* *Protocol)
 {
   debug("cIptvDevice::GetChannelSettings(%d)\n", deviceIndex);
   char *loc = NULL;
-  if (sscanf(Param, "IPTV|UDP|%a[^|]|%u", &loc, IpPort) == 2) {
+  if (sscanf(IptvParam, "IPTV|UDP|%a[^|]|%u", &loc, Parameter) == 2) {
      cString addr(loc, true);
      *Protocol = pUdpProtocol;
      return addr;
      }
-  else if (sscanf(Param, "IPTV|HTTP|%a[^|]|%u", &loc, IpPort) == 2) {
+  else if (sscanf(IptvParam, "IPTV|HTTP|%a[^|]|%u", &loc, Parameter) == 2) {
      cString addr(loc, true);
      *Protocol = pHttpProtocol;
      return addr;
      }
-  else if (sscanf(Param, "IPTV|FILE|%a[^|]|%u", &loc, IpPort) == 2) {
+  else if (sscanf(IptvParam, "IPTV|FILE|%a[^|]|%u", &loc, Parameter) == 2) {
      cString addr(loc, true);
      *Protocol = pFileProtocol;
      return addr;
      }
-  else if (sscanf(Param, "IPTV|EXT|%a[^|]|%u", &loc, IpPort) == 2) {
+  else if (sscanf(IptvParam, "IPTV|EXT|%a[^|]|%u", &loc, Parameter) == 2) {
      cString addr(loc, true);
      *Protocol = pExtProtocol;
      return addr;
@@ -215,17 +215,17 @@ bool cIptvDevice::ProvidesChannel(const cChannel *Channel, int Priority, bool *N
 
 bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
 {
-  int port;
-  cString addr;
+  int parameter;
+  cString location;
   cIptvProtocolIf *protocol;
 
   debug("cIptvDevice::SetChannelDevice(%d)\n", deviceIndex);
-  addr = GetChannelSettings(Channel->PluginParam(), &port, &protocol);
-  if (isempty(addr)) {
+  location = GetChannelSettings(Channel->PluginParam(), &parameter, &protocol);
+  if (isempty(location)) {
      error("ERROR: Unrecognized IPTV channel settings: %s", Channel->PluginParam());
      return false;
      }
-  pIptvStreamer->Set(addr, port, protocol);
+  pIptvStreamer->Set(location, parameter, protocol);
   if (pSidScanner && IptvConfig.GetSectionFiltering() && IptvConfig.GetSidScanning())
      pSidScanner->SetChannel(Channel);
   return true;

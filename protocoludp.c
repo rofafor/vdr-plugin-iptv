@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.c,v 1.11 2007/10/07 22:54:09 rahrenbe Exp $
+ * $Id: protocoludp.c,v 1.12 2007/10/19 21:36:28 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -216,7 +216,7 @@ int cIptvProtocolUdp::Read(unsigned char* *BufferAddr)
 
 bool cIptvProtocolUdp::Open(void)
 {
-  debug("cIptvProtocolUdp::Open(): streamAddr=%s\n", streamAddr);
+  debug("cIptvProtocolUdp::Open()\n");
   // Join a new multicast group
   JoinMulticast();
   return true;
@@ -224,7 +224,7 @@ bool cIptvProtocolUdp::Open(void)
 
 bool cIptvProtocolUdp::Close(void)
 {
-  debug("cIptvProtocolUdp::Close(): streamAddr=%s\n", streamAddr);
+  debug("cIptvProtocolUdp::Close()\n");
   // Drop the multicast group
   DropMulticast();
   // Close the socket
@@ -232,15 +232,15 @@ bool cIptvProtocolUdp::Close(void)
   return true;
 }
 
-bool cIptvProtocolUdp::Set(const char* Address, const int Port)
+bool cIptvProtocolUdp::Set(const char* Location, const int Parameter)
 {
-  debug("cIptvProtocolUdp::Set(): %s:%d\n", Address, Port);
-  if (!isempty(Address)) {
+  debug("cIptvProtocolUdp::Set(): Location=%s Parameter=%d\n", Location, Parameter);
+  if (!isempty(Location)) {
     // Drop the multicast group
     DropMulticast();
     // Update stream address and port
-    streamAddr = strcpyrealloc(streamAddr, Address);
-    streamPort = Port;
+    streamAddr = strcpyrealloc(streamAddr, Location);
+    streamPort = Parameter;
     // Join a new multicast group
     JoinMulticast();
     }

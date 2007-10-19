@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolfile.c,v 1.10 2007/10/07 22:54:09 rahrenbe Exp $
+ * $Id: protocolfile.c,v 1.11 2007/10/19 21:36:28 rahrenbe Exp $
  */
 
 #include <fcntl.h>
@@ -16,11 +16,12 @@
 #include "protocolfile.h"
 
 cIptvProtocolFile::cIptvProtocolFile()
-: readBufferLen(TS_SIZE * IptvConfig.GetReadBufferTsCount()),
+: fileDelay(0),
+  readBufferLen(TS_SIZE * IptvConfig.GetReadBufferTsCount()),
   isActive(false)
 {
   debug("cIptvProtocolFile::cIptvProtocolFile()\n");
-  streamAddr = strdup("");
+  fileLocation = strdup("");
   // Allocate receive buffer
   readBuffer = MALLOC(unsigned char, readBufferLen);
   if (!readBuffer)
@@ -33,7 +34,7 @@ cIptvProtocolFile::~cIptvProtocolFile()
   // Drop open handles
   Close();
   // Free allocated memory
-  free(streamAddr);
+  free(fileLocation);
   free(readBuffer);
 }
 
@@ -41,8 +42,8 @@ bool cIptvProtocolFile::OpenFile(void)
 {
   debug("cIptvProtocolFile::OpenFile()\n");
   // Check that stream address is valid
-  if (!isActive && !isempty(streamAddr)) {
-     fileStream = fopen(streamAddr, "rb");
+  if (!isActive && !isempty(fileLocation)) {
+     fileStream = fopen(fileLocation, "rb");
      if (ferror(fileStream) || !fileStream) {
         char tmp[64];
         error("ERROR: fopen(): %s", strerror_r(errno, tmp, sizeof(tmp)));
@@ -58,7 +59,7 @@ void cIptvProtocolFile::CloseFile(void)
 {
   debug("cIptvProtocolFile::CloseFile()\n");
   // Check that file stream is valid
-  if (isActive && !isempty(streamAddr)) {
+  if (isActive && !isempty(fileLocation)) {
      fclose(fileStream);
      // Update active flag
      isActive = false;
@@ -79,8 +80,8 @@ int cIptvProtocolFile::Read(unsigned char* *BufferAddr)
       rewind(fileStream);
    // Sleep before reading the file stream to prevent aggressive busy looping
    // and prevent transfer ringbuffer overflows
-   if (streamPort)
-      cCondWait::SleepMs(streamPort);
+   if (fileDelay)
+      cCondWait::SleepMs(fileDelay);
    // This check is to prevent a race condition where file may be switched off
    // during the sleep and buffers are disposed. Check here that the plugin is
    // still active before accessing the buffers
@@ -91,7 +92,7 @@ int cIptvProtocolFile::Read(unsigned char* *BufferAddr)
 
 bool cIptvProtocolFile::Open(void)
 {
-  debug("cIptvProtocolFile::Open(): streamAddr=%s\n", streamAddr);
+  debug("cIptvProtocolFile::Open()\n");
   // Open the file stream
   OpenFile();
   return true;
@@ -99,21 +100,21 @@ bool cIptvProtocolFile::Open(void)
 
 bool cIptvProtocolFile::Close(void)
 {
-  debug("cIptvProtocolFile::Close(): streamAddr=%s\n", streamAddr);
+  debug("cIptvProtocolFile::Close()\n");
   // Close the file stream
   CloseFile();
   return true;
 }
 
-bool cIptvProtocolFile::Set(const char* Address, const int Port)
+bool cIptvProtocolFile::Set(const char* Location, const int Parameter)
 {
-  debug("cIptvProtocolFile::Set(): %s:%d\n", Address, Port);
-  if (!isempty(Address)) {
+  debug("cIptvProtocolFile::Set(): Location=%s Parameter=%d\n", Location, Parameter);
+  if (!isempty(Location)) {
      // Close the file stream
      CloseFile();
      // Update stream address and port
-     streamAddr = strcpyrealloc(streamAddr, Address);
-     streamPort = Port;
+     fileLocation = strcpyrealloc(fileLocation, Location);
+     fileDelay = Parameter;
      // Open the file for input
      OpenFile();
      }
@@ -123,5 +124,5 @@ bool cIptvProtocolFile::Set(const char* Address, const int Port)
 cString cIptvProtocolFile::GetInformation(void)
 {
   //debug("cIptvProtocolFile::GetInformation()");
-  return cString::sprintf("file://%s:%d", streamAddr, streamPort);
+  return cString::sprintf("file://%s:%d", fileLocation, fileDelay);
 }

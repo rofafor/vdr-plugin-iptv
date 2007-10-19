@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.10 2007/10/07 22:54:09 rahrenbe Exp $
+ * $Id: protocolhttp.c,v 1.11 2007/10/19 21:36:28 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -336,27 +336,27 @@ int cIptvProtocolHttp::Read(unsigned char* *BufferAddr)
 
 bool cIptvProtocolHttp::Open(void)
 {
-  debug("cIptvProtocolHttp::Open(): streamAddr=%s\n", streamAddr);
+  debug("cIptvProtocolHttp::Open()\n");
   // Connect the socket
   return Connect();
 }
 
 bool cIptvProtocolHttp::Close(void)
 {
-  debug("cIptvProtocolHttp::Close(): streamAddr=%s\n", streamAddr);
+  debug("cIptvProtocolHttp::Close()\n");
   // Disconnect the current stream
   Disconnect();
   return true;
 }
 
-bool cIptvProtocolHttp::Set(const char* Address, const int Port)
+bool cIptvProtocolHttp::Set(const char* Location, const int Parameter)
 {
-  debug("cIptvProtocolHttp::Set(): %s:%d\n", Address, Port);
-  if (!isempty(Address)) {
+  debug("cIptvProtocolHttp::Set(): Location=%s Parameter=%d\n", Location, Parameter);
+  if (!isempty(Location)) {
     // Disconnect the current socket
     Disconnect();
     // Update stream address, path and port
-    streamAddr = strcpyrealloc(streamAddr, Address);
+    streamAddr = strcpyrealloc(streamAddr, Location);
     char *path = strstr(streamAddr, "/");
     if (path) {
        streamPath = strcpyrealloc(streamPath, path);
@@ -364,7 +364,7 @@ bool cIptvProtocolHttp::Set(const char* Address, const int Port)
        }
     else
        streamPath = strcpyrealloc(streamPath, "/");
-    streamPort = Port;
+    streamPort = Parameter;
     debug("http://%s:%d%s\n", streamAddr, streamPort, streamPath);
     // Re-connect the socket
     Connect();
