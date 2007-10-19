@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolif.h,v 1.6 2007/10/19 21:36:28 rahrenbe Exp $
+ * $Id: protocolif.h,v 1.7 2007/10/19 22:18:55 rahrenbe Exp $
  */
 
 #ifndef __IPTV_PROTOCOLIF_H
@@ -14,7 +14,7 @@ public:
   cIptvProtocolIf() {}
   virtual ~cIptvProtocolIf() {}
   virtual int Read(unsigned char* *BufferAddr) = 0;
-  virtual bool Set(const char* Location, const int Parameter) = 0;
+  virtual bool Set(const char* Location, const int Parameter, const int Index) = 0;
   virtual bool Open(void) = 0;
   virtual bool Close(void) = 0;
   virtual cString GetInformation(void) = 0;

@@ -124,6 +124,10 @@ Notes:
 - The following section filters are recommended to be disabled:
   "NIT (0x40)", "SDT (0x42)", "TDT (0x70)"
 
+- The EXT protocol listens UDP packets from localhost. The default listen
+  port base number is 4321 and it can be configured via a commandline
+  switch. The port range is defined by the number of IPTV devices (max. 8).
+
 Acknowledgements:
 
 - The IPTV section filtering code is derived from Linux kernel.

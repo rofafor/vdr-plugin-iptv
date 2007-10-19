@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolfile.c,v 1.11 2007/10/19 21:36:28 rahrenbe Exp $
+ * $Id: protocolfile.c,v 1.12 2007/10/19 22:18:55 rahrenbe Exp $
  */
 
 #include <fcntl.h>
@@ -106,9 +106,9 @@ bool cIptvProtocolFile::Close(void)
   return true;
 }
 
-bool cIptvProtocolFile::Set(const char* Location, const int Parameter)
+bool cIptvProtocolFile::Set(const char* Location, const int Parameter, const int Index)
 {
-  debug("cIptvProtocolFile::Set(): Location=%s Parameter=%d\n", Location, Parameter);
+  debug("cIptvProtocolFile::Set(): Location=%s Parameter=%d Index=%d\n", Location, Parameter, Index);
   if (!isempty(Location)) {
      // Close the file stream
      CloseFile();

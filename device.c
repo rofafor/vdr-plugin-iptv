@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.70 2007/10/19 21:36:27 rahrenbe Exp $
+ * $Id: device.c,v 1.71 2007/10/19 22:18:55 rahrenbe Exp $
  */
 
 #include "config.h"
@@ -225,7 +225,7 @@ bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
      error("ERROR: Unrecognized IPTV channel settings: %s", Channel->PluginParam());
      return false;
      }
-  pIptvStreamer->Set(location, parameter, protocol);
+  pIptvStreamer->Set(location, parameter, deviceIndex, protocol);
   if (pSidScanner && IptvConfig.GetSectionFiltering() && IptvConfig.GetSidScanning())
      pSidScanner->SetChannel(Channel);
   return true;

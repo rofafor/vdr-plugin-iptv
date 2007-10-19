@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.c,v 1.24 2007/10/19 21:36:28 rahrenbe Exp $
+ * $Id: streamer.c,v 1.25 2007/10/19 22:18:55 rahrenbe Exp $
  */
 
 #include <vdr/thread.h>
@@ -77,7 +77,7 @@ bool cIptvStreamer::Close(void)
   return true;
 }
 
-bool cIptvStreamer::Set(const char* Location, const int Parameter, cIptvProtocolIf* Protocol)
+bool cIptvStreamer::Set(const char* Location, const int Parameter, const int Index, cIptvProtocolIf* Protocol)
 {
   debug("cIptvStreamer::Set(): %s:%d\n", Location, Parameter);
   if (!isempty(Location)) {
@@ -91,7 +91,7 @@ bool cIptvStreamer::Set(const char* Location, const int Parameter, cIptvProtocol
         }
      // Set protocol location and parameter
      if (protocol)
-        protocol->Set(Location, Parameter);
+        protocol->Set(Location, Parameter, Index);
      }
   return true;
 }

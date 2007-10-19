@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.11 2007/10/19 21:36:28 rahrenbe Exp $
+ * $Id: protocolhttp.c,v 1.12 2007/10/19 22:18:55 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -349,9 +349,9 @@ bool cIptvProtocolHttp::Close(void)
   return true;
 }
 
-bool cIptvProtocolHttp::Set(const char* Location, const int Parameter)
+bool cIptvProtocolHttp::Set(const char* Location, const int Parameter, const int Index)
 {
-  debug("cIptvProtocolHttp::Set(): Location=%s Parameter=%d\n", Location, Parameter);
+  debug("cIptvProtocolHttp::Set(): Location=%s Parameter=%d Index=%d\n", Location, Parameter, Index);
   if (!isempty(Location)) {
     // Disconnect the current socket
     Disconnect();

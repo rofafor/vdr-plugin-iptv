@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.c,v 1.12 2007/10/19 21:36:28 rahrenbe Exp $
+ * $Id: protocoludp.c,v 1.13 2007/10/19 22:18:55 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -232,9 +232,9 @@ bool cIptvProtocolUdp::Close(void)
   return true;
 }
 
-bool cIptvProtocolUdp::Set(const char* Location, const int Parameter)
+bool cIptvProtocolUdp::Set(const char* Location, const int Parameter, const int Index)
 {
-  debug("cIptvProtocolUdp::Set(): Location=%s Parameter=%d\n", Location, Parameter);
+  debug("cIptvProtocolUdp::Set(): Location=%s Parameter=%d Index=%d\n", Location, Parameter, Index);
   if (!isempty(Location)) {
     // Drop the multicast group
     DropMulticast();

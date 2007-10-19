@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: config.h,v 1.13 2007/10/08 23:51:58 rahrenbe Exp $
+ * $Id: config.h,v 1.14 2007/10/19 22:18:55 rahrenbe Exp $
  */
 
 #ifndef __IPTV_CONFIG_H
@@ -22,6 +22,7 @@ protected:
   unsigned int useBytes;
   unsigned int sectionFiltering;
   unsigned int sidScanning;
+  unsigned int extListenPortBase;
   int disabledFilters[SECTION_FILTER_TABLE_SIZE];
 
 public:
@@ -32,6 +33,7 @@ public:
   unsigned int GetUseBytes(void) { return useBytes; }
   unsigned int GetSectionFiltering(void) { return sectionFiltering; }
   unsigned int GetSidScanning(void) { return sidScanning; }
+  unsigned int GetExtListenPortBase(void) { return extListenPortBase; }
   unsigned int GetDisabledFiltersCount(void);
   int GetDisabledFilters(unsigned int Index);
   void SetTsBufferSize(unsigned int Size) { tsBufferSize = Size; }
@@ -39,6 +41,7 @@ public:
   void SetUseBytes(unsigned int On) { useBytes = On; }
   void SetSectionFiltering(unsigned int On) { sectionFiltering = On; }
   void SetSidScanning(unsigned int On) { sidScanning = On; }
+  void SetExtListenPortBase(unsigned int PortNumber) { extListenPortBase = PortNumber; }
   void SetDisabledFilters(unsigned int Index, int Number);
 };
 

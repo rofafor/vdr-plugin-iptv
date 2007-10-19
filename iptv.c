@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.21 2007/10/15 21:03:45 rahrenbe Exp $
+ * $Id: iptv.c,v 1.22 2007/10/19 22:18:55 rahrenbe Exp $
  */
 
 #include <getopt.h>
@@ -66,7 +66,8 @@ const char *cPluginIptv::CommandLineHelp(void)
 {
   debug("cPluginIptv::CommandLineHelp()\n");
   // Return a string that describes all known command line options.
-  return "  -d <num>, --devices=<number> number of devices to be created (default: 1)\n";
+  return "  -d <num>, --devices=<number> number of devices to be created\n"
+         "  -p <port>,--port=<port>      base port number for EXT protocol UDP streaming\n";
 }
 
 bool cPluginIptv::ProcessArgs(int argc, char *argv[])
@@ -75,14 +76,18 @@ bool cPluginIptv::ProcessArgs(int argc, char *argv[])
   // Implement command line argument processing here if applicable.
   static const struct option long_options[] = {
        { "devices", required_argument, NULL, 'd' },
+       { "port",    required_argument, NULL, 'p' },
        { NULL }
      };
 
   int c;
-  while ((c = getopt_long(argc, argv, "d:", long_options, NULL)) != -1) {
+  while ((c = getopt_long(argc, argv, "d:p:", long_options, NULL)) != -1) {
         switch (c) {
           case 'd':
                deviceCount = atoi(optarg);
+               break;
+          case 'p':
+               IptvConfig.SetExtListenPortBase(atoi(optarg));
                break;
           default:
                return false;
