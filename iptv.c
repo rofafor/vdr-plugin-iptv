@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.22 2007/10/19 22:18:55 rahrenbe Exp $
+ * $Id: iptv.c,v 1.23 2007/10/19 22:54:03 rahrenbe Exp $
  */
 
 #include <getopt.h>
@@ -100,6 +100,7 @@ bool cPluginIptv::Initialize(void)
 {
   debug("cPluginIptv::Initialize()\n");
   // Initialize any background activities the plugin shall perform.
+  IptvConfig.SetConfigDirectory(cPlugin::ConfigDirectory(PLUGIN_NAME_I18N));
   return cIptvDevice::Initialize(deviceCount);
 }
 

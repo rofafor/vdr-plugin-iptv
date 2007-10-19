@@ -42,6 +42,8 @@ ln -s iptv-X.Y.Z iptv
 cd /put/your/path/here/VDR
 patch -p1 < PLUGINS/src/iptv/patches/vdr-X.Y.Z-pluginparam.patch
 cp sources.conf /path/to/vdrconf/
+mkdir -p /path/to/vdrconf/plugins/iptv
+cp PLUGINS/src/iptv/examples/iptvstream.sh /path/to/vdrconf/plugins/iptv/
 make
 make plugins
 ./vdr -P iptv
@@ -95,8 +97,8 @@ Configuration:
 
 - channels.conf
 
-  TV4;IPTV:4:IPTV|EXT|/video/iptvstream.sh|4321:P:0:0:680:0:0:4:0:0:0
-  TV3;IPTV:3:IPTV|FILE|/media/video.ts|5:P:0:514:670:2321:0:3:0:0:0
+  TV4;IPTV:4:IPTV|EXT|iptvstream.sh|0:P:0:0:680:0:0:4:0:0:0
+  TV3;IPTV:3:IPTV|FILE|/video/stream.ts|5:P:0:514:670:2321:0:3:0:0:0
   TV2;IPTV:2:IPTV|HTTP|127.0.0.1/TS/2|3000:P:0:513:660:2321:0:2:0:0:0
   TV1;IPTV:1:IPTV|UDP|127.0.0.1|1234:P:0:512:650:2321:0:1:0:0:0
            ^ ^    ^   ^         ^    ^
@@ -127,6 +129,9 @@ Notes:
 - The EXT protocol listens UDP packets from localhost. The default listen
   port base number is 4321 and it can be configured via a commandline
   switch. The port range is defined by the number of IPTV devices (max. 8).
+
+- The EXT protocol scripts must be located in the config directory of the
+  plugin.
 
 Acknowledgements:
 

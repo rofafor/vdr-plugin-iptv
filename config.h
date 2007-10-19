@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: config.h,v 1.14 2007/10/19 22:18:55 rahrenbe Exp $
+ * $Id: config.h,v 1.15 2007/10/19 22:54:03 rahrenbe Exp $
  */
 
 #ifndef __IPTV_CONFIG_H
@@ -15,7 +15,7 @@
 
 class cIptvConfig
 {
-protected:
+private:
   unsigned int readBufferTsCount;
   unsigned int tsBufferSize;
   unsigned int tsBufferPrefillRatio;
@@ -24,6 +24,7 @@ protected:
   unsigned int sidScanning;
   unsigned int extListenPortBase;
   int disabledFilters[SECTION_FILTER_TABLE_SIZE];
+  char configDirectory[255];
 
 public:
   cIptvConfig();
@@ -34,6 +35,7 @@ public:
   unsigned int GetSectionFiltering(void) { return sectionFiltering; }
   unsigned int GetSidScanning(void) { return sidScanning; }
   unsigned int GetExtListenPortBase(void) { return extListenPortBase; }
+  const char *GetConfigDirectory(void) { return configDirectory; }
   unsigned int GetDisabledFiltersCount(void);
   int GetDisabledFilters(unsigned int Index);
   void SetTsBufferSize(unsigned int Size) { tsBufferSize = Size; }
@@ -43,6 +45,7 @@ public:
   void SetSidScanning(unsigned int On) { sidScanning = On; }
   void SetExtListenPortBase(unsigned int PortNumber) { extListenPortBase = PortNumber; }
   void SetDisabledFilters(unsigned int Index, int Number);
+  void SetConfigDirectory(const char *directoryP);
 };
 
 extern cIptvConfig IptvConfig;

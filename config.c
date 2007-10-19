@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: config.c,v 1.16 2007/10/19 22:18:55 rahrenbe Exp $
+ * $Id: config.c,v 1.17 2007/10/19 22:54:03 rahrenbe Exp $
  */
 
 #include "config.h"
@@ -21,6 +21,7 @@ cIptvConfig::cIptvConfig(void)
 {
   for (unsigned int i = 0; i < sizeof(disabledFilters); ++i)
       disabledFilters[i] = -1;
+  memset(configDirectory, '\0', sizeof(configDirectory));
 }
 
 unsigned int cIptvConfig::GetDisabledFiltersCount(void)
@@ -40,4 +41,10 @@ void cIptvConfig::SetDisabledFilters(unsigned int Index, int Number)
 {
   if (Index < sizeof(disabledFilters))
      disabledFilters[Index] = Number;
+}
+
+void cIptvConfig::SetConfigDirectory(const char *directoryP)
+{
+  debug("cIptvConfig::SetConfigDirectory(%s)", directoryP);
+  strn0cpy(configDirectory, directoryP, sizeof(configDirectory));
 }

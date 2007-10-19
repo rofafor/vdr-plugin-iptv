@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.38 2007/10/19 21:36:28 rahrenbe Exp $
+ * $Id: setup.c,v 1.39 2007/10/19 22:54:03 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -294,11 +294,11 @@ eOSState cIptvMenuEditChannel::ProcessKey(eKeys Key)
   if ((Key != kNone) && (data.protocol != oldProtocol)) {
      switch (data.protocol) {
        case eProtocolEXT:
-            strn0cpy(data.location, "/video/iptvstream.sh", sizeof(data.location));
+            strn0cpy(data.location, "iptvstream.sh", sizeof(data.location));
             data.parameter = 0;
             break;
        case eProtocolFILE:
-            strn0cpy(data.location, "/tmp/video.ts", sizeof(data.location));
+            strn0cpy(data.location, "/video/stream.ts", sizeof(data.location));
             data.parameter = 0;
             break;
        case eProtocolHTTP:

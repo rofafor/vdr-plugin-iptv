@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.c,v 1.8 2007/10/19 22:18:55 rahrenbe Exp $
+ * $Id: protocolext.c,v 1.9 2007/10/19 22:54:03 rahrenbe Exp $
  */
 
 #include <sys/wait.h>
@@ -273,12 +273,18 @@ bool cIptvProtocolExt::Set(const char* Location, const int Parameter, const int 
 {
   debug("cIptvProtocolExt::Set(): Location=%s Parameter=%d Index=%d\n", Location, Parameter, Index);
   if (!isempty(Location)) {
-    // Update script file and parameter
-    scriptFile = strcpyrealloc(scriptFile, Location);
-    scriptParameter = Parameter;
-    // Update listen port
-    listenPort = IptvConfig.GetExtListenPortBase() + Index;
-    }
+     struct stat stbuf;
+     // Update script file and parameter
+     free(scriptFile);
+     asprintf(&scriptFile, "%s/%s", IptvConfig.GetConfigDirectory(), Location);
+     if ((stat(scriptFile, &stbuf) != 0) || (strstr(scriptFile, "..") != 0)) {
+        error("ERROR: Non-existent script '%s'", scriptFile);
+        return false;
+        }
+     scriptParameter = Parameter;
+     // Update listen port
+     listenPort = IptvConfig.GetExtListenPortBase() + Index;
+     }
   return true;
 }
 
