@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.35 2007/10/16 22:13:44 rahrenbe Exp $
+ * $Id: setup.c,v 1.36 2007/10/19 17:07:13 ajhseppa Exp $
  */
 
 #include <string.h>
@@ -180,7 +180,8 @@ void cIptvMenuEditChannel::Setup(void)
   int current = Current();
   Clear();
   // IPTV specific settings
-  Add(new cMenuEditStraItem(tr("Protocol"),    &data.protocol, 3, protocols));
+  Add(new cMenuEditStraItem(tr("Protocol"),    &data.protocol,
+                            eProtocolCount, protocols));
   switch (data.protocol) {
     case eProtocolFILE:
          Add(new cMenuEditStrItem(trVDR("File"),     data.location, sizeof(data.location), trVDR(FileNameChars)));
