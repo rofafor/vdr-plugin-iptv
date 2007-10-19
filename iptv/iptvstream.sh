@@ -11,13 +11,32 @@ PARAMETER=${1}
 # Iptv plugin listens this port
 PORT=${2}
 
-# Define stream address
-URL=""
+# There is a way to specify multiple URLs in the same script. The selection is
+# then controlled by the extra parameter passed by IPTV plugin to the script
+case $PARAMETER in
+    1)
+	URL=""
+	;;
+    2)
+	URL=""
+	;;
+    3)
+	URL=""
+	;;
+    *)
+	URL=""  # Default URL
+	;;
+esac
 
 if [ -z "${URL}" ]; then
     logger "$0: error: URL not defined!"
     exit 1;
 fi
 
-# Use 'exec' for capturing script pid
-exec vlc "${URL}" --sout "#transcode{vcodec=mp2v,acodec=mpga,vb=800,ab=192}:standard{access=udp,mux=ts,dst=127.0.0.1:${PORT}}" --intf dummy
+# Create unique pids for the stream
+let VPID=${PARAMETER}+1
+let APID=${PARAMETER}+2
+let SPID=${PARAMETER}+3
+
+# Use 'exec' for capturing program pid for further management in IPTV plugin
+exec vlc "${URL}" --sout "#transcode{vcodec=mp2v,acodec=mpga,vb=2400,ab=320}:standard{access=udp,mux=ts{pid-video=${VPID},pid-audio=${APID},pid-spu=${SPID}},dst=127.0.0.1:${PORT}}" --intf dummy
