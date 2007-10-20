@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.c,v 1.25 2007/10/19 22:18:55 rahrenbe Exp $
+ * $Id: streamer.c,v 1.26 2007/10/20 08:32:00 ajhseppa Exp $
  */
 
 #include <vdr/thread.h>
@@ -35,17 +35,19 @@ void cIptvStreamer::Action(void)
   while (Running()) {
     if (ringBuffer && mutex && protocol && ringBuffer->Free()) {
        unsigned char *buffer = NULL;
+       mutex->Lock();
        int length = protocol->Read(&buffer);
        if (length >= 0) {
           AddStatistic(length);
-          mutex->Lock();
           int p = ringBuffer->Put(buffer, length);
           if (p != length && Running())
              ringBuffer->ReportOverflow(length - p);
           mutex->Unlock();
           }
-       else
+       else {
+          mutex->Unlock();
           cCondWait::SleepMs(100); // to reduce cpu load
+          }
        }
     else
        cCondWait::SleepMs(100); // and avoid busy loop
@@ -72,8 +74,11 @@ bool cIptvStreamer::Close(void)
   if (Running())
      Cancel(3);
   // Close the protocol
-  if (protocol)
+  if (protocol) {
+     mutex->Lock();
      protocol->Close();
+     mutex->Unlock();
+     }
   return true;
 }
 
