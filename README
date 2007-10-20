@@ -28,11 +28,16 @@ live viewing, recording, etc. The plugin also features full section
 filtering capabilities which allow for example EIT information to be
 extracted from the incoming stream.
 
-Currently the IPTV plugin supports both multicast UDP/RTP and unicast
-HTTP MPEG1/2 transport streams. Also a file input method is supported,
-but a file delay must be selected individually to prevent VDR's transfer
-buffer over/underflow. Therefore the file input should be considered
-as a testing feature only.
+Currently the IPTV plugin has direct support for both multicast UDP/RTP
+and unicast HTTP MPEG1/2 transport streams. Also a file input method is
+supported, but a file delay must be selected individually to prevent
+VDR's transfer buffer over/underflow. Therefore the file input should be
+considered as a testing feature only.
+
+IPTV plugin also features a support for external streaming applications.
+With proper helper applications and configuration IPTV plugin is able to
+display not only MPEG1/2 transport streams but also other formats like
+MP3 radio streams, mms video streams and so on.
 
 Installation:
 
@@ -121,11 +126,6 @@ Configuration:
   iptables -A INPUT -i eth0 -p igmp -d 224.0.0.0/4 -j ACCEPT
 
 External streaming:
-
-- Starting from version 0.0.2 IPTV plugin features a support for external
-  streaming applications. With proper helper applications and configuration
-  the IPTV plugin is now able to display not only MPEG1/2 transport streams
-  but also other formats like MP3 radio streams.
 
 - To watch an externally received channel add an EXT entry to channels.conf
   and specify a script name and parameter. The specified script is executed
