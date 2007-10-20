@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.c,v 1.26 2007/10/20 08:32:00 ajhseppa Exp $
+ * $Id: streamer.c,v 1.27 2007/10/20 08:58:15 ajhseppa Exp $
  */
 
 #include <vdr/thread.h>
@@ -73,7 +73,9 @@ bool cIptvStreamer::Close(void)
   // Stop thread
   if (Running())
      Cancel(3);
-  // Close the protocol
+  // Close the protocol. A mutex should be taken here to avoid a race condition
+  // where thread Action() may be in the process of accessing the protocol.
+  // Taking a mutex serializes the Close() and Action() -calls.
   if (protocol) {
      mutex->Lock();
      protocol->Close();
