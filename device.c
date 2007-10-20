@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.71 2007/10/19 22:18:55 rahrenbe Exp $
+ * $Id: device.c,v 1.72 2007/10/20 20:35:06 rahrenbe Exp $
  */
 
 #include "config.h"
@@ -158,26 +158,29 @@ cString cIptvDevice::GetInformation(unsigned int Page)
 cString cIptvDevice::GetChannelSettings(const char *IptvParam, int *Parameter, cIptvProtocolIf* *Protocol)
 {
   debug("cIptvDevice::GetChannelSettings(%d)\n", deviceIndex);
+  char *tag = NULL;
+  char *proto = NULL;
   char *loc = NULL;
-  if (sscanf(IptvParam, "IPTV|UDP|%a[^|]|%u", &loc, Parameter) == 2) {
-     cString addr(loc, true);
-     *Protocol = pUdpProtocol;
-     return addr;
-     }
-  else if (sscanf(IptvParam, "IPTV|HTTP|%a[^|]|%u", &loc, Parameter) == 2) {
-     cString addr(loc, true);
-     *Protocol = pHttpProtocol;
-     return addr;
-     }
-  else if (sscanf(IptvParam, "IPTV|FILE|%a[^|]|%u", &loc, Parameter) == 2) {
-     cString addr(loc, true);
-     *Protocol = pFileProtocol;
-     return addr;
-     }
-  else if (sscanf(IptvParam, "IPTV|EXT|%a[^|]|%u", &loc, Parameter) == 2) {
-     cString addr(loc, true);
-     *Protocol = pExtProtocol;
-     return addr;
+  if (sscanf(IptvParam, "%a[^|]|%a[^|]|%a[^|]|%u", &tag, &proto, &loc, Parameter) == 4) {
+     cString tagstr(tag, true);
+     cString protostr(proto, true);
+     cString locstr(loc, true);
+     // check if IPTV tag
+     if (strncasecmp(*tagstr, "IPTV", 4) == 0) {
+        // check if protocol is supported and update the pointer
+        if (strncasecmp(*protostr, "UDP", 3) == 0)
+           *Protocol = pUdpProtocol;
+        else if (strncasecmp(*protostr, "HTTP", 4) == 0)
+           *Protocol = pHttpProtocol;
+        else if (strncasecmp(*protostr, "FILE", 4) == 0)
+           *Protocol = pFileProtocol;
+        else if (strncasecmp(*protostr, "EXT", 3) == 0)
+           *Protocol = pExtProtocol;
+        else
+           return NULL;
+        // return location
+        return locstr;
+        }
      }
   return NULL;
 }
@@ -185,7 +188,7 @@ cString cIptvDevice::GetChannelSettings(const char *IptvParam, int *Parameter, c
 bool cIptvDevice::ProvidesIptv(const char *Param) const
 {
   debug("cIptvDevice::ProvidesIptv(%d)\n", deviceIndex);
-  return (strncmp(Param, "IPTV", 4) == 0);
+  return (strncasecmp(Param, "IPTV", 4) == 0);
 }
 
 bool cIptvDevice::ProvidesSource(int Source) const

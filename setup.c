@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.40 2007/10/20 17:26:46 rahrenbe Exp $
+ * $Id: setup.c,v 1.41 2007/10/20 20:35:06 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -70,26 +70,29 @@ cIptvMenuEditChannel::cIptvMenuEditChannel(cChannel *Channel, bool New)
 
 cString cIptvMenuEditChannel::GetIptvSettings(const char *Param, int *Parameter, int *Protocol)
 {
+  char *tag = NULL;
+  char *proto = NULL;
   char *loc = NULL;
-  if (sscanf(Param, "IPTV|UDP|%a[^|]|%u", &loc, Parameter) == 2) {
-     cString addr(loc, true);
-     *Protocol = eProtocolUDP;
-     return addr;
-     }
-  else if (sscanf(Param, "IPTV|HTTP|%a[^|]|%u", &loc, Parameter) == 2) {
-     cString addr(loc, true);
-     *Protocol = eProtocolHTTP;
-     return addr;
-     }
-  else if (sscanf(Param, "IPTV|FILE|%a[^|]|%u", &loc, Parameter) == 2) {
-     cString addr(loc, true);
-     *Protocol = eProtocolFILE;
-     return addr;
-     }
-  else if (sscanf(Param, "IPTV|EXT|%a[^|]|%u", &loc, Parameter) == 2) {
-     cString addr(loc, true);
-     *Protocol = eProtocolEXT;
-     return addr;
+  if (sscanf(Param, "%a[^|]|%a[^|]|%a[^|]|%u", &tag, &proto, &loc, Parameter) == 4) {
+     cString tagstr(tag, true);
+     cString protostr(proto, true);
+     cString locstr(loc, true);
+     // check if IPTV tag
+     if (strncasecmp(*tagstr, "IPTV", 4) == 0) {
+        // check if protocol is supported and update the pointer
+        if (strncasecmp(*protostr, "UDP", 3) == 0)
+           *Protocol = eProtocolUDP;
+        else if (strncasecmp(*protostr, "HTTP", 4) == 0)
+           *Protocol = eProtocolHTTP;
+        else if (strncasecmp(*protostr, "FILE", 4) == 0)
+           *Protocol = eProtocolFILE;
+        else if (strncasecmp(*protostr, "EXT", 3) == 0)
+           *Protocol = eProtocolEXT;
+        else
+           return NULL;
+        // return location
+        return locstr;
+        }
      }
   return NULL;
 }
@@ -379,7 +382,7 @@ void cIptvMenuChannels::Setup(void)
 {
   Clear();
   for (cChannel *channel = Channels.First(); channel; channel = Channels.Next(channel)) {
-      if (!channel->GroupSep() && channel->IsPlug() && !strncmp(channel->PluginParam(), "IPTV", 4)) {
+      if (!channel->GroupSep() && channel->IsPlug() && !strncasecmp(channel->PluginParam(), "IPTV", 4)) {
          cIptvMenuChannelItem *item = new cIptvMenuChannelItem(channel);
          Add(item);
          }
