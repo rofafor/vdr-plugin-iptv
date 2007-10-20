@@ -116,6 +116,29 @@ Configuration:
   # IGMP required by multicasts
   iptables -A INPUT -i eth0 -p igmp -d 224.0.0.0/4 -j ACCEPT
 
+External streaming:
+
+- Starting from version 0.0.2 IPTV plugin features support for external
+  streaming applications. What this means in short is that with proper helper
+  applications and configuration the plugin is able to display streams not 
+  originally in MPEG1/2 TS format.
+
+- To add an externally received channel, add an EXT entry to channels.conf.
+  Specify a script name as the location parameter. This script is executed
+  from plugin configuration directory when VDR tunes to the specified
+  channel. The port parameter in channels.conf is passed to the script and
+  can be used to select for example between different URLs.
+
+- When EXT channel is opened IPTV plugin opens an UDP listening port on the
+  local host. The script executing is then responsible for supplying IPTV
+  plugin with MPEG2 TS data in UDP format to the opened port. The data will
+  then be processed by VDR as usual. The opened listening port can be
+  specified in plugin configuration.
+
+- IPTV plugin includes an example script which uses VLC media player for
+  receiving streams, transcoding and handing the result to IPTV plugin. IPTV
+  was tested with VLC version 0.8.6c
+
 Notes:
 
 - Working EIT requires correct Nid/Tid/Sid values as the NIT filter cannot
