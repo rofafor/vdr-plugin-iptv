@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: common.h,v 1.9 2007/10/10 19:41:10 rahrenbe Exp $
+ * $Id: common.h,v 1.10 2007/10/20 20:27:59 ajhseppa Exp $
  */
 
 #ifndef __IPTV_COMMON_H
@@ -32,6 +32,7 @@
 uint16_t ts_pid(const uint8_t *buf);
 uint8_t payload(const uint8_t *tsp);
 const char *id_pid(const u_short Pid);
+int selectSingleDesc(int descriptor, const int usecs, const bool selectWrite);
 
 struct section_filter_table_type {
   const char *description;

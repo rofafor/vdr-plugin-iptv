@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.c,v 1.11 2007/10/08 16:24:48 rahrenbe Exp $
+ * $Id: sectionfilter.c,v 1.12 2007/10/20 20:27:59 ajhseppa Exp $
  */
 
 #include "sectionfilter.h"
@@ -97,21 +97,10 @@ int cIptvSectionFilter::dmxdev_section_callback(const uint8_t *buffer1, size_t b
                                                 const uint8_t *buffer2, size_t buffer2_len,
                                                 enum dmx_success success)
 {
-  struct timeval tv;
-  tv.tv_sec = 0;
-  tv.tv_usec = 0;
-  fd_set rfds;
-  FD_ZERO(&rfds);
-  FD_SET(fifoDescriptor, &rfds);
-  int retval = select(fifoDescriptor + 1, &rfds, NULL, NULL, &tv);
-
-  // Check if error
-  if (retval < 0) {
-     char tmp[64];
-     error("ERROR: select(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-     }
+  // See if there is data in the fifo
+  int retval = selectSingleDesc(fifoDescriptor, 0, false);
   // There is no data in the fifo, more can be written
-  else if (!retval) {
+  if (!retval) {
 #ifdef DEBUG_PRINTF
      printf("id = %d, pid %d would now write %d data to buffer\n", id, pid, buffer1_len);
      for (unsigned int i = 0; i < buffer1_len; ++i)

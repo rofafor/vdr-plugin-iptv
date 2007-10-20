@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: common.c,v 1.3 2007/10/10 19:41:10 rahrenbe Exp $
+ * $Id: common.c,v 1.4 2007/10/20 20:27:58 ajhseppa Exp $
  */
 
 #include <vdr/i18n.h>
@@ -37,6 +37,29 @@ const char *id_pid(const u_short Pid)
          return section_filter_table[i].tag;
       }
   return "---";
+}
+
+int selectSingleDesc(int descriptor, const int usecs, const bool selectWrite)
+{
+  // Wait for data
+  struct timeval tv;
+  tv.tv_sec = 0;
+  tv.tv_usec = usecs;
+  // Use select
+  fd_set fds;
+  FD_ZERO(&fds);
+  FD_SET(descriptor, &fds);
+  int retval = 0;
+  if (selectWrite)
+    retval = select(descriptor + 1, NULL, &fds, NULL, &tv);
+  else
+    retval = select(descriptor + 1, &fds, NULL, NULL, &tv);
+  // Check if error
+  if (retval < 0) {
+     char tmp[64];
+     error("ERROR: select(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+     }
+  return retval;
 }
 
 const section_filter_table_type section_filter_table[SECTION_FILTER_TABLE_SIZE] =

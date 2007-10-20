@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.c,v 1.12 2007/10/20 17:26:46 rahrenbe Exp $
+ * $Id: protocolext.c,v 1.13 2007/10/20 20:27:59 ajhseppa Exp $
  */
 
 #include <sys/wait.h>
@@ -196,20 +196,10 @@ int cIptvProtocolExt::Read(unsigned char* *BufferAddr)
   // Set argument point to read buffer
   *BufferAddr = readBuffer;
   // Wait for data
-  struct timeval tv;
-  tv.tv_sec = 0;
-  tv.tv_usec = 500000;
-  // Use select
-  fd_set rfds;
-  FD_ZERO(&rfds);
-  FD_SET(socketDesc, &rfds);
-  int retval = select(socketDesc + 1, &rfds, NULL, NULL, &tv);
+  int retval = selectSingleDesc(socketDesc, 500000, false);
   // Check if error
-  if (retval < 0) {
-     char tmp[64];
-     error("ERROR: select(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+  if (retval < 0)
      return retval;
-     }
   // Check if data available
   else if (retval) {
      // Read data from socket

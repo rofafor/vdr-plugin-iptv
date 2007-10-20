@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.13 2007/10/20 11:36:21 ajhseppa Exp $
+ * $Id: protocolhttp.c,v 1.14 2007/10/20 20:27:59 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -141,22 +141,11 @@ bool cIptvProtocolHttp::Connect(void)
         return false;
         }
 
-     // Select on the socket completion
-     struct timeval tv;
-     tv.tv_sec = 1;
-     tv.tv_usec = 0;
-     // Use select to check socket writability
-     fd_set wfds;
-     FD_ZERO(&wfds);
-     FD_SET(socketDesc, &wfds);
-     int retval = select(socketDesc + 1, NULL, &wfds, NULL, &tv);
-     // Check if error
-     if (retval < 0) {
-        char tmp[64];
-        error("ERROR: select(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-        return -1;
-        }
-     
+     // Select on the socket completion, check if it is writable
+     int retval = selectSingleDesc(socketDesc, 800000, true);
+     if (retval < 0)
+        return retval;
+
      // Select has returned. Get socket errors if there are any
      int socketStatus = 0;
      socklen_t len = sizeof(socketStatus);
@@ -229,22 +218,11 @@ bool cIptvProtocolHttp::GetHeaderLine(char* dest, unsigned int destLen,
 
   while (!newline || !linefeed) {
     socklen_t addrlen = sizeof(sockAddr);
-    // Set argument point to read buffer
     // Wait for data
-    struct timeval tv;
-    tv.tv_sec = 0;
-    tv.tv_usec = 500000;
-    // Use select
-    fd_set rfds;
-    FD_ZERO(&rfds);
-    FD_SET(socketDesc, &rfds);
-    int retval = select(socketDesc + 1, &rfds, NULL, NULL, &tv);
+    int retval = selectSingleDesc(socketDesc, 500000, false);
     // Check if error
-    if (retval < 0) {
-       char tmp[64];
-       error("ERROR: select(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+    if (retval < 0)
        return false;
-       }
     // Check if data available
     else if (retval) {
        int retval = recvfrom(socketDesc, bufptr, 1, MSG_DONTWAIT,
@@ -316,20 +294,10 @@ int cIptvProtocolHttp::Read(unsigned char* *BufferAddr)
   // Set argument point to read buffer
   *BufferAddr = readBuffer;
   // Wait for data
-  struct timeval tv;
-  tv.tv_sec = 0;
-  tv.tv_usec = 500000;
-  // Use select
-  fd_set rfds;
-  FD_ZERO(&rfds);
-  FD_SET(socketDesc, &rfds);
-  int retval = select(socketDesc + 1, &rfds, NULL, NULL, &tv);
+  int retval = selectSingleDesc(socketDesc, 500000, false);
   // Check if error
-  if (retval < 0) {
-     char tmp[64];
-     error("ERROR: select(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+  if (retval < 0)
      return retval;
-     }
   // Check if data available
   else if (retval) {
      // Read data from socket
