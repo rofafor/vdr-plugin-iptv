@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.c,v 1.17 2007/10/20 23:16:28 ajhseppa Exp $
+ * $Id: protocoludp.c,v 1.18 2007/10/20 23:25:14 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -56,7 +56,7 @@ bool cIptvProtocolUdp::OpenSocket(const int Port)
      int yes = 1;     
      // Create socket
      socketDesc = socket(PF_INET, SOCK_DGRAM, 0);
-     ERROR_IF(socketDesc < 0, "socket()", return false);
+     ERROR_IF_RET(socketDesc < 0, "socket()", return false);
      // Make it use non-blocking I/O to avoid stuck read calls
      ERROR_IF_FUNC(fcntl(socketDesc, F_SETFL, O_NONBLOCK), "fcntl()", CloseSocket(), return false);
      // Allow multiple sockets to use the same PORT number
@@ -98,7 +98,7 @@ bool cIptvProtocolUdp::JoinMulticast(void)
      mreq.imr_interface.s_addr = htonl(INADDR_ANY);
      int err = setsockopt(socketDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq,
                           sizeof(mreq));
-     ERROR_IF(err < 0, "setsockopt()", return false);
+     ERROR_IF_RET(err < 0, "setsockopt()", return false);
      // Update multicasting flag
      isActive = true;
      }
@@ -118,7 +118,7 @@ bool cIptvProtocolUdp::DropMulticast(void)
       mreq.imr_interface.s_addr = htonl(INADDR_ANY);
       int err = setsockopt(socketDesc, IPPROTO_IP, IP_DROP_MEMBERSHIP, &mreq,
                            sizeof(mreq));
-      ERROR_IF(err < 0, "setsockopt()", return false);
+      ERROR_IF_RET(err < 0, "setsockopt()", return false);
       // Update multicasting flag
       isActive = false;
      }
@@ -148,7 +148,7 @@ int cIptvProtocolUdp::Read(unsigned char* *BufferAddr)
      if (isActive)
         len = recvfrom(socketDesc, readBuffer, readBufferLen, MSG_DONTWAIT,
                        (struct sockaddr *)&sockAddr, &addrlen);
-     ERROR_IF(len < 0, "recvfrom()", return len);
+     ERROR_IF_RET(len < 0, "recvfrom()", return len);
      if ((len > 0) && (readBuffer[0] == 0x47)) {
         // Set argument point to read buffer
         *BufferAddr = &readBuffer[0];

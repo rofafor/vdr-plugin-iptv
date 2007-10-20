@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolfile.c,v 1.13 2007/10/20 23:16:28 ajhseppa Exp $
+ * $Id: protocolfile.c,v 1.14 2007/10/20 23:25:14 ajhseppa Exp $
  */
 
 #include <fcntl.h>
@@ -44,7 +44,7 @@ bool cIptvProtocolFile::OpenFile(void)
   // Check that stream address is valid
   if (!isActive && !isempty(fileLocation)) {
      fileStream = fopen(fileLocation, "rb");
-     ERROR_IF(!fileStream || ferror(fileStream), "fopen()", return false);
+     ERROR_IF_RET(!fileStream || ferror(fileStream), "fopen()", return false);
      // Update active flag
      isActive = true;
      }

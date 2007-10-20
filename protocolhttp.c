@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.16 2007/10/20 23:16:28 ajhseppa Exp $
+ * $Id: protocolhttp.c,v 1.17 2007/10/20 23:25:14 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -59,7 +59,7 @@ bool cIptvProtocolHttp::OpenSocket(const int Port)
      int yes = 1;     
      // Create socket
      socketDesc = socket(PF_INET, SOCK_STREAM, 0);
-     ERROR_IF(socketDesc < 0, "socket()", return false);
+     ERROR_IF_RET(socketDesc < 0, "socket()", return false);
      // Make it use non-blocking I/O to avoid stuck read calls
      ERROR_IF_FUNC(fcntl(socketDesc, F_SETFL, O_NONBLOCK), "fcntl()", CloseSocket(), return false);
      // Allow multiple sockets to use the same PORT number

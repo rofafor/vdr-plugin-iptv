@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.c,v 1.14 2007/10/20 23:16:28 ajhseppa Exp $
+ * $Id: sectionfilter.c,v 1.15 2007/10/20 23:25:14 ajhseppa Exp $
  */
 
 #include "sectionfilter.h"
@@ -56,7 +56,7 @@ cIptvSectionFilter::cIptvSectionFilter(int Index, int devInd,
   if (S_ISFIFO(sb.st_mode))
      unlink(pipeName);
   int err = mknod(pipeName, 0644 | S_IFIFO, 0);
-  ERROR_IF(err < 0, "mknod()", return);
+  ERROR_IF_RET(err < 0, "mknod()", return);
 
   // Create descriptors
   fifoDescriptor = open(pipeName, O_RDWR | O_NONBLOCK);
@@ -104,7 +104,7 @@ int cIptvSectionFilter::dmxdev_section_callback(const uint8_t *buffer1, size_t b
      printf("\n");
 #endif
      retval = write(fifoDescriptor, buffer1, buffer1_len);
-     ERROR_IF(retval < 0, "write()", );
+     ERROR_IF(retval < 0, "write()");
      // Update statistics
      AddStatistic(retval, 1);
      }

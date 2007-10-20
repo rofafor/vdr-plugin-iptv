@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.c,v 1.15 2007/10/20 23:16:28 ajhseppa Exp $
+ * $Id: protocolext.c,v 1.16 2007/10/20 23:25:14 ajhseppa Exp $
  */
 
 #include <sys/wait.h>
@@ -55,7 +55,7 @@ bool cIptvProtocolExt::OpenSocket(void)
      int yes = 1;     
      // Create socket
      socketDesc = socket(PF_INET, SOCK_DGRAM, 0);
-     ERROR_IF(socketDesc < 0, "socket()", return false);
+     ERROR_IF_RET(socketDesc < 0, "socket()", return false);
      // Make it use non-blocking I/O to avoid stuck read calls
      ERROR_IF_FUNC(fcntl(socketDesc, F_SETFL, O_NONBLOCK), "fcntl()", CloseSocket(), return false);
      // Allow multiple sockets to use the same PORT number
@@ -91,7 +91,7 @@ void cIptvProtocolExt::ExecuteCommand(void)
      return;
      }
   // Let's fork
-  ERROR_IF((pid = fork()) == -1, "fork()", return);
+  ERROR_IF_RET((pid = fork()) == -1, "fork()", return);
   // Check if child process
   if (pid == 0) {
      // Close all dup'ed filedescriptors
@@ -125,7 +125,7 @@ void cIptvProtocolExt::TerminateCommand(void)
      bool waitOver = false;
      // signal and wait for termination
      int retval = kill(pid, SIGINT);
-     ERROR_IF(retval < 0, "kill()", waitOver = true);
+     ERROR_IF_RET(retval < 0, "kill()", waitOver = true);
      while (!waitOver) {
        retval = 0;
        waitms += timeoutms;
@@ -137,7 +137,7 @@ void cIptvProtocolExt::TerminateCommand(void)
        memset(&waitStatus, '\0', sizeof(waitStatus));
        // Wait for child termination
        retval = waitid(P_PID, pid, &waitStatus, (WNOHANG | WEXITED));
-       ERROR_IF(retval < 0, "waitid()", waitOver = true);
+       ERROR_IF_RET(retval < 0, "waitid()", waitOver = true);
        // These are the acceptable conditions under which child exit is
        // regarded as successful
        if (!retval && waitStatus.si_pid && (waitStatus.si_pid == pid) &&
@@ -176,7 +176,7 @@ int cIptvProtocolExt::Read(unsigned char* *BufferAddr)
      if (isActive)
         len = recvfrom(socketDesc, readBuffer, readBufferLen, MSG_DONTWAIT,
                        (struct sockaddr *)&sockAddr, &addrlen);
-     ERROR_IF(len < 0, "recvfrom()", return len);
+     ERROR_IF_RET(len < 0, "recvfrom()", return len);
      if ((len > 0) && (readBuffer[0] == 0x47)) {
         // Set argument point to read buffer
         *BufferAddr = &readBuffer[0];

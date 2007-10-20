@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: common.h,v 1.12 2007/10/20 23:16:28 ajhseppa Exp $
+ * $Id: common.h,v 1.13 2007/10/20 23:25:14 ajhseppa Exp $
  */
 
 #ifndef __IPTV_COMMON_H
@@ -39,7 +39,10 @@
         }                                                                  \
   } while (0)
 
-#define ERROR_IF(exp, errstr, ret) ERROR_IF_FUNC(exp, errstr, ,ret);
+
+#define ERROR_IF_RET(exp, errstr, ret) ERROR_IF_FUNC(exp, errstr, ,ret);
+
+#define ERROR_IF(exp, errstr) ERROR_IF_FUNC(exp, errstr, , );
 
 uint16_t ts_pid(const uint8_t *buf);
 uint8_t payload(const uint8_t *tsp);

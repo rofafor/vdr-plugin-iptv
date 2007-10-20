@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: common.c,v 1.6 2007/10/20 23:16:28 ajhseppa Exp $
+ * $Id: common.c,v 1.7 2007/10/20 23:25:14 ajhseppa Exp $
  */
 
 #include <vdr/i18n.h>
@@ -55,7 +55,7 @@ int select_single_desc(int descriptor, const int usecs, const bool selectWrite)
   else
     retval = select(descriptor + 1, &fds, NULL, NULL, &tv);
   // Check if error
-  ERROR_IF(retval < 0, "select()", return retval);
+  ERROR_IF_RET(retval < 0, "select()", return retval);
   return retval;
 }
 
