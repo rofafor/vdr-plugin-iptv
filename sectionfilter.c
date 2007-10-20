@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.c,v 1.12 2007/10/20 20:27:59 ajhseppa Exp $
+ * $Id: sectionfilter.c,v 1.13 2007/10/20 20:43:22 ajhseppa Exp $
  */
 
 #include "sectionfilter.h"
@@ -98,7 +98,7 @@ int cIptvSectionFilter::dmxdev_section_callback(const uint8_t *buffer1, size_t b
                                                 enum dmx_success success)
 {
   // See if there is data in the fifo
-  int retval = selectSingleDesc(fifoDescriptor, 0, false);
+  int retval = select_single_desc(fifoDescriptor, 0, false);
   // There is no data in the fifo, more can be written
   if (!retval) {
 #ifdef DEBUG_PRINTF

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: common.c,v 1.4 2007/10/20 20:27:58 ajhseppa Exp $
+ * $Id: common.c,v 1.5 2007/10/20 20:43:22 ajhseppa Exp $
  */
 
 #include <vdr/i18n.h>
@@ -39,7 +39,7 @@ const char *id_pid(const u_short Pid)
   return "---";
 }
 
-int selectSingleDesc(int descriptor, const int usecs, const bool selectWrite)
+int select_single_desc(int descriptor, const int usecs, const bool selectWrite)
 {
   // Wait for data
   struct timeval tv;

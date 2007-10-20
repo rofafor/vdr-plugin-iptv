@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.c,v 1.13 2007/10/20 20:27:59 ajhseppa Exp $
+ * $Id: protocolext.c,v 1.14 2007/10/20 20:43:22 ajhseppa Exp $
  */
 
 #include <sys/wait.h>
@@ -196,7 +196,7 @@ int cIptvProtocolExt::Read(unsigned char* *BufferAddr)
   // Set argument point to read buffer
   *BufferAddr = readBuffer;
   // Wait for data
-  int retval = selectSingleDesc(socketDesc, 500000, false);
+  int retval = select_single_desc(socketDesc, 500000, false);
   // Check if error
   if (retval < 0)
      return retval;
