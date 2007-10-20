@@ -55,7 +55,11 @@ Setup menu:
 - TS buffer prefill ratio [%] = 0  Defines prefill ratio for transport
                                    stream ringbuffer before data is
                                    transferred to VDR.
-                                   The valid range: 0...40
+                                   Valid range: 0...40
+- EXT protocol base port = 4321    Defines base port used in EXT protocol.
+                                   The port range is defined by the number
+                                   of IPTV devices (max. 8).
+                                   Valid range: 0...65527
 - Use section filtering = 1        Defines whether section filtering shall
                                    be used.
                                    Valid range: 0...1
@@ -118,26 +122,30 @@ Configuration:
 
 External streaming:
 
-- Starting from version 0.0.2 IPTV plugin features support for external
-  streaming applications. What this means in short is that with proper helper
-  applications and configuration the plugin is able to display streams not 
-  originally in MPEG1/2 TS format.
+- Starting from version 0.0.2 IPTV plugin features a support for external
+  streaming applications. With proper helper applications and configuration
+  the IPTV plugin is now able to display not only MPEG1/2 transport streams
+  but also other formats like MP3 radio streams.
 
-- To add an externally received channel, add an EXT entry to channels.conf.
-  Specify a script name as the location parameter. This script is executed
-  from plugin configuration directory when VDR tunes to the specified
-  channel. The port parameter in channels.conf is passed to the script and
-  can be used to select for example between different URLs.
+- To watch an externally received channel add an EXT entry to channels.conf
+  and specify a script name and parameter. The specified script is executed
+  from plugin configuration directory when VDR tunes to the channel. The
+  specified script parameter is passed to the script and it can be used to
+  select for example between different URLs.
 
-- When EXT channel is opened IPTV plugin opens an UDP listening port on the
-  local host. The script executing is then responsible for supplying IPTV
-  plugin with MPEG2 TS data in UDP format to the opened port. The data will
-  then be processed by VDR as usual. The opened listening port can be
-  specified in plugin configuration.
+- When an EXT channel is opened the IPTV plugin opens an UDP listening port
+  on the localhost. The external script is responsible for supplying IPTV
+  plugin with MPEG2 TS data in UDP/RTP format to the listening port. The
+  data will be processed in VDR like a normal DVB broadcast. The listening
+  base port can be specified in the plugin configuration menu.
+
+- Each IPTV device is having a different listen port. The port number is
+  specified as a base port number plus IPTV device index minus one. Maximum
+  8 IPTV devices can be used.
 
 - IPTV plugin includes an example script which uses VLC media player for
-  receiving streams, transcoding and handing the result to IPTV plugin. IPTV
-  was tested with VLC version 0.8.6c
+  receiving streams, transcoding and handing the result to IPTV plugin. The
+  plugin was tested with VLC version 0.8.6c.
 
 Notes:
 
@@ -147,13 +155,6 @@ Notes:
 
 - The following section filters are recommended to be disabled:
   "NIT (0x40)", "SDT (0x42)", "TDT (0x70)"
-
-- The EXT protocol listens UDP packets from localhost. The default listen
-  port base number is 4321 and it can be configured via a commandline
-  switch. The port range is defined by the number of IPTV devices (max. 8).
-
-- The EXT protocol scripts must be located in the config directory of the
-  plugin.
 
 Acknowledgements:
 

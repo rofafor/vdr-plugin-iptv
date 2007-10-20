@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: config.c,v 1.17 2007/10/19 22:54:03 rahrenbe Exp $
+ * $Id: config.c,v 1.18 2007/10/20 17:26:46 rahrenbe Exp $
  */
 
 #include "config.h"
@@ -14,10 +14,10 @@ cIptvConfig::cIptvConfig(void)
 : readBufferTsCount(48),
   tsBufferSize(2),
   tsBufferPrefillRatio(0),
+  extProtocolBasePort(4321),
   useBytes(1),
   sectionFiltering(1),
-  sidScanning(1),
-  extListenPortBase(4321)
+  sidScanning(1)
 {
   for (unsigned int i = 0; i < sizeof(disabledFilters); ++i)
       disabledFilters[i] = -1;

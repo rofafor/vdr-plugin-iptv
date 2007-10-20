@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.5.7\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2007-10-19 23:10+0300\n"
+"POT-Creation-Date: 2007-10-20 19:43+0300\n"
 "PO-Revision-Date: 2007-08-12 23:22+0300\n"
 "Last-Translator: Rolf Ahrenberg\n"
 "Language-Team: <vdr@linuxtv.org>\n"
@@ -107,6 +107,9 @@ msgstr "TS-puskurin koko [MB]"
 
 msgid "TS buffer prefill ratio [%]"
 msgstr "TS-puskurin esitäyttöaste [%]"
+
+msgid "EXT protocol base port"
+msgstr "EXT-protokollan perusportti"
 
 msgid "Use section filtering"
 msgstr "Käytä sektioiden suodatusta"

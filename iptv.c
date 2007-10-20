@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.23 2007/10/19 22:54:03 rahrenbe Exp $
+ * $Id: iptv.c,v 1.24 2007/10/20 17:26:46 rahrenbe Exp $
  */
 
 #include <getopt.h>
@@ -66,8 +66,7 @@ const char *cPluginIptv::CommandLineHelp(void)
 {
   debug("cPluginIptv::CommandLineHelp()\n");
   // Return a string that describes all known command line options.
-  return "  -d <num>, --devices=<number> number of devices to be created\n"
-         "  -p <port>,--port=<port>      base port number for EXT protocol UDP streaming\n";
+  return "  -d <num>, --devices=<number> number of devices to be created\n";
 }
 
 bool cPluginIptv::ProcessArgs(int argc, char *argv[])
@@ -76,18 +75,14 @@ bool cPluginIptv::ProcessArgs(int argc, char *argv[])
   // Implement command line argument processing here if applicable.
   static const struct option long_options[] = {
        { "devices", required_argument, NULL, 'd' },
-       { "port",    required_argument, NULL, 'p' },
        { NULL }
      };
 
   int c;
-  while ((c = getopt_long(argc, argv, "d:p:", long_options, NULL)) != -1) {
+  while ((c = getopt_long(argc, argv, "d:", long_options, NULL)) != -1) {
         switch (c) {
           case 'd':
                deviceCount = atoi(optarg);
-               break;
-          case 'p':
-               IptvConfig.SetExtListenPortBase(atoi(optarg));
                break;
           default:
                return false;
@@ -183,6 +178,8 @@ bool cPluginIptv::SetupParse(const char *Name, const char *Value)
      IptvConfig.SetTsBufferSize(atoi(Value));
   else if (!strcasecmp(Name, "TsBufferPrefill"))
      IptvConfig.SetTsBufferPrefillRatio(atoi(Value));
+  else if (!strcasecmp(Name, "ExtProtocolBasePort"))
+     IptvConfig.SetExtProtocolBasePort(atoi(Value));
   else if (!strcasecmp(Name, "SectionFiltering"))
      IptvConfig.SetSectionFiltering(atoi(Value));
   else if (!strcasecmp(Name, "SidScanning"))

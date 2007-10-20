@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.c,v 1.11 2007/10/20 11:36:21 ajhseppa Exp $
+ * $Id: protocolext.c,v 1.12 2007/10/20 17:26:46 rahrenbe Exp $
  */
 
 #include <sys/wait.h>
@@ -22,7 +22,7 @@
 
 cIptvProtocolExt::cIptvProtocolExt()
 : pid(-1),
-  listenPort(IptvConfig.GetExtListenPortBase()),
+  listenPort(IptvConfig.GetExtProtocolBasePort()),
   scriptParameter(0),
   socketDesc(-1),
   readBufferLen(TS_SIZE * IptvConfig.GetReadBufferTsCount())
@@ -297,7 +297,7 @@ bool cIptvProtocolExt::Set(const char* Location, const int Parameter, const int 
         }
      scriptParameter = Parameter;
      // Update listen port
-     listenPort = IptvConfig.GetExtListenPortBase() + Index;
+     listenPort = IptvConfig.GetExtProtocolBasePort() + Index;
      }
   return true;
 }

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.39 2007/10/19 22:54:03 rahrenbe Exp $
+ * $Id: setup.c,v 1.40 2007/10/20 17:26:46 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -593,6 +593,7 @@ cIptvPluginSetup::cIptvPluginSetup()
   debug("cIptvPluginSetup::cIptvPluginSetup()\n");
   tsBufferSize = IptvConfig.GetTsBufferSize();
   tsBufferPrefill = IptvConfig.GetTsBufferPrefillRatio();
+  extProtocolBasePort = IptvConfig.GetExtProtocolBasePort();
   sectionFiltering = IptvConfig.GetSectionFiltering();
   sidScanning = IptvConfig.GetSidScanning();
   numDisabledFilters = IptvConfig.GetDisabledFiltersCount();
@@ -612,6 +613,7 @@ void cIptvPluginSetup::Setup(void)
   Clear();
   Add(new cMenuEditIntItem( tr("TS buffer size [MB]"),         &tsBufferSize, 1, 4));
   Add(new cMenuEditIntItem( tr("TS buffer prefill ratio [%]"), &tsBufferPrefill, 0, 40));
+  Add(new cMenuEditIntItem( tr("EXT protocol base port"),      &extProtocolBasePort, 0, 0xFFF7));
   Add(new cMenuEditBoolItem(tr("Use section filtering"),       &sectionFiltering));
   if (sectionFiltering) {
      Add(new cMenuEditBoolItem(tr("Scan Sid automatically"),   &sidScanning));
@@ -685,12 +687,14 @@ void cIptvPluginSetup::Store(void)
   // Store values into setup.conf
   SetupStore("TsBufferSize", tsBufferSize);
   SetupStore("TsBufferPrefill", tsBufferPrefill);
+  SetupStore("ExtProtocolBasePort", extProtocolBasePort);
   SetupStore("SectionFiltering", sectionFiltering);
   SetupStore("SidScanning", sidScanning);
   StoreFilters("DisabledFilters", disabledFilterIndexes);
   // Update global config
   IptvConfig.SetTsBufferSize(tsBufferSize);
   IptvConfig.SetTsBufferPrefillRatio(tsBufferPrefill);
+  IptvConfig.SetExtProtocolBasePort(extProtocolBasePort);
   IptvConfig.SetSectionFiltering(sectionFiltering);
   IptvConfig.SetSidScanning(sidScanning);
   for (int i = 0; i < SECTION_FILTER_TABLE_SIZE; ++i)
