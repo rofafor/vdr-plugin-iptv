@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.c,v 1.13 2007/10/19 22:18:55 rahrenbe Exp $
+ * $Id: protocoludp.c,v 1.14 2007/10/20 11:36:21 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -155,6 +155,11 @@ bool cIptvProtocolUdp::DropMulticast(void)
 int cIptvProtocolUdp::Read(unsigned char* *BufferAddr)
 {
   //debug("cIptvProtocolUdp::Read()\n");
+  // Error out if socket not initialized
+  if (socketDesc <= 0) {
+    error("ERROR: Invalid socket in %s\n", __FUNCTION__);
+    return -1;
+  }
   socklen_t addrlen = sizeof(sockAddr);
   // Set argument point to read buffer
   *BufferAddr = readBuffer;
@@ -171,14 +176,21 @@ int cIptvProtocolUdp::Read(unsigned char* *BufferAddr)
   if (retval < 0) {
      char tmp[64];
      error("ERROR: select(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-     return -1;
+     return retval;
      }
   // Check if data available
   else if (retval) {
+     int len = 0;
      // Read data from socket
-     int len = recvfrom(socketDesc, readBuffer, readBufferLen, MSG_DONTWAIT,
-                        (struct sockaddr *)&sockAddr, &addrlen);
-     if ((len > 0) && (readBuffer[0] == 0x47)) {
+     if (isActive)
+        len = recvfrom(socketDesc, readBuffer, readBufferLen, MSG_DONTWAIT,
+                       (struct sockaddr *)&sockAddr, &addrlen);
+     if (len < 0) {
+        char tmp[64];
+        error("ERROR: recvfrom(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+        return len;
+        }
+     else if ((len > 0) && (readBuffer[0] == 0x47)) {
         // Set argument point to read buffer
         *BufferAddr = &readBuffer[0];
         return len;

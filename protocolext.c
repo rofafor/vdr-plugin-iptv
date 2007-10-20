@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.c,v 1.10 2007/10/19 22:56:25 rahrenbe Exp $
+ * $Id: protocolext.c,v 1.11 2007/10/20 11:36:21 ajhseppa Exp $
  */
 
 #include <sys/wait.h>
@@ -187,6 +187,11 @@ void cIptvProtocolExt::TerminateCommand(void)
 int cIptvProtocolExt::Read(unsigned char* *BufferAddr)
 {
   //debug("cIptvProtocolExt::Read()\n");
+  // Error out if socket not initialized
+  if (socketDesc <= 0) {
+    error("ERROR: Invalid socket in %s\n", __FUNCTION__);
+    return -1;
+  }
   socklen_t addrlen = sizeof(sockAddr);
   // Set argument point to read buffer
   *BufferAddr = readBuffer;
@@ -203,14 +208,21 @@ int cIptvProtocolExt::Read(unsigned char* *BufferAddr)
   if (retval < 0) {
      char tmp[64];
      error("ERROR: select(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-     return -1;
+     return retval;
      }
   // Check if data available
   else if (retval) {
      // Read data from socket
-     int len = recvfrom(socketDesc, readBuffer, readBufferLen, MSG_DONTWAIT,
-                        (struct sockaddr *)&sockAddr, &addrlen);
-     if ((len > 0) && (readBuffer[0] == 0x47)) {
+     int len = 0;
+     if (isActive)
+        len = recvfrom(socketDesc, readBuffer, readBufferLen, MSG_DONTWAIT,
+                       (struct sockaddr *)&sockAddr, &addrlen);
+     if (len < 0) {
+        char tmp[64];
+        error("ERROR: recvfrom(): %s", strerror_r(errno, tmp, sizeof(tmp)));
+        return len;
+        }
+     else if ((len > 0) && (readBuffer[0] == 0x47)) {
         // Set argument point to read buffer
         *BufferAddr = &readBuffer[0];
         return len;
@@ -256,6 +268,7 @@ bool cIptvProtocolExt::Open(void)
   OpenSocket();
   // Execute the external command
   ExecuteCommand();
+  isActive = true;
   return true;
 }
 
@@ -266,6 +279,7 @@ bool cIptvProtocolExt::Close(void)
   CloseSocket();
   // Terminate the external script
   TerminateCommand();
+  isActive = false;
   return true;
 }
 
