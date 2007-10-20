@@ -139,9 +139,9 @@ External streaming:
   data will be processed in VDR like a normal DVB broadcast. The listening
   base port can be specified in the plugin configuration menu.
 
-- Each IPTV device is having a different listen port. The port number is
-  specified as a base port number plus IPTV device index minus one. Maximum
-  8 IPTV devices can be used.
+- Each IPTV device has different listen port. The port number is specified
+  as a base port number plus IPTV device index minus one. Maximum of 8 IPTV
+  devices can be used simultaneously.
 
 - IPTV plugin includes an example script which uses VLC media player for
   receiving streams, transcoding and handing the result to IPTV plugin. The
