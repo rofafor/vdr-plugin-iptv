@@ -5,6 +5,8 @@ VDR Plugin 'iptv' Revision History
 
 - Initial revision.
 
-2007-xx-xx: Version 0.0.2
+2007-10-20: Version 0.0.2
 
 - Added EXT protocol.
+- Fixes to shutdown logic.
+- Improved error checking in protocols.
