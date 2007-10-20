@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.15 2007/10/20 20:43:22 ajhseppa Exp $
+ * $Id: protocolhttp.c,v 1.16 2007/10/20 23:16:28 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -59,29 +59,12 @@ bool cIptvProtocolHttp::OpenSocket(const int Port)
      int yes = 1;     
      // Create socket
      socketDesc = socket(PF_INET, SOCK_STREAM, 0);
-     if (socketDesc < 0) {
-        char tmp[64];
-        error("ERROR: socket(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-        return false;
-        }
-
+     ERROR_IF(socketDesc < 0, "socket()", return false);
      // Make it use non-blocking I/O to avoid stuck read calls
-     if (fcntl(socketDesc, F_SETFL, O_NONBLOCK)) {
-        char tmp[64];
-        error("ERROR: fcntl(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-        CloseSocket();
-        return false;
-        }
-
+     ERROR_IF_FUNC(fcntl(socketDesc, F_SETFL, O_NONBLOCK), "fcntl()", CloseSocket(), return false);
      // Allow multiple sockets to use the same PORT number
-     if (setsockopt(socketDesc, SOL_SOCKET, SO_REUSEADDR, &yes,
-		    sizeof(yes)) < 0) {
-        char tmp[64];
-        error("ERROR: setsockopt(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-        CloseSocket();
-        return false;
-        }
-
+     ERROR_IF_FUNC(setsockopt(socketDesc, SOL_SOCKET, SO_REUSEADDR, &yes,
+                              sizeof(yes)) < 0, "setsockopt()", CloseSocket(), return false);
      // Create default socket
      memset(&sockAddr, '\0', sizeof(sockAddr));
      sockAddr.sin_family = AF_INET;
@@ -134,13 +117,7 @@ bool cIptvProtocolHttp::Connect(void)
      int err = connect(socketDesc, (struct sockaddr*)&sockAddr,
 		       sizeof(sockAddr));
      // Non-blocking sockets always report in-progress error when connected
-     if (err < 0 && errno != EINPROGRESS) {
-        char tmp[64];
-        error("ERROR: Connect(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-        CloseSocket();
-        return false;
-        }
-
+     ERROR_IF_FUNC(err < 0 && errno != EINPROGRESS, "connect()", CloseSocket(), return false);
      // Select on the socket completion, check if it is writable
      int retval = select_single_desc(socketDesc, 800000, true);
      if (retval < 0)
@@ -173,12 +150,7 @@ bool cIptvProtocolHttp::Connect(void)
 
      //debug("Sending http request: %s\n", buffer);
      err = send(socketDesc, buffer, strlen(buffer), 0);
-     if (err < 0) {
-        char tmp[64];
-        error("ERROR: send(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-        CloseSocket();
-        return false;
-        }
+     ERROR_IF_FUNC(err < 0, "send()", CloseSocket(), return false);
 
      // Now process headers
      if (!ProcessHeaders()) {

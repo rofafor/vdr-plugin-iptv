@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.c,v 1.16 2007/10/20 20:43:22 ajhseppa Exp $
+ * $Id: protocoludp.c,v 1.17 2007/10/20 23:16:28 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -56,38 +56,19 @@ bool cIptvProtocolUdp::OpenSocket(const int Port)
      int yes = 1;     
      // Create socket
      socketDesc = socket(PF_INET, SOCK_DGRAM, 0);
-     if (socketDesc < 0) {
-        char tmp[64];
-        error("ERROR: socket(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-        return false;
-        }
+     ERROR_IF(socketDesc < 0, "socket()", return false);
      // Make it use non-blocking I/O to avoid stuck read calls
-     if (fcntl(socketDesc, F_SETFL, O_NONBLOCK)) {
-        char tmp[64];
-        error("ERROR: fcntl(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-        CloseSocket();
-        return false;
-        }
+     ERROR_IF_FUNC(fcntl(socketDesc, F_SETFL, O_NONBLOCK), "fcntl()", CloseSocket(), return false);
      // Allow multiple sockets to use the same PORT number
-     if (setsockopt(socketDesc, SOL_SOCKET, SO_REUSEADDR, &yes,
-		    sizeof(yes)) < 0) {
-        char tmp[64];
-        error("ERROR: setsockopt(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-        CloseSocket();
-        return false;
-        }
+     ERROR_IF_FUNC(setsockopt(socketDesc, SOL_SOCKET, SO_REUSEADDR, &yes,
+                              sizeof(yes)) < 0, "setsockopt()", CloseSocket(), return false);
      // Bind socket
      memset(&sockAddr, '\0', sizeof(sockAddr));
      sockAddr.sin_family = AF_INET;
      sockAddr.sin_port = htons(Port);
      sockAddr.sin_addr.s_addr = htonl(INADDR_ANY);
      int err = bind(socketDesc, (struct sockaddr *)&sockAddr, sizeof(sockAddr));
-     if (err < 0) {
-        char tmp[64];
-        error("ERROR: bind(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-        CloseSocket();
-        return false;
-        }
+     ERROR_IF_FUNC(err < 0, "bind()", CloseSocket(), return false);
      // Update stream port
      streamPort = Port;
      }
@@ -117,11 +98,7 @@ bool cIptvProtocolUdp::JoinMulticast(void)
      mreq.imr_interface.s_addr = htonl(INADDR_ANY);
      int err = setsockopt(socketDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq,
                           sizeof(mreq));
-     if (err < 0) {
-        char tmp[64];
-        error("ERROR: setsockopt(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-        return false;
-        }
+     ERROR_IF(err < 0, "setsockopt()", return false);
      // Update multicasting flag
      isActive = true;
      }
@@ -141,11 +118,7 @@ bool cIptvProtocolUdp::DropMulticast(void)
       mreq.imr_interface.s_addr = htonl(INADDR_ANY);
       int err = setsockopt(socketDesc, IPPROTO_IP, IP_DROP_MEMBERSHIP, &mreq,
                            sizeof(mreq));
-      if (err < 0) {
-         char tmp[64];
-         error("ERROR: setsockopt(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-         return false;
-         }
+      ERROR_IF(err < 0, "setsockopt()", return false);
       // Update multicasting flag
       isActive = false;
      }
@@ -175,12 +148,8 @@ int cIptvProtocolUdp::Read(unsigned char* *BufferAddr)
      if (isActive)
         len = recvfrom(socketDesc, readBuffer, readBufferLen, MSG_DONTWAIT,
                        (struct sockaddr *)&sockAddr, &addrlen);
-     if (len < 0) {
-        char tmp[64];
-        error("ERROR: recvfrom(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-        return len;
-        }
-     else if ((len > 0) && (readBuffer[0] == 0x47)) {
+     ERROR_IF(len < 0, "recvfrom()", return len);
+     if ((len > 0) && (readBuffer[0] == 0x47)) {
         // Set argument point to read buffer
         *BufferAddr = &readBuffer[0];
         return len;

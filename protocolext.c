@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.c,v 1.14 2007/10/20 20:43:22 ajhseppa Exp $
+ * $Id: protocolext.c,v 1.15 2007/10/20 23:16:28 ajhseppa Exp $
  */
 
 #include <sys/wait.h>
@@ -55,38 +55,19 @@ bool cIptvProtocolExt::OpenSocket(void)
      int yes = 1;     
      // Create socket
      socketDesc = socket(PF_INET, SOCK_DGRAM, 0);
-     if (socketDesc < 0) {
-        char tmp[64];
-        error("ERROR: socket(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-        return false;
-        }
+     ERROR_IF(socketDesc < 0, "socket()", return false);
      // Make it use non-blocking I/O to avoid stuck read calls
-     if (fcntl(socketDesc, F_SETFL, O_NONBLOCK)) {
-        char tmp[64];
-        error("ERROR: fcntl(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-        CloseSocket();
-        return false;
-        }
+     ERROR_IF_FUNC(fcntl(socketDesc, F_SETFL, O_NONBLOCK), "fcntl()", CloseSocket(), return false);
      // Allow multiple sockets to use the same PORT number
-     if (setsockopt(socketDesc, SOL_SOCKET, SO_REUSEADDR, &yes,
-		    sizeof(yes)) < 0) {
-        char tmp[64];
-        error("ERROR: setsockopt(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-        CloseSocket();
-        return false;
-        }
+     ERROR_IF_FUNC(setsockopt(socketDesc, SOL_SOCKET, SO_REUSEADDR, &yes,
+			      sizeof(yes)) < 0, "setsockopt()", CloseSocket(), return false);
      // Bind socket
      memset(&sockAddr, '\0', sizeof(sockAddr));
      sockAddr.sin_family = AF_INET;
      sockAddr.sin_port = htons(listenPort);
      sockAddr.sin_addr.s_addr = htonl(INADDR_ANY);
      int err = bind(socketDesc, (struct sockaddr *)&sockAddr, sizeof(sockAddr));
-     if (err < 0) {
-        char tmp[64];
-        error("ERROR: bind(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-        CloseSocket();
-        return false;
-        }
+     ERROR_IF_FUNC(err < 0, "bind()", CloseSocket(), return false);
      }
   return true;
 }
@@ -110,11 +91,7 @@ void cIptvProtocolExt::ExecuteCommand(void)
      return;
      }
   // Let's fork
-  if ((pid = fork()) == -1) {
-     char tmp[64];
-     error("ERROR: fork(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-     return;
-     }
+  ERROR_IF((pid = fork()) == -1, "fork()", return);
   // Check if child process
   if (pid == 0) {
      // Close all dup'ed filedescriptors
@@ -148,11 +125,7 @@ void cIptvProtocolExt::TerminateCommand(void)
      bool waitOver = false;
      // signal and wait for termination
      int retval = kill(pid, SIGINT);
-     if (retval < 0) {
-        char tmp[64];
-        error("ERROR: kill(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-        waitOver = true;
-        }
+     ERROR_IF(retval < 0, "kill()", waitOver = true);
      while (!waitOver) {
        retval = 0;
        waitms += timeoutms;
@@ -164,11 +137,7 @@ void cIptvProtocolExt::TerminateCommand(void)
        memset(&waitStatus, '\0', sizeof(waitStatus));
        // Wait for child termination
        retval = waitid(P_PID, pid, &waitStatus, (WNOHANG | WEXITED));
-       if (retval < 0) {
-          char tmp[64];
-          error("ERROR: waitid(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-          waitOver = true;
-          }
+       ERROR_IF(retval < 0, "waitid()", waitOver = true);
        // These are the acceptable conditions under which child exit is
        // regarded as successful
        if (!retval && waitStatus.si_pid && (waitStatus.si_pid == pid) &&
@@ -207,12 +176,8 @@ int cIptvProtocolExt::Read(unsigned char* *BufferAddr)
      if (isActive)
         len = recvfrom(socketDesc, readBuffer, readBufferLen, MSG_DONTWAIT,
                        (struct sockaddr *)&sockAddr, &addrlen);
-     if (len < 0) {
-        char tmp[64];
-        error("ERROR: recvfrom(): %s", strerror_r(errno, tmp, sizeof(tmp)));
-        return len;
-        }
-     else if ((len > 0) && (readBuffer[0] == 0x47)) {
+     ERROR_IF(len < 0, "recvfrom()", return len);
+     if ((len > 0) && (readBuffer[0] == 0x47)) {
         // Set argument point to read buffer
         *BufferAddr = &readBuffer[0];
         return len;
