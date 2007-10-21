@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: socket.c,v 1.1 2007/10/21 13:31:21 ajhseppa Exp $
+ * $Id: socket.c,v 1.2 2007/10/21 15:49:54 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -19,7 +19,7 @@
 #include "socket.h"
 
 cIptvSocket::cIptvSocket()
-: socketPort(IptvConfig.GetExtProtocolBasePort()),
+: socketPort(0),
   socketDesc(-1),
   readBufferLen(TS_SIZE * IptvConfig.GetReadBufferTsCount()),
   isActive(false)
