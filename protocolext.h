@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.h,v 1.7 2007/10/21 13:31:21 ajhseppa Exp $
+ * $Id: protocolext.h,v 1.8 2007/10/21 17:32:43 ajhseppa Exp $
  */
 
 #ifndef __IPTV_PROTOCOLEXT_H
@@ -13,7 +13,7 @@
 #include "protocolif.h"
 #include "socket.h"
 
-class cIptvProtocolExt : public cIptvSocket, public cIptvProtocolIf {
+class cIptvProtocolExt : public cIptvUdpSocket, public cIptvProtocolIf {
 private:
   int pid;
   char* listenAddr;
@@ -27,7 +27,7 @@ private:
 public:
   cIptvProtocolExt();
   virtual ~cIptvProtocolExt();
-  virtual int Read(unsigned char* *BufferAddr);
+  int Read(unsigned char* *BufferAddr);
   virtual bool Set(const char* Location, const int Parameter, const int Index);
   virtual bool Open(void);
   virtual bool Close(void);

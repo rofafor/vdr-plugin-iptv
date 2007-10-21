@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.18 2007/10/21 13:31:21 ajhseppa Exp $
+ * $Id: protocolhttp.c,v 1.19 2007/10/21 17:32:43 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -204,32 +204,6 @@ bool cIptvProtocolHttp::ProcessHeaders(void)
   return true;
 }
 
-int cIptvProtocolHttp::Read(unsigned char* *BufferAddr)
-{
-  //debug("cIptvProtocolHttp::Read()\n");
-  // Error out if socket not initialized
-  if (socketDesc <= 0) {
-    error("ERROR: Invalid socket in %s\n", __FUNCTION__);
-    return -1;
-  }
-  socklen_t addrlen = sizeof(sockAddr);
-  // Set argument point to read buffer
-  *BufferAddr = readBuffer;
-  // Wait for data
-  int retval = select_single_desc(socketDesc, 500000, false);
-  // Check if error
-  if (retval < 0)
-     return retval;
-  // Check if data available
-  else if (retval) {
-     // Read data from socket
-     if (isActive)
-        return recvfrom(socketDesc, readBuffer, readBufferLen, MSG_DONTWAIT,
-                        (struct sockaddr *)&sockAddr, &addrlen);
-     }
-  return 0;
-}
-
 bool cIptvProtocolHttp::Open(void)
 {
   debug("cIptvProtocolHttp::Open()\n");
@@ -243,6 +217,11 @@ bool cIptvProtocolHttp::Close(void)
   // Disconnect the current stream
   Disconnect();
   return true;
+}
+
+int cIptvProtocolHttp::Read(unsigned char* *BufferAddr)
+{
+  return cIptvTcpSocket::Read(BufferAddr);
 }
 
 bool cIptvProtocolHttp::Set(const char* Location, const int Parameter, const int Index)

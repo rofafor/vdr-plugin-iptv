@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.c,v 1.18 2007/10/21 13:31:21 ajhseppa Exp $
+ * $Id: protocolext.c,v 1.19 2007/10/21 17:32:43 ajhseppa Exp $
  */
 
 #include <sys/wait.h>
@@ -110,11 +110,6 @@ void cIptvProtocolExt::TerminateScript(void)
      }
 }
 
-int cIptvProtocolExt::Read(unsigned char* *BufferAddr)
-{
-  return ReadUdpSocket(BufferAddr);
-}
-
 bool cIptvProtocolExt::Open(void)
 {
   debug("cIptvProtocolExt::Open()\n");
@@ -138,6 +133,11 @@ bool cIptvProtocolExt::Close(void)
   TerminateScript();
   isActive = false;
   return true;
+}
+
+int cIptvProtocolExt::Read(unsigned char* *BufferAddr)
+{
+  return cIptvUdpSocket::Read(BufferAddr);
 }
 
 bool cIptvProtocolExt::Set(const char* Location, const int Parameter, const int Index)

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: socket.c,v 1.2 2007/10/21 15:49:54 rahrenbe Exp $
+ * $Id: socket.c,v 1.3 2007/10/21 17:32:43 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -88,9 +88,20 @@ void cIptvSocket::CloseSocket(void)
      }
 }
 
-int cIptvSocket::ReadUdpSocket(unsigned char* *BufferAddr)
+// UDP socket class
+cIptvUdpSocket::cIptvUdpSocket()
 {
-  //debug("cIptvSocket::Read()\n");
+  debug("cIptvUdpSocket::cIptvUdpSocket()\n");
+}
+
+cIptvUdpSocket::~cIptvUdpSocket()
+{
+  debug("cIptvUdpSocket::~cIptvUdpSocket()\n");
+}
+
+int cIptvUdpSocket::Read(unsigned char* *BufferAddr)
+{
+  //debug("cIptvUdpSocket::Read()\n");
   // Error out if socket not initialized
   if (socketDesc <= 0) {
     error("ERROR: Invalid socket in %s\n", __FUNCTION__);
@@ -144,6 +155,43 @@ int cIptvSocket::ReadUdpSocket(unsigned char* *BufferAddr)
            return (len - headerlen);
            }
         }
+     }
+  return 0;
+}
+
+// TCP socket class
+cIptvTcpSocket::cIptvTcpSocket()
+{
+  debug("cIptvTcpSocket::cIptvTcpSocket()\n");
+}
+
+cIptvTcpSocket::~cIptvTcpSocket()
+{
+  debug("cIptvTcpSocket::~cIptvTcpSocket()\n");
+}
+
+int cIptvTcpSocket::Read(unsigned char* *BufferAddr)
+{
+  //debug("cIptvTcpSocket::Read()\n");
+  // Error out if socket not initialized
+  if (socketDesc <= 0) {
+    error("ERROR: Invalid socket in %s\n", __FUNCTION__);
+    return -1;
+  }
+  socklen_t addrlen = sizeof(sockAddr);
+  // Set argument point to read buffer
+  *BufferAddr = readBuffer;
+  // Wait for data
+  int retval = select_single_desc(socketDesc, 500000, false);
+  // Check if error
+  if (retval < 0)
+     return retval;
+  // Check if data available
+  else if (retval) {
+     // Read data from socket
+     if (isActive)
+        return recvfrom(socketDesc, readBuffer, readBufferLen, MSG_DONTWAIT,
+                        (struct sockaddr *)&sockAddr, &addrlen);
      }
   return 0;
 }

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.c,v 1.19 2007/10/21 13:31:21 ajhseppa Exp $
+ * $Id: protocoludp.c,v 1.20 2007/10/21 17:32:43 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -74,11 +74,6 @@ bool cIptvProtocolUdp::DropMulticast(void)
   return true;
 }
 
-int cIptvProtocolUdp::Read(unsigned char* *BufferAddr)
-{
-  return ReadUdpSocket(BufferAddr);
-}
-
 bool cIptvProtocolUdp::Open(void)
 {
   debug("cIptvProtocolUdp::Open()\n");
@@ -95,6 +90,11 @@ bool cIptvProtocolUdp::Close(void)
   // Close the socket
   CloseSocket();
   return true;
+}
+
+int cIptvProtocolUdp::Read(unsigned char* *BufferAddr)
+{
+  return cIptvUdpSocket::Read(BufferAddr);
 }
 
 bool cIptvProtocolUdp::Set(const char* Location, const int Parameter, const int Index)
