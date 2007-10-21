@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.c,v 1.16 2007/10/20 23:25:14 ajhseppa Exp $
+ * $Id: protocolext.c,v 1.17 2007/10/21 09:24:24 rahrenbe Exp $
  */
 
 #include <sys/wait.h>
@@ -82,12 +82,12 @@ void cIptvProtocolExt::CloseSocket(void)
      }
 }
 
-void cIptvProtocolExt::ExecuteCommand(void)
+void cIptvProtocolExt::ExecuteScript(void)
 {
-  debug("cIptvProtocolExt::ExecuteCommand()\n");
+  debug("cIptvProtocolExt::ExecuteScript()\n");
   // Check if already executing
   if (pid > 0) {
-     error("ERROR: Cannot execute command!");
+     error("ERROR: Cannot execute script!");
      return;
      }
   // Let's fork
@@ -101,9 +101,9 @@ void cIptvProtocolExt::ExecuteCommand(void)
      // Execute the external script
      char* cmd = NULL;
      asprintf(&cmd, "%s %d %d", scriptFile, scriptParameter, listenPort);
-     debug("cIptvProtocolExt::ExecuteCommand(child): %s\n", cmd);
+     debug("cIptvProtocolExt::ExecuteScript(child): %s\n", cmd);
      if (execl("/bin/sh", "sh", "-c", cmd, NULL) == -1) {
-        error("ERROR: Command failed: %s", cmd);
+        error("ERROR: Script executionfailed: %s", cmd);
         free(cmd);
         _exit(-1);
         }
@@ -111,13 +111,13 @@ void cIptvProtocolExt::ExecuteCommand(void)
      _exit(0);
      }
   else {
-     debug("cIptvProtocolExt::ExecuteCommand(): pid=%d\n", pid);
+     debug("cIptvProtocolExt::ExecuteScript(): pid=%d\n", pid);
      }
 }
 
-void cIptvProtocolExt::TerminateCommand(void)
+void cIptvProtocolExt::TerminateScript(void)
 {
-  debug("cIptvProtocolExt::TerminateCommand(): pid=%d\n", pid);
+  debug("cIptvProtocolExt::TerminateScript(): pid=%d\n", pid);
   if (pid > 0) {
      const unsigned int timeoutms = 100;
      unsigned int waitms = 0;
@@ -221,8 +221,8 @@ bool cIptvProtocolExt::Open(void)
       return false;
   // Create the listening socket
   OpenSocket();
-  // Execute the external command
-  ExecuteCommand();
+  // Execute the external script
+  ExecuteScript();
   isActive = true;
   return true;
 }
@@ -233,7 +233,7 @@ bool cIptvProtocolExt::Close(void)
   // Close the socket
   CloseSocket();
   // Terminate the external script
-  TerminateCommand();
+  TerminateScript();
   isActive = false;
   return true;
 }
