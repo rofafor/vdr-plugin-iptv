@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.17 2007/10/20 23:25:14 ajhseppa Exp $
+ * $Id: protocolhttp.c,v 1.18 2007/10/21 13:31:21 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -20,18 +20,10 @@
 #include "protocolhttp.h"
 
 cIptvProtocolHttp::cIptvProtocolHttp()
-: streamPort(3000),
-  socketDesc(-1),
-  readBufferLen(TS_SIZE * IptvConfig.GetReadBufferTsCount()),
-  isActive(false)
 {
   debug("cIptvProtocolHttp::cIptvProtocolHttp()\n");
   streamAddr = strdup("");
   streamPath = strdup("/");
-  // Allocate receive buffer
-  readBuffer = MALLOC(unsigned char, readBufferLen);
-  if (!readBuffer)
-     error("ERROR: MALLOC() failed in ProtocolHttp()");
 }
 
 cIptvProtocolHttp::~cIptvProtocolHttp()
@@ -42,49 +34,7 @@ cIptvProtocolHttp::~cIptvProtocolHttp()
   // Free allocated memory
   free(streamPath);
   free(streamAddr);
-  free(readBuffer);
-}
 
-bool cIptvProtocolHttp::OpenSocket(const int Port)
-{
-  debug("cIptvProtocolHttp::OpenSocket()\n");
-  // If socket is there already and it is bound to a different port, it must
-  // be closed first
-  if (Port != streamPort) {
-     debug("cIptvProtocolHttp::OpenSocket(): Socket tear-down\n");
-     CloseSocket();
-     }
-  // Bind to the socket if it is not active already
-  if (socketDesc < 0) {
-     int yes = 1;     
-     // Create socket
-     socketDesc = socket(PF_INET, SOCK_STREAM, 0);
-     ERROR_IF_RET(socketDesc < 0, "socket()", return false);
-     // Make it use non-blocking I/O to avoid stuck read calls
-     ERROR_IF_FUNC(fcntl(socketDesc, F_SETFL, O_NONBLOCK), "fcntl()", CloseSocket(), return false);
-     // Allow multiple sockets to use the same PORT number
-     ERROR_IF_FUNC(setsockopt(socketDesc, SOL_SOCKET, SO_REUSEADDR, &yes,
-                              sizeof(yes)) < 0, "setsockopt()", CloseSocket(), return false);
-     // Create default socket
-     memset(&sockAddr, '\0', sizeof(sockAddr));
-     sockAddr.sin_family = AF_INET;
-     sockAddr.sin_port = htons(Port);
-     sockAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-     // Update stream port
-     streamPort = Port;
-     }
-  return true;
-}
-
-void cIptvProtocolHttp::CloseSocket(void)
-{
-  debug("cIptvProtocolHttp::CloseSocket()\n");
-  // Check if socket exists
-  if (socketDesc >= 0) {
-     close(socketDesc);
-     socketDesc = -1;
-     }
 }
 
 bool cIptvProtocolHttp::Connect(void)
@@ -93,7 +43,7 @@ bool cIptvProtocolHttp::Connect(void)
   // Check that stream address is valid
   if (!isActive && !isempty(streamAddr) && !isempty(streamPath)) {
      // Ensure that socket is valid
-     OpenSocket(streamPort);
+     OpenSocket(socketPort, false);
 
      // First try only the IP address
      sockAddr.sin_addr.s_addr = inet_addr(streamAddr);
@@ -310,8 +260,8 @@ bool cIptvProtocolHttp::Set(const char* Location, const int Parameter, const int
        }
     else
        streamPath = strcpyrealloc(streamPath, "/");
-    streamPort = Parameter;
-    debug("http://%s:%d%s\n", streamAddr, streamPort, streamPath);
+    socketPort = Parameter;
+    debug("http://%s:%d%s\n", streamAddr, socketPort, streamPath);
     // Re-connect the socket
     Connect();
     }
@@ -321,5 +271,5 @@ bool cIptvProtocolHttp::Set(const char* Location, const int Parameter, const int
 cString cIptvProtocolHttp::GetInformation(void)
 {
   //debug("cIptvProtocolHttp::GetInformation()");
-  return cString::sprintf("http://%s:%d%s", streamAddr, streamPort, streamPath);
+  return cString::sprintf("http://%s:%d%s", streamAddr, socketPort, streamPath);
 }

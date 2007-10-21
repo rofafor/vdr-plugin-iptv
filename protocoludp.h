@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.h,v 1.10 2007/10/19 22:18:55 rahrenbe Exp $
+ * $Id: protocoludp.h,v 1.11 2007/10/21 13:31:21 ajhseppa Exp $
  */
 
 #ifndef __IPTV_PROTOCOLUDP_H
@@ -11,20 +11,13 @@
 
 #include <arpa/inet.h>
 #include "protocolif.h"
+#include "socket.h"
 
-class cIptvProtocolUdp : public cIptvProtocolIf {
+class cIptvProtocolUdp : public cIptvSocket, public cIptvProtocolIf {
 private:
   char* streamAddr;
-  int streamPort;
-  int socketDesc;
-  unsigned char* readBuffer;
-  unsigned int readBufferLen;
-  struct sockaddr_in sockAddr;
-  bool isActive;
 
 private:
-  bool OpenSocket(const int Port);
-  void CloseSocket(void);
   bool JoinMulticast(void);
   bool DropMulticast(void);
 

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.h,v 1.9 2007/10/19 22:18:55 rahrenbe Exp $
+ * $Id: protocolhttp.h,v 1.10 2007/10/21 13:31:21 ajhseppa Exp $
  */
 
 #ifndef __IPTV_PROTOCOLHTTP_H
@@ -11,21 +11,14 @@
 
 #include <arpa/inet.h>
 #include "protocolif.h"
+#include "socket.h"
 
-class cIptvProtocolHttp : public cIptvProtocolIf {
+class cIptvProtocolHttp : public cIptvSocket, public cIptvProtocolIf {
 private:
   char* streamAddr;
   char* streamPath;
-  int streamPort;
-  int socketDesc;
-  unsigned char* readBuffer;
-  unsigned int readBufferLen;
-  struct sockaddr_in sockAddr;
-  bool isActive;
 
 private:
-  bool OpenSocket(const int Port);
-  void CloseSocket(void);
   bool Connect(void);
   bool Disconnect(void);
   bool GetHeaderLine(char* dest, unsigned int destLen,

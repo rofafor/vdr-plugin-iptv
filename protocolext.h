@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.h,v 1.6 2007/10/21 09:24:24 rahrenbe Exp $
+ * $Id: protocolext.h,v 1.7 2007/10/21 13:31:21 ajhseppa Exp $
  */
 
 #ifndef __IPTV_PROTOCOLEXT_H
@@ -11,23 +11,16 @@
 
 #include <arpa/inet.h>
 #include "protocolif.h"
+#include "socket.h"
 
-class cIptvProtocolExt : public cIptvProtocolIf {
+class cIptvProtocolExt : public cIptvSocket, public cIptvProtocolIf {
 private:
   int pid;
   char* listenAddr;
-  int listenPort;
   char* scriptFile;
   int scriptParameter;
-  int socketDesc;
-  unsigned char* readBuffer;
-  unsigned int readBufferLen;
-  struct sockaddr_in sockAddr;
-  bool isActive;
 
 private:
-  bool OpenSocket(void);
-  void CloseSocket(void);
   void TerminateScript(void);
   void ExecuteScript(void);
 
