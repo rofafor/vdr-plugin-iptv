@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: socket.c,v 1.4 2007/10/21 19:32:15 ajhseppa Exp $
+ * $Id: socket.c,v 1.5 2007/10/21 19:46:03 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -116,7 +116,7 @@ int cIptvUdpSocket::Read(unsigned char* *BufferAddr)
   socklen_t addrlen = sizeof(sockAddr);
   // Set argument point to read buffer
   *BufferAddr = readBuffer;
-  // Wait for data
+  // Wait 500ms for data
   int retval = select_single_desc(socketDesc, 500000, false);
   // Check if error
   if (retval < 0)
@@ -193,7 +193,7 @@ int cIptvTcpSocket::Read(unsigned char* *BufferAddr)
   socklen_t addrlen = sizeof(sockAddr);
   // Set argument point to read buffer
   *BufferAddr = readBuffer;
-  // Wait for data
+  // Wait 500ms for data
   int retval = select_single_desc(socketDesc, 500000, false);
   // Check if error
   if (retval < 0)

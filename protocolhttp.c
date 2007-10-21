@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.20 2007/10/21 19:32:14 ajhseppa Exp $
+ * $Id: protocolhttp.c,v 1.21 2007/10/21 19:46:03 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -68,7 +68,7 @@ bool cIptvProtocolHttp::Connect(void)
 		       sizeof(sockAddr));
      // Non-blocking sockets always report in-progress error when connected
      ERROR_IF_FUNC(err < 0 && errno != EINPROGRESS, "connect()", CloseSocket(), return false);
-     // Select on the socket completion, check if it is writable
+     // Select with 800ms timeout on the socket completion, check if it is writable
      int retval = select_single_desc(socketDesc, 800000, true);
      if (retval < 0)
         return retval;
@@ -140,7 +140,7 @@ bool cIptvProtocolHttp::GetHeaderLine(char* dest, unsigned int destLen,
 
   while (!newline || !linefeed) {
     socklen_t addrlen = sizeof(sockAddr);
-    // Wait for data
+    // Wait 500ms for data
     int retval = select_single_desc(socketDesc, 500000, false);
     // Check if error
     if (retval < 0)
