@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: socket.c,v 1.3 2007/10/21 17:32:43 ajhseppa Exp $
+ * $Id: socket.c,v 1.4 2007/10/21 19:32:15 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -99,6 +99,12 @@ cIptvUdpSocket::~cIptvUdpSocket()
   debug("cIptvUdpSocket::~cIptvUdpSocket()\n");
 }
 
+bool cIptvUdpSocket::OpenSocket(const int Port)
+{
+  debug("cIptvUdpSocket::OpenSocket()\n");
+  return cIptvSocket::OpenSocket(Port, true);
+}
+
 int cIptvUdpSocket::Read(unsigned char* *BufferAddr)
 {
   //debug("cIptvUdpSocket::Read()\n");
@@ -168,6 +174,12 @@ cIptvTcpSocket::cIptvTcpSocket()
 cIptvTcpSocket::~cIptvTcpSocket()
 {
   debug("cIptvTcpSocket::~cIptvTcpSocket()\n");
+}
+
+bool cIptvTcpSocket::OpenSocket(const int Port)
+{
+  debug("cIptvTcpSocket::OpenSocket()\n");
+  return cIptvSocket::OpenSocket(Port, false);
 }
 
 int cIptvTcpSocket::Read(unsigned char* *BufferAddr)

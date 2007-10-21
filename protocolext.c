@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.c,v 1.19 2007/10/21 17:32:43 ajhseppa Exp $
+ * $Id: protocolext.c,v 1.20 2007/10/21 19:32:14 ajhseppa Exp $
  */
 
 #include <sys/wait.h>
@@ -117,7 +117,7 @@ bool cIptvProtocolExt::Open(void)
   if (!strlen(scriptFile))
       return false;
   // Create the listening socket
-  OpenSocket(socketPort, true);
+  OpenSocket(socketPort);
   // Execute the external script
   ExecuteScript();
   isActive = true;

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.c,v 1.20 2007/10/21 17:32:43 ajhseppa Exp $
+ * $Id: protocoludp.c,v 1.21 2007/10/21 19:32:15 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -40,7 +40,7 @@ bool cIptvProtocolUdp::JoinMulticast(void)
   // Check that stream address is valid
   if (!isActive && !isempty(streamAddr)) {
      // Ensure that socket is valid
-     OpenSocket(socketPort, true);
+     OpenSocket(socketPort);
      // Join a new multicast group
      struct ip_mreq mreq;
      mreq.imr_multiaddr.s_addr = inet_addr(streamAddr);
@@ -60,7 +60,7 @@ bool cIptvProtocolUdp::DropMulticast(void)
   // Check that stream address is valid
   if (isActive && !isempty(streamAddr)) {
       // Ensure that socket is valid
-      OpenSocket(socketPort, true);
+      OpenSocket(socketPort);
       // Drop the multicast group
       struct ip_mreq mreq;
       mreq.imr_multiaddr.s_addr = inet_addr(streamAddr);

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.19 2007/10/21 17:32:43 ajhseppa Exp $
+ * $Id: protocolhttp.c,v 1.20 2007/10/21 19:32:14 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -43,7 +43,7 @@ bool cIptvProtocolHttp::Connect(void)
   // Check that stream address is valid
   if (!isActive && !isempty(streamAddr) && !isempty(streamPath)) {
      // Ensure that socket is valid
-     OpenSocket(socketPort, false);
+     OpenSocket(socketPort);
 
      // First try only the IP address
      sockAddr.sin_addr.s_addr = inet_addr(streamAddr);
