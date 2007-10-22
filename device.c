@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.72 2007/10/20 20:35:06 rahrenbe Exp $
+ * $Id: device.c,v 1.73 2007/10/22 16:22:11 rahrenbe Exp $
  */
 
 #include "config.h"
@@ -45,16 +45,16 @@ cIptvDevice::cIptvDevice(unsigned int Index)
 cIptvDevice::~cIptvDevice()
 {
   debug("cIptvDevice::~cIptvDevice(%d)\n", deviceIndex);
-  DELETENULL(pIptvStreamer);
-  DELETENULL(pUdpProtocol);
-  DELETENULL(pHttpProtocol);
-  DELETENULL(pFileProtocol);
-  DELETENULL(pExtProtocol);
-  DELETENULL(tsBuffer);
+  DELETE_POINTER(pIptvStreamer, cIptvStreamer);
+  DELETE_POINTER(pUdpProtocol, cIptvProtocolUdp);
+  DELETE_POINTER(pHttpProtocol, cIptvProtocolHttp);
+  DELETE_POINTER(pFileProtocol, cIptvProtocolFile);
+  DELETE_POINTER(pExtProtocol, cIptvProtocolExt);
+  DELETE_POINTER(tsBuffer, cRingBufferLinear);
   // Detach and destroy sid filter
   if (pSidScanner) {
      Detach(pSidScanner);
-     DELETENULL(pSidScanner);
+     DELETE_POINTER(pSidScanner, cSidScanner);
      }
   // Destroy all filters
   for (int i = 0; i < eMaxSecFilterCount; ++i)
@@ -103,7 +103,7 @@ cString cIptvDevice::GetGeneralInformation(void)
                           deviceIndex, CardIndex(),
                           pIptvStreamer ? *pIptvStreamer->GetInformation() : "",
                           pIptvStreamer ? *pIptvStreamer->GetStatistic() : "",
-			  *cIptvBufferStatistics::GetStatistic(),
+                          *cIptvBufferStatistics::GetStatistic(),
                           *Channels.GetByNumber(cDevice::CurrentChannel())->ToText());
 }
 

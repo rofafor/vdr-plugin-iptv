@@ -11,3 +11,7 @@ VDR Plugin 'iptv' Revision History
 - Added Spids to channel editor.
 - Fixed shutdown logic.
 - Improved error checking in protocols.
+
+2007-xx-xx: Version 0.0.3
+
+- Fixed shutdown crash.
