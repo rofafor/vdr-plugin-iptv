@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.73 2007/10/22 16:22:11 rahrenbe Exp $
+ * $Id: device.c,v 1.74 2007/10/22 19:32:19 ajhseppa Exp $
  */
 
 #include "config.h"
@@ -45,16 +45,16 @@ cIptvDevice::cIptvDevice(unsigned int Index)
 cIptvDevice::~cIptvDevice()
 {
   debug("cIptvDevice::~cIptvDevice(%d)\n", deviceIndex);
-  DELETE_POINTER(pIptvStreamer, cIptvStreamer);
-  DELETE_POINTER(pUdpProtocol, cIptvProtocolUdp);
-  DELETE_POINTER(pHttpProtocol, cIptvProtocolHttp);
-  DELETE_POINTER(pFileProtocol, cIptvProtocolFile);
-  DELETE_POINTER(pExtProtocol, cIptvProtocolExt);
-  DELETE_POINTER(tsBuffer, cRingBufferLinear);
+  DELETE_POINTER(pIptvStreamer);
+  DELETE_POINTER(pUdpProtocol);
+  DELETE_POINTER(pHttpProtocol);
+  DELETE_POINTER(pFileProtocol);
+  DELETE_POINTER(pExtProtocol);
+  DELETE_POINTER(tsBuffer);
   // Detach and destroy sid filter
   if (pSidScanner) {
      Detach(pSidScanner);
-     DELETE_POINTER(pSidScanner, cSidScanner);
+     DELETE_POINTER(pSidScanner);
      }
   // Destroy all filters
   for (int i = 0; i < eMaxSecFilterCount; ++i)

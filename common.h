@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: common.h,v 1.14 2007/10/22 16:22:11 rahrenbe Exp $
+ * $Id: common.h,v 1.15 2007/10/22 19:32:19 ajhseppa Exp $
  */
 
 #ifndef __IPTV_COMMON_H
@@ -44,13 +44,13 @@
 
 #define ERROR_IF(exp, errstr) ERROR_IF_FUNC(exp, errstr, , );
 
-#define DELETE_POINTER(ptr, type) \
-  do {                         \
-     if (ptr) {                \
-        type *tmp = ptr;       \
-        ptr = NULL;            \
-        delete(tmp);           \
-        }                      \
+#define DELETE_POINTER(ptr)       \
+  do {                            \
+     if (ptr) {                   \
+        typeof(*ptr) *tmp = ptr;  \
+        ptr = NULL;               \
+        delete(tmp);              \
+        }                         \
   } while (0)
 
 uint16_t ts_pid(const uint8_t *buf);
