@@ -17,8 +17,7 @@ See the file COPYING for more information.
 
 Requirements:
 
-An IPTV patched VDR-1.5.10 (or later) setup and DVB compatible MPEG1/2
-network video streams.
+An IPTV patched VDR setup and DVB compatible MPEG1/2 network video streams.
 
 Description:
 
@@ -45,7 +44,7 @@ cd /put/your/path/here/VDR/PLUGINS/src
 tar -xzf /put/your/path/here/vdr-iptv-X.Y.Z.tgz
 ln -s iptv-X.Y.Z iptv
 cd /put/your/path/here/VDR
-patch -p1 < PLUGINS/src/iptv/patches/vdr-X.Y.Z-pluginparam.patch
+patch -p1 < PLUGINS/src/iptv/patches/vdr-X.Y.Z-*.patch
 cp sources.conf /path/to/vdrconf/
 cp -R PLUGINS/src/iptv/iptv /path/to/vdrconf/plugins/
 make

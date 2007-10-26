@@ -1,0 +1,80 @@
+diff -Nru vdr-1.4.7-vanilla/config.h vdr-1.4.7-closefilter/config.h
+--- vdr-1.4.7-vanilla/config.h	2007-10-27 01:08:39.000000000 +0300
++++ vdr-1.4.7-closefilter/config.h	2007-10-27 01:39:43.000000000 +0300
+@@ -29,6 +29,8 @@
+ #define APIVERSION  "1.4.5"
+ #define APIVERSNUM   10405  // Version * 10000 + Major * 100 + Minor
+ 
++#define CLOSEFILTERPATCHVERSNUM 1
++
+ // When loading plugins, VDR searches them by their APIVERSION, which
+ // may be smaller than VDRVERSION in case there have been no changes to
+ // VDR header files since the last APIVERSION. This allows compiled
+diff -Nru vdr-1.4.7-vanilla/device.c vdr-1.4.7-closefilter/device.c
+--- vdr-1.4.7-vanilla/device.c	2007-10-27 01:08:39.000000000 +0300
++++ vdr-1.4.7-closefilter/device.c	2007-10-27 01:37:34.000000000 +0300
+@@ -509,6 +509,11 @@
+   return -1;
+ }
+ 
++void cDevice::CloseFilter(int Handle)
++{
++  close(Handle);
++}
++
+ void cDevice::AttachFilter(cFilter *Filter)
+ {
+   if (sectionHandler)
+diff -Nru vdr-1.4.7-vanilla/device.h vdr-1.4.7-closefilter/device.h
+--- vdr-1.4.7-vanilla/device.h	2007-10-27 01:08:39.000000000 +0300
++++ vdr-1.4.7-closefilter/device.h	2007-10-27 01:37:19.000000000 +0300
+@@ -302,6 +302,11 @@
+        ///< Opens a file handle for the given filter data.
+        ///< A derived device that provides section data must
+        ///< implement this function.
++  virtual void CloseFilter(int Handle);
++       ///< Closes a file handle that has previously been opened
++       ///< by OpenFilter(). If this is as simple as calling close(Handle),
++       ///< a derived class need not implement this function, because this
++       ///< is done by the default implementation.
+   void AttachFilter(cFilter *Filter);
+        ///< Attaches the given filter to this device.
+   void Detach(cFilter *Filter);
+diff -Nru vdr-1.4.7-vanilla/dvbdevice.c vdr-1.4.7-closefilter/dvbdevice.c
+--- vdr-1.4.7-vanilla/dvbdevice.c	2007-10-27 01:08:39.000000000 +0300
++++ vdr-1.4.7-closefilter/dvbdevice.c	2007-10-27 01:37:50.000000000 +0300
+@@ -726,6 +726,11 @@
+   return -1;
+ }
+ 
++void cDvbDevice::CloseFilter(int Handle)
++{
++  close(Handle);
++}
++
+ void cDvbDevice::TurnOffLiveMode(bool LiveView)
+ {
+   if (LiveView) {
+diff -Nru vdr-1.4.7-vanilla/dvbdevice.h vdr-1.4.7-closefilter/dvbdevice.h
+--- vdr-1.4.7-vanilla/dvbdevice.h	2007-10-27 01:08:39.000000000 +0300
++++ vdr-1.4.7-closefilter/dvbdevice.h	2007-10-27 01:37:59.000000000 +0300
+@@ -79,6 +79,7 @@
+ 
+ protected:
+   virtual int OpenFilter(u_short Pid, u_char Tid, u_char Mask);
++  virtual void CloseFilter(int Handle);
+ 
+ // Image Grab facilities
+ 
+diff -Nru vdr-1.4.7-vanilla/sections.c vdr-1.4.7-closefilter/sections.c
+--- vdr-1.4.7-vanilla/sections.c	2007-10-27 01:08:39.000000000 +0300
++++ vdr-1.4.7-closefilter/sections.c	2007-10-27 01:34:06.000000000 +0300
+@@ -105,7 +105,7 @@
+   for (fh = filterHandles.First(); fh; fh = filterHandles.Next(fh)) {
+       if (fh->filterData.Is(FilterData->pid, FilterData->tid, FilterData->mask)) {
+          if (--fh->used <= 0) {
+-            close(fh->handle);
++            device->CloseFilter(fh->handle);
+             filterHandles.Del(fh);
+             break;
+             }

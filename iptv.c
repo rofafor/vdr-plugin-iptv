@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.25 2007/10/22 16:22:11 rahrenbe Exp $
+ * $Id: iptv.c,v 1.26 2007/10/26 23:13:24 rahrenbe Exp $
  */
 
 #include <getopt.h>
@@ -13,8 +13,12 @@
 #include "setup.h"
 #include "device.h"
 
-#if defined(APIVERSNUM) && APIVERSNUM < 10510
-#error "VDR-1.5.10 API version or greater is required!"
+#ifndef PLUGINPARAMPATCHVERSNUM
+#error "You must apply the pluginparam patch for VDR!"
+#endif
+
+#if defined(APIVERSNUM) && APIVERSNUM < 10510 && !defined(CLOSEFILTERPATCHVERSNUM)
+#error "You must apply the closefilter patch for VDR!"
 #endif
 
 static const char *VERSION        = "0.0.3";

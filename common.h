@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: common.h,v 1.15 2007/10/22 19:32:19 ajhseppa Exp $
+ * $Id: common.h,v 1.16 2007/10/26 23:13:24 rahrenbe Exp $
  */
 
 #ifndef __IPTV_COMMON_H
@@ -17,6 +17,14 @@
 #else
 #define debug(x...) ;
 #define error(x...) esyslog("IPTV: " x);
+#endif
+
+#ifndef trNOOP
+#define trNOOP(s) (s)
+#endif
+
+#ifndef trVDR
+#define trVDR(s) tr(s)
 #endif
 
 #define IPTV_DEVICE_INFO_ALL            0

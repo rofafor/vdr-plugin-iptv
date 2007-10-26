@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.41 2007/10/20 20:35:06 rahrenbe Exp $
+ * $Id: setup.c,v 1.42 2007/10/26 23:13:24 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -154,7 +154,6 @@ void cIptvMenuEditChannel::SetChannelData(cChannel *Channel)
      cString param;
      char alangs[MAXAPIDS][MAXLANGCODE2] = { "" };
      char dlangs[MAXDPIDS][MAXLANGCODE2] = { "" };
-     char slangs[MAXSPIDS][MAXLANGCODE2] = { "" };
      switch (data.protocol) {
        case eProtocolEXT:
             param = cString::sprintf("IPTV|EXT|%s|%d", data.location, data.parameter);
@@ -170,7 +169,12 @@ void cIptvMenuEditChannel::SetChannelData(cChannel *Channel)
             param = cString::sprintf("IPTV|UDP|%s|%d", data.location, data.parameter);
             break;
        }
+#if defined(APIVERSNUM) && APIVERSNUM < 10510
+     Channel->SetPids(data.vpid, data.ppid, data.apid, alangs, data.dpid, dlangs, data.tpid);
+#else
+     char slangs[MAXSPIDS][MAXLANGCODE2] = { "" };
      Channel->SetPids(data.vpid, data.ppid, data.apid, alangs, data.dpid, dlangs, data.spid, slangs, data.tpid);
+#endif
      Channel->SetCaIds(data.caids);
      Channel->SetId(data.nid, data.tid, data.sid, data.rid);
      Channel->SetName(data.name, "", "IPTV");
@@ -517,8 +521,9 @@ public:
 };
 
 cIptvMenuInfo::cIptvMenuInfo()
-:cOsdMenu(tr("IPTV Information")), text(""), timeout(INFO_TIMEOUT_MS), page(IPTV_DEVICE_INFO_GENERAL)
+:cOsdMenu(tr("IPTV Information")), text(""), timeout(), page(IPTV_DEVICE_INFO_GENERAL)
 {
+  timeout.Set(INFO_TIMEOUT_MS);
   UpdateInfo();
   SetHelp(tr("General"), tr("Pids"), tr("Filters"), tr("Bits/bytes"));
 }
