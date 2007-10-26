@@ -3,10 +3,9 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: common.c,v 1.7 2007/10/20 23:25:14 ajhseppa Exp $
+ * $Id: common.c,v 1.8 2007/10/26 23:18:50 rahrenbe Exp $
  */
 
-#include <vdr/i18n.h>
 #include <vdr/tools.h>
 #include "common.h"
 

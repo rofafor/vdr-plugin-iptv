@@ -3,13 +3,14 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: common.h,v 1.16 2007/10/26 23:13:24 rahrenbe Exp $
+ * $Id: common.h,v 1.17 2007/10/26 23:18:49 rahrenbe Exp $
  */
 
 #ifndef __IPTV_COMMON_H
 #define __IPTV_COMMON_H
 
 #include <vdr/tools.h>
+#include <vdr/i18n.h>
 
 #ifdef DEBUG
 #define debug(x...) dsyslog("IPTV: " x);
