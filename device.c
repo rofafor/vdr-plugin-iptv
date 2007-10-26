@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.75 2007/10/26 22:07:10 rahrenbe Exp $
+ * $Id: device.c,v 1.76 2007/10/26 23:48:30 rahrenbe Exp $
  */
 
 #include "config.h"
@@ -384,11 +384,9 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
             }
         return true;
         }
-     else
-        cCondWait::SleepMs(100); // to reduce cpu load
      }
-  else
-     cCondWait::SleepMs(100); // and avoid busy loop
+  // Reduce cpu load by preventing busylooping
+  cCondWait::SleepMs(100);
   Data = NULL;
   return true;
 }
