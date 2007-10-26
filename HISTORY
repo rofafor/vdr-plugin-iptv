@@ -15,3 +15,5 @@ VDR Plugin 'iptv' Revision History
 2007-xx-xx: Version 0.0.3
 
 - Fixed shutdown crash.
+- Added some minor tweaks.
+- RTP payload now restricted to TS only.

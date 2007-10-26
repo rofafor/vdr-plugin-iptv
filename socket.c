@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: socket.c,v 1.5 2007/10/21 19:46:03 rahrenbe Exp $
+ * $Id: socket.c,v 1.6 2007/10/26 22:07:10 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -142,8 +142,8 @@ int cIptvUdpSocket::Read(unsigned char* *BufferAddr)
         unsigned int x = (readBuffer[0] >> 4) & 0x01;
         // cscr count
         unsigned int cc = readBuffer[0] & 0x0F;
-        // payload type
-        unsigned int pt = readBuffer[1] & 0x7F;
+        // payload type: MPEG2 TS = 33
+        //unsigned int pt = readBuffer[1] & 0x7F;
         // header lenght
         unsigned int headerlen = (3 + cc) * sizeof(uint32_t);
         // check if extension
@@ -153,9 +153,8 @@ int cIptvUdpSocket::Read(unsigned char* *BufferAddr)
            // update header length
            headerlen += (ehl + 1) * sizeof(uint32_t);
            }
-        // Check that rtp is version 2, payload type is MPEG2 TS
-        // and payload contains multiple of TS packet data
-        if ((v == 2) && (pt == 33) && (((len - headerlen) % TS_SIZE) == 0)) {
+        // Check that rtp is version 2 and payload contains multiple of TS packet data
+        if ((v == 2) && (((len - headerlen) % TS_SIZE) == 0) && (readBuffer[headerlen] == 0x47)) {
            // Set argument point to payload in read buffer
            *BufferAddr = &readBuffer[headerlen];
            return (len - headerlen);
