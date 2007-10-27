@@ -44,7 +44,10 @@ cd /put/your/path/here/VDR/PLUGINS/src
 tar -xzf /put/your/path/here/vdr-iptv-X.Y.Z.tgz
 ln -s iptv-X.Y.Z iptv
 cd /put/your/path/here/VDR
-patch -p1 < PLUGINS/src/iptv/patches/vdr-X.Y.Z-*.patch
+# Note: pluginparam patch is required for every vdr
+patch -p1 < PLUGINS/src/iptv/patches/vdr-X.Y.Z-pluginparam.patch
+# Note: closefilter patch is required only for vdr-1.5.9 or earlier
+patch -p1 < PLUGINS/src/iptv/patches/vdr-X.Y.Z-closefilter.patch
 cp sources.conf /path/to/vdrconf/
 cp -R PLUGINS/src/iptv/iptv /path/to/vdrconf/plugins/
 make
