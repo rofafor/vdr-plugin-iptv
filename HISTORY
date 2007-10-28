@@ -17,4 +17,5 @@ VDR Plugin 'iptv' Revision History
 - Fixed shutdown crash.
 - Added some minor tweaks.
 - RTP payload now restricted to TS only.
-- Added preliminary support for vdr-1.4.7.
+- Added preliminary support for vdr-1.4.7
+  without localization.
