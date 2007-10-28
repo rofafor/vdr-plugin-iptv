@@ -1,7 +1,7 @@
 #
 # Makefile for a Video Disk Recorder plugin
 #
-# $Id: Makefile,v 1.20 2007/10/21 13:31:21 ajhseppa Exp $
+# $Id: Makefile,v 1.21 2007/10/28 16:22:44 rahrenbe Exp $
 
 # Debugging on/off 
 #IPTV_DEBUG = 1
@@ -40,6 +40,9 @@ TMPDIR = /tmp
 
 APIVERSION = $(shell sed -ne '/define APIVERSION/s/^.*"\(.*\)".*$$/\1/p' $(VDRDIR)/config.h)
 
+### Test whether VDR has locale support
+VDRLOCALE = $(shell grep '^LOCALEDIR' $(VDRDIR)/Makefile)
+
 ### The name of the distribution archive:
 
 ARCHIVE = $(PLUGIN)-$(VERSION)
@@ -59,7 +62,7 @@ endif
 
 OBJS = $(PLUGIN).o config.o setup.o device.o streamer.o protocoludp.o \
 	protocolhttp.o protocolfile.o protocolext.o sectionfilter.o \
-	sidscanner.o statistics.o common.o socket.o
+	sidscanner.o statistics.o common.o socket.o i18n.o
 
 ### The main target:
 
@@ -75,7 +78,7 @@ all: libvdr-$(PLUGIN).so i18n
 MAKEDEP = $(CXX) -MM -MG
 DEPFILE = .dependencies
 $(DEPFILE): Makefile
-	@$(MAKEDEP) $(DEFINES) $(INCLUDES) $(OBJS:%.o=%.c) > $@
+	@$(MAKEDEP) $(DEFINES) $(INCLUDES) $(subst i18n.c,,$(OBJS:%.o=%.c)) > $@
 
 -include $(DEPFILE)
 
@@ -87,12 +90,21 @@ I18Npo    = $(wildcard $(PODIR)/*.po)
 I18Nmo    = $(addsuffix .mo, $(foreach file, $(I18Npo), $(basename $(file))))
 I18Ndirs  = $(notdir $(foreach file, $(I18Npo), $(basename $(file))))
 I18Npot   = $(PODIR)/$(PLUGIN).pot
+ifeq ($(strip $(APIVERSION)),1.5.7)
+I18Nvdrmo = $(PLUGIN).mo
+else
+I18Nvdrmo = vdr-$(PLUGIN).mo
+endif
+
+### Do gettext based i18n stuff
+
+ifneq ($(strip $(VDRLOCALE)),)
 
 %.mo: %.po
 	msgfmt -c -o $@ $<
 
 $(I18Npot): $(wildcard *.c)
-	xgettext -C -cTRANSLATORS --no-wrap --no-location -k -ktr -ktrNOOP --msgid-bugs-address='Rolf Ahrenberg' -o $@ $(wildcard *.c)
+	xgettext -C -cTRANSLATORS --no-wrap --no-location -k -ktr -ktrNOOP --msgid-bugs-address='Rolf Ahrenberg' -o $@ $(subst i18n.c,,$(wildcard *.c))
 
 $(I18Npo): $(I18Npot)
 	msgmerge -U --no-wrap --no-location --backup=none -q $@ $<
@@ -101,8 +113,24 @@ i18n: $(I18Npot) $(I18Nmo)
 	@mkdir -p $(LOCALEDIR)
 	for i in $(I18Ndirs); do\
 	    mkdir -p $(LOCALEDIR)/$$i/LC_MESSAGES;\
-	    cp $(PODIR)/$$i.mo $(LOCALEDIR)/$$i/LC_MESSAGES/vdr-$(PLUGIN).mo;\
+	    cp $(PODIR)/$$i.mo $(LOCALEDIR)/$$i/LC_MESSAGES/$(I18Nvdrmo);\
 	    done
+
+i18n.c: i18n-template.c 
+	@cp i18n-template.c i18n.c
+
+### Do i18n.c based i18n stuff
+
+else
+
+i18n:
+	@### nothing to do
+
+#i18n compatibility generator:
+i18n.c: i18n-template.c po2i18n.pl $(I18Npo)
+	./po2i18n.pl < i18n-template.c > i18n.c
+
+endif 
 
 ### Targets:
 
@@ -122,4 +150,4 @@ dist: clean
 	@echo Distribution package created as $(PACKAGE).tgz
 
 clean:
-	@-rm -f $(OBJS) $(DEPFILE) *.so *.tgz core* *~ $(PODIR)/*.mo $(PODIR)/*.pot
+	@-rm -f $(OBJS) $(DEPFILE) i18n.c *.so *.tgz core* *~ $(PODIR)/*.mo $(PODIR)/*.pot

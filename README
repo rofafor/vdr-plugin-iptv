@@ -161,3 +161,5 @@ Notes:
 Acknowledgements:
 
 - The IPTV section filtering code is derived from Linux kernel.
+
+- Udo Richter's po2i18n package is used to support VDR's old i18n system.

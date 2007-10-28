@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: config.h,v 1.16 2007/10/20 17:26:46 rahrenbe Exp $
+ * $Id: config.h,v 1.17 2007/10/28 16:22:44 rahrenbe Exp $
  */
 
 #ifndef __IPTV_CONFIG_H
@@ -11,7 +11,6 @@
 
 #include <vdr/menuitems.h>
 #include "common.h"
-#include "config.h"
 
 class cIptvConfig
 {
