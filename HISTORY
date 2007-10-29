@@ -18,3 +18,8 @@ VDR Plugin 'iptv' Revision History
 - Added some minor tweaks.
 - RTP payload now restricted to TS only.
 - Added preliminary support for vdr-1.4.7.
+
+2007-xx-xx: Version 0.0.4
+
+- Added German translation (Thanks to Tobias Grimm)
+
