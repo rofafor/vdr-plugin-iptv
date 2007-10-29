@@ -1,0 +1,127 @@
+# German translations for iptv package.
+# Copyright (C) 2007 THE iptv'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the iptv package.
+# Tobias <vdr@e-tobi.net>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: iptv 0.0.2.x\n"
+"Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
+"POT-Creation-Date: 2007-10-27 12:49+0200\n"
+"PO-Revision-Date: 2007-10-29 21:19+0100\n"
+"Last-Translator: Tobias Grimm <tg@e-tobi.net>\n"
+"Language-Team: German\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "PAT (0x00)"
+msgstr "PAT (0x00)"
+
+msgid "NIT (0x40)"
+msgstr "NIT (0x40)"
+
+msgid "SDT (0x42)"
+msgstr "SDT (0x42)"
+
+msgid "EIT (0x4E/0x4F)"
+msgstr "EIT (0x4E/0x4F)"
+
+msgid "EIT (0x5X)"
+msgstr "EIT (0x5X)"
+
+msgid "EIT (0x6X)"
+msgstr "EIT (0x6X)"
+
+msgid "TDT (0x70)"
+msgstr "TDT (0x70)"
+
+msgid "Experience the IPTV"
+msgstr "Erlebe IPTV"
+
+msgid "UDP"
+msgstr "UDP"
+
+msgid "HTTP"
+msgstr "HTTP"
+
+msgid "FILE"
+msgstr "DATEI"
+
+msgid "EXT"
+msgstr "EXT"
+
+msgid "Protocol"
+msgstr "Protokoll"
+
+msgid "Delay (ms)"
+msgstr "Verzögerung (ms)"
+
+msgid "Script"
+msgstr "Skript"
+
+msgid "Parameter"
+msgstr "Parameter"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Port"
+msgstr "Port"
+
+msgid "Nid"
+msgstr "Nid"
+
+msgid "Tid"
+msgstr "Tid"
+
+msgid "Rid"
+msgstr "Rid"
+
+msgid "Cannot find unique channel settings!"
+msgstr "Kann eindeutige Kanaleinstellungen nicht finden!"
+
+msgid "IPTV Channels"
+msgstr "IPTV Kanäle"
+
+msgid "IPTV Information"
+msgstr "IPTV Informationen"
+
+msgid "General"
+msgstr "Allgemein"
+
+msgid "Pids"
+msgstr "Pids"
+
+msgid "Filters"
+msgstr "Filter"
+
+msgid "Bits/bytes"
+msgstr "Bits/Bytes"
+
+msgid "IPTV information not available!"
+msgstr "IPTV Informationen nicht verfügbar!"
+
+msgid "TS buffer size [MB]"
+msgstr "TS Puffergröße [MB]"
+
+msgid "TS buffer prefill ratio [%]"
+msgstr "TS Puffer-Preload [%]"
+
+msgid "EXT protocol base port"
+msgstr "EXT Protokoll Basisport"
+
+msgid "Use section filtering"
+msgstr "Benutze Abschnittsfilterung"
+
+msgid "Scan Sid automatically"
+msgstr "Scanne SID automatisch"
+
+msgid "Disable filters"
+msgstr "Deaktiviere Filter"
+
+#. TRANSLATORS: note the singular!
+msgid "Disable filter"
+msgstr "Deaktiviere Filter"
+
