@@ -21,6 +21,6 @@ VDR Plugin 'iptv' Revision History
 
 2007-11-04: Version 0.0.4
 
-- Added German translation (Thanks to Tobias Grimm)
+- Added German translation (Thanks to Tobias Grimm).
 - Added pluginparam patch for vdr-1.5.11.
 - Updated Makefile 'i18n' targets.
