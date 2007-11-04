@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.43 2007/10/27 12:07:40 rahrenbe Exp $
+ * $Id: setup.c,v 1.44 2007/11/04 15:23:16 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -191,22 +191,38 @@ void cIptvMenuEditChannel::Setup(void)
                             eProtocolCount, protocols));
   switch (data.protocol) {
     case eProtocolFILE:
+#if defined(APIVERSNUM) && APIVERSNUM < 10511
          Add(new cMenuEditStrItem(trVDR("File"),     data.location, sizeof(data.location), trVDR(FileNameChars)));
+#else
+         Add(new cMenuEditStrItem(trVDR("File"),     data.location, sizeof(data.location)));
+#endif
          Add(new cMenuEditIntItem(tr("Delay (ms)"), &data.parameter,  0, 0xFFFF));
          break;
     case eProtocolEXT:
+#if defined(APIVERSNUM) && APIVERSNUM < 10511
          Add(new cMenuEditStrItem(tr("Script"),     data.location, sizeof(data.location), trVDR(FileNameChars)));
+#else
+         Add(new cMenuEditStrItem(tr("Script"),     data.location, sizeof(data.location)));
+#endif
          Add(new cMenuEditIntItem(tr("Parameter"), &data.parameter,  0, 0xFFFF));
          break;
     case eProtocolHTTP:
     case eProtocolUDP:
     default:
+#if defined(APIVERSNUM) && APIVERSNUM < 10511
          Add(new cMenuEditStrItem(tr("Address"), data.location, sizeof(data.location), trVDR(FileNameChars)));
+#else
+         Add(new cMenuEditStrItem(tr("Address"), data.location, sizeof(data.location)));
+#endif
          Add(new cMenuEditIntItem(tr("Port"),   &data.parameter,  0, 0xFFFF));
          break;
     }
   // Normal settings
+#if defined(APIVERSNUM) && APIVERSNUM < 10511
   Add(new cMenuEditStrItem(trVDR("Name"),       data.name,     sizeof(data.name), trVDR(FileNameChars)));
+#else
+  Add(new cMenuEditStrItem(trVDR("Name"),       data.name,     sizeof(data.name)));
+#endif
   Add(new cMenuEditIntItem(trVDR("Frequency"), &data.frequency));
   Add(new cMenuEditIntItem(trVDR("Vpid"),      &data.vpid,     0, 0x1FFF));
   Add(new cMenuEditIntItem(trVDR("Ppid"),      &data.ppid,     0, 0x1FFF));
