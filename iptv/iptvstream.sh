@@ -17,7 +17,7 @@ ABITRATE=320
 
 # There is a way to specify multiple URLs in the same script. The selection is
 # then controlled by the extra parameter passed by IPTV plugin to the script
-case $PARAMETER in
+case ${PARAMETER} in
     1)
 	URL=""
 	;;
