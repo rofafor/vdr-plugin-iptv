@@ -28,3 +28,4 @@ VDR Plugin 'iptv' Revision History
 2007-xx-xx: Version 0.0.5
 
 - Added French translation (Thanks to Bruno Roussel).
+- Improve iptvstream.sh compatibility under non-bash shells.
