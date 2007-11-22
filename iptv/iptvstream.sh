@@ -42,5 +42,13 @@ let VPID=${PARAMETER}+1
 let APID=${PARAMETER}+2
 let SPID=${PARAMETER}+3
 
-# Use 'exec' for capturing program pid for further management in IPTV plugin
-exec vlc "${URL}" --sout "#transcode{vcodec=mp2v,acodec=mpga,vb=${VBITRATE},ab=${ABITRATE}}:standard{access=udp,mux=ts{pid-video=${VPID},pid-audio=${APID},pid-spu=${SPID}},dst=127.0.0.1:${PORT}}" --intf dummy
+# Capture program pid for further management in IPTV plugin
+vlc "${URL}" --sout "#transcode{vcodec=mp2v,acodec=mpga,vb=${VBITRATE},ab=${ABITRATE}}:standard{access=udp,mux=ts{pid-video=${VPID},pid-audio=${APID},pid-spu=${SPID}},dst=127.0.0.1:${PORT}}" --intf dummy &
+
+PID=$!
+
+trap 'kill -INT ${PID} 2> /dev/null' INT EXIT QUIT TERM
+
+# Waiting for the given PID to terminate
+wait $PID
+
