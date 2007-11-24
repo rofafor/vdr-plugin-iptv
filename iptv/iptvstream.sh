@@ -3,7 +3,7 @@
 # iptvstream.sh can be used by the VDR iptv plug-in to transcode external
 # sources
 #
-# (C) 2007 Rolf Ahrenberg, Antti Sepp√§l√§
+# (C) 2007 Rolf Ahrenberg, Antti Sepp‰l‰
 #
 # iptvstream.sh is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
