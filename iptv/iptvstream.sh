@@ -1,4 +1,24 @@
 #!/bin/sh
+#
+# iptvstream.sh can be used by the VDR iptv plug-in to transcode external
+# sources
+#
+# (C) 2007 Rolf Ahrenberg, Antti Seppälä
+#
+# iptvstream.sh is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This package is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this package; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston,
+# MA 02110-1301, USA.
 
 if [ $# -ne 2 ]; then
     logger "$0: error: Invalid parameter count '$#' $*"
@@ -42,7 +62,7 @@ let VPID=${PARAMETER}+1
 let APID=${PARAMETER}+2
 let SPID=${PARAMETER}+3
 
-# Capture program pid for further management in IPTV plugin
+# Capture VLC pid for further management in IPTV plugin
 vlc "${URL}" --sout "#transcode{vcodec=mp2v,acodec=mpga,vb=${VBITRATE},ab=${ABITRATE}}:standard{access=udp,mux=ts{pid-video=${VPID},pid-audio=${APID},pid-spu=${SPID}},dst=127.0.0.1:${PORT}}" --intf dummy &
 
 PID=${!}
@@ -51,4 +71,3 @@ trap 'kill -INT ${PID} 2> /dev/null' INT EXIT QUIT TERM
 
 # Waiting for the given PID to terminate
 wait ${PID}
-
