@@ -25,8 +25,8 @@ VDR Plugin 'iptv' Revision History
 - Added pluginparam patch for vdr-1.5.11.
 - Updated Makefile 'i18n' targets.
 
-2007-xx-xx: Version 0.0.5
+2007-11-27: Version 0.0.5
 
 - Added French translation (Thanks to Bruno Roussel).
-- Improve iptvstream.sh compatibility under non-bash shells.
 - Add more sophisticated example script (Thanks to Tobias Grimm).
+- Improve iptvstream.sh compatibility under non-bash shells.
