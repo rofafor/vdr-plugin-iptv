@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.21 2007/10/21 19:46:03 rahrenbe Exp $
+ * $Id: protocolhttp.c,v 1.22 2008/01/04 23:36:37 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -30,7 +30,7 @@ cIptvProtocolHttp::~cIptvProtocolHttp()
 {
   debug("cIptvProtocolHttp::~cIptvProtocolHttp()\n");
   // Close the socket
-  Close();
+  cIptvProtocolHttp::Close();
   // Free allocated memory
   free(streamPath);
   free(streamAddr);

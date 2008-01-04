@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.76 2007/10/26 23:48:30 rahrenbe Exp $
+ * $Id: device.c,v 1.77 2008/01/04 23:36:37 ajhseppa Exp $
  */
 
 #include "config.h"
@@ -33,7 +33,7 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   pExtProtocol = new cIptvProtocolExt();
   pIptvStreamer = new cIptvStreamer(tsBuffer, &mutex);
   // Initialize filter pointers
-  memset(&secfilters, '\0', sizeof(secfilters));
+  memset(secfilters, '\0', sizeof(secfilters));
   // Start section handler for iptv device
   StartSectionHandler();
   // Sid scanner must be created after the section handler
@@ -320,7 +320,8 @@ void cIptvDevice::CloseDvr(void)
   debug("cIptvDevice::CloseDvr(%d)\n", deviceIndex);
   if (pSidScanner && IptvConfig.GetSectionFiltering() && IptvConfig.GetSidScanning())
      pSidScanner->SetStatus(false);
-  pIptvStreamer->Close();
+  if (pIptvStreamer)
+    pIptvStreamer->Close();
   isOpenDvr = false;
 }
 

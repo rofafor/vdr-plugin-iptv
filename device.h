@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.34 2007/10/19 21:36:28 rahrenbe Exp $
+ * $Id: device.h,v 1.35 2008/01/04 23:36:37 ajhseppa Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -53,8 +53,12 @@ public:
   virtual ~cIptvDevice();
   cString GetInformation(unsigned int Page = IPTV_DEVICE_INFO_ALL);
 
-  // for statistics and general information
+  // copy and assignment constructors
 private:
+  cIptvDevice(const cIptvDevice&);
+  cIptvDevice& operator=(const cIptvDevice&);
+
+  // for statistics and general information
   cString GetGeneralInformation(void);
   cString GetPidsInformation(void);
   cString GetFiltersInformation(void);

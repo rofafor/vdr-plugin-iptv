@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: config.c,v 1.18 2007/10/20 17:26:46 rahrenbe Exp $
+ * $Id: config.c,v 1.19 2008/01/04 23:36:37 ajhseppa Exp $
  */
 
 #include "config.h"
@@ -19,27 +19,27 @@ cIptvConfig::cIptvConfig(void)
   sectionFiltering(1),
   sidScanning(1)
 {
-  for (unsigned int i = 0; i < sizeof(disabledFilters); ++i)
+  for (unsigned int i = 0; i < ARRAY_SIZE(disabledFilters) - 1; ++i)
       disabledFilters[i] = -1;
   memset(configDirectory, '\0', sizeof(configDirectory));
 }
 
-unsigned int cIptvConfig::GetDisabledFiltersCount(void)
+unsigned int cIptvConfig::GetDisabledFiltersCount(void) const
 {
   unsigned int n = 0;
-  while ((disabledFilters[n] != -1) && (n < sizeof(disabledFilters)))
+  while ((disabledFilters[n] != -1) && (n < ARRAY_SIZE(disabledFilters) - 1))
     n++;
   return n;
 }
 
-int cIptvConfig::GetDisabledFilters(unsigned int Index)
+int cIptvConfig::GetDisabledFilters(unsigned int Index) const
 {
-  return (Index < sizeof(disabledFilters)) ? disabledFilters[Index] : -1;
+  return (Index < ARRAY_SIZE(disabledFilters)) ? disabledFilters[Index] : -1;
 }
 
 void cIptvConfig::SetDisabledFilters(unsigned int Index, int Number)
 {
-  if (Index < sizeof(disabledFilters))
+  if (Index < ARRAY_SIZE(disabledFilters))
      disabledFilters[Index] = Number;
 }
 

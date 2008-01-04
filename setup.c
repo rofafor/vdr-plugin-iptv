@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.44 2007/11/04 15:23:16 rahrenbe Exp $
+ * $Id: setup.c,v 1.45 2008/01/04 23:36:37 ajhseppa Exp $
  */
 
 #include <string.h>
@@ -73,7 +73,7 @@ cString cIptvMenuEditChannel::GetIptvSettings(const char *Param, int *Parameter,
   char *tag = NULL;
   char *proto = NULL;
   char *loc = NULL;
-  if (sscanf(Param, "%a[^|]|%a[^|]|%a[^|]|%u", &tag, &proto, &loc, Parameter) == 4) {
+  if (sscanf(Param, "%a[^|]|%a[^|]|%a[^|]|%d", &tag, &proto, &loc, Parameter) == 4) {
      cString tagstr(tag, true);
      cString protostr(proto, true);
      cString locstr(loc, true);
@@ -106,13 +106,13 @@ void cIptvMenuEditChannel::GetChannelData(cChannel *Channel)
      data.vpid = Channel->Vpid();
      data.ppid = Channel->Ppid();
      data.tpid = Channel->Tpid();
-     for (unsigned int i = 0; i < sizeof(data.apid); ++i)
+     for (unsigned int i = 0; i < ARRAY_SIZE(data.apid); ++i)
          data.apid[i] = Channel->Apid(i);
-     for (unsigned int i = 0; i < sizeof(data.dpid); ++i)
+     for (unsigned int i = 0; i < ARRAY_SIZE(data.dpid); ++i)
          data.dpid[i] = Channel->Dpid(i);
-     for (unsigned int i = 0; i < sizeof(data.spid); ++i)
+     for (unsigned int i = 0; i < ARRAY_SIZE(data.spid); ++i)
          data.spid[i] = Channel->Spid(i);
-     for (unsigned int i = 0; i < sizeof(data.caids); ++i)
+     for (unsigned int i = 0; i < ARRAY_SIZE(data.caids); ++i)
          data.caids[i] = Channel->Ca(i);
      data.sid = Channel->Sid();
      data.nid = Channel->Nid();
@@ -129,13 +129,13 @@ void cIptvMenuEditChannel::GetChannelData(cChannel *Channel)
      data.vpid = 0;
      data.ppid = 0;
      data.tpid = 0;
-     for (unsigned int i = 0; i < sizeof(data.apid); ++i)
+     for (unsigned int i = 0; i < ARRAY_SIZE(data.apid); ++i)
          data.apid[i] = 0;
-     for (unsigned int i = 0; i < sizeof(data.dpid); ++i)
+     for (unsigned int i = 0; i < ARRAY_SIZE(data.dpid); ++i)
          data.dpid[i] = 0;
-     for (unsigned int i = 0; i < sizeof(data.spid); ++i)
+     for (unsigned int i = 0; i < ARRAY_SIZE(data.spid); ++i)
          data.spid[i] = 0;
-     for (unsigned int i = 0; i < sizeof(data.caids); ++i)
+     for (unsigned int i = 0; i < ARRAY_SIZE(data.caids); ++i)
          data.caids[i] = 0;
      data.sid = 1;
      data.nid = 0;

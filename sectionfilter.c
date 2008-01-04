@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.c,v 1.15 2007/10/20 23:25:14 ajhseppa Exp $
+ * $Id: sectionfilter.c,v 1.16 2008/01/04 23:36:37 ajhseppa Exp $
  */
 
 #include "sectionfilter.h"
@@ -283,7 +283,7 @@ void cIptvSectionFilter::ProcessData(const uint8_t* buf)
         const uint8_t *before = &buf[p + 1];
         uint8_t before_len = buf[p];
         const uint8_t *after = &before[before_len];
-        uint8_t after_len = count - 1 - before_len;
+        uint8_t after_len = (count - 1) - before_len;
 
         demux_swfilter_section_copy_dump(before, before_len);
         /* before start of new section, set pusi_seen = 1 */

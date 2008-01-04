@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.c,v 1.21 2007/10/21 19:32:15 ajhseppa Exp $
+ * $Id: protocoludp.c,v 1.22 2008/01/04 23:36:37 ajhseppa Exp $
  */
 
 #include <sys/types.h>
@@ -29,7 +29,7 @@ cIptvProtocolUdp::~cIptvProtocolUdp()
 {
   debug("cIptvProtocolUdp::~cIptvProtocolUdp()\n");
   // Drop the multicast group and close the socket
-  Close();
+  cIptvProtocolUdp::Close();
   // Free allocated memory
   free(streamAddr);
 }

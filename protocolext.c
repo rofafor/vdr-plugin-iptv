@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.c,v 1.20 2007/10/21 19:32:14 ajhseppa Exp $
+ * $Id: protocolext.c,v 1.21 2008/01/04 23:36:37 ajhseppa Exp $
  */
 
 #include <sys/wait.h>
@@ -33,7 +33,7 @@ cIptvProtocolExt::~cIptvProtocolExt()
 {
   debug("cIptvProtocolExt::~cIptvProtocolExt()\n");
   // Drop the socket connection
-  Close();
+  cIptvProtocolExt::Close();
   // Free allocated memory
   free(scriptFile);
   free(listenAddr);

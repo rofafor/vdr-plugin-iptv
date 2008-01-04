@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolfile.c,v 1.14 2007/10/20 23:25:14 ajhseppa Exp $
+ * $Id: protocolfile.c,v 1.15 2008/01/04 23:36:37 ajhseppa Exp $
  */
 
 #include <fcntl.h>
@@ -32,7 +32,7 @@ cIptvProtocolFile::~cIptvProtocolFile()
 {
   debug("cIptvProtocolFile::~cIptvProtocolFile()\n");
   // Drop open handles
-  Close();
+  cIptvProtocolFile::Close();
   // Free allocated memory
   free(fileLocation);
   free(readBuffer);

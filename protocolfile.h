@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolfile.h,v 1.7 2007/10/19 22:18:55 rahrenbe Exp $
+ * $Id: protocolfile.h,v 1.8 2008/01/04 23:36:37 ajhseppa Exp $
  */
 
 #ifndef __IPTV_PROTOCOLFILE_H
@@ -28,11 +28,11 @@ private:
 public:
   cIptvProtocolFile();
   virtual ~cIptvProtocolFile();
-  virtual int Read(unsigned char* *BufferAddr);
-  virtual bool Set(const char* Location, const int Parameter, const int Index);
-  virtual bool Open(void);
-  virtual bool Close(void);
-  virtual cString GetInformation(void);
+  int Read(unsigned char* *BufferAddr);
+  bool Set(const char* Location, const int Parameter, const int Index);
+  bool Open(void);
+  bool Close(void);
+  cString GetInformation(void);
 };
 
 #endif // __IPTV_PROTOCOLFILE_H

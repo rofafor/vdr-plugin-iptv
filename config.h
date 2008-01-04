@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: config.h,v 1.17 2007/10/28 16:22:44 rahrenbe Exp $
+ * $Id: config.h,v 1.18 2008/01/04 23:36:37 ajhseppa Exp $
  */
 
 #ifndef __IPTV_CONFIG_H
@@ -27,16 +27,16 @@ private:
 
 public:
   cIptvConfig();
-  unsigned int GetReadBufferTsCount(void) { return readBufferTsCount; }
-  unsigned int GetTsBufferSize(void) { return tsBufferSize; }
-  unsigned int GetTsBufferPrefillRatio(void) { return tsBufferPrefillRatio; }
-  unsigned int GetExtProtocolBasePort(void) { return extProtocolBasePort; }
-  unsigned int GetUseBytes(void) { return useBytes; }
-  unsigned int GetSectionFiltering(void) { return sectionFiltering; }
-  unsigned int GetSidScanning(void) { return sidScanning; }
-  const char *GetConfigDirectory(void) { return configDirectory; }
-  unsigned int GetDisabledFiltersCount(void);
-  int GetDisabledFilters(unsigned int Index);
+  unsigned int GetReadBufferTsCount(void) const { return readBufferTsCount; }
+  unsigned int GetTsBufferSize(void) const { return tsBufferSize; }
+  unsigned int GetTsBufferPrefillRatio(void) const { return tsBufferPrefillRatio; }
+  unsigned int GetExtProtocolBasePort(void) const { return extProtocolBasePort; }
+  unsigned int GetUseBytes(void) const { return useBytes; }
+  unsigned int GetSectionFiltering(void) const { return sectionFiltering; }
+  unsigned int GetSidScanning(void) const { return sidScanning; }
+  const char *GetConfigDirectory(void) const { return configDirectory; }
+  unsigned int GetDisabledFiltersCount(void) const;
+  int GetDisabledFilters(unsigned int Index) const;
   void SetTsBufferSize(unsigned int Size) { tsBufferSize = Size; }
   void SetTsBufferPrefillRatio(unsigned int Ratio) { tsBufferPrefillRatio = Ratio; }
   void SetExtProtocolBasePort(unsigned int PortNumber) { extProtocolBasePort = PortNumber; }

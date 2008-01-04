@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: common.h,v 1.18 2007/10/28 16:22:44 rahrenbe Exp $
+ * $Id: common.h,v 1.19 2008/01/04 23:36:37 ajhseppa Exp $
  */
 
 #ifndef __IPTV_COMMON_H
@@ -62,6 +62,8 @@
         delete(tmp);              \
         }                         \
   } while (0)
+
+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 
 uint16_t ts_pid(const uint8_t *buf);
 uint8_t payload(const uint8_t *tsp);

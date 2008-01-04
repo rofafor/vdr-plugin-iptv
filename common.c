@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: common.c,v 1.8 2007/10/26 23:18:50 rahrenbe Exp $
+ * $Id: common.c,v 1.9 2008/01/04 23:36:37 ajhseppa Exp $
  */
 
 #include <vdr/tools.h>
@@ -23,7 +23,7 @@ uint8_t payload(const uint8_t *tsp)
      if (tsp[4] > 183) // corrupted data?
         return 0;
      else
-        return 184 - 1 - tsp[4];
+        return (184 - 1) - tsp[4];
      }
 
   return 184;

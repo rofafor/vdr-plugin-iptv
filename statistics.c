@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.c,v 1.20 2007/10/11 23:06:49 rahrenbe Exp $
+ * $Id: statistics.c,v 1.21 2008/01/04 23:36:37 ajhseppa Exp $
  */
 
 #include <limits.h>
@@ -84,7 +84,7 @@ cString cIptvPidStatistics::GetStatistic()
                                  IptvConfig.GetUseBytes() ? "B" : "bit");
          }
       }
-  memset(&mostActivePids, '\0', sizeof(mostActivePids));
+  memset(mostActivePids, '\0', sizeof(mostActivePids));
   return info;
 }
 
@@ -110,7 +110,7 @@ void cIptvPidStatistics::AddStatistic(u_short Pid, long Payload)
       if (mostActivePids[i].pid == Pid) {
          mostActivePids[i].DataAmount += Payload;
          // Now re-sort the array and quit
-         qsort(&mostActivePids, numberOfElements, sizeof(pidStruct), SortPids);
+         qsort(mostActivePids, numberOfElements, sizeof(pidStruct), SortPids);
          return;
          }
       }
