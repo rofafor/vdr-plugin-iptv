@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.30 2008/01/04 23:36:37 ajhseppa Exp $
+ * $Id: iptv.c,v 1.31 2008/01/06 20:19:02 rahrenbe Exp $
  */
 
 #include <getopt.h>
@@ -194,11 +194,10 @@ bool cPluginIptv::SetupParse(const char *Name, const char *Value)
      IptvConfig.SetSidScanning(atoi(Value));
   else if (!strcasecmp(Name, "DisabledFilters")) {
      int DisabledFilters[SECTION_FILTER_TABLE_SIZE];
-     for (unsigned int i = 0; i < ARRAY_SIZE(DisabledFilters); ++i) {
+     for (unsigned int i = 0; i < ARRAY_SIZE(DisabledFilters); ++i)
          DisabledFilters[i] = -1;
-     }
      int DisabledFiltersCount = ParseFilters(Value, DisabledFilters);
-     for (int i = 0; i < DisabledFiltersCount; ++i)
+     for (unsigned int i = 0; i < DisabledFiltersCount; ++i)
          IptvConfig.SetDisabledFilters(i, DisabledFilters[i]);
      }
   else

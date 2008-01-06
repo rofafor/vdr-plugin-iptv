@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.c,v 1.21 2008/01/04 23:36:37 ajhseppa Exp $
+ * $Id: protocolext.c,v 1.22 2008/01/06 20:19:02 rahrenbe Exp $
  */
 
 #include <sys/wait.h>
@@ -60,7 +60,7 @@ void cIptvProtocolExt::ExecuteScript(void)
      asprintf(&cmd, "%s %d %d", scriptFile, scriptParameter, socketPort);
      debug("cIptvProtocolExt::ExecuteScript(child): %s\n", cmd);
      if (execl("/bin/sh", "sh", "-c", cmd, NULL) == -1) {
-        error("ERROR: Script executionfailed: %s", cmd);
+        error("ERROR: Script execution failed: %s", cmd);
         free(cmd);
         _exit(-1);
         }
