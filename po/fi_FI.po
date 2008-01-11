@@ -1,11 +1,11 @@
 # VDR plugin language source file.
-# Copyright (C) 2007 Klaus Schmidinger <kls@cadsoft.de>
-# This file is distributed under the same license as the VDR package.
+# Copyright (C) 2007 Rolf Ahrenberg & Antti Seppälä
+# This file is distributed under the same license as the vdr-iptv package.
 # Rolf Ahrenberg
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: VDR 1.5.7\n"
+"Project-Id-Version: vdr-iptv-0.0.5\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
 "POT-Creation-Date: 2007-10-20 19:43+0300\n"
 "PO-Revision-Date: 2007-08-12 23:22+0300\n"

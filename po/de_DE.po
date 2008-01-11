@@ -1,11 +1,11 @@
-# German translations for iptv package.
-# Copyright (C) 2007 THE iptv'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the iptv package.
+# VDR plugin language source file.
+# Copyright (C) 2007 Rolf Ahrenberg & Antti Seppälä
+# This file is distributed under the same license as the vdr-iptv package.
 # Tobias <vdr@e-tobi.net>, 2007.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: iptv 0.0.2.x\n"
+"Project-Id-Version: vdr-iptv-0.0.5\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
 "POT-Creation-Date: 2007-10-27 12:49+0200\n"
 "PO-Revision-Date: 2007-10-29 21:19+0100\n"
