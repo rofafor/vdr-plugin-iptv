@@ -1,7 +1,7 @@
 #
 # Makefile for a Video Disk Recorder plugin
 #
-# $Id: Makefile,v 1.23 2007/11/04 14:13:11 rahrenbe Exp $
+# $Id: Makefile,v 1.24 2008/01/13 16:45:02 rahrenbe Exp $
 
 # Debugging on/off 
 #IPTV_DEBUG = 1
@@ -24,7 +24,7 @@ VERSION = $(shell grep 'static const char VERSION\[\] *=' $(PLUGIN).c | awk '{ p
 ### The C++ compiler and options:
 
 CXX      ?= g++
-CXXFLAGS ?= -fPIC -g -O2 -Wall -Woverloaded-virtual
+CXXFLAGS ?= -fPIC -g -O2 -Wall -Woverloaded-virtual -Wno-parentheses
 
 ### The directory environment:
 
