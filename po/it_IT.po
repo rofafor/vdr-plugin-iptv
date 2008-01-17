@@ -1,16 +1,16 @@
 # VDR plugin language source file.
 # Copyright (C) 2007 Rolf Ahrenberg & Antti Seppala
 # This file is distributed under the same license as the iptv package.
-# Tobias <vdr@e-tobi.net>, 2007.
+# Gringo <vdr-italian@tiscali.it>, 2008.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: iptv 0.0.5\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
 "POT-Creation-Date: 2007-10-27 12:49+0200\n"
-"PO-Revision-Date: 2007-10-29 21:19+0100\n"
-"Last-Translator: Tobias Grimm <tg@e-tobi.net>\n"
-"Language-Team: German\n"
+"PO-Revision-Date: 2008-01-13 16:46+0100\n"
+"Last-Translator: Gringo <vdr-italian@tiscali.it>\n"
+"Language-Team: Italian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -38,7 +38,7 @@ msgid "TDT (0x70)"
 msgstr "TDT (0x70)"
 
 msgid "Experience the IPTV"
-msgstr "Erlebe IPTV"
+msgstr "Esperimenta la IPTV"
 
 msgid "UDP"
 msgstr "UDP"
@@ -53,22 +53,22 @@ msgid "EXT"
 msgstr "EXT"
 
 msgid "Protocol"
-msgstr "Protokoll"
+msgstr "Protocollo"
 
 msgid "Delay (ms)"
-msgstr "Verzögerung (ms)"
+msgstr "Ritardo (ms)"
 
 msgid "Script"
 msgstr "Skript"
 
 msgid "Parameter"
-msgstr "Parameter"
+msgstr "Parametro"
 
 msgid "Address"
-msgstr "Adresse"
+msgstr "Indirizzo"
 
 msgid "Port"
-msgstr "Port"
+msgstr "Porta"
 
 msgid "Nid"
 msgstr "Nid"
@@ -80,48 +80,48 @@ msgid "Rid"
 msgstr "Rid"
 
 msgid "Cannot find unique channel settings!"
-msgstr "Kann eindeutige Kanaleinstellungen nicht finden!"
+msgstr "Impossibile trovare impostazioni canale unico!"
 
 msgid "IPTV Channels"
-msgstr "IPTV Kanäle"
+msgstr "Canali IPTV"
 
 msgid "IPTV Information"
-msgstr "IPTV Informationen"
+msgstr "Informazione IPTV"
 
 msgid "General"
-msgstr "Allgemein"
+msgstr "Generale"
 
 msgid "Pids"
 msgstr "Pids"
 
 msgid "Filters"
-msgstr "Filter"
+msgstr "Filtri"
 
 msgid "Bits/bytes"
-msgstr "Bits/Bytes"
+msgstr "Bits/bytes"
 
 msgid "IPTV information not available!"
-msgstr "IPTV Informationen nicht verfügbar!"
+msgstr "Informazione IPTV non disponibile!"
 
 msgid "TS buffer size [MB]"
-msgstr "TS Puffergröße [MB]"
+msgstr "Dimensione buffer TS [MB]"
 
 msgid "TS buffer prefill ratio [%]"
-msgstr "TS Puffer-Preload [%]"
+msgstr "Percentuale preriempimento buffer TS [%]"
 
 msgid "EXT protocol base port"
-msgstr "EXT Protokoll Basisport"
+msgstr "Porta base protocollo EXT"
 
 msgid "Use section filtering"
-msgstr "Benutze Abschnittsfilterung"
+msgstr "Utilizza sezione filtri"
 
 msgid "Scan Sid automatically"
-msgstr "Scanne SID automatisch"
+msgstr "Scansione Sid automatica"
 
 msgid "Disable filters"
-msgstr "Deaktiviere Filter"
+msgstr "Disabilita filtri"
 
 #. TRANSLATORS: note the singular!
 msgid "Disable filter"
-msgstr "Deaktiviere Filter"
+msgstr "Disabilita filtro"
 
