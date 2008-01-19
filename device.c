@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.77 2008/01/04 23:36:37 ajhseppa Exp $
+ * $Id: device.c,v 1.78 2008/01/19 21:08:02 ajhseppa Exp $
  */
 
 #include "config.h"
@@ -102,15 +102,15 @@ cString cIptvDevice::GetGeneralInformation(void)
   return cString::sprintf("IPTV device: %d\nCardIndex: %d\n%s%s%sChannel: %s",
                           deviceIndex, CardIndex(),
                           pIptvStreamer ? *pIptvStreamer->GetInformation() : "",
-                          pIptvStreamer ? *pIptvStreamer->GetStatistic() : "",
-                          *cIptvBufferStatistics::GetStatistic(),
+                          pIptvStreamer ? *pIptvStreamer->GetStreamerStatistic() : "",
+                          *GetBufferStatistic(),
                           *Channels.GetByNumber(cDevice::CurrentChannel())->ToText());
 }
 
 cString cIptvDevice::GetPidsInformation(void)
 {
   //debug("cIptvDevice::GetPidsInformation(%d)\n", deviceIndex);
-  return cIptvPidStatistics::GetStatistic();
+  return GetPidStatistic();
 }
 
 cString cIptvDevice::GetFiltersInformation(void)
@@ -122,7 +122,7 @@ cString cIptvDevice::GetFiltersInformation(void)
   for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
       if (secfilters[i]) {
          info = cString::sprintf("%sFilter %d: %s Pid=0x%02X (%s)\n", *info, i,
-                                 *secfilters[i]->GetStatistic(), secfilters[i]->GetPid(),
+                                 *secfilters[i]->GetSectionStatistic(), secfilters[i]->GetPid(),
                                  id_pid(secfilters[i]->GetPid()));
          if (++count > IPTV_STATS_ACTIVE_FILTERS_COUNT)
             break;
@@ -359,7 +359,7 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
         tsBuffer->Del(TS_SIZE);
         isPacketDelivered = false;
         // Update buffer statistics
-        cIptvBufferStatistics::AddStatistic(TS_SIZE, tsBuffer->Available());
+        AddBufferStatistic(TS_SIZE, tsBuffer->Available());
         }
      uchar *p = tsBuffer->Get(Count);
      if (p && Count >= TS_SIZE) {
@@ -377,7 +377,7 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
         isPacketDelivered = true;
         Data = p;
 	// Update pid statistics 
-	cIptvPidStatistics::AddStatistic(ts_pid(p), payload(p));
+	AddPidStatistic(ts_pid(p), payload(p));
         // Run the data through all filters
         for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
             if (secfilters[i])

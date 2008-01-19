@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.c,v 1.28 2008/01/04 23:36:37 ajhseppa Exp $
+ * $Id: streamer.c,v 1.29 2008/01/19 21:08:03 ajhseppa Exp $
  */
 
 #include <vdr/thread.h>
@@ -38,7 +38,7 @@ void cIptvStreamer::Action(void)
        mutex->Lock();
        int length = protocol->Read(&buffer);
        if (length >= 0) {
-          AddStatistic(length);
+          AddStreamerStatistic(length);
           int p = ringBuffer->Put(buffer, length);
           if (p != length && Running())
              ringBuffer->ReportOverflow(length - p);

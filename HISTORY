@@ -33,7 +33,8 @@ VDR Plugin 'iptv' Revision History
 
 2008-01-20: Version 0.0.6
 
-- Fixed lint warnings.
+- Fixed some lint warnings.
 - Added Italian translation (Thanks to Gringo).
 - Added '-Wno-parentheses' to the compiler options.
 - Mapped 'kInfo' as help key in setup menu.
+- Refactored statistic collecting code.

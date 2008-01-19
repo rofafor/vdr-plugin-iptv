@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.c,v 1.16 2008/01/04 23:36:37 ajhseppa Exp $
+ * $Id: sectionfilter.c,v 1.17 2008/01/19 21:08:02 ajhseppa Exp $
  */
 
 #include "sectionfilter.h"
@@ -106,7 +106,7 @@ int cIptvSectionFilter::dmxdev_section_callback(const uint8_t *buffer1, size_t b
      retval = write(fifoDescriptor, buffer1, buffer1_len);
      ERROR_IF(retval < 0, "write()");
      // Update statistics
-     AddStatistic(retval, 1);
+     AddSectionStatistic(retval, 1);
      }
 #ifdef DEBUG_PRINTF
   else if (retval)

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.h,v 1.10 2007/10/11 23:06:49 rahrenbe Exp $
+ * $Id: statistics.h,v 1.11 2008/01/19 21:08:03 ajhseppa Exp $
  */
 
 #ifndef __IPTV_STATISTICS_H
@@ -11,17 +11,15 @@
 
 #include <vdr/thread.h>
 
-#include "statisticif.h"
-
 // Section statistics
-class cIptvSectionStatistics : public cIptvStatisticIf {
+class cIptvSectionStatistics {
 public:
   cIptvSectionStatistics();
   virtual ~cIptvSectionStatistics();
-  cString GetStatistic();
+  cString GetSectionStatistic();
 
 protected:
-  void AddStatistic(long Bytes, long Calls);
+  void AddSectionStatistic(long Bytes, long Calls);
 
 private:
   long filteredData;
@@ -31,14 +29,14 @@ private:
 };
 
 // Pid statistics
-class cIptvPidStatistics : public cIptvStatisticIf {
+class cIptvPidStatistics {
 public:
   cIptvPidStatistics();
   virtual ~cIptvPidStatistics();
-  cString GetStatistic();
+  cString GetPidStatistic();
 
 protected:
-  void AddStatistic(u_short Pid, long Payload);
+  void AddPidStatistic(u_short Pid, long Payload);
 
 private:
   struct pidStruct {
@@ -54,14 +52,14 @@ private:
 };
 
 // Streamer statistics
-class cIptvStreamerStatistics : public cIptvStatisticIf {
+class cIptvStreamerStatistics {
 public:
   cIptvStreamerStatistics();
   virtual ~cIptvStreamerStatistics();
-  cString GetStatistic();
+  cString GetStreamerStatistic();
 
 protected:
-  void AddStatistic(long Bytes);
+  void AddStreamerStatistic(long Bytes);
 
 private:
   long dataBytes;
@@ -70,14 +68,14 @@ private:
 };
 
 // Buffer statistics
-class cIptvBufferStatistics : public cIptvStatisticIf {
+class cIptvBufferStatistics {
 public:
   cIptvBufferStatistics();
   virtual ~cIptvBufferStatistics();
-  cString GetStatistic();
+  cString GetBufferStatistic();
 
 protected:
-  void AddStatistic(long Bytes, long Used);
+  void AddBufferStatistic(long Bytes, long Used);
 
 private:
   long dataBytes;

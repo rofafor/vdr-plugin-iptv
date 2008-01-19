@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.c,v 1.21 2008/01/04 23:36:37 ajhseppa Exp $
+ * $Id: statistics.c,v 1.22 2008/01/19 21:08:03 ajhseppa Exp $
  */
 
 #include <limits.h>
@@ -27,7 +27,7 @@ cIptvSectionStatistics::~cIptvSectionStatistics()
   //debug("cIptvSectionStatistics::~cIptvSectionStatistics()\n");
 }
 
-cString cIptvSectionStatistics::GetStatistic()
+cString cIptvSectionStatistics::GetSectionStatistic()
 {
   //debug("cIptvSectionStatistics::GetStatistic()\n");
   cMutexLock MutexLock(&mutex);
@@ -43,7 +43,7 @@ cString cIptvSectionStatistics::GetStatistic()
   return info;
 }
 
-void cIptvSectionStatistics::AddStatistic(long Bytes, long Calls)
+void cIptvSectionStatistics::AddSectionStatistic(long Bytes, long Calls)
 {
   //debug("cIptvSectionStatistics::AddStatistic(Bytes=%ld, Calls=%ld)\n", Bytes, Calls); 
   cMutexLock MutexLock(&mutex);
@@ -67,7 +67,7 @@ cIptvPidStatistics::~cIptvPidStatistics()
   debug("cIptvPidStatistics::~cIptvPidStatistics()\n");
 }
 
-cString cIptvPidStatistics::GetStatistic()
+cString cIptvPidStatistics::GetPidStatistic()
 {
   //debug("cIptvPidStatistics::GetStatistic()\n");
   cMutexLock MutexLock(&mutex);
@@ -100,7 +100,7 @@ int cIptvPidStatistics::SortPids(const void* data1, const void* data2)
   return 0;
 }
 
-void cIptvPidStatistics::AddStatistic(u_short Pid, long Payload)
+void cIptvPidStatistics::AddPidStatistic(u_short Pid, long Payload)
 {
   //debug("cIptvPidStatistics::AddStatistic(pid=%ld, payload=%ld)\n", Pid, Payload);
   cMutexLock MutexLock(&mutex);
@@ -140,7 +140,7 @@ cIptvStreamerStatistics::~cIptvStreamerStatistics()
   debug("cIptvStreamerStatistics::~cIptvStreamerStatistics()\n");
 }
 
-cString cIptvStreamerStatistics::GetStatistic()
+cString cIptvStreamerStatistics::GetStreamerStatistic()
 {
   //debug("cIptvStreamerStatistics::GetStatistic()\n");
   cMutexLock MutexLock(&mutex);
@@ -154,7 +154,7 @@ cString cIptvStreamerStatistics::GetStatistic()
   return info;
 }
 
-void cIptvStreamerStatistics::AddStatistic(long Bytes)
+void cIptvStreamerStatistics::AddStreamerStatistic(long Bytes)
 {
   //debug("cIptvStreamerStatistics::AddStatistic(Bytes=%ld)\n", Bytes);
   cMutexLock MutexLock(&mutex);
@@ -177,7 +177,7 @@ cIptvBufferStatistics::~cIptvBufferStatistics()
   debug("cIptvBufferStatistics::~cIptvBufferStatistics()\n");
 }
 
-cString cIptvBufferStatistics::GetStatistic()
+cString cIptvBufferStatistics::GetBufferStatistic()
 {
   //debug("cIptvBufferStatistics::GetStatistic()\n");
   cMutexLock MutexLock(&mutex);
@@ -201,7 +201,7 @@ cString cIptvBufferStatistics::GetStatistic()
   return info;
 }
 
-void cIptvBufferStatistics::AddStatistic(long Bytes, long Used)
+void cIptvBufferStatistics::AddBufferStatistic(long Bytes, long Used)
 {
   //debug("cIptvBufferStatistics::AddStatistic(Bytes=%ld, Used=%ld)\n", Bytes, Used);
   cMutexLock MutexLock(&mutex);
