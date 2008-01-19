@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: iptv 0.0.5\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2007-10-27 12:49+0200\n"
+"POT-Creation-Date: 2008-01-19 23:59+0200\n"
 "PO-Revision-Date: 2008-01-13 16:46+0100\n"
 "Last-Translator: Gringo <vdr-italian@tiscali.it>\n"
 "Language-Team: Italian\n"
@@ -106,22 +106,54 @@ msgstr "Informazione IPTV non disponibile!"
 msgid "TS buffer size [MB]"
 msgstr "Dimensione buffer TS [MB]"
 
+msgid "Define a ringbuffer size for transport streams in megabytes."
+msgstr ""
+
 msgid "TS buffer prefill ratio [%]"
 msgstr "Percentuale preriempimento buffer TS [%]"
+
+msgid "Define a prefill ratio of the ringbuffer for transport streams before data is transferred to VDR."
+msgstr ""
 
 msgid "EXT protocol base port"
 msgstr "Porta base protocollo EXT"
 
+msgid ""
+"Define a base port used in EXT protocol.\n"
+"\n"
+"The port range is defined by the number of IPTV devices."
+msgstr ""
+
 msgid "Use section filtering"
 msgstr "Utilizza sezione filtri"
+
+msgid "Define whether the section filtering shall be used."
+msgstr ""
 
 msgid "Scan Sid automatically"
 msgstr "Scansione Sid automatica"
 
+msgid ""
+"Define whether the service id shall be scanned automatically.\n"
+"\n"
+"Requires the section filtering."
+msgstr ""
+
 msgid "Disable filters"
 msgstr "Disabilita filtri"
+
+msgid ""
+"Define number of section filters to be disabled.\n"
+"\n"
+"Certain section filters might cause some unwanted behaviour to VDR such as time being falsely synchronized etc."
+msgstr ""
 
 #. TRANSLATORS: note the singular!
 msgid "Disable filter"
 msgstr "Disabilita filtro"
 
+msgid "Define an ill-behaving filter to be blacklisted."
+msgstr ""
+
+msgid "Help"
+msgstr "Aiuto"

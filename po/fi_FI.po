@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: iptv 0.0.5\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2007-10-20 19:43+0300\n"
+"POT-Creation-Date: 2008-01-19 23:59+0200\n"
 "PO-Revision-Date: 2007-08-12 23:22+0300\n"
 "Last-Translator: Rolf Ahrenberg\n"
 "Language-Team: <vdr@linuxtv.org>\n"
@@ -105,21 +105,54 @@ msgstr "IPTV-tietoja ei saatavilla!"
 msgid "TS buffer size [MB]"
 msgstr "TS-puskurin koko [MB]"
 
+msgid "Define a ringbuffer size for transport streams in megabytes."
+msgstr "Määritä rengaspuskurin koko TS-lähetteelle megatavuina."
+
 msgid "TS buffer prefill ratio [%]"
 msgstr "TS-puskurin esitäyttöaste [%]"
+
+msgid "Define a prefill ratio of the ringbuffer for transport streams before data is transferred to VDR."
+msgstr "Määrittele TS-rengaspuskurin esitäyttöaste, jonka jälkeen lähetettä aletaan siirtämään eteenpäin VDR:lle."
 
 msgid "EXT protocol base port"
 msgstr "EXT-protokollan perusportti"
 
+msgid ""
+"Define a base port used in EXT protocol.\n"
+"\n"
+"The port range is defined by the number of IPTV devices."
+msgstr "Määrittele EXT-protokollan käyttämä perusportti.\n\nPorttiavaruuden koko määräytyy käytettyjen IPTV-laitteiden mukaan. "
+
 msgid "Use section filtering"
 msgstr "Käytä sektioiden suodatusta"
+
+msgid "Define whether the section filtering shall be used."
+msgstr "Määrittele suodatuksen käyttö sektioille."
 
 msgid "Scan Sid automatically"
 msgstr "Etsi palvelu-ID automaattisesti"
 
+msgid ""
+"Define whether the service id shall be scanned automatically.\n"
+"\n"
+"Requires the section filtering."
+msgstr "Määrittele etsitäänkö palvelu-ID automaattisesti.\n\nAsetus vaatii suodatuksen käyttöönoton sektioille."
+
 msgid "Disable filters"
 msgstr "Poista suodattimia käytöstä"
+
+msgid ""
+"Define number of section filters to be disabled.\n"
+"\n"
+"Certain section filters might cause some unwanted behaviour to VDR such as time being falsely synchronized etc."
+msgstr "Määrittele käytöstä poistettavien suodattimien lukumäärä sektioille.\n\nTietyt sektiot saattavat aiheuttaa virheellistä toimintaa VDR:ssä, esimerkiksi asettavat väärän kellonajan."
 
 #. TRANSLATORS: note the singular!
 msgid "Disable filter"
 msgstr "Poista suodatin käytöstä"
+
+msgid "Define an ill-behaving filter to be blacklisted."
+msgstr "Määrittele käytöstä poistettava suodatin, joka lisätään mustalle listalle."
+
+msgid "Help"
+msgstr "Opaste"

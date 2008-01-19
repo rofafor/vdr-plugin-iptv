@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.46 2008/01/19 16:24:40 rahrenbe Exp $
+ * $Id: setup.c,v 1.47 2008/01/19 23:17:20 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -637,27 +637,36 @@ cIptvPluginSetup::cIptvPluginSetup()
 void cIptvPluginSetup::Setup(void)
 {
   int current = Current();
+
   Clear();
   help.Clear();
-  Add(new cMenuEditIntItem( tr("TS buffer size [MB]"),         &tsBufferSize, 1, 4));
-  help.Append(tr("No help available!"));
+
+  Add(new cMenuEditIntItem( tr("TS buffer size [MB]"), &tsBufferSize, 1, 4));
+  help.Append(tr("Define a ringbuffer size for transport streams in megabytes."));
+
   Add(new cMenuEditIntItem( tr("TS buffer prefill ratio [%]"), &tsBufferPrefill, 0, 40));
-  help.Append(tr("No help available!"));
+  help.Append(tr("Define a prefill ratio of the ringbuffer for transport streams before data is transferred to VDR."));
+
   Add(new cMenuEditIntItem( tr("EXT protocol base port"),      &extProtocolBasePort, 0, 0xFFF7));
-  help.Append(tr("No help available!"));
+  help.Append(tr("Define a base port used in EXT protocol.\n\nThe port range is defined by the number of IPTV devices."));
+
   Add(new cMenuEditBoolItem(tr("Use section filtering"),       &sectionFiltering));
-  help.Append(tr("No help available!"));
+  help.Append(tr("Define whether the section filtering shall be used."));
+
   if (sectionFiltering) {
      Add(new cMenuEditBoolItem(tr("Scan Sid automatically"),   &sidScanning));
-     help.Append(tr("No help available!"));
+     help.Append(tr("Define whether the service id shall be scanned automatically.\n\nRequires the section filtering."));
+
      Add(new cMenuEditIntItem( tr("Disable filters"),          &numDisabledFilters, 0, SECTION_FILTER_TABLE_SIZE));
-     help.Append(tr("No help available!"));
+     help.Append(tr("Define number of section filters to be disabled.\n\nCertain section filters might cause some unwanted behaviour to VDR such as time being falsely synchronized etc."));
+
      for (int i = 0; i < numDisabledFilters; ++i) {
          // TRANSLATORS: note the singular!
          Add(new cMenuEditStraItem(tr("Disable filter"),       &disabledFilterIndexes[i], SECTION_FILTER_TABLE_SIZE, disabledFilterNames));
-         help.Append(tr("No help available!"));
+         help.Append(tr("Define an ill-behaving filter to be blacklisted."));
          }
      }
+
   SetCurrent(Get(current));
   Display();
 }
@@ -683,6 +692,7 @@ eOSState cIptvPluginSetup::ProcessKey(eKeys Key)
   int oldsectionFiltering = sectionFiltering;
   int oldNumDisabledFilters = numDisabledFilters;
   eOSState state = cMenuSetupPage::ProcessKey(Key);
+
   if (state == osUnknown) {
      switch (Key) {
        case kRed:  return EditChannel();
@@ -692,11 +702,13 @@ eOSState cIptvPluginSetup::ProcessKey(eKeys Key)
        default:    state = osContinue;
        }
      }
+
   if ((Key != kNone) && ((numDisabledFilters != oldNumDisabledFilters) || (sectionFiltering != oldsectionFiltering))) {
      while ((numDisabledFilters < oldNumDisabledFilters) && (oldNumDisabledFilters > 0))
            disabledFilterIndexes[--oldNumDisabledFilters] = -1;
      Setup();
      }
+
   return state;
 }
 
