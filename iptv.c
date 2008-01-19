@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.31 2008/01/06 20:19:02 rahrenbe Exp $
+ * $Id: iptv.c,v 1.32 2008/01/19 16:51:59 ajhseppa Exp $
  */
 
 #include <getopt.h>
@@ -196,7 +196,7 @@ bool cPluginIptv::SetupParse(const char *Name, const char *Value)
      int DisabledFilters[SECTION_FILTER_TABLE_SIZE];
      for (unsigned int i = 0; i < ARRAY_SIZE(DisabledFilters); ++i)
          DisabledFilters[i] = -1;
-     int DisabledFiltersCount = ParseFilters(Value, DisabledFilters);
+     unsigned int DisabledFiltersCount = ParseFilters(Value, DisabledFilters);
      for (unsigned int i = 0; i < DisabledFiltersCount; ++i)
          IptvConfig.SetDisabledFilters(i, DisabledFilters[i]);
      }
