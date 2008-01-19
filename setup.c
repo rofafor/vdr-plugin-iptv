@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.45 2008/01/04 23:36:37 ajhseppa Exp $
+ * $Id: setup.c,v 1.46 2008/01/19 16:24:40 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -11,6 +11,7 @@
 #include <vdr/device.h>
 #include <vdr/interface.h>
 #include <vdr/status.h>
+#include <vdr/menu.h>
 
 #include "common.h"
 #include "config.h"
@@ -637,16 +638,24 @@ void cIptvPluginSetup::Setup(void)
 {
   int current = Current();
   Clear();
+  help.Clear();
   Add(new cMenuEditIntItem( tr("TS buffer size [MB]"),         &tsBufferSize, 1, 4));
+  help.Append(tr("No help available!"));
   Add(new cMenuEditIntItem( tr("TS buffer prefill ratio [%]"), &tsBufferPrefill, 0, 40));
+  help.Append(tr("No help available!"));
   Add(new cMenuEditIntItem( tr("EXT protocol base port"),      &extProtocolBasePort, 0, 0xFFF7));
+  help.Append(tr("No help available!"));
   Add(new cMenuEditBoolItem(tr("Use section filtering"),       &sectionFiltering));
+  help.Append(tr("No help available!"));
   if (sectionFiltering) {
      Add(new cMenuEditBoolItem(tr("Scan Sid automatically"),   &sidScanning));
+     help.Append(tr("No help available!"));
      Add(new cMenuEditIntItem( tr("Disable filters"),          &numDisabledFilters, 0, SECTION_FILTER_TABLE_SIZE));
+     help.Append(tr("No help available!"));
      for (int i = 0; i < numDisabledFilters; ++i) {
          // TRANSLATORS: note the singular!
          Add(new cMenuEditStraItem(tr("Disable filter"),       &disabledFilterIndexes[i], SECTION_FILTER_TABLE_SIZE, disabledFilterNames));
+         help.Append(tr("No help available!"));
          }
      }
   SetCurrent(Get(current));
@@ -678,6 +687,8 @@ eOSState cIptvPluginSetup::ProcessKey(eKeys Key)
      switch (Key) {
        case kRed:  return EditChannel();
        case kBlue: return ShowInfo();
+       case kInfo: if (Current() < help.Size())
+                      return AddSubMenu(new cMenuText(cString::sprintf("%s - %s '%s'", tr("Help"), trVDR("Plugin"), PLUGIN_NAME_I18N), help[Current()]));
        default:    state = osContinue;
        }
      }
