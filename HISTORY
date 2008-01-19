@@ -30,3 +30,10 @@ VDR Plugin 'iptv' Revision History
 - Added French translation (Thanks to Bruno Roussel).
 - Added a more sophisticated example script (Thanks to Tobias Grimm).
 - Improved iptvstream.sh compatibility under non-bash shells.
+
+2008-01-20: Version 0.0.6
+
+- Fixed lint warnings.
+- Added Italian translation (Thanks to Gringo).
+- Added '-Wno-parentheses' to the compiler options.
+- Mapped 'kInfo' as help key in setup menu.
