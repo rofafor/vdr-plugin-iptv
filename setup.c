@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.49 2008/01/20 14:13:28 rahrenbe Exp $
+ * $Id: setup.c,v 1.50 2008/01/20 16:15:14 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -639,31 +639,47 @@ void cIptvPluginSetup::Setup(void)
   int current = Current();
 
   Clear();
+#if defined(APIVERSNUM) && APIVERSNUM >= 10513
   help.Clear();
+#endif
 
   Add(new cMenuEditIntItem( tr("TS buffer size [MB]"), &tsBufferSize, 1, 4));
+#if defined(APIVERSNUM) && APIVERSNUM >= 10513
   help.Append(tr("Define a ringbuffer size for transport streams in megabytes.\n\nSmaller sizes help memory consumption, but are more prone to buffer overflows."));
+#endif
 
   Add(new cMenuEditIntItem( tr("TS buffer prefill ratio [%]"), &tsBufferPrefill, 0, 40));
+#if defined(APIVERSNUM) && APIVERSNUM >= 10513
   help.Append(tr("Define a prefill ratio of the ringbuffer for transport streams before data is transferred to VDR.\n\nThis is useful if streaming media over a slow or unreliable connection."));
+#endif
 
   Add(new cMenuEditIntItem( tr("EXT protocol base port"), &extProtocolBasePort, 0, 0xFFF7));
+#if defined(APIVERSNUM) && APIVERSNUM >= 10513
   help.Append(tr("Define a base port used by EXT protocol.\n\nThe port range is defined by the number of IPTV devices. This setting sets the port which is listened for connections from external applications when using the EXT protocol."));
+#endif
 
   Add(new cMenuEditBoolItem(tr("Use section filtering"), &sectionFiltering));
+#if defined(APIVERSNUM) && APIVERSNUM >= 10513
   help.Append(tr("Define whether the section filtering shall be used.\n\nSection filtering means that IPTV plugin tries to parse and provide VDR with secondary data about the currently active stream. VDR can then use this data for providing various functionalities such as automatic pid change detection and EPG etc.\nEnabling this feature does not affect streams that do not contain section data."));
+#endif
 
   if (sectionFiltering) {
      Add(new cMenuEditBoolItem(tr("Scan Sid automatically"), &sidScanning));
+#if defined(APIVERSNUM) && APIVERSNUM >= 10513
      help.Append(tr("Define whether the service id shall be scanned automatically.\n\nRequires the section filtering. Automatic Sid scanning helps VDR to detect changed pids of streams."));
+#endif
 
      Add(new cMenuEditIntItem( tr("Disable filters"), &numDisabledFilters, 0, SECTION_FILTER_TABLE_SIZE));
+#if defined(APIVERSNUM) && APIVERSNUM >= 10513
      help.Append(tr("Define number of section filters to be disabled.\n\nCertain section filters might cause some unwanted behaviour to VDR such as time being falsely synchronized. By black-listing the filters here useful section data can be left intact for VDR to process."));
+#endif
 
      for (int i = 0; i < numDisabledFilters; ++i) {
          // TRANSLATORS: note the singular!
          Add(new cMenuEditStraItem(tr("Disable filter"), &disabledFilterIndexes[i], SECTION_FILTER_TABLE_SIZE, disabledFilterNames));
+#if defined(APIVERSNUM) && APIVERSNUM >= 10513
          help.Append(tr("Define an ill-behaving filter to be blacklisted."));
+#endif
          }
      }
 
@@ -697,8 +713,10 @@ eOSState cIptvPluginSetup::ProcessKey(eKeys Key)
      switch (Key) {
        case kRed:  return EditChannel();
        case kBlue: return ShowInfo();
+#if defined(APIVERSNUM) && APIVERSNUM >= 10513
        case kInfo: if (Current() < help.Size())
                       return AddSubMenu(new cMenuText(cString::sprintf("%s - %s '%s'", tr("Help"), trVDR("Plugin"), PLUGIN_NAME_I18N), help[Current()]));
+#endif
        default:    state = osContinue;
        }
      }
