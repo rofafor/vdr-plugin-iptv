@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.48 2008/01/20 13:17:36 ajhseppa Exp $
+ * $Id: setup.c,v 1.49 2008/01/20 14:13:28 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -642,27 +642,27 @@ void cIptvPluginSetup::Setup(void)
   help.Clear();
 
   Add(new cMenuEditIntItem( tr("TS buffer size [MB]"), &tsBufferSize, 1, 4));
-  help.Append(tr("Define a ringbuffer size for transport streams in megabytes.\n\nSmaller sizes help memory consumption but are more prone to buffer overflows."));
+  help.Append(tr("Define a ringbuffer size for transport streams in megabytes.\n\nSmaller sizes help memory consumption, but are more prone to buffer overflows."));
 
   Add(new cMenuEditIntItem( tr("TS buffer prefill ratio [%]"), &tsBufferPrefill, 0, 40));
-  help.Append(tr("Define a prefill ratio of the ringbuffer for transport streams before data is transferred to VDR. This is useful if streaming media over a slow or unreliable connection."));
+  help.Append(tr("Define a prefill ratio of the ringbuffer for transport streams before data is transferred to VDR.\n\nThis is useful if streaming media over a slow or unreliable connection."));
 
-  Add(new cMenuEditIntItem( tr("EXT protocol base port"),      &extProtocolBasePort, 0, 0xFFF7));
+  Add(new cMenuEditIntItem( tr("EXT protocol base port"), &extProtocolBasePort, 0, 0xFFF7));
   help.Append(tr("Define a base port used by EXT protocol.\n\nThe port range is defined by the number of IPTV devices. This setting sets the port which is listened for connections from external applications when using the EXT protocol."));
 
-  Add(new cMenuEditBoolItem(tr("Use section filtering"),       &sectionFiltering));
-  help.Append(tr("Define whether the section filtering shall be used. Section filtering means that iptv plugin tries to parse and provide VDR with secondary data about the currently active stream. VDR can then use this data for providing various functionalities such as automatic pid change detection and EPG etc. Enabling this feature does not affect streams that do not contain section data."));
+  Add(new cMenuEditBoolItem(tr("Use section filtering"), &sectionFiltering));
+  help.Append(tr("Define whether the section filtering shall be used.\n\nSection filtering means that IPTV plugin tries to parse and provide VDR with secondary data about the currently active stream. VDR can then use this data for providing various functionalities such as automatic pid change detection and EPG etc.\nEnabling this feature does not affect streams that do not contain section data."));
 
   if (sectionFiltering) {
-     Add(new cMenuEditBoolItem(tr("Scan Sid automatically"),   &sidScanning));
+     Add(new cMenuEditBoolItem(tr("Scan Sid automatically"), &sidScanning));
      help.Append(tr("Define whether the service id shall be scanned automatically.\n\nRequires the section filtering. Automatic Sid scanning helps VDR to detect changed pids of streams."));
 
-     Add(new cMenuEditIntItem( tr("Disable filters"),          &numDisabledFilters, 0, SECTION_FILTER_TABLE_SIZE));
+     Add(new cMenuEditIntItem( tr("Disable filters"), &numDisabledFilters, 0, SECTION_FILTER_TABLE_SIZE));
      help.Append(tr("Define number of section filters to be disabled.\n\nCertain section filters might cause some unwanted behaviour to VDR such as time being falsely synchronized. By black-listing the filters here useful section data can be left intact for VDR to process."));
 
      for (int i = 0; i < numDisabledFilters; ++i) {
          // TRANSLATORS: note the singular!
-         Add(new cMenuEditStraItem(tr("Disable filter"),       &disabledFilterIndexes[i], SECTION_FILTER_TABLE_SIZE, disabledFilterNames));
+         Add(new cMenuEditStraItem(tr("Disable filter"), &disabledFilterIndexes[i], SECTION_FILTER_TABLE_SIZE, disabledFilterNames));
          help.Append(tr("Define an ill-behaving filter to be blacklisted."));
          }
      }
