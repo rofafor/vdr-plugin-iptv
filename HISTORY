@@ -38,3 +38,7 @@ VDR Plugin 'iptv' Revision History
 - Added '-Wno-parentheses' to the compiler options.
 - Mapped 'kInfo' as help key in setup menu.
 - Refactored statistic collecting code.
+
+2008-xx-xx: Version 0.0.7
+
+- Updated French translation (Thanks to Michaël Nival).

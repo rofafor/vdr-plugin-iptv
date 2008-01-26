@@ -1,6 +1,6 @@
 diff -Nru vdr-1.5.13-vanilla/channels.c vdr-1.5.13-pluginparam/channels.c
 --- vdr-1.5.13-vanilla/channels.c	2008-01-13 17:31:25.000000000 +0200
-+++ vdr-1.5.13-pluginparam/channels.c	2008-01-20 02:00:08.000000000 +0200
++++ vdr-1.5.13-pluginparam/channels.c	2008-01-26 22:41:29.000000000 +0200
 @@ -166,6 +166,7 @@
    shortName = strdup("");
    provider = strdup("");
@@ -124,7 +124,7 @@ diff -Nru vdr-1.5.13-vanilla/channels.c vdr-1.5.13-pluginparam/channels.c
          free(sourcebuf);
 diff -Nru vdr-1.5.13-vanilla/channels.h vdr-1.5.13-pluginparam/channels.h
 --- vdr-1.5.13-vanilla/channels.h	2008-01-13 17:31:25.000000000 +0200
-+++ vdr-1.5.13-pluginparam/channels.h	2008-01-20 02:00:08.000000000 +0200
++++ vdr-1.5.13-pluginparam/channels.h	2008-01-26 22:41:29.000000000 +0200
 @@ -114,6 +114,7 @@
    char *shortName;
    char *provider;
@@ -166,7 +166,7 @@ diff -Nru vdr-1.5.13-vanilla/channels.h vdr-1.5.13-pluginparam/channels.h
    void SetCaDescriptors(int Level);
 diff -Nru vdr-1.5.13-vanilla/config.h vdr-1.5.13-pluginparam/config.h
 --- vdr-1.5.13-vanilla/config.h	2008-01-13 17:31:25.000000000 +0200
-+++ vdr-1.5.13-pluginparam/config.h	2008-01-20 02:00:08.000000000 +0200
++++ vdr-1.5.13-pluginparam/config.h	2008-01-26 22:41:29.000000000 +0200
 @@ -30,6 +30,8 @@
  #define APIVERSION  "1.5.13"
  #define APIVERSNUM   10513  // Version * 10000 + Major * 100 + Minor
@@ -178,7 +178,7 @@ diff -Nru vdr-1.5.13-vanilla/config.h vdr-1.5.13-pluginparam/config.h
  // VDR header files since the last APIVERSION. This allows compiled
 diff -Nru vdr-1.5.13-vanilla/menu.c vdr-1.5.13-pluginparam/menu.c
 --- vdr-1.5.13-vanilla/menu.c	2008-01-13 17:31:25.000000000 +0200
-+++ vdr-1.5.13-pluginparam/menu.c	2008-01-20 02:00:08.000000000 +0200
++++ vdr-1.5.13-pluginparam/menu.c	2008-01-26 22:41:29.000000000 +0200
 @@ -219,6 +219,7 @@
    cChannel *channel;
    cChannel data;
@@ -213,7 +213,7 @@ diff -Nru vdr-1.5.13-vanilla/menu.c vdr-1.5.13-pluginparam/menu.c
                isyslog("edited channel %d %s", channel->Number(), *data.ToText());
 diff -Nru vdr-1.5.13-vanilla/po/fi_FI.po vdr-1.5.13-pluginparam/po/fi_FI.po
 --- vdr-1.5.13-vanilla/po/fi_FI.po	2008-01-13 17:31:25.000000000 +0200
-+++ vdr-1.5.13-pluginparam/po/fi_FI.po	2008-01-20 02:00:08.000000000 +0200
++++ vdr-1.5.13-pluginparam/po/fi_FI.po	2008-01-26 22:41:29.000000000 +0200
 @@ -1001,3 +1001,6 @@
  #, c-format
  msgid "VDR will shut down in %s minutes"
@@ -221,9 +221,19 @@ diff -Nru vdr-1.5.13-vanilla/po/fi_FI.po vdr-1.5.13-pluginparam/po/fi_FI.po
 +
 +msgid "Parameters"
 +msgstr "Parametrit"
+diff -Nru vdr-1.5.13-vanilla/po/fr_FR.po vdr-1.5.13-pluginparam/po/fr_FR.po
+--- vdr-1.5.13-vanilla/po/fr_FR.po	2008-01-13 17:31:25.000000000 +0200
++++ vdr-1.5.13-pluginparam/po/fr_FR.po	2008-01-26 22:41:41.000000000 +0200
+@@ -1004,3 +1004,6 @@
+ #, c-format
+ msgid "VDR will shut down in %s minutes"
+ msgstr "VDR s'arrêtera dans %s minutes"
++
++msgid "Parameters"
++msgstr "Paramètres"
 diff -Nru vdr-1.5.13-vanilla/sources.c vdr-1.5.13-pluginparam/sources.c
 --- vdr-1.5.13-vanilla/sources.c	2008-01-13 17:31:25.000000000 +0200
-+++ vdr-1.5.13-pluginparam/sources.c	2008-01-20 02:00:08.000000000 +0200
++++ vdr-1.5.13-pluginparam/sources.c	2008-01-26 22:41:29.000000000 +0200
 @@ -37,6 +37,7 @@
    char buffer[16];
    char *q = buffer;
@@ -242,7 +252,7 @@ diff -Nru vdr-1.5.13-vanilla/sources.c vdr-1.5.13-pluginparam/sources.c
      case 'T': type = stTerr;  break;
 diff -Nru vdr-1.5.13-vanilla/sources.conf vdr-1.5.13-pluginparam/sources.conf
 --- vdr-1.5.13-vanilla/sources.conf	2008-01-13 17:31:25.000000000 +0200
-+++ vdr-1.5.13-pluginparam/sources.conf	2008-01-20 02:00:08.000000000 +0200
++++ vdr-1.5.13-pluginparam/sources.conf	2008-01-26 22:41:29.000000000 +0200
 @@ -188,3 +188,7 @@
  # Terrestrial
  
@@ -253,7 +263,7 @@ diff -Nru vdr-1.5.13-vanilla/sources.conf vdr-1.5.13-pluginparam/sources.conf
 +P       Plugin
 diff -Nru vdr-1.5.13-vanilla/sources.h vdr-1.5.13-pluginparam/sources.h
 --- vdr-1.5.13-vanilla/sources.h	2008-01-13 17:31:25.000000000 +0200
-+++ vdr-1.5.13-pluginparam/sources.h	2008-01-20 02:00:08.000000000 +0200
++++ vdr-1.5.13-pluginparam/sources.h	2008-01-26 22:41:29.000000000 +0200
 @@ -16,10 +16,11 @@
  public:
    enum eSourceType {

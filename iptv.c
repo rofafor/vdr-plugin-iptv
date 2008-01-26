@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.33 2008/01/19 20:24:10 rahrenbe Exp $
+ * $Id: iptv.c,v 1.34 2008/01/26 20:45:25 rahrenbe Exp $
  */
 
 #include <getopt.h>
@@ -22,7 +22,7 @@
 #error "You must apply the closefilter patch for VDR!"
 #endif
 
-static const char VERSION[]     = "0.0.6";
+static const char VERSION[]     = "0.0.7";
 static const char DESCRIPTION[] = trNOOP("Experience the IPTV");
 
 class cPluginIptv : public cPlugin {
