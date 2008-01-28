@@ -1,7 +1,7 @@
 #
 # Makefile for a Video Disk Recorder plugin
 #
-# $Id: Makefile,v 1.24 2008/01/13 16:45:02 rahrenbe Exp $
+# $Id: Makefile,v 1.25 2008/01/28 22:37:27 rahrenbe Exp $
 
 # Debugging on/off 
 #IPTV_DEBUG = 1
@@ -39,9 +39,11 @@ TMPDIR = /tmp
 ### The version number of VDR's plugin API (taken from VDR's "config.h"):
 
 APIVERSION = $(shell sed -ne '/define APIVERSION/s/^.*"\(.*\)".*$$/\1/p' $(VDRDIR)/config.h)
+APIVERSNUM = $(shell sed -ne '/define APIVERSNUM/s/^.*APIVERSNUM[ \t]*\([0-9]*\).*$$/\1/p' $(VDRDIR)/config.h)
 
 ### Test whether VDR has locale support
-VDRLOCALE = $(shell grep '^LOCALEDIR' $(VDRDIR)/Makefile)
+#VDRLOCALE = $(shell grep '^LOCALEDIR' $(VDRDIR)/Makefile)
+VDRLOCALE = $(shell if [ $(APIVERSNUM) -ge 10507 ]; then echo "locale"; fi)
 
 ### The name of the distribution archive:
 
