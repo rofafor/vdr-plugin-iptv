@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.35 2008/01/04 23:36:37 ajhseppa Exp $
+ * $Id: device.h,v 1.36 2008/01/28 21:36:33 rahrenbe Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -77,6 +77,7 @@ public:
   virtual bool ProvidesSource(int Source) const;
   virtual bool ProvidesTransponder(const cChannel *Channel) const;
   virtual bool ProvidesChannel(const cChannel *Channel, int Priority = -1, bool *NeedsDetachReceivers = NULL) const;
+  virtual int NumProvidedSystems(void) const;
 protected:
   virtual bool SetChannelDevice(const cChannel *Channel, bool LiveView);
 

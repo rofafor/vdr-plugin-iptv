@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.78 2008/01/19 21:08:02 ajhseppa Exp $
+ * $Id: device.c,v 1.79 2008/01/28 21:36:32 rahrenbe Exp $
  */
 
 #include "config.h"
@@ -214,6 +214,11 @@ bool cIptvDevice::ProvidesChannel(const cChannel *Channel, int Priority, bool *N
   if (NeedsDetachReceivers)
      *NeedsDetachReceivers = needsDetachReceivers;
   return result;
+}
+
+int cIptvDevice::NumProvidedSystems(void) const
+{
+  return 1;
 }
 
 bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
