@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.36 2008/01/28 21:36:33 rahrenbe Exp $
+ * $Id: device.h,v 1.37 2008/01/30 22:41:59 rahrenbe Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -17,6 +17,7 @@
 #include "protocolext.h"
 #include "streamer.h"
 #include "sectionfilter.h"
+#include "pidscanner.h"
 #include "sidscanner.h"
 #include "statistics.h"
 
@@ -43,6 +44,7 @@ private:
   cIptvProtocolFile *pFileProtocol;
   cIptvProtocolExt *pExtProtocol;
   cIptvStreamer *pIptvStreamer;
+  cPidScanner *pPidScanner;
   cSidScanner *pSidScanner;
   cMutex mutex;
   cIptvSectionFilter* secfilters[eMaxSecFilterCount];

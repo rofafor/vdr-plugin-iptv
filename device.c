@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.80 2008/01/30 21:57:33 rahrenbe Exp $
+ * $Id: device.c,v 1.81 2008/01/30 22:41:59 rahrenbe Exp $
  */
 
 #include "config.h"
@@ -32,6 +32,7 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   pFileProtocol = new cIptvProtocolFile();
   pExtProtocol = new cIptvProtocolExt();
   pIptvStreamer = new cIptvStreamer(tsBuffer, &mutex);
+  pPidScanner = new cPidScanner;
   // Initialize filter pointers
   memset(secfilters, '\0', sizeof(secfilters));
   // Start section handler for iptv device
@@ -51,6 +52,7 @@ cIptvDevice::~cIptvDevice()
   DELETE_POINTER(pFileProtocol);
   DELETE_POINTER(pExtProtocol);
   DELETE_POINTER(tsBuffer);
+  DELETE_POINTER(pPidScanner);
   // Detach and destroy sid filter
   if (pSidScanner) {
      Detach(pSidScanner);
@@ -236,6 +238,8 @@ bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
   pIptvStreamer->Set(location, parameter, deviceIndex, protocol);
   if (pSidScanner && IptvConfig.GetSectionFiltering() && IptvConfig.GetSidScanning())
      pSidScanner->SetChannel(Channel);
+  if (pPidScanner && IptvConfig.GetPidScanning())
+     pPidScanner->SetChannel(Channel);
   return true;
 }
 
@@ -381,8 +385,11 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
            }
         isPacketDelivered = true;
         Data = p;
-	// Update pid statistics 
-	AddPidStatistic(ts_pid(p), payload(p));
+        // Update pid statistics 
+        AddPidStatistic(ts_pid(p), payload(p));
+        // Analyze incomplete streams with built-in pid analyzer
+        if (pPidScanner && IptvConfig.GetPidScanning())
+            pPidScanner->Process(p);
         // Run the data through all filters
         for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
             if (secfilters[i])
