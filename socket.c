@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: socket.c,v 1.6 2007/10/26 22:07:10 rahrenbe Exp $
+ * $Id: socket.c,v 1.7 2008/01/30 21:57:33 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -71,7 +71,7 @@ bool cIptvSocket::OpenSocket(const int Port, const bool isUdp)
      if (isUdp) {
         int err = bind(socketDesc, (struct sockaddr *)&sockAddr, sizeof(sockAddr));
         ERROR_IF_FUNC(err < 0, "bind()", CloseSocket(), return false);
-     }
+        }
      // Update socket port
      socketPort = Port;
      }
@@ -110,9 +110,9 @@ int cIptvUdpSocket::Read(unsigned char* *BufferAddr)
   //debug("cIptvUdpSocket::Read()\n");
   // Error out if socket not initialized
   if (socketDesc <= 0) {
-    error("ERROR: Invalid socket in %s\n", __FUNCTION__);
-    return -1;
-  }
+     error("ERROR: Invalid socket in %s\n", __FUNCTION__);
+     return -1;
+     }
   socklen_t addrlen = sizeof(sockAddr);
   // Set argument point to read buffer
   *BufferAddr = readBuffer;
@@ -186,9 +186,9 @@ int cIptvTcpSocket::Read(unsigned char* *BufferAddr)
   //debug("cIptvTcpSocket::Read()\n");
   // Error out if socket not initialized
   if (socketDesc <= 0) {
-    error("ERROR: Invalid socket in %s\n", __FUNCTION__);
-    return -1;
-  }
+     error("ERROR: Invalid socket in %s\n", __FUNCTION__);
+     return -1;
+     }
   socklen_t addrlen = sizeof(sockAddr);
   // Set argument point to read buffer
   *BufferAddr = readBuffer;

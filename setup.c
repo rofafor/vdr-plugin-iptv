@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.50 2008/01/20 16:15:14 rahrenbe Exp $
+ * $Id: setup.c,v 1.51 2008/01/30 21:57:33 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -257,44 +257,44 @@ eOSState cIptvMenuEditChannel::ProcessKey(eKeys Key)
         bool firstIncrement = true;
         // Search for identical channels as these will be ignored by vdr
         for (cChannel *iteratorChannel = Channels.First(); iteratorChannel;
-             iteratorChannel = Channels.Next(iteratorChannel)) {
-           // This is one of the channels cause the uniquity check to fail
-           if (!iteratorChannel->GroupSep() && iteratorChannel != channel
-               && iteratorChannel->GetChannelID() == newchannel.GetChannelID()) {
-              // See if it has unique Plugin param. If yes then increment
-              // the corresponding Rid until it is unique
-              if (strcmp(iteratorChannel->PluginParam(),
-                         newchannel.PluginParam())) {
-                 // If the channel RID is already at maximum, then fail the
-                 // channel modification
-                 if (iteratorChannel->Rid() >= 0x1FFF) {
-                    debug("Cannot increment RID over maximum value\n");
-                    uniquityFailed = true;
-                    break;
-                    }
-                 debug("Incrementing conflicting channel RID\n");
-                 iteratorChannel->SetId(iteratorChannel->Nid(),
-                                        iteratorChannel->Tid(),
-                                        iteratorChannel->Sid(),
-                                        firstIncrement ?
-                                        0 : iteratorChannel->Rid() + 1);
+            iteratorChannel = Channels.Next(iteratorChannel)) {
+            // This is one of the channels cause the uniquity check to fail
+            if (!iteratorChannel->GroupSep() && iteratorChannel != channel &&
+                iteratorChannel->GetChannelID() == newchannel.GetChannelID()) {
+               // See if it has unique Plugin param. If yes then increment
+               // the corresponding Rid until it is unique
+               if (strcmp(iteratorChannel->PluginParam(),
+                          newchannel.PluginParam())) {
+                  // If the channel RID is already at maximum, then fail the
+                  // channel modification
+                  if (iteratorChannel->Rid() >= 0x1FFF) {
+                     debug("Cannot increment RID over maximum value\n");
+                     uniquityFailed = true;
+                     break;
+                     }
+                  debug("Incrementing conflicting channel RID\n");
+                  iteratorChannel->SetId(iteratorChannel->Nid(),
+                                         iteratorChannel->Tid(),
+                                         iteratorChannel->Sid(),
+                                         firstIncrement ?
+                                         0 : iteratorChannel->Rid() + 1);
 
-                 // Try zero Rid:s at first increment. Prevents them from
-                 // creeping slowly towards their maximum value
-                 firstIncrement = false;
+                  // Try zero Rid:s at first increment. Prevents them from
+                  // creeping slowly towards their maximum value
+                  firstIncrement = false;
 
-                 // Re-set the search and start again
-                 iteratorChannel = Channels.First();
-                 continue;
-                 // Cannot work around by incrementing rid because channels
-                 // are actually copies of each other
-                 }
-              else {
-                 uniquityFailed = true;
-                 break;
-                 }
-              }
-           }
+                  // Re-set the search and start again
+                  iteratorChannel = Channels.First();
+                  continue;
+                  // Cannot work around by incrementing rid because channels
+                  // are actually copies of each other
+                  }
+               else {
+                  uniquityFailed = true;
+                  break;
+                  }
+               }
+            }
         if (!uniquityFailed) {
            if (channel) {
               SetChannelData(channel);
@@ -623,6 +623,7 @@ cIptvPluginSetup::cIptvPluginSetup()
   extProtocolBasePort = IptvConfig.GetExtProtocolBasePort();
   sectionFiltering = IptvConfig.GetSectionFiltering();
   sidScanning = IptvConfig.GetSidScanning();
+  pidScanning = IptvConfig.GetPidScanning();
   numDisabledFilters = IptvConfig.GetDisabledFiltersCount();
   if (numDisabledFilters > SECTION_FILTER_TABLE_SIZE)
      numDisabledFilters = SECTION_FILTER_TABLE_SIZE;
@@ -656,6 +657,11 @@ void cIptvPluginSetup::Setup(void)
   Add(new cMenuEditIntItem( tr("EXT protocol base port"), &extProtocolBasePort, 0, 0xFFF7));
 #if defined(APIVERSNUM) && APIVERSNUM >= 10513
   help.Append(tr("Define a base port used by EXT protocol.\n\nThe port range is defined by the number of IPTV devices. This setting sets the port which is listened for connections from external applications when using the EXT protocol."));
+#endif
+
+  Add(new cMenuEditBoolItem(tr("Scan Pid automatically"), &pidScanning));
+#if defined(APIVERSNUM) && APIVERSNUM >= 10513
+  help.Append(tr("Define whether program ids shall be scanned automatically.\n\nAutomatic Pid scanning helps VDR to detect changed pids of streams."));
 #endif
 
   Add(new cMenuEditBoolItem(tr("Use section filtering"), &sectionFiltering));
@@ -757,6 +763,7 @@ void cIptvPluginSetup::Store(void)
   SetupStore("ExtProtocolBasePort", extProtocolBasePort);
   SetupStore("SectionFiltering", sectionFiltering);
   SetupStore("SidScanning", sidScanning);
+  SetupStore("PidScanning", pidScanning);
   StoreFilters("DisabledFilters", disabledFilterIndexes);
   // Update global config
   IptvConfig.SetTsBufferSize(tsBufferSize);
@@ -764,6 +771,7 @@ void cIptvPluginSetup::Store(void)
   IptvConfig.SetExtProtocolBasePort(extProtocolBasePort);
   IptvConfig.SetSectionFiltering(sectionFiltering);
   IptvConfig.SetSidScanning(sidScanning);
+  IptvConfig.SetPidScanning(pidScanning);
   for (int i = 0; i < SECTION_FILTER_TABLE_SIZE; ++i)
       IptvConfig.SetDisabledFilters(i, disabledFilterIndexes[i]);
 }

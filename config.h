@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: config.h,v 1.18 2008/01/04 23:36:37 ajhseppa Exp $
+ * $Id: config.h,v 1.19 2008/01/30 21:57:33 rahrenbe Exp $
  */
 
 #ifndef __IPTV_CONFIG_H
@@ -22,6 +22,7 @@ private:
   unsigned int useBytes;
   unsigned int sectionFiltering;
   unsigned int sidScanning;
+  unsigned int pidScanning;
   int disabledFilters[SECTION_FILTER_TABLE_SIZE];
   char configDirectory[255];
 
@@ -34,6 +35,7 @@ public:
   unsigned int GetUseBytes(void) const { return useBytes; }
   unsigned int GetSectionFiltering(void) const { return sectionFiltering; }
   unsigned int GetSidScanning(void) const { return sidScanning; }
+  unsigned int GetPidScanning(void) const { return pidScanning; }
   const char *GetConfigDirectory(void) const { return configDirectory; }
   unsigned int GetDisabledFiltersCount(void) const;
   int GetDisabledFilters(unsigned int Index) const;
@@ -43,6 +45,7 @@ public:
   void SetUseBytes(unsigned int On) { useBytes = On; }
   void SetSectionFiltering(unsigned int On) { sectionFiltering = On; }
   void SetSidScanning(unsigned int On) { sidScanning = On; }
+  void SetPidScanning(unsigned int On) { pidScanning = On; }
   void SetDisabledFilters(unsigned int Index, int Number);
   void SetConfigDirectory(const char *directoryP);
 };

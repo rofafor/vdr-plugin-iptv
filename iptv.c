@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.34 2008/01/26 20:45:25 rahrenbe Exp $
+ * $Id: iptv.c,v 1.35 2008/01/30 21:57:33 rahrenbe Exp $
  */
 
 #include <getopt.h>
@@ -79,20 +79,20 @@ bool cPluginIptv::ProcessArgs(int argc, char *argv[])
   debug("cPluginIptv::ProcessArgs()\n");
   // Implement command line argument processing here if applicable.
   static const struct option long_options[] = {
-       { "devices", required_argument, NULL, 'd' },
-       { NULL }
-     };
+    { "devices", required_argument, NULL, 'd' },
+    { NULL }
+    };
 
   int c;
   while ((c = getopt_long(argc, argv, "d:", long_options, NULL)) != -1) {
-        switch (c) {
-          case 'd':
-               deviceCount = atoi(optarg);
-               break;
-          default:
-               return false;
-          }
-        }
+    switch (c) {
+      case 'd':
+           deviceCount = atoi(optarg);
+           break;
+      default:
+           return false;
+      }
+    }
   return true;
 }
 
@@ -167,14 +167,14 @@ int cPluginIptv::ParseFilters(const char *Value, int *Filters)
   char buffer[256];
   int n = 0;
   while (Value && *Value && (n < SECTION_FILTER_TABLE_SIZE)) {
-        strn0cpy(buffer, Value, sizeof(buffer));
-        int i = atoi(buffer);
-        //debug("cPluginIptv::ParseFilters(): Filters[%d]=%d\n", n, i);
-        if (i >= 0)
-           Filters[n++] = i;
-        if ((Value = strchr(Value, ' ')) != NULL)
-           Value++;
-        }
+    strn0cpy(buffer, Value, sizeof(buffer));
+    int i = atoi(buffer);
+    //debug("cPluginIptv::ParseFilters(): Filters[%d]=%d\n", n, i);
+    if (i >= 0)
+       Filters[n++] = i;
+    if ((Value = strchr(Value, ' ')) != NULL)
+       Value++;
+    }
   return n;
 }
 
@@ -192,6 +192,8 @@ bool cPluginIptv::SetupParse(const char *Name, const char *Value)
      IptvConfig.SetSectionFiltering(atoi(Value));
   else if (!strcasecmp(Name, "SidScanning"))
      IptvConfig.SetSidScanning(atoi(Value));
+  else if (!strcasecmp(Name, "PidScanning"))
+     IptvConfig.SetPidScanning(atoi(Value));
   else if (!strcasecmp(Name, "DisabledFilters")) {
      int DisabledFilters[SECTION_FILTER_TABLE_SIZE];
      for (unsigned int i = 0; i < ARRAY_SIZE(DisabledFilters); ++i)

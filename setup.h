@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.h,v 1.18 2008/01/20 16:15:14 rahrenbe Exp $
+ * $Id: setup.h,v 1.19 2008/01/30 21:57:33 rahrenbe Exp $
  */
 
 #ifndef __IPTV_SETUP_H
@@ -20,6 +20,7 @@ private:
   int extProtocolBasePort;
   int sectionFiltering;
   int sidScanning;
+  int pidScanning;
   int numDisabledFilters;
   int disabledFilterIndexes[SECTION_FILTER_TABLE_SIZE];
   const char *disabledFilterNames[SECTION_FILTER_TABLE_SIZE];

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolif.h,v 1.7 2007/10/19 22:18:55 rahrenbe Exp $
+ * $Id: protocolif.h,v 1.8 2008/01/30 21:57:33 rahrenbe Exp $
  */
 
 #ifndef __IPTV_PROTOCOLIF_H
@@ -20,8 +20,8 @@ public:
   virtual cString GetInformation(void) = 0;
 
 private:
-    cIptvProtocolIf(const cIptvProtocolIf&);
-    cIptvProtocolIf& operator=(const cIptvProtocolIf&);
+  cIptvProtocolIf(const cIptvProtocolIf&);
+  cIptvProtocolIf& operator=(const cIptvProtocolIf&);
 };
 
 #endif // __IPTV_PROTOCOLIF_H

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.22 2008/01/04 23:36:37 ajhseppa Exp $
+ * $Id: protocolhttp.c,v 1.23 2008/01/30 21:57:33 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -119,10 +119,10 @@ bool cIptvProtocolHttp::Disconnect(void)
   debug("cIptvProtocolHttp::Disconnect()\n");
   // Check that stream address is valid
   if (isActive) {
-      // Close the socket
-      CloseSocket();
-      // Update active flag
-      isActive = false;
+     // Close the socket
+     CloseSocket();
+     // Update active flag
+     isActive = false;
      }
   return true;
 }
@@ -228,22 +228,22 @@ bool cIptvProtocolHttp::Set(const char* Location, const int Parameter, const int
 {
   debug("cIptvProtocolHttp::Set(): Location=%s Parameter=%d Index=%d\n", Location, Parameter, Index);
   if (!isempty(Location)) {
-    // Disconnect the current socket
-    Disconnect();
-    // Update stream address, path and port
-    streamAddr = strcpyrealloc(streamAddr, Location);
-    char *path = strstr(streamAddr, "/");
-    if (path) {
-       streamPath = strcpyrealloc(streamPath, path);
-       *path = 0;
-       }
-    else
-       streamPath = strcpyrealloc(streamPath, "/");
-    socketPort = Parameter;
-    debug("http://%s:%d%s\n", streamAddr, socketPort, streamPath);
-    // Re-connect the socket
-    Connect();
-    }
+     // Disconnect the current socket
+     Disconnect();
+     // Update stream address, path and port
+     streamAddr = strcpyrealloc(streamAddr, Location);
+     char *path = strstr(streamAddr, "/");
+     if (path) {
+        streamPath = strcpyrealloc(streamPath, path);
+        *path = 0;
+        }
+     else
+        streamPath = strcpyrealloc(streamPath, "/");
+     socketPort = Parameter;
+     debug("http://%s:%d%s\n", streamAddr, socketPort, streamPath);
+     // Re-connect the socket
+     Connect();
+     }
   return true;
 }
 

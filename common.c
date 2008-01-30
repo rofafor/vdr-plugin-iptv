@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: common.c,v 1.9 2008/01/04 23:36:37 ajhseppa Exp $
+ * $Id: common.c,v 1.10 2008/01/30 21:57:33 rahrenbe Exp $
  */
 
 #include <vdr/tools.h>
@@ -50,9 +50,9 @@ int select_single_desc(int descriptor, const int usecs, const bool selectWrite)
   FD_SET(descriptor, &fds);
   int retval = 0;
   if (selectWrite)
-    retval = select(descriptor + 1, NULL, &fds, NULL, &tv);
+     retval = select(descriptor + 1, NULL, &fds, NULL, &tv);
   else
-    retval = select(descriptor + 1, &fds, NULL, NULL, &tv);
+     retval = select(descriptor + 1, &fds, NULL, NULL, &tv);
   // Check if error
   ERROR_IF_RET(retval < 0, "select()", return retval);
   return retval;

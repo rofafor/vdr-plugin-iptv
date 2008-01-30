@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.c,v 1.17 2008/01/19 21:08:02 ajhseppa Exp $
+ * $Id: sectionfilter.c,v 1.18 2008/01/30 21:57:33 rahrenbe Exp $
  */
 
 #include "sectionfilter.h"
@@ -38,17 +38,16 @@ cIptvSectionFilter::cIptvSectionFilter(int Index, int devInd,
   filter_mask[0] = Mask;
 
   // Invert the filter
-  for (int i = 0; i < DMX_MAX_FILTER_SIZE; ++i) {
+  for (int i = 0; i < DMX_MAX_FILTER_SIZE; ++i)
       filter_value[i] ^= 0xff;
-  }
 
   uint8_t mask, mode, local_doneq = 0;
-  for (int i = 0; i < DMX_MAX_FILTER_SIZE; i++) {
-    mode = filter_mode[i];
-    mask = filter_mask[i];
-    maskandmode[i] = mask & mode;
-    local_doneq |= maskandnotmode[i] = mask & ~mode;
-  }
+  for (int i = 0; i < DMX_MAX_FILTER_SIZE; ++i) {
+      mode = filter_mode[i];
+      mask = filter_mask[i];
+      maskandmode[i] = mask & mode;
+      local_doneq |= maskandnotmode[i] = mask & ~mode;
+      }
   doneq = local_doneq ? 1 : 0;
 
   struct stat sb;
@@ -115,8 +114,6 @@ int cIptvSectionFilter::dmxdev_section_callback(const uint8_t *buffer1, size_t b
   return 0;
 }
 
-
-
 void cIptvSectionFilter::demux_swfilter_section_new()
 {
 #ifdef DEMUX_SECTION_LOSS_LOG
@@ -131,7 +128,7 @@ void cIptvSectionFilter::demux_swfilter_section_new()
         printf("sectionfilter.c section ts padding loss: %d/%d\n",
                n, tsfeedp);
         printf("sectionfilter.c pad data:");
-        for (i = 0; i < n; i++)
+        for (i = 0; i < n; ++i)
 	    printf(" %02x", secbuf[i]);
         printf("\n");
         }
@@ -146,7 +143,7 @@ int cIptvSectionFilter::demux_swfilter_sectionfilter()
   uint8_t neq = 0;
   int i;
 
-  for (i = 0; i < DMX_MAX_FILTER_SIZE; i++) {
+  for (i = 0; i < DMX_MAX_FILTER_SIZE; ++i) {
       uint8_t local_xor = filter_value[i] ^ secbuf[i];
       if (maskandmode[i] & local_xor) {
 #ifdef DEBUG_PRINTF
@@ -206,7 +203,7 @@ int cIptvSectionFilter::demux_swfilter_section_copy_dump(const uint8_t *buf, uin
   /* to be sure always set secbuf */
   secbuf = secbuf_base + secbufp;
 
-  for (n = 0; secbufp + 2 < limit; n++) {
+  for (n = 0; secbufp + 2 < limit; ++n) {
       seclen_local = section_length(secbuf);
       if (seclen_local <= 0 || seclen_local > DMX_MAX_SECTION_SIZE ||
          seclen_local + secbufp > limit)

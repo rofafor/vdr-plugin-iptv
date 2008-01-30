@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.79 2008/01/28 21:36:32 rahrenbe Exp $
+ * $Id: device.c,v 1.80 2008/01/30 21:57:33 rahrenbe Exp $
  */
 
 #include "config.h"
@@ -326,7 +326,7 @@ void cIptvDevice::CloseDvr(void)
   if (pSidScanner && IptvConfig.GetSectionFiltering() && IptvConfig.GetSidScanning())
      pSidScanner->SetStatus(false);
   if (pIptvStreamer)
-    pIptvStreamer->Close();
+     pIptvStreamer->Close();
   isOpenDvr = false;
 }
 
