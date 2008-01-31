@@ -44,3 +44,5 @@ VDR Plugin 'iptv' Revision History
 - Updated French translation (Thanks to Michaël Nival).
 - Modified VDR locale support detection.
 - Added preliminary automatic Pid scanning functionality.
+- Modified channels.conf format to enable/disable channel
+  specific pid and sid scanning functionality.

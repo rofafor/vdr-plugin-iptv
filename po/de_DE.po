@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: iptv 0.0.6\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2008-01-30 23:53+0200\n"
+"POT-Creation-Date: 2008-02-01 00:24+0200\n"
 "PO-Revision-Date: 2007-10-29 21:19+0100\n"
 "Last-Translator: Tobias Grimm <tg@e-tobi.net>\n"
 "Language-Team: German\n"
@@ -69,6 +69,12 @@ msgstr "Adresse"
 
 msgid "Port"
 msgstr "Port"
+
+msgid "Scan Sid"
+msgstr "Scanne SID"
+
+msgid "Scan Pid"
+msgstr "Scanne PID"
 
 msgid "Nid"
 msgstr "Nid"

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.81 2008/01/30 22:41:59 rahrenbe Exp $
+ * $Id: device.c,v 1.82 2008/01/31 22:28:53 rahrenbe Exp $
  */
 
 #include "config.h"
@@ -19,6 +19,8 @@ cIptvDevice::cIptvDevice(unsigned int Index)
 : deviceIndex(Index),
   isPacketDelivered(false),
   isOpenDvr(false),
+  sidScanEnabled(false),
+  pidScanEnabled(false),
   mutex()
 {
   debug("cIptvDevice::cIptvDevice(%d)\n", deviceIndex);
@@ -157,16 +159,40 @@ cString cIptvDevice::GetInformation(unsigned int Page)
   return info;
 }
 
-cString cIptvDevice::GetChannelSettings(const char *IptvParam, int *Parameter, cIptvProtocolIf* *Protocol)
+cString cIptvDevice::GetChannelSettings(const char *IptvParam, int *Parameter, int *SidScan, int *PidScan, cIptvProtocolIf* *Protocol)
 {
   debug("cIptvDevice::GetChannelSettings(%d)\n", deviceIndex);
   char *tag = NULL;
   char *proto = NULL;
   char *loc = NULL;
-  if (sscanf(IptvParam, "%a[^|]|%a[^|]|%a[^|]|%u", &tag, &proto, &loc, Parameter) == 4) {
+  if (sscanf(IptvParam, "%a[^|]|S%dP%d|%a[^|]|%a[^|]|%u", &tag, SidScan, PidScan, &proto, &loc, Parameter) == 6) {
      cString tagstr(tag, true);
      cString protostr(proto, true);
      cString locstr(loc, true);
+     // check if IPTV tag
+     if (strncasecmp(*tagstr, "IPTV", 4) == 0) {
+        // check if protocol is supported and update the pointer
+        if (strncasecmp(*protostr, "UDP", 3) == 0)
+           *Protocol = pUdpProtocol;
+        else if (strncasecmp(*protostr, "HTTP", 4) == 0)
+           *Protocol = pHttpProtocol;
+        else if (strncasecmp(*protostr, "FILE", 4) == 0)
+           *Protocol = pFileProtocol;
+        else if (strncasecmp(*protostr, "EXT", 3) == 0)
+           *Protocol = pExtProtocol;
+        else
+           return NULL;
+        // return location
+        return locstr;
+        }
+     }
+  // compatibility mode for old channels.conf format
+  else if (sscanf(IptvParam, "%a[^|]|%a[^|]|%a[^|]|%u", &tag, &proto, &loc, Parameter) == 4) {
+     cString tagstr(tag, true);
+     cString protostr(proto, true);
+     cString locstr(loc, true);
+     *SidScan = 0;
+     *PidScan = 0;
      // check if IPTV tag
      if (strncasecmp(*tagstr, "IPTV", 4) == 0) {
         // check if protocol is supported and update the pointer
@@ -225,20 +251,22 @@ int cIptvDevice::NumProvidedSystems(void) const
 
 bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
 {
-  int parameter;
+  int parameter, sidscan, pidscan;
   cString location;
   cIptvProtocolIf *protocol;
 
   debug("cIptvDevice::SetChannelDevice(%d)\n", deviceIndex);
-  location = GetChannelSettings(Channel->PluginParam(), &parameter, &protocol);
+  location = GetChannelSettings(Channel->PluginParam(), &parameter, &sidscan, &pidscan, &protocol);
   if (isempty(location)) {
      error("ERROR: Unrecognized IPTV channel settings: %s", Channel->PluginParam());
      return false;
      }
+  sidScanEnabled = sidscan ? true : false;
+  pidScanEnabled = pidscan ? true : false;
   pIptvStreamer->Set(location, parameter, deviceIndex, protocol);
-  if (pSidScanner && IptvConfig.GetSectionFiltering() && IptvConfig.GetSidScanning())
+  if (sidScanEnabled && pSidScanner && IptvConfig.GetSectionFiltering() && IptvConfig.GetSidScanning())
      pSidScanner->SetChannel(Channel);
-  if (pPidScanner && IptvConfig.GetPidScanning())
+  if (pidScanEnabled && pPidScanner && IptvConfig.GetPidScanning())
      pPidScanner->SetChannel(Channel);
   return true;
 }
@@ -318,7 +346,7 @@ bool cIptvDevice::OpenDvr(void)
   mutex.Unlock();
   ResetBuffering();
   pIptvStreamer->Open();
-  if (pSidScanner && IptvConfig.GetSectionFiltering() && IptvConfig.GetSidScanning())
+  if (sidScanEnabled && pSidScanner && IptvConfig.GetSectionFiltering() && IptvConfig.GetSidScanning())
      pSidScanner->SetStatus(true);
   isOpenDvr = true;
   return true;
@@ -327,7 +355,7 @@ bool cIptvDevice::OpenDvr(void)
 void cIptvDevice::CloseDvr(void)
 {
   debug("cIptvDevice::CloseDvr(%d)\n", deviceIndex);
-  if (pSidScanner && IptvConfig.GetSectionFiltering() && IptvConfig.GetSidScanning())
+  if (pidScanEnabled && pSidScanner && IptvConfig.GetSectionFiltering() && IptvConfig.GetSidScanning())
      pSidScanner->SetStatus(false);
   if (pIptvStreamer)
      pIptvStreamer->Close();
@@ -388,7 +416,7 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
         // Update pid statistics 
         AddPidStatistic(ts_pid(p), payload(p));
         // Analyze incomplete streams with built-in pid analyzer
-        if (pPidScanner && IptvConfig.GetPidScanning())
+        if (pidScanEnabled && pPidScanner && IptvConfig.GetPidScanning())
             pPidScanner->Process(p);
         // Run the data through all filters
         for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {

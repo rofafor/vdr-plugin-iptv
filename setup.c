@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.51 2008/01/30 21:57:33 rahrenbe Exp $
+ * $Id: setup.c,v 1.52 2008/01/31 22:28:53 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -37,12 +37,13 @@ private:
   struct tIptvChannel {
     int frequency, source, protocol, parameter, vpid, ppid, tpid, sid, nid, tid, rid;
     int apid[MAXAPIDS + 1], dpid[MAXDPIDS + 1], spid[MAXSPIDS + 1], caids[MAXCAIDS + 1];
+    int sidscan, pidscan;
     char name[256], location[256];
   } data;
   cChannel *channel;
   const char *protocols[eProtocolCount];
   void Setup(void);
-  cString GetIptvSettings(const char *Param, int *Parameter, int *Protocol);
+  cString GetIptvSettings(const char *Param, int *Parameter, int *SidScan, int *PidScan, int *Protocol);
   void GetChannelData(cChannel *Channel);
   void SetChannelData(cChannel *Channel);
 
@@ -69,15 +70,38 @@ cIptvMenuEditChannel::cIptvMenuEditChannel(cChannel *Channel, bool New)
   Setup();
 }
 
-cString cIptvMenuEditChannel::GetIptvSettings(const char *Param, int *Parameter, int *Protocol)
+cString cIptvMenuEditChannel::GetIptvSettings(const char *Param, int *Parameter, int *SidScan, int *PidScan, int *Protocol)
 {
   char *tag = NULL;
   char *proto = NULL;
   char *loc = NULL;
-  if (sscanf(Param, "%a[^|]|%a[^|]|%a[^|]|%d", &tag, &proto, &loc, Parameter) == 4) {
+  if (sscanf(Param, "%a[^|]|S%dP%d|%a[^|]|%a[^|]|%d", &tag, SidScan, PidScan, &proto, &loc, Parameter) == 6) {
      cString tagstr(tag, true);
      cString protostr(proto, true);
      cString locstr(loc, true);
+     // check if IPTV tag
+     if (strncasecmp(*tagstr, "IPTV", 4) == 0) {
+        // check if protocol is supported and update the pointer
+        if (strncasecmp(*protostr, "UDP", 3) == 0)
+           *Protocol = eProtocolUDP;
+        else if (strncasecmp(*protostr, "HTTP", 4) == 0)
+           *Protocol = eProtocolHTTP;
+        else if (strncasecmp(*protostr, "FILE", 4) == 0)
+           *Protocol = eProtocolFILE;
+        else if (strncasecmp(*protostr, "EXT", 3) == 0)
+           *Protocol = eProtocolEXT;
+        else
+           return NULL;
+        // return location
+        return locstr;
+        }
+     }
+  else if (sscanf(Param, "%a[^|]|%a[^|]|%a[^|]|%d", &tag, &proto, &loc, Parameter) == 4) {
+     cString tagstr(tag, true);
+     cString protostr(proto, true);
+     cString locstr(loc, true);
+     *SidScan = 0;
+     *PidScan = 0;
      // check if IPTV tag
      if (strncasecmp(*tagstr, "IPTV", 4) == 0) {
         // check if protocol is supported and update the pointer
@@ -101,7 +125,7 @@ cString cIptvMenuEditChannel::GetIptvSettings(const char *Param, int *Parameter,
 void cIptvMenuEditChannel::GetChannelData(cChannel *Channel)
 {
   if (Channel) {
-     int parameter, protocol;
+     int parameter, protocol, sidscan, pidscan;
      data.frequency = Channel->Frequency();
      data.source = Channel->Source();
      data.vpid = Channel->Vpid();
@@ -120,7 +144,9 @@ void cIptvMenuEditChannel::GetChannelData(cChannel *Channel)
      data.tid = Channel->Tid();
      data.rid = Channel->Rid();
      strn0cpy(data.name, Channel->Name(), sizeof(data.name));
-     strn0cpy(data.location, *GetIptvSettings(Channel->PluginParam(), &parameter, &protocol), sizeof(data.location));
+     strn0cpy(data.location, *GetIptvSettings(Channel->PluginParam(), &parameter, &sidscan, &pidscan, &protocol), sizeof(data.location));
+     data.sidscan = sidscan;
+     data.pidscan = pidscan;
      data.protocol = protocol;
      data.parameter = parameter;
      }
@@ -144,6 +170,8 @@ void cIptvMenuEditChannel::GetChannelData(cChannel *Channel)
      data.rid = 0;
      strn0cpy(data.name, "IPTV", sizeof(data.name));
      strn0cpy(data.location, "127.0.0.1", sizeof(data.location));
+     data.sidscan = 0;
+     data.pidscan = 0;
      data.protocol = eProtocolUDP;
      data.parameter = 1234;
      }
@@ -157,17 +185,17 @@ void cIptvMenuEditChannel::SetChannelData(cChannel *Channel)
      char dlangs[MAXDPIDS][MAXLANGCODE2] = { "" };
      switch (data.protocol) {
        case eProtocolEXT:
-            param = cString::sprintf("IPTV|EXT|%s|%d", data.location, data.parameter);
+            param = cString::sprintf("IPTV|S%dP%d|EXT|%s|%d", data.sidscan, data.pidscan, data.location, data.parameter);
             break;
        case eProtocolFILE:
-            param = cString::sprintf("IPTV|FILE|%s|%d", data.location, data.parameter);
+            param = cString::sprintf("IPTV|S%dP%d|FILE|%s|%d", data.sidscan, data.pidscan, data.location, data.parameter);
             break;
        case eProtocolHTTP:
-            param = cString::sprintf("IPTV|HTTP|%s|%d", data.location, data.parameter);
+            param = cString::sprintf("IPTV|S%dP%d|HTTP|%s|%d", data.sidscan, data.pidscan, data.location, data.parameter);
             break;
        default:
        case eProtocolUDP:
-            param = cString::sprintf("IPTV|UDP|%s|%d", data.location, data.parameter);
+            param = cString::sprintf("IPTV|S%dP%d|UDP|%s|%d", data.sidscan, data.pidscan, data.location, data.parameter);
             break;
        }
 #if defined(APIVERSNUM) && APIVERSNUM < 10510
@@ -218,6 +246,8 @@ void cIptvMenuEditChannel::Setup(void)
          Add(new cMenuEditIntItem(tr("Port"),   &data.parameter,  0, 0xFFFF));
          break;
     }
+  Add(new cMenuEditBoolItem(tr("Scan Sid"),    &data.sidscan));
+  Add(new cMenuEditBoolItem(tr("Scan Pid"),    &data.pidscan));
   // Normal settings
 #if defined(APIVERSNUM) && APIVERSNUM < 10511
   Add(new cMenuEditStrItem(trVDR("Name"),       data.name,     sizeof(data.name), trVDR(FileNameChars)));

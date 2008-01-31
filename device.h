@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.37 2008/01/30 22:41:59 rahrenbe Exp $
+ * $Id: device.h,v 1.38 2008/01/31 22:28:53 rahrenbe Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -37,6 +37,8 @@ private:
   unsigned int deviceIndex;
   bool isPacketDelivered;
   bool isOpenDvr;
+  bool sidScanEnabled;
+  bool pidScanEnabled;
   cRingBufferLinear *tsBuffer;
   int tsBufferPrefill;
   cIptvProtocolUdp *pUdpProtocol;
@@ -67,7 +69,7 @@ private:
 
   // for channel parsing & buffering
 private:
-  cString GetChannelSettings(const char *IptvParam, int *Parameter, cIptvProtocolIf* *Protocol);
+  cString GetChannelSettings(const char *IptvParam, int *Parameter, int *SidScan, int *PidScan, cIptvProtocolIf* *Protocol);
   bool ProvidesIptv(const char *Param) const;
   void ResetBuffering(void);
   bool IsBuffering(void);
