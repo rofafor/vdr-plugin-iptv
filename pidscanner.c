@@ -3,14 +3,17 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: pidscanner.c,v 1.1 2008/01/30 22:41:59 rahrenbe Exp $
+ * $Id: pidscanner.c,v 1.2 2008/02/01 21:54:24 rahrenbe Exp $
  */
 
 #include "common.h"
 #include "pidscanner.h"
 
+#define PIDSCANNER_TIMEOUT_IN_MS 60000 /* 60s */
+
 cPidScanner::cPidScanner(void) 
-: process(true),
+: timeout(0),
+  process(true),
   Vpid(0xFFFF),
   Apid(0xFFFF),
   numVpids(0),
@@ -30,6 +33,10 @@ void cPidScanner::Process(const uint8_t* buf)
   //debug("cPidScanner::Process()\n");
   if (!process)
      return;
+
+  // Stop scanning after defined timeout
+  if (timeout.TimedOut())
+     process = false;
 
   if (buf[0] != 0x47) {
      error("Not TS packet: 0x%X\n", buf[0]);
@@ -81,15 +88,21 @@ void cPidScanner::Process(const uint8_t* buf)
               return;
 	   debug("cPidScanner::Process(): Vpid=0x%04X, Apid=0x%04X\n", Vpid, Apid);
            cChannel *IptvChannel = Channels.GetByChannelID(channel.GetChannelID());
-           int Ppid = 0;
            int Apids[MAXAPIDS + 1] = { 0 }; // these lists are zero-terminated
            int Dpids[MAXDPIDS + 1] = { 0 };
            int Spids[MAXSPIDS + 1] = { 0 };
            char ALangs[MAXAPIDS][MAXLANGCODE2] = { "" };
            char DLangs[MAXDPIDS][MAXLANGCODE2] = { "" };
            char SLangs[MAXSPIDS][MAXLANGCODE2] = { "" };
-           int Tpid = 0;
+           int Ppid = IptvChannel->Ppid();
+           int Tpid = IptvChannel->Tpid();
            Apids[0] = Apid;
+           for (unsigned int i = 1; i < MAXAPIDS; ++i)
+               Apids[i] = IptvChannel->Apid(i);
+           for (unsigned int i = 0; i < MAXDPIDS; ++i)
+               Dpids[i] = IptvChannel->Dpid(i);
+           for (unsigned int i = 0; i < MAXSPIDS; ++i)
+               Spids[i] = IptvChannel->Spid(i);
            IptvChannel->SetPids(Vpid, Ppid, Apids, ALangs, Dpids, DLangs, Spids, SLangs, Tpid);
            Channels.Unlock();
 	   process = false;
@@ -113,4 +126,5 @@ void cPidScanner::SetChannel(const cChannel *Channel)
   Apid = 0xFFFF;
   numApids = 0;
   process = true;
+  timeout.Set(PIDSCANNER_TIMEOUT_IN_MS);
 }

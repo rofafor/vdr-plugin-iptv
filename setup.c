@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.52 2008/01/31 22:28:53 rahrenbe Exp $
+ * $Id: setup.c,v 1.53 2008/02/01 21:54:24 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -76,6 +76,27 @@ cString cIptvMenuEditChannel::GetIptvSettings(const char *Param, int *Parameter,
   char *proto = NULL;
   char *loc = NULL;
   if (sscanf(Param, "%a[^|]|S%dP%d|%a[^|]|%a[^|]|%d", &tag, SidScan, PidScan, &proto, &loc, Parameter) == 6) {
+     cString tagstr(tag, true);
+     cString protostr(proto, true);
+     cString locstr(loc, true);
+     // check if IPTV tag
+     if (strncasecmp(*tagstr, "IPTV", 4) == 0) {
+        // check if protocol is supported and update the pointer
+        if (strncasecmp(*protostr, "UDP", 3) == 0)
+           *Protocol = eProtocolUDP;
+        else if (strncasecmp(*protostr, "HTTP", 4) == 0)
+           *Protocol = eProtocolHTTP;
+        else if (strncasecmp(*protostr, "FILE", 4) == 0)
+           *Protocol = eProtocolFILE;
+        else if (strncasecmp(*protostr, "EXT", 3) == 0)
+           *Protocol = eProtocolEXT;
+        else
+           return NULL;
+        // return location
+        return locstr;
+        }
+     }
+  else if (sscanf(Param, "%a[^|]|P%dS%d|%a[^|]|%a[^|]|%d", &tag, PidScan, SidScan, &proto, &loc, Parameter) == 6) {
      cString tagstr(tag, true);
      cString protostr(proto, true);
      cString locstr(loc, true);
@@ -246,8 +267,11 @@ void cIptvMenuEditChannel::Setup(void)
          Add(new cMenuEditIntItem(tr("Port"),   &data.parameter,  0, 0xFFFF));
          break;
     }
-  Add(new cMenuEditBoolItem(tr("Scan Sid"),    &data.sidscan));
-  Add(new cMenuEditBoolItem(tr("Scan Pid"),    &data.pidscan));
+  cOsdItem *sidScanItem = new cMenuEditBoolItem(tr("Scan Sid"), &data.sidscan);
+  if (!IptvConfig.GetSectionFiltering())
+     sidScanItem->SetSelectable(false);
+  Add(sidScanItem);
+  Add(new cMenuEditBoolItem(tr("Scan pids"),   &data.pidscan));
   // Normal settings
 #if defined(APIVERSNUM) && APIVERSNUM < 10511
   Add(new cMenuEditStrItem(trVDR("Name"),       data.name,     sizeof(data.name), trVDR(FileNameChars)));
@@ -652,8 +676,6 @@ cIptvPluginSetup::cIptvPluginSetup()
   tsBufferPrefill = IptvConfig.GetTsBufferPrefillRatio();
   extProtocolBasePort = IptvConfig.GetExtProtocolBasePort();
   sectionFiltering = IptvConfig.GetSectionFiltering();
-  sidScanning = IptvConfig.GetSidScanning();
-  pidScanning = IptvConfig.GetPidScanning();
   numDisabledFilters = IptvConfig.GetDisabledFiltersCount();
   if (numDisabledFilters > SECTION_FILTER_TABLE_SIZE)
      numDisabledFilters = SECTION_FILTER_TABLE_SIZE;
@@ -689,22 +711,12 @@ void cIptvPluginSetup::Setup(void)
   help.Append(tr("Define a base port used by EXT protocol.\n\nThe port range is defined by the number of IPTV devices. This setting sets the port which is listened for connections from external applications when using the EXT protocol."));
 #endif
 
-  Add(new cMenuEditBoolItem(tr("Scan Pid automatically"), &pidScanning));
-#if defined(APIVERSNUM) && APIVERSNUM >= 10513
-  help.Append(tr("Define whether program ids shall be scanned automatically.\n\nAutomatic Pid scanning helps VDR to detect changed pids of streams."));
-#endif
-
   Add(new cMenuEditBoolItem(tr("Use section filtering"), &sectionFiltering));
 #if defined(APIVERSNUM) && APIVERSNUM >= 10513
   help.Append(tr("Define whether the section filtering shall be used.\n\nSection filtering means that IPTV plugin tries to parse and provide VDR with secondary data about the currently active stream. VDR can then use this data for providing various functionalities such as automatic pid change detection and EPG etc.\nEnabling this feature does not affect streams that do not contain section data."));
 #endif
 
   if (sectionFiltering) {
-     Add(new cMenuEditBoolItem(tr("Scan Sid automatically"), &sidScanning));
-#if defined(APIVERSNUM) && APIVERSNUM >= 10513
-     help.Append(tr("Define whether the service id shall be scanned automatically.\n\nRequires the section filtering. Automatic Sid scanning helps VDR to detect changed pids of streams."));
-#endif
-
      Add(new cMenuEditIntItem( tr("Disable filters"), &numDisabledFilters, 0, SECTION_FILTER_TABLE_SIZE));
 #if defined(APIVERSNUM) && APIVERSNUM >= 10513
      help.Append(tr("Define number of section filters to be disabled.\n\nCertain section filters might cause some unwanted behaviour to VDR such as time being falsely synchronized. By black-listing the filters here useful section data can be left intact for VDR to process."));
@@ -792,16 +804,12 @@ void cIptvPluginSetup::Store(void)
   SetupStore("TsBufferPrefill", tsBufferPrefill);
   SetupStore("ExtProtocolBasePort", extProtocolBasePort);
   SetupStore("SectionFiltering", sectionFiltering);
-  SetupStore("SidScanning", sidScanning);
-  SetupStore("PidScanning", pidScanning);
   StoreFilters("DisabledFilters", disabledFilterIndexes);
   // Update global config
   IptvConfig.SetTsBufferSize(tsBufferSize);
   IptvConfig.SetTsBufferPrefillRatio(tsBufferPrefill);
   IptvConfig.SetExtProtocolBasePort(extProtocolBasePort);
   IptvConfig.SetSectionFiltering(sectionFiltering);
-  IptvConfig.SetSidScanning(sidScanning);
-  IptvConfig.SetPidScanning(pidScanning);
   for (int i = 0; i < SECTION_FILTER_TABLE_SIZE; ++i)
       IptvConfig.SetDisabledFilters(i, disabledFilterIndexes[i]);
 }

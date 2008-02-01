@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: pidscanner.h,v 1.1 2008/01/30 22:41:59 rahrenbe Exp $
+ * $Id: pidscanner.h,v 1.2 2008/02/01 21:54:24 rahrenbe Exp $
  */
 
 #ifndef __PIDSCANNER_H
@@ -13,6 +13,7 @@
 
 class cPidScanner {
 private:
+  cTimeMs timeout;
   cChannel channel;
   bool process;
   int Vpid;
