@@ -46,3 +46,4 @@ VDR Plugin 'iptv' Revision History
 - Added preliminary automatic Pid scanning functionality.
 - Modified channels.conf format to enable/disable channel
   specific pid and sid scanning functionality.
+- Removed the general sid scanning setup option.

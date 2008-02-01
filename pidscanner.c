@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: pidscanner.c,v 1.2 2008/02/01 21:54:24 rahrenbe Exp $
+ * $Id: pidscanner.c,v 1.3 2008/02/01 21:58:22 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -84,8 +84,10 @@ void cPidScanner::Process(const uint8_t* buf)
               }
            }
         if (numVpids > 10 && numApids > 5) {
-           if (!Channels.Lock(true, 10))
+           if (!Channels.Lock(true, 10)) {
+              timeout.Set(PIDSCANNER_TIMEOUT_IN_MS);
               return;
+              }
 	   debug("cPidScanner::Process(): Vpid=0x%04X, Apid=0x%04X\n", Vpid, Apid);
            cChannel *IptvChannel = Channels.GetByChannelID(channel.GetChannelID());
            int Apids[MAXAPIDS + 1] = { 0 }; // these lists are zero-terminated
