@@ -70,10 +70,6 @@ Setup menu:
 - Use section filtering = 1        Defines whether section filtering shall
                                    be used.
                                    Valid range: 0...1
-- Scan Sid automatically = 1       Defines whether service id shall be
-                                   scanned automatically. Requires section
-                                   filtering.
-                                   Valid range: 0...1
 - Disable filters = 0              Certain section filters might cause some
                                    unwanted behaviour to VDR such as time
                                    being falsely synchronized etc. This
@@ -95,6 +91,17 @@ Channel editor menu:
   An IPTV channel editor is accessible via "Setup -> Plugins -> IPTV" and
   pressing the Red button. The channel editor is functionally similar to
   VDR's built-in channel editor.
+
+- Scan Sid:  [yes|no]              Defines whether service id shall be
+                                   scanned automatically. Service id is
+                                   used in channel identification and
+                                   EPG information is set according to it.
+                                   This option requires section filtering.
+
+- Scan pids: [yes|no]              Defines whether video and audio pids
+                                   shall be scanned automatically. This
+                                   option is useful with streams missing
+                                   correct PAT/PMT information.
 
 Information menu:
 
