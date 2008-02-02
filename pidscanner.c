@@ -3,13 +3,16 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: pidscanner.c,v 1.3 2008/02/01 21:58:22 rahrenbe Exp $
+ * $Id: pidscanner.c,v 1.4 2008/02/02 20:23:44 ajhseppa Exp $
  */
 
 #include "common.h"
 #include "pidscanner.h"
 
 #define PIDSCANNER_TIMEOUT_IN_MS 60000 /* 60s */
+#define NR_APIDS      5
+#define NR_VPIDS     10
+#define NR_PID_DELTA 50
 
 cPidScanner::cPidScanner(void) 
 : timeout(0),
@@ -35,8 +38,10 @@ void cPidScanner::Process(const uint8_t* buf)
      return;
 
   // Stop scanning after defined timeout
-  if (timeout.TimedOut())
+  if (timeout.TimedOut()) {
+     debug("cPidScanner::Process: Timed out determining pids\n");
      process = false;
+  }
 
   if (buf[0] != 0x47) {
      error("Not TS packet: 0x%X\n", buf[0]);
@@ -68,27 +73,36 @@ void cPidScanner::Process(const uint8_t* buf)
            // Stream ID
            if ((sid >= 0xC0) && (sid <= 0xDF)) {
               if (pid < Apid) {
+                 debug("Found lower Apid: 0x%X instead of 0x%X\n", pid, Apid);
                  Apid = pid;
                  numApids = 1;
                  }
-              else if (pid == Apid)
+              else if (pid == Apid) {
                  ++numApids;
+                 debug("Incrementing Apids, now at %d\n", numApids);
+                 }
               }
            else if ((sid >= 0xE0) && (sid <= 0xEF)) {
               if (pid < Vpid) {
+                 debug("Found lower Vpid: 0x%X instead of 0x%X\n", pid, Vpid);
                  Vpid = pid;
                  numVpids = 1;
                  }
-              else if (pid == Vpid)
+              else if (pid == Vpid) {
                  ++numVpids;
+                 debug("Incrementing Vpids, now at %d\n", numVpids);
+                 }
               }
            }
-        if (numVpids > 10 && numApids > 5) {
+        if ((numVpids > NR_VPIDS && numApids > NR_APIDS) ||
+            abs(numApids - numVpids) > NR_PID_DELTA) {
+
            if (!Channels.Lock(true, 10)) {
               timeout.Set(PIDSCANNER_TIMEOUT_IN_MS);
               return;
               }
-	   debug("cPidScanner::Process(): Vpid=0x%04X, Apid=0x%04X\n", Vpid, Apid);
+           debug("cPidScanner::Process(): Vpid=0x%04X, Apid=0x%04X\n", Vpid,
+                 Apid);
            cChannel *IptvChannel = Channels.GetByChannelID(channel.GetChannelID());
            int Apids[MAXAPIDS + 1] = { 0 }; // these lists are zero-terminated
            int Dpids[MAXDPIDS + 1] = { 0 };
@@ -105,9 +119,17 @@ void cPidScanner::Process(const uint8_t* buf)
                Dpids[i] = IptvChannel->Dpid(i);
            for (unsigned int i = 0; i < MAXSPIDS; ++i)
                Spids[i] = IptvChannel->Spid(i);
+           if (numVpids <= NR_VPIDS) {
+              // No detected video pid, set zero.
+              Vpid = 0;
+              }
+           else if (numApids <= NR_APIDS) {
+              // Channel with no detected audio pid. Set zero.
+              Apids[0] = 0;
+              }
            IptvChannel->SetPids(Vpid, Ppid, Apids, ALangs, Dpids, DLangs, Spids, SLangs, Tpid);
            Channels.Unlock();
-	   process = false;
+           process = false;
            }
         }
      }
