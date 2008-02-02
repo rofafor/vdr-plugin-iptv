@@ -3,16 +3,16 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: pidscanner.c,v 1.5 2008/02/02 20:51:47 rahrenbe Exp $
+ * $Id: pidscanner.c,v 1.6 2008/02/02 21:06:14 rahrenbe Exp $
  */
 
 #include "common.h"
 #include "pidscanner.h"
 
-#define PIDSCANNER_TIMEOUT_IN_MS 60000 /* 60s */
-#define NR_APIDS      5
-#define NR_VPIDS     10
-#define NR_PID_DELTA 50
+#define PIDSCANNER_TIMEOUT_IN_MS   15000 /* 15s timeout for detection */
+#define PIDSCANNER_APID_COUNT      5     /* minimum count of audio pid samples for pid detection */
+#define PIDSCANNER_VPID_COUNT      10    /* minimum count of video pid samples for pid detection */
+#define PIDSCANNER_PID_DELTA_COUNT 50    /* minimum count of pid samples for audio/video only pid detection */
 
 cPidScanner::cPidScanner(void) 
 : timeout(0),
@@ -113,8 +113,8 @@ void cPidScanner::Process(const uint8_t* buf)
                  }
               }
            }
-        if ((numVpids > NR_VPIDS && numApids > NR_APIDS) ||
-            abs(numApids - numVpids) > NR_PID_DELTA) {
+        if (((numVpids > PIDSCANNER_VPID_COUNT) && (numApids > PIDSCANNER_APID_COUNT)) ||
+            (abs(numApids - numVpids) > PIDSCANNER_PID_DELTA_COUNT)) {
            // Lock channels for pid updates
            if (!Channels.Lock(true, 10)) {
               timeout.Set(PIDSCANNER_TIMEOUT_IN_MS);
@@ -130,9 +130,9 @@ void cPidScanner::Process(const uint8_t* buf)
            int Ppid = IptvChannel->Ppid();
            int Tpid = IptvChannel->Tpid();
            bool foundApid = false;
-           if (numVpids <= NR_VPIDS)
+           if (numVpids <= PIDSCANNER_VPID_COUNT)
               Vpid = 0; // No detected video pid
-           else if (numApids <= NR_APIDS)
+           else if (numApids <= PIDSCANNER_APID_COUNT)
               Apid = 0; // No detected audio pid
            for (unsigned int i = 1; i < MAXAPIDS; ++i) {
                Apids[i] = IptvChannel->Apid(i);
