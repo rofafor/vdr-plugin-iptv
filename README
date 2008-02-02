@@ -170,4 +170,6 @@ Acknowledgements:
 
 - The IPTV section filtering code is derived from Linux kernel.
 
+- The pid scanning code is derived from Udo Richter's streamplayer plugin.
+
 - Udo Richter's po2i18n package is used to support VDR's old i18n system.

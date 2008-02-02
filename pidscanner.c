@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: pidscanner.c,v 1.4 2008/02/02 20:23:44 ajhseppa Exp $
+ * $Id: pidscanner.c,v 1.5 2008/02/02 20:51:47 rahrenbe Exp $
  */
 
 #include "common.h"
@@ -31,6 +31,24 @@ cPidScanner::~cPidScanner()
   debug("cPidScanner::~cPidScanner()\n");
 }
 
+void cPidScanner::SetChannel(const cChannel *Channel)
+{
+  if (Channel) {
+     debug("cPidScanner::SetChannel(): %s\n", Channel->PluginParam());
+     channel = *Channel;
+     }
+  else {
+     debug("cPidScanner::SetChannel()\n");
+     channel = cChannel();
+     }
+  Vpid = 0xFFFF;
+  numVpids = 0;
+  Apid = 0xFFFF;
+  numApids = 0;
+  process = true;
+  timeout.Set(PIDSCANNER_TIMEOUT_IN_MS);
+}
+
 void cPidScanner::Process(const uint8_t* buf)
 {
   //debug("cPidScanner::Process()\n");
@@ -43,6 +61,7 @@ void cPidScanner::Process(const uint8_t* buf)
      process = false;
   }
 
+  // Verify TS packet
   if (buf[0] != 0x47) {
      error("Not TS packet: 0x%X\n", buf[0]);
      return;
@@ -52,7 +71,7 @@ void cPidScanner::Process(const uint8_t* buf)
   int pid = ts_pid(buf);
   int xpid = (buf[1] << 8 | buf[2]);
 
-  // count == 0 if no payload or out of range
+  // Check if payload available
   uint8_t count = payload(buf);
   if (count == 0)
      return;
@@ -96,13 +115,11 @@ void cPidScanner::Process(const uint8_t* buf)
            }
         if ((numVpids > NR_VPIDS && numApids > NR_APIDS) ||
             abs(numApids - numVpids) > NR_PID_DELTA) {
-
+           // Lock channels for pid updates
            if (!Channels.Lock(true, 10)) {
               timeout.Set(PIDSCANNER_TIMEOUT_IN_MS);
               return;
               }
-           debug("cPidScanner::Process(): Vpid=0x%04X, Apid=0x%04X\n", Vpid,
-                 Apid);
            cChannel *IptvChannel = Channels.GetByChannelID(channel.GetChannelID());
            int Apids[MAXAPIDS + 1] = { 0 }; // these lists are zero-terminated
            int Dpids[MAXDPIDS + 1] = { 0 };
@@ -112,43 +129,27 @@ void cPidScanner::Process(const uint8_t* buf)
            char SLangs[MAXSPIDS][MAXLANGCODE2] = { "" };
            int Ppid = IptvChannel->Ppid();
            int Tpid = IptvChannel->Tpid();
-           Apids[0] = Apid;
-           for (unsigned int i = 1; i < MAXAPIDS; ++i)
+           bool foundApid = false;
+           if (numVpids <= NR_VPIDS)
+              Vpid = 0; // No detected video pid
+           else if (numApids <= NR_APIDS)
+              Apid = 0; // No detected audio pid
+           for (unsigned int i = 1; i < MAXAPIDS; ++i) {
                Apids[i] = IptvChannel->Apid(i);
+               if (Apids[i] && (Apids[i] == Apid))
+                  foundApid = true;
+               }
+           if (!foundApid)
+              Apids[0] = Apid;
            for (unsigned int i = 0; i < MAXDPIDS; ++i)
                Dpids[i] = IptvChannel->Dpid(i);
            for (unsigned int i = 0; i < MAXSPIDS; ++i)
                Spids[i] = IptvChannel->Spid(i);
-           if (numVpids <= NR_VPIDS) {
-              // No detected video pid, set zero.
-              Vpid = 0;
-              }
-           else if (numApids <= NR_APIDS) {
-              // Channel with no detected audio pid. Set zero.
-              Apids[0] = 0;
-              }
+           debug("cPidScanner::Process(): Vpid=0x%04X, Apid=0x%04X\n", Vpid, Apid);
            IptvChannel->SetPids(Vpid, Ppid, Apids, ALangs, Dpids, DLangs, Spids, SLangs, Tpid);
            Channels.Unlock();
            process = false;
            }
         }
      }
-}
-
-void cPidScanner::SetChannel(const cChannel *Channel)
-{
-  if (Channel) {
-     debug("cPidScanner::SetChannel(): %s\n", Channel->PluginParam());
-     channel = *Channel;
-     }
-  else {
-     debug("cPidScanner::SetChannel()\n");
-     channel = cChannel();
-     }
-  Vpid = 0xFFFF;
-  numVpids = 0;
-  Apid = 0xFFFF;
-  numApids = 0;
-  process = true;
-  timeout.Set(PIDSCANNER_TIMEOUT_IN_MS);
 }
