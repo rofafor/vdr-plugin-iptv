@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.23 2008/01/30 21:57:33 rahrenbe Exp $
+ * $Id: protocolhttp.c,v 1.24 2008/02/17 19:18:47 rahrenbe Exp $
  */
 
 #include <sys/types.h>
@@ -88,17 +88,14 @@ bool cIptvProtocolHttp::Connect(void)
         }
 
      // Formulate and send HTTP request
-     char buffer[256];
-     memset(buffer, '\0', sizeof(buffer));
-     snprintf(buffer, sizeof(buffer),
-	      "GET %s HTTP/1.1\r\n"
-	      "Host: %s\r\n"
-	      "User-Agent: vdr-iptv\r\n"
-	      "Range: bytes=0-\r\n"
-	      "Connection: Close\r\n"
-	      "\r\n", streamPath, streamAddr);
+     cString buffer = cString::sprintf("GET %s HTTP/1.1\r\n"
+                                       "Host: %s\r\n"
+                                       "User-Agent: vdr-iptv\r\n"
+                                       "Range: bytes=0-\r\n"
+                                       "Connection: Close\r\n"
+                                       "\r\n", streamPath, streamAddr);
 
-     //debug("Sending http request: %s\n", buffer);
+     debug("Sending http request: %s\n", *buffer);
      err = send(socketDesc, buffer, strlen(buffer), 0);
      ERROR_IF_FUNC(err < 0, "send()", CloseSocket(), return false);
 

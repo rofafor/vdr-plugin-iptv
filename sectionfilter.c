@@ -3,13 +3,10 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.c,v 1.18 2008/01/30 21:57:33 rahrenbe Exp $
+ * $Id: sectionfilter.c,v 1.19 2008/02/17 19:18:47 rahrenbe Exp $
  */
 
 #include "sectionfilter.h"
-#include "statistics.h"
-
-#define IPTV_FILTER_FILENAME "/tmp/vdr-iptv%d.filter%d"
 
 cIptvSectionFilter::cIptvSectionFilter(int Index, int devInd,
 				       u_short Pid, u_char Tid, u_char Mask)
@@ -21,7 +18,8 @@ cIptvSectionFilter::cIptvSectionFilter(int Index, int devInd,
   seclen(0),
   tsfeedp(0),
   pid(Pid),
-  id(Index)
+  id(Index),
+  pipeName("")
 {
   //debug("cIptvSectionFilter::cIptvSectionFilter(%d)\n", Index);
   memset(secbuf_base, '\0', sizeof(secbuf_base));
@@ -30,7 +28,6 @@ cIptvSectionFilter::cIptvSectionFilter(int Index, int devInd,
   memset(filter_mode, '\0', sizeof(filter_mode));
   memset(maskandmode, '\0', sizeof(maskandmode));
   memset(maskandnotmode, '\0', sizeof(maskandnotmode));
-  memset(pipeName, '\0', sizeof(pipeName));
 
   SetPipeName(devInd);
 
@@ -68,14 +65,13 @@ cIptvSectionFilter::~cIptvSectionFilter()
   close(fifoDescriptor);
   close(readDescriptor);
   unlink(pipeName);
-  memset(pipeName, '\0', sizeof(pipeName));
   fifoDescriptor = -1;
   readDescriptor = -1;
 }
 
 void cIptvSectionFilter::SetPipeName(int deviceIndex)
 {
-  snprintf(pipeName, sizeof(pipeName), IPTV_FILTER_FILENAME, deviceIndex, id);
+  pipeName = cString::sprintf(IPTV_FILTER_FILENAME, deviceIndex, id);
 }
 
 int cIptvSectionFilter::GetReadDesc()

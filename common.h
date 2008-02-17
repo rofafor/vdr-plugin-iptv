@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: common.h,v 1.19 2008/01/04 23:36:37 ajhseppa Exp $
+ * $Id: common.h,v 1.20 2008/02/17 19:18:47 rahrenbe Exp $
  */
 
 #ifndef __IPTV_COMMON_H
@@ -28,6 +28,9 @@
 #ifndef trVDR
 #define trVDR(s) tr(s)
 #endif
+
+#define IPTV_FILTER_FILENAME            "/tmp/vdr-iptv%d.filter%d"
+#define IPTV_DVR_FILENAME               "/tmp/vdr-iptv%d.dvr"
 
 #define IPTV_DEVICE_INFO_ALL            0
 #define IPTV_DEVICE_INFO_GENERAL        1

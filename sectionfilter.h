@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.h,v 1.7 2007/10/08 23:51:58 rahrenbe Exp $
+ * $Id: sectionfilter.h,v 1.8 2008/02/17 19:18:47 rahrenbe Exp $
  */
 
 #ifndef __IPTV_SECTIONFILTER_H
@@ -65,7 +65,7 @@ private:
   uint8_t maskandmode[DMX_MAX_FILTER_SIZE];
   uint8_t maskandnotmode[DMX_MAX_FILTER_SIZE];
 
-  char pipeName[128];
+  cString pipeName;
 
   inline uint16_t section_length(const uint8_t *buf);
 

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.h,v 1.38 2008/01/31 22:28:53 rahrenbe Exp $
+ * $Id: device.h,v 1.39 2008/02/17 19:18:47 rahrenbe Exp $
  */
 
 #ifndef __IPTV_DEVICE_H
@@ -35,6 +35,7 @@ private:
     eMaxSecFilterCount = 32
   };
   unsigned int deviceIndex;
+  int dvrFd;
   bool isPacketDelivered;
   bool isOpenDvr;
   bool sidScanEnabled;

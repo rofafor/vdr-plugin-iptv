@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.83 2008/02/01 21:54:24 rahrenbe Exp $
+ * $Id: device.c,v 1.84 2008/02/17 19:18:47 rahrenbe Exp $
  */
 
 #include "config.h"
@@ -17,6 +17,7 @@ unsigned int cIptvDevice::deviceCount = 0;
 
 cIptvDevice::cIptvDevice(unsigned int Index)
 : deviceIndex(Index),
+  dvrFd(-1),
   isPacketDelivered(false),
   isOpenDvr(false),
   sidScanEnabled(false),
@@ -43,11 +44,24 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   pSidScanner = new cSidScanner;
   if (pSidScanner)
      AttachFilter(pSidScanner);
+  // Check if dvr fifo exists
+  struct stat sb;
+  cString filename = cString::sprintf(IPTV_DVR_FILENAME, deviceIndex);
+  stat(filename, &sb);
+  if (S_ISFIFO(sb.st_mode)) {
+     dvrFd = open(filename, O_WRONLY | O_NONBLOCK);
+     if (dvrFd >= 0)
+        dsyslog("IPTV device %d redirecting input stream to '%s'", deviceIndex, *filename);
+     }
 }
 
 cIptvDevice::~cIptvDevice()
 {
   debug("cIptvDevice::~cIptvDevice(%d)\n", deviceIndex);
+#if defined(APIVERSNUM) && APIVERSNUM >= 10515
+  // Stop section handler of iptv device
+  StopSectionHandler();
+#endif
   DELETE_POINTER(pIptvStreamer);
   DELETE_POINTER(pUdpProtocol);
   DELETE_POINTER(pHttpProtocol);
@@ -63,6 +77,12 @@ cIptvDevice::~cIptvDevice()
   // Destroy all filters
   for (int i = 0; i < eMaxSecFilterCount; ++i)
       DeleteFilter(i);
+  // Close dvr fifo
+  if (dvrFd >= 0) {
+     int fd = dvrFd;
+     dvrFd = -1;
+     close(fd);
+     }
 }
 
 bool cIptvDevice::Initialize(unsigned int DeviceCount)
@@ -436,6 +456,9 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
         Data = p;
         // Update pid statistics 
         AddPidStatistic(ts_pid(p), payload(p));
+        // Send data also to dvr fifo
+        if (dvrFd >= 0)
+           write(dvrFd, p, TS_SIZE);
         // Analyze incomplete streams with built-in pid analyzer
         if (pidScanEnabled && pPidScanner)
             pPidScanner->Process(p);

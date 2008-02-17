@@ -166,6 +166,10 @@ Notes:
 - The following section filters are recommended to be disabled:
   "NIT (0x40)", "SDT (0x42)", "TDT (0x70)"
 
+- The IPTV devices look for a "/tmp/vdr-iptv<devicenumber>.dvr" fifo at
+  startup. If the fifo is found and succesfully opened, the device writes
+  the current data stream into it. This can be used for debugging purposes.
+
 Acknowledgements:
 
 - The IPTV section filtering code is derived from Linux kernel.

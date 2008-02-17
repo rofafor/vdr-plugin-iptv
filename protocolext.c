@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.c,v 1.23 2008/01/30 21:57:33 rahrenbe Exp $
+ * $Id: protocolext.c,v 1.24 2008/02/17 19:18:47 rahrenbe Exp $
  */
 
 #include <sys/wait.h>
@@ -22,11 +22,10 @@
 
 cIptvProtocolExt::cIptvProtocolExt()
 : pid(-1),
+  scriptFile(""),
   scriptParameter(0)
 {
   debug("cIptvProtocolExt::cIptvProtocolExt()\n");
-  scriptFile = strdup("");
-  listenAddr = strdup("127.0.0.1");
 }
 
 cIptvProtocolExt::~cIptvProtocolExt()
@@ -34,9 +33,6 @@ cIptvProtocolExt::~cIptvProtocolExt()
   debug("cIptvProtocolExt::~cIptvProtocolExt()\n");
   // Drop the socket connection
   cIptvProtocolExt::Close();
-  // Free allocated memory
-  free(scriptFile);
-  free(listenAddr);
 }
 
 void cIptvProtocolExt::ExecuteScript(void)
@@ -56,15 +52,12 @@ void cIptvProtocolExt::ExecuteScript(void)
      for (int i = STDERR_FILENO + 1; i < MaxPossibleFileDescriptors; i++)
          close(i);
      // Execute the external script
-     char* cmd = NULL;
-     asprintf(&cmd, "%s %d %d", scriptFile, scriptParameter, socketPort);
-     debug("cIptvProtocolExt::ExecuteScript(child): %s\n", cmd);
-     if (execl("/bin/sh", "sh", "-c", cmd, NULL) == -1) {
-        error("ERROR: Script execution failed: %s", cmd);
-        free(cmd);
+     cString cmd = cString::sprintf("%s %d %d", *scriptFile, scriptParameter, socketPort);
+     debug("cIptvProtocolExt::ExecuteScript(child): %s\n", *cmd);
+     if (execl("/bin/sh", "sh", "-c", *cmd, NULL) == -1) {
+        error("ERROR: Script execution failed: %s", *cmd);
         _exit(-1);
         }
-     free(cmd);
      _exit(0);
      }
   else {
@@ -87,7 +80,7 @@ void cIptvProtocolExt::TerminateScript(void)
        retval = 0;
        waitms += timeoutms;
        if ((waitms % 2000) == 0) {
-          error("ERROR: Script '%s' won't terminate - killing it!", scriptFile);
+          error("ERROR: Script '%s' won't terminate - killing it!", *scriptFile);
           kill(pid, SIGKILL);
           }
        // Clear wait status to make sure child exit status is accessible
@@ -146,10 +139,9 @@ bool cIptvProtocolExt::Set(const char* Location, const int Parameter, const int 
   if (!isempty(Location)) {
      struct stat stbuf;
      // Update script file and parameter
-     free(scriptFile);
-     asprintf(&scriptFile, "%s/%s", IptvConfig.GetConfigDirectory(), Location);
+     scriptFile = cString::sprintf("%s/%s", IptvConfig.GetConfigDirectory(), Location);
      if ((stat(scriptFile, &stbuf) != 0) || (strstr(scriptFile, "..") != 0)) {
-        error("ERROR: Non-existent or relative path script '%s'", scriptFile);
+        error("ERROR: Non-existent or relative path script '%s'", *scriptFile);
         return false;
         }
      scriptParameter = Parameter;
@@ -162,5 +154,5 @@ bool cIptvProtocolExt::Set(const char* Location, const int Parameter, const int 
 cString cIptvProtocolExt::GetInformation(void)
 {
   //debug("cIptvProtocolExt::GetInformation()");
-  return cString::sprintf("ext://%s:%d", scriptFile, scriptParameter);
+  return cString::sprintf("ext://%s:%d", *scriptFile, scriptParameter);
 }
