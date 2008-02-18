@@ -39,7 +39,7 @@ VDR Plugin 'iptv' Revision History
 - Mapped 'kInfo' as help key in setup menu.
 - Refactored statistic collecting code.
 
-2008-xx-xx: Version 0.0.7
+2008-02-18: Version 0.0.7
 
 - Updated French translation (Thanks to Michaël Nival).
 - Modified VDR locale support detection.
@@ -47,3 +47,4 @@ VDR Plugin 'iptv' Revision History
 - Modified channels.conf format to enable/disable channel
   specific pid and sid scanning functionality.
 - Removed the general sid scanning setup option.
+- Updated for vdr-1.5.15.

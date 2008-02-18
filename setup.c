@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.54 2008/02/17 19:18:47 rahrenbe Exp $
+ * $Id: setup.c,v 1.55 2008/02/18 11:54:01 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -618,7 +618,7 @@ void cIptvMenuInfo::Display(void)
 {
   cOsdMenu::Display();
   DisplayMenu()->SetText(text, true);
-  if (text)
+  if (*text)
      cStatus::MsgOsdTextItem(text);
 }
 
