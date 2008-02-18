@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.55 2008/02/18 11:54:01 rahrenbe Exp $
+ * $Id: setup.c,v 1.56 2008/02/18 16:50:07 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -417,7 +417,7 @@ cIptvMenuChannelItem::cIptvMenuChannelItem(cChannel *Channel)
 
 void cIptvMenuChannelItem::Set(void)
 {
-  SetText(cString::sprintf("%d\t%s", channel->Number(), channel->Name()), false);
+  SetText(cString::sprintf("%d\t%s", channel->Number(), channel->Name()));
 }
 
 // --- cIptvMenuChannels -----------------------------------------------------
