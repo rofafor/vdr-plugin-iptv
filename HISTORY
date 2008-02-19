@@ -49,3 +49,7 @@ VDR Plugin 'iptv' Revision History
 - Modified channels.conf format to enable/disable channel
   specific pid and sid scanning functionality.
 - Removed the general sid scanning setup option.
+
+2008-03-xx: Version 0.2.0
+
+- Updated for vdr-1.6.0.

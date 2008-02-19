@@ -1,7 +1,7 @@
 #
 # Makefile for a Video Disk Recorder plugin
 #
-# $Id: Makefile,v 1.26 2008/01/30 22:41:58 rahrenbe Exp $
+# $Id: Makefile,v 1.27 2008/02/19 22:29:02 rahrenbe Exp $
 
 # Debugging on/off 
 #IPTV_DEBUG = 1
@@ -39,11 +39,6 @@ TMPDIR = /tmp
 ### The version number of VDR's plugin API (taken from VDR's "config.h"):
 
 APIVERSION = $(shell sed -ne '/define APIVERSION/s/^.*"\(.*\)".*$$/\1/p' $(VDRDIR)/config.h)
-APIVERSNUM = $(shell sed -ne '/define APIVERSNUM/s/^.*APIVERSNUM[ \t]*\([0-9]*\).*$$/\1/p' $(VDRDIR)/config.h)
-
-### Test whether VDR has locale support
-#VDRLOCALE = $(shell grep '^LOCALEDIR' $(VDRDIR)/Makefile)
-VDRLOCALE = $(shell if [ $(APIVERSNUM) -ge 10507 ]; then echo "locale"; fi)
 
 ### The name of the distribution archive:
 
@@ -60,11 +55,14 @@ ifdef IPTV_DEBUG
 DEFINES += -DDEBUG
 endif
 
+.PHONY: all all-redirect
+all-redirect: all
+
 ### The object files (add further files here):
 
 OBJS = $(PLUGIN).o config.o setup.o device.o streamer.o protocoludp.o \
 	protocolhttp.o protocolfile.o protocolext.o sectionfilter.o \
-	sidscanner.o pidscanner.o statistics.o common.o socket.o i18n.o
+	sidscanner.o pidscanner.o statistics.o common.o socket.o
 
 ### The main target:
 
@@ -80,7 +78,7 @@ all: libvdr-$(PLUGIN).so i18n
 MAKEDEP = $(CXX) -MM -MG
 DEPFILE = .dependencies
 $(DEPFILE): Makefile
-	@$(MAKEDEP) $(DEFINES) $(INCLUDES) $(subst i18n.c,,$(OBJS:%.o=%.c)) > $@
+	@$(MAKEDEP) $(DEFINES) $(INCLUDES) $(OBJS:%.o=%.c) > $@
 
 -include $(DEPFILE)
 
@@ -91,20 +89,11 @@ LOCALEDIR = $(VDRDIR)/locale
 I18Npo    = $(wildcard $(PODIR)/*.po)
 I18Nmsgs  = $(addprefix $(LOCALEDIR)/, $(addsuffix /LC_MESSAGES/vdr-$(PLUGIN).mo, $(notdir $(foreach file, $(I18Npo), $(basename $(file))))))
 I18Npot   = $(PODIR)/$(PLUGIN).pot
-ifeq ($(strip $(APIVERSION)),1.5.7)
-I18Nvdrmo = $(PLUGIN).mo
-else
-I18Nvdrmo = vdr-$(PLUGIN).mo
-endif
-
-### Do gettext based i18n stuff
-
-ifneq ($(strip $(VDRLOCALE)),)
 
 %.mo: %.po
 	msgfmt -c -o $@ $<
 
-$(I18Npot): $(subst i18n.c,,$(wildcard *.c))
+$(I18Npot): $(wildcard *.c)
 	xgettext -C -cTRANSLATORS --no-wrap --no-location -k -ktr -ktrNOOP --msgid-bugs-address='Rolf Ahrenberg' -o $@ $^
 
 %.po: $(I18Npot)
@@ -116,23 +105,7 @@ $(I18Nmsgs): $(LOCALEDIR)/%/LC_MESSAGES/vdr-$(PLUGIN).mo: $(PODIR)/%.mo
 	cp $< $@
 
 .PHONY: i18n
-i18n: $(I18Nmsgs)
-
-i18n.c: i18n-template.c 
-	@cp i18n-template.c i18n.c
-
-### Do i18n.c based i18n stuff
-
-else
-
-i18n:
-	@### nothing to do
-
-#i18n compatibility generator:
-i18n.c: i18n-template.c po2i18n.pl $(I18Npo)
-	./po2i18n.pl < i18n-template.c > i18n.c
-
-endif 
+i18n: $(I18Nmsgs) $(I18Npot)
 
 ### Targets:
 
@@ -152,4 +125,4 @@ dist: clean
 	@echo Distribution package created as $(PACKAGE).tgz
 
 clean:
-	@-rm -f $(OBJS) $(DEPFILE) i18n.c *.so *.tgz core* *~ $(PODIR)/*.mo $(PODIR)/*.pot
+	@-rm -f $(OBJS) $(DEPFILE) *.so *.tgz core* *~ $(PODIR)/*.mo $(PODIR)/*.pot

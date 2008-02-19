@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.36 2008/02/01 21:54:24 rahrenbe Exp $
+ * $Id: iptv.c,v 1.37 2008/02/19 22:29:02 rahrenbe Exp $
  */
 
 #include <getopt.h>
@@ -12,17 +12,16 @@
 #include "config.h"
 #include "setup.h"
 #include "device.h"
-#include "i18n.h"
 
 #ifndef PLUGINPARAMPATCHVERSNUM
 #error "You must apply the pluginparam patch for VDR!"
 #endif
 
-#if defined(APIVERSNUM) && APIVERSNUM < 10510 && !defined(CLOSEFILTERPATCHVERSNUM)
-#error "You must apply the closefilter patch for VDR!"
+#if defined(APIVERSNUM) && APIVERSNUM < 10515
+#error "VDR-1.5.15 API version or greater is required!"
 #endif
 
-static const char VERSION[]     = "0.0.7";
+static const char VERSION[]     = "0.2.0";
 static const char DESCRIPTION[] = trNOOP("Experience the IPTV");
 
 class cPluginIptv : public cPlugin {
@@ -100,9 +99,6 @@ bool cPluginIptv::Initialize(void)
 {
   debug("cPluginIptv::Initialize()\n");
   // Initialize any background activities the plugin shall perform.
-#if defined(APIVERSNUM) && APIVERSNUM < 10507
-  RegisterI18n(IptvPhrases);
-#endif
   IptvConfig.SetConfigDirectory(cPlugin::ConfigDirectory(PLUGIN_NAME_I18N));
   return cIptvDevice::Initialize(deviceCount);
 }

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.h,v 1.20 2008/02/01 21:54:24 rahrenbe Exp $
+ * $Id: setup.h,v 1.21 2008/02/19 22:29:02 rahrenbe Exp $
  */
 
 #ifndef __IPTV_SETUP_H
@@ -22,9 +22,7 @@ private:
   int numDisabledFilters;
   int disabledFilterIndexes[SECTION_FILTER_TABLE_SIZE];
   const char *disabledFilterNames[SECTION_FILTER_TABLE_SIZE];
-#if defined(APIVERSNUM) && APIVERSNUM >= 10513
   cVector<const char*> help;
-#endif
 
   eOSState EditChannel(void);
   eOSState ShowInfo(void);

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.56 2008/02/18 16:50:07 rahrenbe Exp $
+ * $Id: setup.c,v 1.57 2008/02/19 22:29:02 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -219,12 +219,8 @@ void cIptvMenuEditChannel::SetChannelData(cChannel *Channel)
             param = cString::sprintf("IPTV|S%dP%d|UDP|%s|%d", data.sidscan, data.pidscan, data.location, data.parameter);
             break;
        }
-#if defined(APIVERSNUM) && APIVERSNUM < 10510
-     Channel->SetPids(data.vpid, data.ppid, data.apid, alangs, data.dpid, dlangs, data.tpid);
-#else
      char slangs[MAXSPIDS][MAXLANGCODE2] = { "" };
      Channel->SetPids(data.vpid, data.ppid, data.apid, alangs, data.dpid, dlangs, data.spid, slangs, data.tpid);
-#endif
      Channel->SetCaIds(data.caids);
      Channel->SetId(data.nid, data.tid, data.sid, data.rid);
      Channel->SetName(data.name, "", "IPTV");
@@ -241,29 +237,17 @@ void cIptvMenuEditChannel::Setup(void)
                             eProtocolCount, protocols));
   switch (data.protocol) {
     case eProtocolFILE:
-#if defined(APIVERSNUM) && APIVERSNUM < 10511
-         Add(new cMenuEditStrItem(trVDR("File"),     data.location, sizeof(data.location), trVDR(FileNameChars)));
-#else
          Add(new cMenuEditStrItem(trVDR("File"),     data.location, sizeof(data.location)));
-#endif
          Add(new cMenuEditIntItem(tr("Delay (ms)"), &data.parameter,  0, 0xFFFF));
          break;
     case eProtocolEXT:
-#if defined(APIVERSNUM) && APIVERSNUM < 10511
-         Add(new cMenuEditStrItem(tr("Script"),     data.location, sizeof(data.location), trVDR(FileNameChars)));
-#else
          Add(new cMenuEditStrItem(tr("Script"),     data.location, sizeof(data.location)));
-#endif
          Add(new cMenuEditIntItem(tr("Parameter"), &data.parameter,  0, 0xFFFF));
          break;
     case eProtocolHTTP:
     case eProtocolUDP:
     default:
-#if defined(APIVERSNUM) && APIVERSNUM < 10511
-         Add(new cMenuEditStrItem(tr("Address"), data.location, sizeof(data.location), trVDR(FileNameChars)));
-#else
          Add(new cMenuEditStrItem(tr("Address"), data.location, sizeof(data.location)));
-#endif
          Add(new cMenuEditIntItem(tr("Port"),   &data.parameter,  0, 0xFFFF));
          break;
     }
@@ -273,11 +257,7 @@ void cIptvMenuEditChannel::Setup(void)
   Add(sidScanItem);
   Add(new cMenuEditBoolItem(tr("Scan pids"),   &data.pidscan));
   // Normal settings
-#if defined(APIVERSNUM) && APIVERSNUM < 10511
-  Add(new cMenuEditStrItem(trVDR("Name"),       data.name,     sizeof(data.name), trVDR(FileNameChars)));
-#else
   Add(new cMenuEditStrItem(trVDR("Name"),       data.name,     sizeof(data.name)));
-#endif
   Add(new cMenuEditIntItem(trVDR("Frequency"), &data.frequency));
   Add(new cMenuEditIntItem(trVDR("Vpid"),      &data.vpid,     0, 0x1FFF));
   Add(new cMenuEditIntItem(trVDR("Ppid"),      &data.ppid,     0, 0x1FFF));
@@ -285,10 +265,8 @@ void cIptvMenuEditChannel::Setup(void)
   Add(new cMenuEditIntItem(trVDR("Apid2"),     &data.apid[1],  0, 0x1FFF));
   Add(new cMenuEditIntItem(trVDR("Dpid1"),     &data.dpid[0],  0, 0x1FFF));
   Add(new cMenuEditIntItem(trVDR("Dpid2"),     &data.dpid[1],  0, 0x1FFF));
-#if defined(APIVERSNUM) && APIVERSNUM >= 10510
   Add(new cMenuEditIntItem(trVDR("Spid1"),     &data.spid[0],  0, 0x1FFF));
   Add(new cMenuEditIntItem(trVDR("Spid2"),     &data.spid[1],  0, 0x1FFF));
-#endif
   Add(new cMenuEditIntItem(trVDR("Tpid"),      &data.tpid,     0, 0x1FFF));
   Add(new cMenuEditIntItem(trVDR("CA"),        &data.caids[0], 0, 0xFFFF));
   Add(new cMenuEditIntItem(trVDR("Sid"),       &data.sid,      1, 0xFFFF));
@@ -690,42 +668,28 @@ void cIptvPluginSetup::Setup(void)
   int current = Current();
 
   Clear();
-#if defined(APIVERSNUM) && APIVERSNUM >= 10513
   help.Clear();
-#endif
 
   Add(new cMenuEditIntItem( tr("TS buffer size [MB]"), &tsBufferSize, 1, 4));
-#if defined(APIVERSNUM) && APIVERSNUM >= 10513
   help.Append(tr("Define a ringbuffer size for transport streams in megabytes.\n\nSmaller sizes help memory consumption, but are more prone to buffer overflows."));
-#endif
 
   Add(new cMenuEditIntItem( tr("TS buffer prefill ratio [%]"), &tsBufferPrefill, 0, 40));
-#if defined(APIVERSNUM) && APIVERSNUM >= 10513
   help.Append(tr("Define a prefill ratio of the ringbuffer for transport streams before data is transferred to VDR.\n\nThis is useful if streaming media over a slow or unreliable connection."));
-#endif
 
   Add(new cMenuEditIntItem( tr("EXT protocol base port"), &extProtocolBasePort, 0, 0xFFF7));
-#if defined(APIVERSNUM) && APIVERSNUM >= 10513
   help.Append(tr("Define a base port used by EXT protocol.\n\nThe port range is defined by the number of IPTV devices. This setting sets the port which is listened for connections from external applications when using the EXT protocol."));
-#endif
 
   Add(new cMenuEditBoolItem(tr("Use section filtering"), &sectionFiltering));
-#if defined(APIVERSNUM) && APIVERSNUM >= 10513
   help.Append(tr("Define whether the section filtering shall be used.\n\nSection filtering means that IPTV plugin tries to parse and provide VDR with secondary data about the currently active stream. VDR can then use this data for providing various functionalities such as automatic pid change detection and EPG etc.\nEnabling this feature does not affect streams that do not contain section data."));
-#endif
 
   if (sectionFiltering) {
      Add(new cMenuEditIntItem( tr("Disable filters"), &numDisabledFilters, 0, SECTION_FILTER_TABLE_SIZE));
-#if defined(APIVERSNUM) && APIVERSNUM >= 10513
      help.Append(tr("Define number of section filters to be disabled.\n\nCertain section filters might cause some unwanted behaviour to VDR such as time being falsely synchronized. By black-listing the filters here useful section data can be left intact for VDR to process."));
-#endif
 
      for (int i = 0; i < numDisabledFilters; ++i) {
          // TRANSLATORS: note the singular!
          Add(new cMenuEditStraItem(tr("Disable filter"), &disabledFilterIndexes[i], SECTION_FILTER_TABLE_SIZE, disabledFilterNames));
-#if defined(APIVERSNUM) && APIVERSNUM >= 10513
          help.Append(tr("Define an ill-behaving filter to be blacklisted."));
-#endif
          }
      }
 
@@ -759,10 +723,8 @@ eOSState cIptvPluginSetup::ProcessKey(eKeys Key)
      switch (Key) {
        case kRed:  return EditChannel();
        case kBlue: return ShowInfo();
-#if defined(APIVERSNUM) && APIVERSNUM >= 10513
        case kInfo: if (Current() < help.Size())
                       return AddSubMenu(new cMenuText(cString::sprintf("%s - %s '%s'", tr("Help"), trVDR("Plugin"), PLUGIN_NAME_I18N), help[Current()]));
-#endif
        default:    state = osContinue;
        }
      }

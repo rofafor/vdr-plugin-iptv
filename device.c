@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.84 2008/02/17 19:18:47 rahrenbe Exp $
+ * $Id: device.c,v 1.85 2008/02/19 22:29:02 rahrenbe Exp $
  */
 
 #include "config.h"
@@ -58,10 +58,8 @@ cIptvDevice::cIptvDevice(unsigned int Index)
 cIptvDevice::~cIptvDevice()
 {
   debug("cIptvDevice::~cIptvDevice(%d)\n", deviceIndex);
-#if defined(APIVERSNUM) && APIVERSNUM >= 10515
   // Stop section handler of iptv device
   StopSectionHandler();
-#endif
   DELETE_POINTER(pIptvStreamer);
   DELETE_POINTER(pUdpProtocol);
   DELETE_POINTER(pHttpProtocol);
