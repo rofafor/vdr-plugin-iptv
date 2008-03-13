@@ -50,7 +50,8 @@ VDR Plugin 'iptv' Revision History
   specific pid and sid scanning functionality.
 - Removed the general sid scanning setup option.
 
-2008-03-02: Version 0.2.0
+2008-xx-xx: Version 0.2.0
 
 - Updated for vdr-1.6.0.
 - Updated Italian translation (Thanks to Gringo).
+- Added Russian translation (Thanks to Alexander).
