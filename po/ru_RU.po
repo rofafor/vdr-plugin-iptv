@@ -1,16 +1,16 @@
 # VDR plugin language source file.
 # Copyright (C) 2007 Rolf Ahrenberg & Antti Seppala
 # This file is distributed under the same license as the iptv package.
-# Alexander <Bikalexander@gmail.com>, 2008.
+# Alexander Gross <Bikalexander@gmail.com>, 2008.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: iptv 0.0.7\n"
+"Project-Id-Version: iptv 0.2.0\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
 "POT-Creation-Date: 2008-02-01 23:43+0200\n"
-"PO-Revision-Date: 2008-03-11 19:10+0100\n"
-"Last-Translator: Alexander <Bikalexander@gmail.com>\n"
-"Language-Team: Russian\n"
+"PO-Revision-Date: 2008-03-16 12:14+0100\n"
+"Last-Translator: Alexander Gross <Bikalexander@gmail.com>\n"
+"Language-Team: Russian <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -161,7 +161,7 @@ msgid "Disable filter"
 msgstr "Деактивировать фильтр"
 
 msgid "Define an ill-behaving filter to be blacklisted."
-msgstr ""
+msgstr "Неправильно работающий фильтр, занести в черный список."
 
 msgid "Help"
 msgstr "Справка"
