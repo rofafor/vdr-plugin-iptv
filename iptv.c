@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.38 2008/03/27 20:27:26 rahrenbe Exp $
+ * $Id: iptv.c,v 1.39 2008/03/30 20:25:12 rahrenbe Exp $
  */
 
 #include <getopt.h>
@@ -21,7 +21,7 @@
 #error "VDR-1.6.0 API version or greater is required!"
 #endif
 
-static const char VERSION[]     = "0.2.0";
+static const char VERSION[]     = "0.2.1";
 static const char DESCRIPTION[] = trNOOP("Experience the IPTV");
 
 class cPluginIptv : public cPlugin {
