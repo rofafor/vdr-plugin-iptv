@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.h,v 1.14 2008/01/30 21:57:33 rahrenbe Exp $
+ * $Id: streamer.h,v 1.15 2008/04/02 20:22:48 rahrenbe Exp $
  */
 
 #ifndef __IPTV_STREAMER_H
@@ -24,6 +24,9 @@ private:
   unsigned char* readBuffer;
   unsigned int readBufferLen;
   cIptvProtocolIf* protocol;
+  cString location;
+  int parameter;
+  int index;
 
 public:
   cIptvStreamer(cRingBufferLinear* RingBuffer, cMutex* Mutex);

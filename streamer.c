@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.c,v 1.30 2008/01/30 21:57:33 rahrenbe Exp $
+ * $Id: streamer.c,v 1.31 2008/04/02 20:22:48 rahrenbe Exp $
  */
 
 #include <vdr/thread.h>
@@ -16,7 +16,10 @@ cIptvStreamer::cIptvStreamer(cRingBufferLinear* RingBuffer, cMutex* Mutex)
 : cThread("IPTV streamer"),
   ringBuffer(RingBuffer),
   mutex(Mutex),
-  protocol(NULL)
+  protocol(NULL),
+  location(NULL),
+  parameter(-1),
+  index(-1)
 {
   debug("cIptvStreamer::cIptvStreamer()\n");
 }
@@ -89,6 +92,9 @@ bool cIptvStreamer::Set(const char* Location, const int Parameter, const int Ind
 {
   debug("cIptvStreamer::Set(): %s:%d\n", Location, Parameter);
   if (!isempty(Location)) {
+     // 
+     if (!strcmp(*location, Location) && (parameter == Parameter) && (index == Index) && (protocol == Protocol))
+        return false;
      // Update protocol; Close the existing one if changed
      if (protocol != Protocol) {
         if (protocol)
@@ -98,8 +104,12 @@ bool cIptvStreamer::Set(const char* Location, const int Parameter, const int Ind
            protocol->Open();
         }
      // Set protocol location and parameter
-     if (protocol)
-        protocol->Set(Location, Parameter, Index);
+     if (protocol) {
+        location = cString(Location);
+        parameter = Parameter;
+        index = Index;
+        protocol->Set(location, parameter, index);
+        }
      }
   return true;
 }

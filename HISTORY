@@ -59,3 +59,5 @@ VDR Plugin 'iptv' Revision History
 2008-xx-xx: Version 0.2.1
 
 - Updated Italian translation (Thanks to Diego Pierotto).
+- Removed compatibility mode for old channels.conf format.
+- EXT protocol is re-tuned only if iptv parameters differ.

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.57 2008/02/19 22:29:02 rahrenbe Exp $
+ * $Id: setup.c,v 1.58 2008/04/02 20:22:48 rahrenbe Exp $
  */
 
 #include <string.h>
@@ -100,29 +100,6 @@ cString cIptvMenuEditChannel::GetIptvSettings(const char *Param, int *Parameter,
      cString tagstr(tag, true);
      cString protostr(proto, true);
      cString locstr(loc, true);
-     // check if IPTV tag
-     if (strncasecmp(*tagstr, "IPTV", 4) == 0) {
-        // check if protocol is supported and update the pointer
-        if (strncasecmp(*protostr, "UDP", 3) == 0)
-           *Protocol = eProtocolUDP;
-        else if (strncasecmp(*protostr, "HTTP", 4) == 0)
-           *Protocol = eProtocolHTTP;
-        else if (strncasecmp(*protostr, "FILE", 4) == 0)
-           *Protocol = eProtocolFILE;
-        else if (strncasecmp(*protostr, "EXT", 3) == 0)
-           *Protocol = eProtocolEXT;
-        else
-           return NULL;
-        // return location
-        return locstr;
-        }
-     }
-  else if (sscanf(Param, "%a[^|]|%a[^|]|%a[^|]|%d", &tag, &proto, &loc, Parameter) == 4) {
-     cString tagstr(tag, true);
-     cString protostr(proto, true);
-     cString locstr(loc, true);
-     *SidScan = 0;
-     *PidScan = 0;
      // check if IPTV tag
      if (strncasecmp(*tagstr, "IPTV", 4) == 0) {
         // check if protocol is supported and update the pointer
