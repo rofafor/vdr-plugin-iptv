@@ -3,14 +3,14 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: pidscanner.c,v 1.6 2008/02/02 21:06:14 rahrenbe Exp $
+ * $Id: pidscanner.c,v 1.7 2008/04/02 22:55:04 rahrenbe Exp $
  */
 
 #include "common.h"
 #include "pidscanner.h"
 
 #define PIDSCANNER_TIMEOUT_IN_MS   15000 /* 15s timeout for detection */
-#define PIDSCANNER_APID_COUNT      5     /* minimum count of audio pid samples for pid detection */
+#define PIDSCANNER_APID_COUNT      10    /* minimum count of audio pid samples for pid detection */
 #define PIDSCANNER_VPID_COUNT      10    /* minimum count of video pid samples for pid detection */
 #define PIDSCANNER_PID_DELTA_COUNT 50    /* minimum count of pid samples for audio/video only pid detection */
 
@@ -92,29 +92,29 @@ void cPidScanner::Process(const uint8_t* buf)
            // Stream ID
            if ((sid >= 0xC0) && (sid <= 0xDF)) {
               if (pid < Apid) {
-                 debug("Found lower Apid: 0x%X instead of 0x%X\n", pid, Apid);
+                 debug("cPidScanner::Process: Found lower Apid: 0x%X instead of 0x%X\n", pid, Apid);
                  Apid = pid;
                  numApids = 1;
                  }
               else if (pid == Apid) {
                  ++numApids;
-                 debug("Incrementing Apids, now at %d\n", numApids);
+                 debug("cPidScanner::Process: Incrementing Apids, now at %d\n", numApids);
                  }
               }
            else if ((sid >= 0xE0) && (sid <= 0xEF)) {
               if (pid < Vpid) {
-                 debug("Found lower Vpid: 0x%X instead of 0x%X\n", pid, Vpid);
+                 debug("cPidScanner::Process: Found lower Vpid: 0x%X instead of 0x%X\n", pid, Vpid);
                  Vpid = pid;
                  numVpids = 1;
                  }
               else if (pid == Vpid) {
                  ++numVpids;
-                 debug("Incrementing Vpids, now at %d\n", numVpids);
+                 debug("cPidScanner::Process: Incrementing Vpids, now at %d\n", numVpids);
                  }
               }
            }
-        if (((numVpids > PIDSCANNER_VPID_COUNT) && (numApids > PIDSCANNER_APID_COUNT)) ||
-            (abs(numApids - numVpids) > PIDSCANNER_PID_DELTA_COUNT)) {
+        if (((numVpids >= PIDSCANNER_VPID_COUNT) && (numApids >= PIDSCANNER_APID_COUNT)) ||
+            (abs(numApids - numVpids) >= PIDSCANNER_PID_DELTA_COUNT)) {
            // Lock channels for pid updates
            if (!Channels.Lock(true, 10)) {
               timeout.Set(PIDSCANNER_TIMEOUT_IN_MS);
@@ -130,9 +130,9 @@ void cPidScanner::Process(const uint8_t* buf)
            int Ppid = IptvChannel->Ppid();
            int Tpid = IptvChannel->Tpid();
            bool foundApid = false;
-           if (numVpids <= PIDSCANNER_VPID_COUNT)
+           if (numVpids < PIDSCANNER_VPID_COUNT)
               Vpid = 0; // No detected video pid
-           else if (numApids <= PIDSCANNER_APID_COUNT)
+           else if (numApids < PIDSCANNER_APID_COUNT)
               Apid = 0; // No detected audio pid
            for (unsigned int i = 1; i < MAXAPIDS; ++i) {
                Apids[i] = IptvChannel->Apid(i);

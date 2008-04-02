@@ -61,3 +61,4 @@ VDR Plugin 'iptv' Revision History
 - Updated Italian translation (Thanks to Diego Pierotto).
 - Removed compatibility mode for old channels.conf format.
 - EXT protocol is re-tuned only if iptv parameters differ.
+- Updated vlc2iptv script for new channels.conf format.

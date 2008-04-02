@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.86 2008/04/02 20:22:48 rahrenbe Exp $
+ * $Id: device.c,v 1.87 2008/04/02 22:55:04 rahrenbe Exp $
  */
 
 #include "config.h"
@@ -371,7 +371,7 @@ bool cIptvDevice::OpenDvr(void)
 void cIptvDevice::CloseDvr(void)
 {
   debug("cIptvDevice::CloseDvr(%d)\n", deviceIndex);
-  if (pidScanEnabled && pSidScanner && IptvConfig.GetSectionFiltering())
+  if (sidScanEnabled && pSidScanner && IptvConfig.GetSectionFiltering())
      pSidScanner->SetStatus(false);
   if (pIptvStreamer)
      pIptvStreamer->Close();
@@ -436,7 +436,7 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
            write(dvrFd, p, TS_SIZE);
         // Analyze incomplete streams with built-in pid analyzer
         if (pidScanEnabled && pPidScanner)
-            pPidScanner->Process(p);
+           pPidScanner->Process(p);
         // Run the data through all filters
         for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
             if (secfilters[i])
