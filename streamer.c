@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.c,v 1.32 2008/04/02 22:55:04 rahrenbe Exp $
+ * $Id: streamer.c,v 1.33 2008/04/04 20:55:44 rahrenbe Exp $
  */
 
 #include <vdr/thread.h>
@@ -16,10 +16,7 @@ cIptvStreamer::cIptvStreamer(cRingBufferLinear* RingBuffer, cMutex* Mutex)
 : cThread("IPTV streamer"),
   ringBuffer(RingBuffer),
   mutex(Mutex),
-  protocol(NULL),
-  location(""),
-  parameter(-1),
-  index(-1)
+  protocol(NULL)
 {
   debug("cIptvStreamer::cIptvStreamer()\n");
 }
@@ -79,17 +76,11 @@ bool cIptvStreamer::Close(void)
   // where thread Action() may be in the process of accessing the protocol.
   // Taking a mutex serializes the Close() and Action() -calls.
   if (mutex)
-      mutex->Lock();
+     mutex->Lock();
   if (protocol)
      protocol->Close();
   if (mutex)
      mutex->Unlock();
-  // reset stream variables
-  protocol = NULL;
-  location = cString("");
-  parameter = -1;
-  index = -1;
-
   return true;
 }
 
@@ -97,11 +88,6 @@ bool cIptvStreamer::Set(const char* Location, const int Parameter, const int Ind
 {
   debug("cIptvStreamer::Set(): %s:%d\n", Location, Parameter);
   if (!isempty(Location)) {
-     // Check if (re)tune is needed
-     //if ((strcmp(*location, Location) == 0) && (parameter == Parameter) && (index == Index) && (protocol == Protocol)) {
-     //   debug("cIptvStreamer::Set(): (Re)tune skipped\n");
-     //   return false;
-     //   }
      // Update protocol; Close the existing one if changed
      if (protocol != Protocol) {
         if (protocol)
@@ -111,12 +97,8 @@ bool cIptvStreamer::Set(const char* Location, const int Parameter, const int Ind
            protocol->Open();
         }
      // Set protocol location and parameter
-     if (protocol) {
-        location = cString(Location);
-        parameter = Parameter;
-        index = Index;
-        protocol->Set(location, parameter, index);
-        }
+     if (protocol)
+        protocol->Set(Location, Parameter, Index);
      }
   return true;
 }
