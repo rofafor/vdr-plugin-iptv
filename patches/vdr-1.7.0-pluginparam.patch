@@ -1,0 +1,287 @@
+diff -Nru vdr-1.7.0-vanilla/channels.c vdr-1.7.0-pluginparam/channels.c
+--- vdr-1.7.0-vanilla/channels.c	2008-04-12 16:49:12.000000000 +0300
++++ vdr-1.7.0-pluginparam/channels.c	2008-04-13 18:58:41.000000000 +0300
+@@ -216,6 +216,7 @@
+   shortName = strdup("");
+   provider = strdup("");
+   portalName = strdup("");
++  pluginParam = strdup("");
+   memset(&__BeginData__, 0, (char *)&__EndData__ - (char *)&__BeginData__);
+   inversion    = DVBFE_INVERSION_AUTO;
+   bandwidth    = DVBFE_BANDWIDTH_AUTO;
+@@ -241,6 +242,7 @@
+   shortName = NULL;
+   provider = NULL;
+   portalName = NULL;
++  pluginParam = NULL;
+   schedule     = NULL;
+   linkChannels = NULL;
+   refChannel   = NULL;
+@@ -269,6 +271,7 @@
+   free(shortName);
+   free(provider);
+   free(portalName);
++  free(pluginParam);
+ }
+ 
+ cChannel& cChannel::operator= (const cChannel &Channel)
+@@ -277,6 +280,7 @@
+   shortName = strcpyrealloc(shortName, Channel.shortName);
+   provider = strcpyrealloc(provider, Channel.provider);
+   portalName = strcpyrealloc(portalName, Channel.portalName);
++  pluginParam = strcpyrealloc(pluginParam, Channel.pluginParam);
+   memcpy(&__BeginData__, &Channel.__BeginData__, (char *)&Channel.__EndData__ - (char *)&Channel.__BeginData__);
+   return *this;
+ }
+@@ -338,9 +342,26 @@
+      alpha        = Channel->alpha;
+      priority     = Channel->priority;
+      rollOff      = Channel->rollOff;
++     if (IsPlug())  pluginParam = strcpyrealloc(pluginParam, Channel->pluginParam);
+      }
+ }
+ 
++bool cChannel::SetPlugTransponderData(int Source, int Frequency, const char *PluginParam)
++{
++  if (source != Source || frequency != Frequency || (strcmp(pluginParam, PluginParam) != 0)) {
++     if (Number()) {
++        dsyslog("changing transponder data of channel %d from %s:%d:%s to %s:%d:%s", Number(), *cSource::ToString(source), frequency, pluginParam, *cSource::ToString(Source), Frequency, PluginParam);
++        modification |= CHANNELMOD_TRANSP;
++        Channels.SetModified();
++        }
++     source = Source;
++     frequency = Frequency;
++     pluginParam = strcpyrealloc(pluginParam, PluginParam);
++     schedule = NULL;
++     }
++  return true;
++}
++
+ bool cChannel::SetSatTransponderData(int Source, int Frequency, char Polarization, int Srate, int CoderateH, int Modulation, int System, int RollOff)
+ {
+   // Workarounds for broadcaster stupidity:
+@@ -472,6 +493,18 @@
+      }
+ }
+ 
++void cChannel::SetPluginParam(const char *PluginParam)
++{
++  if (!isempty(PluginParam) && strcmp(pluginParam, PluginParam) != 0) {
++     if (Number()) {
++        dsyslog("changing plugin parameters of channel %d from '%s' to '%s'", Number(), pluginParam, PluginParam);
++        modification |= CHANNELMOD_TRANSP;
++        Channels.SetModified();
++        }
++     pluginParam = strcpyrealloc(pluginParam, PluginParam);
++     }
++}
++
+ #define STRDIFF 0x01
+ #define VALDIFF 0x02
+ 
+@@ -665,7 +698,7 @@
+   if (isdigit(type))
+      type = 'S';
+ #define ST(s) if (strchr(s, type))
+-  char buffer[64];
++  char buffer[256];
+   char *q = buffer;
+   *q = 0;
+   ST(" S ")  q += sprintf(q, "%c", polarization);
+@@ -681,6 +714,7 @@
+   ST(" S ")  q += PrintParameter(q, 'S', MapToUser(system, SystemValues));
+   ST("  T")  q += PrintParameter(q, 'T', MapToUser(transmission, TransmissionValues));
+   ST("  T")  q += PrintParameter(q, 'Y', MapToUser(hierarchy, HierarchyValues));
++  ST("P  ")  snprintf(buffer, sizeof(buffer), "%s", pluginParam);
+   return buffer;
+ }
+ 
+@@ -702,7 +736,7 @@
+ 
+ bool cChannel::StringToParameters(const char *s)
+ {
+-  while (s && *s) {
++  while (s && *s && !IsPlug()) {
+         switch (toupper(*s)) {
+           case 'A': s = ParseParameter(s, alpha, AlphaValues); break;
+           case 'B': s = ParseParameter(s, bandwidth, BandwidthValues); break;
+@@ -817,7 +851,7 @@
+         dpids[0] = 0;
+         ok = false;
+         if (parambuf && sourcebuf && vpidbuf && apidbuf) {
+-           ok = StringToParameters(parambuf) && (source = cSource::FromString(sourcebuf)) >= 0;
++           ok = ((source = cSource::FromString(sourcebuf)) >= 0) && StringToParameters(parambuf);
+ 
+            char *p = strchr(vpidbuf, '+');
+            if (p)
+@@ -908,6 +942,7 @@
+            shortName = strcpyrealloc(shortName, p);
+            }
+         name = strcpyrealloc(name, namebuf);
++        if (IsPlug()) pluginParam = strcpyrealloc(pluginParam, parambuf);
+ 
+         free(parambuf);
+         free(sourcebuf);
+diff -Nru vdr-1.7.0-vanilla/channels.h vdr-1.7.0-pluginparam/channels.h
+--- vdr-1.7.0-vanilla/channels.h	2008-04-12 16:46:50.000000000 +0300
++++ vdr-1.7.0-pluginparam/channels.h	2008-04-13 18:57:08.000000000 +0300
+@@ -118,6 +118,7 @@
+   char *shortName;
+   char *provider;
+   char *portalName;
++  char *pluginParam;
+   int __BeginData__;
+   int frequency; // MHz
+   int source;
+@@ -174,6 +175,7 @@
+   int Frequency(void) const { return frequency; } ///< Returns the actual frequency, as given in 'channels.conf'
+   int Transponder(void) const;                    ///< Returns the transponder frequency in MHz, plus the polarization in case of sat
+   static int Transponder(int Frequency, char Polarization); ///< builds the transponder from the given Frequency and Polarization
++  const char *PluginParam(void) const { return pluginParam; }
+   int Source(void) const { return source; }
+   int Srate(void) const { return srate; }
+   int Vpid(void) const { return vpid; }
+@@ -212,6 +214,7 @@
+   int RollOff(void) const { return rollOff; }
+   const cLinkChannels* LinkChannels(void) const { return linkChannels; }
+   const cChannel *RefChannel(void) const { return refChannel; }
++  bool IsPlug(void) const { return cSource::IsPlug(source); }
+   bool IsCable(void) const { return cSource::IsCable(source); }
+   bool IsSat(void) const { return cSource::IsSat(source); }
+   bool IsTerr(void) const { return cSource::IsTerr(source); }
+@@ -219,12 +222,14 @@
+   bool HasTimer(void) const;
+   int Modification(int Mask = CHANNELMOD_ALL);
+   void CopyTransponderData(const cChannel *Channel);
++  bool SetPlugTransponderData(int Source, int Frequency, const char *PluginParam);
+   bool SetSatTransponderData(int Source, int Frequency, char Polarization, int Srate, int CoderateH, int Modulation, int System, int RollOff);
+   bool SetCableTransponderData(int Source, int Frequency, int Modulation, int Srate, int CoderateH);
+   bool SetTerrTransponderData(int Source, int Frequency, int Bandwidth, int Modulation, int Hierarchy, int CodeRateH, int CodeRateL, int Guard, int Transmission, int Alpha, int Priority);
+   void SetId(int Nid, int Tid, int Sid, int Rid = 0);
+   void SetName(const char *Name, const char *ShortName, const char *Provider);
+   void SetPortalName(const char *PortalName);
++  void SetPluginParam(const char *PluginParam);
+   void SetPids(int Vpid, int Ppid, int *Apids, char ALangs[][MAXLANGCODE2], int *Dpids, char DLangs[][MAXLANGCODE2], int *Spids, char SLangs[][MAXLANGCODE2], int Tpid);
+   void SetCaIds(const int *CaIds); // list must be zero-terminated
+   void SetCaDescriptors(int Level);
+diff -Nru vdr-1.7.0-vanilla/config.h vdr-1.7.0-pluginparam/config.h
+--- vdr-1.7.0-vanilla/config.h	2008-04-12 16:02:10.000000000 +0300
++++ vdr-1.7.0-pluginparam/config.h	2008-04-13 18:54:25.000000000 +0300
+@@ -30,6 +30,8 @@
+ #define APIVERSION  "1.7.0"
+ #define APIVERSNUM   10700  // Version * 10000 + Major * 100 + Minor
+ 
++#define PLUGINPARAMPATCHVERSNUM 1
++
+ // When loading plugins, VDR searches them by their APIVERSION, which
+ // may be smaller than VDRVERSION in case there have been no changes to
+ // VDR header files since the last APIVERSION. This allows compiled
+diff -Nru vdr-1.7.0-vanilla/menu.c vdr-1.7.0-pluginparam/menu.c
+--- vdr-1.7.0-vanilla/menu.c	2008-04-12 14:37:17.000000000 +0300
++++ vdr-1.7.0-pluginparam/menu.c	2008-04-13 18:56:07.000000000 +0300
+@@ -189,6 +189,7 @@
+   cChannel *channel;
+   cChannel data;
+   char name[256];
++  char pluginParam[256];
+   void Setup(void);
+ public:
+   cMenuEditChannel(cChannel *Channel, bool New = false);
+@@ -221,6 +222,7 @@
+ 
+   // Parameters for all types of sources:
+   strn0cpy(name, data.name, sizeof(name));
++  strn0cpy(pluginParam, data.pluginParam, sizeof(pluginParam));
+   Add(new cMenuEditStrItem( tr("Name"),          name, sizeof(name)));
+   Add(new cMenuEditSrcItem( tr("Source"),       &data.source));
+   Add(new cMenuEditIntItem( tr("Frequency"),    &data.frequency));
+@@ -255,6 +257,7 @@
+   ST("  T")  Add(new cMenuEditMapItem( tr("Alpha"),        &data.alpha,        AlphaValues));
+   ST("  T")  Add(new cMenuEditMapItem( tr("Priority"),     &data.priority,     PriorityValues));
+   ST(" S ")  Add(new cMenuEditMapItem( tr("Rolloff"),      &data.rollOff,      RollOffValues));
++  ST("P  ")  Add(new cMenuEditStrItem( tr("Parameters"),    pluginParam, sizeof(pluginParam), tr(FileNameChars)));
+ 
+   SetCurrent(Get(current));
+   Display();
+@@ -269,6 +272,7 @@
+      if (Key == kOk) {
+         if (Channels.HasUniqueChannelID(&data, channel)) {
+            data.name = strcpyrealloc(data.name, name);
++           data.pluginParam = strcpyrealloc(data.pluginParam, pluginParam);
+            if (channel) {
+               *channel = data;
+               isyslog("edited channel %d %s", channel->Number(), *data.ToText());
+diff -Nru vdr-1.7.0-vanilla/po/fi_FI.po vdr-1.7.0-pluginparam/po/fi_FI.po
+--- vdr-1.7.0-vanilla/po/fi_FI.po	2008-04-13 17:16:58.000000000 +0300
++++ vdr-1.7.0-pluginparam/po/fi_FI.po	2008-04-13 18:54:25.000000000 +0300
+@@ -1019,3 +1019,6 @@
+ #, c-format
+ msgid "VDR will shut down in %s minutes"
+ msgstr "VDR sammuu %s minuutin kuluttua"
++
++msgid "Parameters"
++msgstr "Parametrit"
+diff -Nru vdr-1.7.0-vanilla/po/fr_FR.po vdr-1.7.0-pluginparam/po/fr_FR.po
+--- vdr-1.7.0-vanilla/po/fr_FR.po	2008-04-13 17:16:58.000000000 +0300
++++ vdr-1.7.0-pluginparam/po/fr_FR.po	2008-04-13 18:54:25.000000000 +0300
+@@ -1022,3 +1022,6 @@
+ #, c-format
+ msgid "VDR will shut down in %s minutes"
+ msgstr "VDR s'arrêtera dans %s minutes"
++
++msgid "Parameters"
++msgstr "Paramètres"
+diff -Nru vdr-1.7.0-vanilla/sources.c vdr-1.7.0-pluginparam/sources.c
+--- vdr-1.7.0-vanilla/sources.c	2008-02-10 16:07:26.000000000 +0200
++++ vdr-1.7.0-pluginparam/sources.c	2008-04-13 18:54:25.000000000 +0300
+@@ -37,6 +37,7 @@
+   char buffer[16];
+   char *q = buffer;
+   switch (Code & st_Mask) {
++    case stPlug:  *q++ = 'P'; break;
+     case stCable: *q++ = 'C'; break;
+     case stSat:   *q++ = 'S';
+                   {
+@@ -56,6 +57,7 @@
+ {
+   int type = stNone;
+   switch (toupper(*s)) {
++    case 'P': type = stPlug;  break;
+     case 'C': type = stCable; break;
+     case 'S': type = stSat;   break;
+     case 'T': type = stTerr;  break;
+diff -Nru vdr-1.7.0-vanilla/sources.conf vdr-1.7.0-pluginparam/sources.conf
+--- vdr-1.7.0-vanilla/sources.conf	2007-02-17 18:15:13.000000000 +0200
++++ vdr-1.7.0-pluginparam/sources.conf	2008-04-13 18:54:25.000000000 +0300
+@@ -188,3 +188,7 @@
+ # Terrestrial
+ 
+ T       Terrestrial
++
++# Plugin
++
++P       Plugin
+diff -Nru vdr-1.7.0-vanilla/sources.h vdr-1.7.0-pluginparam/sources.h
+--- vdr-1.7.0-vanilla/sources.h	2005-05-14 12:30:41.000000000 +0300
++++ vdr-1.7.0-pluginparam/sources.h	2008-04-13 18:54:25.000000000 +0300
+@@ -16,10 +16,11 @@
+ public:
+   enum eSourceType {
+     stNone  = 0x0000,
++    stPlug  = 0x2000,
+     stCable = 0x4000,
+     stSat   = 0x8000,
+     stTerr  = 0xC000,
+-    st_Mask = 0xC000,
++    st_Mask = 0xE000,
+     st_Neg  = 0x0800,
+     st_Pos  = 0x07FF,
+     };
+@@ -35,6 +36,7 @@
+   static cString ToString(int Code);
+   static int FromString(const char *s);
+   static int FromData(eSourceType SourceType, int Position = 0, bool East = false);
++  static bool IsPlug(int Code) { return (Code & st_Mask) == stPlug; }
+   static bool IsCable(int Code) { return (Code & st_Mask) == stCable; }
+   static bool IsSat(int Code) { return (Code & st_Mask) == stSat; }
+   static bool IsTerr(int Code) { return (Code & st_Mask) == stTerr; }

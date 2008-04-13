@@ -61,3 +61,4 @@ VDR Plugin 'iptv' Revision History
 - Updated Italian translation (Thanks to Diego Pierotto).
 - Removed compatibility mode for old channels.conf format.
 - Updated vlc2iptv script for new channels.conf format.
+- Added pluginparam patch for vdr-1.7.0.
