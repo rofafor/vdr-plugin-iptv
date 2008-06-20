@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# vlc2iptv is used by the VDR iptv plug-in to transcode external sources
+# vlc2iptv is used by the VDR iptv plugin to transcode external sources
 #
 # (C) 2007 Rolf Ahrenberg, Antti Seppälä
 # (C) 2007 Tobias Grimm

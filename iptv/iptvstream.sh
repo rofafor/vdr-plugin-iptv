@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# iptvstream.sh can be used by the VDR iptv plug-in to transcode external
+# iptvstream.sh can be used by the VDR iptv plugin to transcode external
 # sources
 #
 # (C) 2007 Rolf Ahrenberg, Antti Seppälä
