@@ -3,16 +3,16 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: pidscanner.c,v 1.7 2008/04/02 22:55:04 rahrenbe Exp $
+ * $Id: pidscanner.c,v 1.8 2008/08/06 08:05:52 rahrenbe Exp $
  */
 
 #include "common.h"
 #include "pidscanner.h"
 
 #define PIDSCANNER_TIMEOUT_IN_MS   15000 /* 15s timeout for detection */
-#define PIDSCANNER_APID_COUNT      10    /* minimum count of audio pid samples for pid detection */
-#define PIDSCANNER_VPID_COUNT      10    /* minimum count of video pid samples for pid detection */
-#define PIDSCANNER_PID_DELTA_COUNT 50    /* minimum count of pid samples for audio/video only pid detection */
+#define PIDSCANNER_APID_COUNT      5     /* minimum count of audio pid samples for pid detection */
+#define PIDSCANNER_VPID_COUNT      5     /* minimum count of video pid samples for pid detection */
+#define PIDSCANNER_PID_DELTA_COUNT 100   /* minimum count of pid samples for audio/video only pid detection */
 
 cPidScanner::cPidScanner(void) 
 : timeout(0),

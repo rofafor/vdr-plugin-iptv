@@ -63,3 +63,7 @@ VDR Plugin 'iptv' Revision History
 - Updated vlc2iptv script for new channels.conf format.
 - Added pluginparam patch for vdr-1.7.0.
 - Added new example scripts from VDR-WIKI.
+
+2008-xx-xx: Version 0.2.2
+
+- Tweaked pid scanner parameters for HD broadcasts.
