@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.c,v 1.58 2008/04/02 20:22:48 rahrenbe Exp $
  */
 
 #include <string.h>

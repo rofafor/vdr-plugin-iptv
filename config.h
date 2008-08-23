@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: config.h,v 1.20 2008/02/01 21:54:24 rahrenbe Exp $
  */
 
 #ifndef __IPTV_CONFIG_H

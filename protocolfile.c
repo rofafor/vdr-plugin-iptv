@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolfile.c,v 1.15 2008/01/04 23:36:37 ajhseppa Exp $
  */
 
 #include <fcntl.h>

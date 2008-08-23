@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.c,v 1.22 2008/01/19 21:08:03 ajhseppa Exp $
  */
 
 #include <limits.h>

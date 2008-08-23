@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.c,v 1.19 2008/02/17 19:18:47 rahrenbe Exp $
  */
 
 #include "sectionfilter.h"

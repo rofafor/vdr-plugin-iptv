@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolfile.h,v 1.8 2008/01/04 23:36:37 ajhseppa Exp $
  */
 
 #ifndef __IPTV_PROTOCOLFILE_H

@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: socket.h,v 1.3 2007/10/21 19:32:15 ajhseppa Exp $
  */
 
 #ifndef __IPTV_SOCKET_H

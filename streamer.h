@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: streamer.h,v 1.16 2008/04/04 20:55:44 rahrenbe Exp $
  */
 
 #ifndef __IPTV_STREAMER_H

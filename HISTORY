@@ -43,7 +43,7 @@ VDR Plugin 'iptv' Revision History
 
 - Updated for vdr-1.5.15.
 - Replaced asprintf with cString.
-- Updated French translation (Thanks to Michaël Nival).
+- Updated French translation (Thanks to MichaÃ«l Nival).
 - Modified VDR locale support detection.
 - Added preliminary automatic Pid scanning functionality.
 - Modified channels.conf format to enable/disable channel

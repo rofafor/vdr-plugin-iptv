@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolext.c,v 1.24 2008/02/17 19:18:47 rahrenbe Exp $
  */
 
 #include <sys/wait.h>

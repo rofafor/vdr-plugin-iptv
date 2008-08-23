@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sidscanner.c,v 1.1 2007/10/01 18:14:57 rahrenbe Exp $
  */
 
 #include <libsi/section.h>

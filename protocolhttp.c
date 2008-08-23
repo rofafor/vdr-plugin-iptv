@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolhttp.c,v 1.25 2008/04/02 22:55:04 rahrenbe Exp $
  */
 
 #include <sys/types.h>

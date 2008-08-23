@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: iptv.c,v 1.39 2008/03/30 20:25:12 rahrenbe Exp $
  */
 
 #include <getopt.h>

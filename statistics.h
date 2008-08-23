@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: statistics.h,v 1.11 2008/01/19 21:08:03 ajhseppa Exp $
  */
 
 #ifndef __IPTV_STATISTICS_H

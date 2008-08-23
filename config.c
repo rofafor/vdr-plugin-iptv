@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: config.c,v 1.21 2008/02/01 21:54:24 rahrenbe Exp $
  */
 
 #include "config.h"

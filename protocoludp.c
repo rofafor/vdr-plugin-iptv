@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocoludp.c,v 1.22 2008/01/04 23:36:37 ajhseppa Exp $
  */
 
 #include <sys/types.h>

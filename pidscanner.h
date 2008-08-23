@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: pidscanner.h,v 1.3 2008/02/02 20:51:47 rahrenbe Exp $
  */
 
 #ifndef __PIDSCANNER_H

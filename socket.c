@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: socket.c,v 1.7 2008/01/30 21:57:33 rahrenbe Exp $
  */
 
 #include <sys/types.h>

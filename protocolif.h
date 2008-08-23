@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: protocolif.h,v 1.8 2008/01/30 21:57:33 rahrenbe Exp $
  */
 
 #ifndef __IPTV_PROTOCOLIF_H

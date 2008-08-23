@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: device.c,v 1.87 2008/04/02 22:55:04 rahrenbe Exp $
  */
 
 #include "config.h"

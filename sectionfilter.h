@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: sectionfilter.h,v 1.8 2008/02/17 19:18:47 rahrenbe Exp $
  */
 
 #ifndef __IPTV_SECTIONFILTER_H

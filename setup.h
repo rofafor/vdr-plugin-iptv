@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: setup.h,v 1.21 2008/02/19 22:29:02 rahrenbe Exp $
  */
 
 #ifndef __IPTV_SETUP_H

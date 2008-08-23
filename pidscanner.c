@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: pidscanner.c,v 1.8 2008/08/06 08:05:52 rahrenbe Exp $
  */
 
 #include "common.h"

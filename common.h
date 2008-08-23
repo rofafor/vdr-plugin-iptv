@@ -3,7 +3,6 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id: common.h,v 1.20 2008/02/17 19:18:47 rahrenbe Exp $
  */
 
 #ifndef __IPTV_COMMON_H
