@@ -23,7 +23,8 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   pidScanEnabled(false),
   mutex()
 {
-  debug("cIptvDevice::cIptvDevice(%d)\n", deviceIndex);
+  //debug("cIptvDevice::cIptvDevice(%d)\n", deviceIndex);
+  isyslog("creating IPTV device %d (CardIndex=%d)", deviceIndex, CardIndex());
   tsBuffer = new cRingBufferLinear(MEGABYTE(IptvConfig.GetTsBufferSize()),
                                    (TS_SIZE * IptvConfig.GetReadBufferTsCount()),
                                    false, "IPTV");
@@ -48,7 +49,7 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   cString filename = cString::sprintf(IPTV_DVR_FILENAME, deviceIndex);
   stat(filename, &sb);
   if (S_ISFIFO(sb.st_mode)) {
-     dvrFd = open(filename, O_WRONLY | O_NONBLOCK);
+     dvrFd = open(filename, O_RDWR | O_NONBLOCK);
      if (dvrFd >= 0)
         dsyslog("IPTV device %d redirecting input stream to '%s'", deviceIndex, *filename);
      }
