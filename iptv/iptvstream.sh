@@ -31,8 +31,10 @@ PARAMETER=${1}
 # Iptv plugin listens this port
 PORT=${2}
 
-# Default bitrates for stream transcoding
+# Default settings for stream transcoding
+VCODEC=mp2v
 VBITRATE=2400
+ACODEC=mpga
 ABITRATE=320
 
 # There is a way to specify multiple URLs in the same script. The selection is
@@ -40,6 +42,8 @@ ABITRATE=320
 case ${PARAMETER} in
     1)
 	URL=""
+	WIDTH=720
+	HEIGHT=576
 	;;
     2)
 	URL=""
@@ -57,13 +61,19 @@ if [ -z "${URL}" ]; then
     exit 1;
 fi
 
+# Create transcoding options
+TRANSCODE_OPTS="vcodec=${VCODEC},acodec=${ACODEC},vb=${VBITRATE},ab=${ABITRATE}"
+if [ -n "${WIDTH}" -a -n "${HEIGHT}" ] ; then
+    TRANSCODE_OPTS="${TRANSCODE_OPTS},width=${WIDTH},height=${HEIGHT}"
+fi
+
 # Create unique pids for the stream
 let VPID=${PARAMETER}+1
 let APID=${PARAMETER}+2
 let SPID=${PARAMETER}+3
 
 # Capture VLC pid for further management in IPTV plugin
-vlc "${URL}" --sout "#transcode{vcodec=mp2v,acodec=mpga,vb=${VBITRATE},ab=${ABITRATE}}:standard{access=udp,mux=ts{pid-video=${VPID},pid-audio=${APID},pid-spu=${SPID}},dst=127.0.0.1:${PORT}}" --intf dummy &
+vlc "${URL}" --sout "#transcode{${TRANSCODE_OPTS}}:standard{access=udp,mux=ts{pid-video=${VPID},pid-audio=${APID},pid-spu=${SPID}},dst=127.0.0.1:${PORT}}" --intf dummy &
 
 PID=${!}
 
