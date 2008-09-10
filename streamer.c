@@ -45,11 +45,11 @@ void cIptvStreamer::Action(void)
           }
        else {
           mutex->Unlock();
-          cCondWait::SleepMs(100); // to reduce cpu load
+          sleep.Wait(100); // to reduce cpu load
           }
        }
     else
-       cCondWait::SleepMs(100); // and avoid busy loop
+       sleep.Wait(100); // and avoid busy loop
     }
   debug("cIptvStreamer::Action(): Exiting\n");
 }
@@ -69,6 +69,7 @@ bool cIptvStreamer::Close(void)
 {
   debug("cIptvStreamer::Close()\n");
   // Stop thread
+  sleep.Signal();
   if (Running())
      Cancel(3);
   // Close the protocol. A mutex should be taken here to avoid a race condition

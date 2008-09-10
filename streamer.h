@@ -20,6 +20,7 @@ class cIptvStreamer : public cThread, public cIptvStreamerStatistics {
 private:
   cRingBufferLinear* ringBuffer;
   cMutex* mutex;
+  cCondWait sleep;
   unsigned char* readBuffer;
   unsigned int readBufferLen;
   cIptvProtocolIf* protocol;
