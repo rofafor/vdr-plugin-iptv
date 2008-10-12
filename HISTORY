@@ -64,8 +64,9 @@ VDR Plugin 'iptv' Revision History
 - Added pluginparam patch for vdr-1.7.0.
 - Added new example scripts from VDR-WIKI.
 
-2008-xx-xx: Version 0.2.2
+2008-10-12: Version 0.2.2
 
+- Converted HISTORY and fi_FI.po to UTF-8.
 - Updated Italian translation (Thanks to Diego Pierotto).
 - Tweaked pid scanner parameters for HD broadcasts.
 - Fixed opening of fifo tap.
