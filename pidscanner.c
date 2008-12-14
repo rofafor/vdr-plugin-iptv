@@ -145,7 +145,11 @@ void cPidScanner::Process(const uint8_t* buf)
            for (unsigned int i = 0; i < MAXSPIDS; ++i)
                Spids[i] = IptvChannel->Spid(i);
            debug("cPidScanner::Process(): Vpid=0x%04X, Apid=0x%04X\n", Vpid, Apid);
+#if defined(APIVERSNUM) && APIVERSNUM >= 10700
+           IptvChannel->SetPids(Vpid, Ppid, 0, Apids, ALangs, Dpids, DLangs, Spids, SLangs, Tpid);
+#else
            IptvChannel->SetPids(Vpid, Ppid, Apids, ALangs, Dpids, DLangs, Spids, SLangs, Tpid);
+#endif
            Channels.Unlock();
            process = false;
            }

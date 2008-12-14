@@ -34,7 +34,7 @@ private:
     eProtocolCount
   };
   struct tIptvChannel {
-    int frequency, source, protocol, parameter, vpid, ppid, tpid, sid, nid, tid, rid;
+    int frequency, source, protocol, parameter, vpid, ppid, vtype, tpid, sid, nid, tid, rid;
     int apid[MAXAPIDS + 1], dpid[MAXDPIDS + 1], spid[MAXSPIDS + 1], caids[MAXCAIDS + 1];
     int sidscan, pidscan;
     char name[256], location[256];
@@ -57,7 +57,7 @@ cIptvMenuEditChannel::cIptvMenuEditChannel(cChannel *Channel, bool New)
   protocols[eProtocolUDP]  = tr("UDP");
   protocols[eProtocolHTTP] = tr("HTTP");
   protocols[eProtocolFILE] = tr("FILE");
-  protocols[eProtocolEXT] = tr("EXT");
+  protocols[eProtocolEXT]  = tr("EXT");
   channel = Channel;
   GetChannelData(channel);
   if (New) {
@@ -127,6 +127,9 @@ void cIptvMenuEditChannel::GetChannelData(cChannel *Channel)
      data.source = Channel->Source();
      data.vpid = Channel->Vpid();
      data.ppid = Channel->Ppid();
+#if defined(APIVERSNUM) && APIVERSNUM >= 10700
+     data.vtype = Channel->Vtype();
+#endif
      data.tpid = Channel->Tpid();
      for (unsigned int i = 0; i < ARRAY_SIZE(data.apid); ++i)
          data.apid[i] = Channel->Apid(i);
@@ -152,6 +155,7 @@ void cIptvMenuEditChannel::GetChannelData(cChannel *Channel)
      data.source = cSource::FromData(cSource::stPlug);
      data.vpid = 0;
      data.ppid = 0;
+     data.vtype = 0;
      data.tpid = 0;
      for (unsigned int i = 0; i < ARRAY_SIZE(data.apid); ++i)
          data.apid[i] = 0;
@@ -196,7 +200,11 @@ void cIptvMenuEditChannel::SetChannelData(cChannel *Channel)
             break;
        }
      char slangs[MAXSPIDS][MAXLANGCODE2] = { "" };
+#if defined(APIVERSNUM) && APIVERSNUM >= 10700
+     Channel->SetPids(data.vpid, data.ppid, data.vtype, data.apid, alangs, data.dpid, dlangs, data.spid, slangs, data.tpid);
+#else
      Channel->SetPids(data.vpid, data.ppid, data.apid, alangs, data.dpid, dlangs, data.spid, slangs, data.tpid);
+#endif
      Channel->SetCaIds(data.caids);
      Channel->SetId(data.nid, data.tid, data.sid, data.rid);
      Channel->SetName(data.name, "", "IPTV");
