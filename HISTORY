@@ -73,6 +73,7 @@ VDR Plugin 'iptv' Revision History
 - Updated iptvstream.sh script to support optional video resolution settings.
 - Optimized streamer thread termination.
 
-200x-xx-xx: Version 0.2.3
+2008-12-16: Version 0.2.3
 
 - Updated for vdr-1.7.2.
+- Silenced a compilation warning.
