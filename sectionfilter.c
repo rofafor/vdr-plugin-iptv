@@ -226,7 +226,7 @@ void cIptvSectionFilter::ProcessData(const uint8_t* buf)
      error("Not TS packet: 0x%X\n", buf[0]);
      return;
      }
-  
+
   // Stop if not the PID this filter is looking for
   if (ts_pid(buf) != pid)
      return;
@@ -240,7 +240,7 @@ void cIptvSectionFilter::ProcessData(const uint8_t* buf)
 
   uint8_t cc = buf[3] & 0x0f;
   int ccok = ((feedcc + 1) & 0x0f) == cc;
-  feedcc = cc;  
+  feedcc = cc;
 
   int dc_i = 0;
   if (buf[3] & 0x20) {

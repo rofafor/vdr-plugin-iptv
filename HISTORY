@@ -77,3 +77,9 @@ VDR Plugin 'iptv' Revision History
 
 - Updated for vdr-1.7.2.
 - Silenced a compilation warning.
+
+2009-02-24: Version 0.2.4
+
+- Updated for vdr-1.7.4.
+- Fixed blacklisting of PAT section filter.
+- Set max IPTV device count to VDR's max devices.

@@ -8,7 +8,7 @@
 #include "config.h"
 #include "device.h"
 
-#define IPTV_MAX_DEVICES 8
+#define IPTV_MAX_DEVICES MAXDEVICES
 
 cIptvDevice * IptvDevices[IPTV_MAX_DEVICES] = { NULL };
 
@@ -429,7 +429,7 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
            }
         isPacketDelivered = true;
         Data = p;
-        // Update pid statistics 
+        // Update pid statistics
         AddPidStatistic(ts_pid(p), payload(p));
         // Send data also to dvr fifo
         if ((dvrFd >= 0) && (write(dvrFd, p, TS_SIZE) != TS_SIZE))

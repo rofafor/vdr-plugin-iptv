@@ -17,7 +17,7 @@ cIptvConfig::cIptvConfig(void)
   useBytes(1),
   sectionFiltering(1)
 {
-  for (unsigned int i = 0; i < ARRAY_SIZE(disabledFilters) - 1; ++i)
+  for (unsigned int i = 0; i < ARRAY_SIZE(disabledFilters); ++i)
       disabledFilters[i] = -1;
   memset(configDirectory, '\0', sizeof(configDirectory));
 }
@@ -25,7 +25,7 @@ cIptvConfig::cIptvConfig(void)
 unsigned int cIptvConfig::GetDisabledFiltersCount(void) const
 {
   unsigned int n = 0;
-  while ((disabledFilters[n] != -1) && (n < ARRAY_SIZE(disabledFilters) - 1))
+  while ((disabledFilters[n] != -1) && (n < ARRAY_SIZE(disabledFilters)))
         n++;
   return n;
 }
