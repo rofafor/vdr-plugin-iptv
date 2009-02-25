@@ -51,8 +51,9 @@ void cSidScanner::Process(u_short Pid, u_char Tid, const u_char *Data, int Lengt
                if (!Channels.Lock(true, 10))
                   return;
                cChannel *IptvChannel = Channels.GetByChannelID(channel.GetChannelID());
-               IptvChannel->SetId(IptvChannel->Nid(), IptvChannel->Tid(),
-                                  assoc.getServiceId(), IptvChannel->Rid());
+               if (IptvChannel)
+                  IptvChannel->SetId(IptvChannel->Nid(), IptvChannel->Tid(),
+                                    assoc.getServiceId(), IptvChannel->Rid());
                Channels.Unlock();
                }
             SetChannel(NULL);
