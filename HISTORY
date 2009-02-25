@@ -83,4 +83,4 @@ VDR Plugin 'iptv' Revision History
 - Updated for vdr-1.7.4.
 - Fixed blacklisting of PAT section filter.
 - Set max IPTV device count to VDR's max devices.
-- Fixed a possible crash in sid scanner.
+- Fixed a possible crash in sid and pid scanners.

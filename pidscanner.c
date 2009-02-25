@@ -120,36 +120,38 @@ void cPidScanner::Process(const uint8_t* buf)
               return;
               }
            cChannel *IptvChannel = Channels.GetByChannelID(channel.GetChannelID());
-           int Apids[MAXAPIDS + 1] = { 0 }; // these lists are zero-terminated
-           int Dpids[MAXDPIDS + 1] = { 0 };
-           int Spids[MAXSPIDS + 1] = { 0 };
-           char ALangs[MAXAPIDS][MAXLANGCODE2] = { "" };
-           char DLangs[MAXDPIDS][MAXLANGCODE2] = { "" };
-           char SLangs[MAXSPIDS][MAXLANGCODE2] = { "" };
-           int Ppid = IptvChannel->Ppid();
-           int Tpid = IptvChannel->Tpid();
-           bool foundApid = false;
-           if (numVpids < PIDSCANNER_VPID_COUNT)
-              Vpid = 0; // No detected video pid
-           else if (numApids < PIDSCANNER_APID_COUNT)
-              Apid = 0; // No detected audio pid
-           for (unsigned int i = 1; i < MAXAPIDS; ++i) {
-               Apids[i] = IptvChannel->Apid(i);
-               if (Apids[i] && (Apids[i] == Apid))
-                  foundApid = true;
-               }
-           if (!foundApid)
-              Apids[0] = Apid;
-           for (unsigned int i = 0; i < MAXDPIDS; ++i)
-               Dpids[i] = IptvChannel->Dpid(i);
-           for (unsigned int i = 0; i < MAXSPIDS; ++i)
-               Spids[i] = IptvChannel->Spid(i);
-           debug("cPidScanner::Process(): Vpid=0x%04X, Apid=0x%04X\n", Vpid, Apid);
+           if (IptvChannel) {
+              int Apids[MAXAPIDS + 1] = { 0 }; // these lists are zero-terminated
+              int Dpids[MAXDPIDS + 1] = { 0 };
+              int Spids[MAXSPIDS + 1] = { 0 };
+              char ALangs[MAXAPIDS][MAXLANGCODE2] = { "" };
+              char DLangs[MAXDPIDS][MAXLANGCODE2] = { "" };
+              char SLangs[MAXSPIDS][MAXLANGCODE2] = { "" };
+              int Ppid = IptvChannel->Ppid();
+              int Tpid = IptvChannel->Tpid();
+              bool foundApid = false;
+              if (numVpids < PIDSCANNER_VPID_COUNT)
+                 Vpid = 0; // No detected video pid
+              else if (numApids < PIDSCANNER_APID_COUNT)
+                 Apid = 0; // No detected audio pid
+              for (unsigned int i = 1; i < MAXAPIDS; ++i) {
+                  Apids[i] = IptvChannel->Apid(i);
+                  if (Apids[i] && (Apids[i] == Apid))
+                     foundApid = true;
+                  }
+              if (!foundApid)
+                 Apids[0] = Apid;
+              for (unsigned int i = 0; i < MAXDPIDS; ++i)
+                  Dpids[i] = IptvChannel->Dpid(i);
+              for (unsigned int i = 0; i < MAXSPIDS; ++i)
+                  Spids[i] = IptvChannel->Spid(i);
+              debug("cPidScanner::Process(): Vpid=0x%04X, Apid=0x%04X\n", Vpid, Apid);
 #if defined(APIVERSNUM) && APIVERSNUM >= 10700
-           IptvChannel->SetPids(Vpid, Ppid, 0, Apids, ALangs, Dpids, DLangs, Spids, SLangs, Tpid);
+              IptvChannel->SetPids(Vpid, Ppid, 0, Apids, ALangs, Dpids, DLangs, Spids, SLangs, Tpid);
 #else
-           IptvChannel->SetPids(Vpid, Ppid, Apids, ALangs, Dpids, DLangs, Spids, SLangs, Tpid);
+              IptvChannel->SetPids(Vpid, Ppid, Apids, ALangs, Dpids, DLangs, Spids, SLangs, Tpid);
 #endif
+              }
            Channels.Unlock();
            process = false;
            }
