@@ -45,7 +45,7 @@ bool cIptvProtocolHttp::Connect(void)
 
      // First try only the IP address
      sockAddr.sin_addr.s_addr = inet_addr(streamAddr);
-     
+
      if (sockAddr.sin_addr.s_addr == INADDR_NONE) {
         debug("Cannot convert %s directly to internet address\n", streamAddr);
 
@@ -214,9 +214,9 @@ bool cIptvProtocolHttp::Close(void)
   return true;
 }
 
-int cIptvProtocolHttp::Read(unsigned char* *BufferAddr)
+int cIptvProtocolHttp::Read(unsigned char* BufferAddr, unsigned int BufferLen)
 {
-  return cIptvTcpSocket::Read(BufferAddr);
+  return cIptvTcpSocket::Read(BufferAddr, BufferLen);
 }
 
 bool cIptvProtocolHttp::Set(const char* Location, const int Parameter, const int Index)

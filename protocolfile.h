@@ -16,8 +16,6 @@ private:
   char* fileLocation;
   int fileDelay;
   FILE* fileStream;
-  unsigned char* readBuffer;
-  unsigned int readBufferLen;
   bool isActive;
 
 private:
@@ -27,7 +25,7 @@ private:
 public:
   cIptvProtocolFile();
   virtual ~cIptvProtocolFile();
-  int Read(unsigned char* *BufferAddr);
+  int Read(unsigned char* BufferAddr, unsigned int BufferLen);
   bool Set(const char* Location, const int Parameter, const int Index);
   bool Open(void);
   bool Close(void);

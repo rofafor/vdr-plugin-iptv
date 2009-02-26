@@ -16,15 +16,10 @@
 
 cIptvProtocolFile::cIptvProtocolFile()
 : fileDelay(0),
-  readBufferLen(TS_SIZE * IptvConfig.GetReadBufferTsCount()),
   isActive(false)
 {
   debug("cIptvProtocolFile::cIptvProtocolFile()\n");
   fileLocation = strdup("");
-  // Allocate receive buffer
-  readBuffer = MALLOC(unsigned char, readBufferLen);
-  if (!readBuffer)
-     error("ERROR: MALLOC() failed in ProtocolFile()");
 }
 
 cIptvProtocolFile::~cIptvProtocolFile()
@@ -34,7 +29,6 @@ cIptvProtocolFile::~cIptvProtocolFile()
   cIptvProtocolFile::Close();
   // Free allocated memory
   free(fileLocation);
-  free(readBuffer);
 }
 
 bool cIptvProtocolFile::OpenFile(void)
@@ -61,10 +55,9 @@ void cIptvProtocolFile::CloseFile(void)
      }
 }
 
-int cIptvProtocolFile::Read(unsigned char* *BufferAddr)
+int cIptvProtocolFile::Read(unsigned char* BufferAddr, unsigned int BufferLen)
 {
    //debug("cIptvProtocolFile::Read()\n");
-   *BufferAddr = readBuffer;
    // Check errors
    if (ferror(fileStream)) {
       debug("Read error\n");
@@ -81,7 +74,7 @@ int cIptvProtocolFile::Read(unsigned char* *BufferAddr)
    // during the sleep and buffers are disposed. Check here that the plugin is
    // still active before accessing the buffers
    if (isActive)
-      return fread(readBuffer, sizeof(unsigned char), readBufferLen, fileStream);
+      return fread(BufferAddr, sizeof(unsigned char), BufferLen, fileStream);
    return -1;
 }
 

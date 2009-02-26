@@ -127,9 +127,9 @@ bool cIptvProtocolExt::Close(void)
   return true;
 }
 
-int cIptvProtocolExt::Read(unsigned char* *BufferAddr)
+int cIptvProtocolExt::Read(unsigned char* BufferAddr, unsigned int BufferLen)
 {
-  return cIptvUdpSocket::Read(BufferAddr);
+  return cIptvUdpSocket::Read(BufferAddr, BufferLen);
 }
 
 bool cIptvProtocolExt::Set(const char* Location, const int Parameter, const int Index)

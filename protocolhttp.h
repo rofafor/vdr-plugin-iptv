@@ -27,7 +27,7 @@ private:
 public:
   cIptvProtocolHttp();
   virtual ~cIptvProtocolHttp();
-  int Read(unsigned char* *BufferAddr);
+  int Read(unsigned char* BufferAddr, unsigned int BufferLen);
   bool Set(const char* Location, const int Parameter, const int Index);
   bool Open(void);
   bool Close(void);

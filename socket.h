@@ -14,8 +14,6 @@ class cIptvSocket {
 protected:
   int socketPort;
   int socketDesc;
-  unsigned char* readBuffer;
-  unsigned int readBufferLen;
   struct sockaddr_in sockAddr;
   bool isActive;
 
@@ -32,7 +30,7 @@ class cIptvUdpSocket : public cIptvSocket {
 public:
   cIptvUdpSocket();
   virtual ~cIptvUdpSocket();
-  virtual int Read(unsigned char* *BufferAddr);
+  virtual int Read(unsigned char* BufferAddr, unsigned int BufferLen);
   bool OpenSocket(const int Port);
 };
 
@@ -40,7 +38,7 @@ class cIptvTcpSocket : public cIptvSocket {
 public:
   cIptvTcpSocket();
   virtual ~cIptvTcpSocket();
-  virtual int Read(unsigned char* *BufferAddr);
+  virtual int Read(unsigned char* BufferAddr, unsigned int BufferLen);
   bool OpenSocket(const int Port);
 };
 

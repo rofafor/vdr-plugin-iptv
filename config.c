@@ -10,8 +10,7 @@
 cIptvConfig IptvConfig;
 
 cIptvConfig::cIptvConfig(void)
-: readBufferTsCount(48),
-  tsBufferSize(2),
+: tsBufferSize(2),
   tsBufferPrefillRatio(0),
   extProtocolBasePort(4321),
   useBytes(1),

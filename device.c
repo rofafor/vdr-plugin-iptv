@@ -20,21 +20,20 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   isPacketDelivered(false),
   isOpenDvr(false),
   sidScanEnabled(false),
-  pidScanEnabled(false),
-  mutex()
+  pidScanEnabled(false)
 {
-  //debug("cIptvDevice::cIptvDevice(%d)\n", deviceIndex);
+  unsigned int bufsize = MEGABYTE(IptvConfig.GetTsBufferSize());
+  bufsize -= (bufsize % TS_SIZE);
   isyslog("creating IPTV device %d (CardIndex=%d)", deviceIndex, CardIndex());
-  tsBuffer = new cRingBufferLinear(MEGABYTE(IptvConfig.GetTsBufferSize()),
-                                   (TS_SIZE * IptvConfig.GetReadBufferTsCount()),
-                                   false, "IPTV");
-  tsBuffer->SetTimeouts(100, 100);
+  tsBuffer = new cRingBufferLinear(bufsize + 1, TS_SIZE, false,
+                                   *cString::sprintf("IPTV %d", deviceIndex));
+  tsBuffer->SetTimeouts(10, 10);
   ResetBuffering();
   pUdpProtocol = new cIptvProtocolUdp();
   pHttpProtocol = new cIptvProtocolHttp();
   pFileProtocol = new cIptvProtocolFile();
   pExtProtocol = new cIptvProtocolExt();
-  pIptvStreamer = new cIptvStreamer(tsBuffer, &mutex);
+  pIptvStreamer = new cIptvStreamer(tsBuffer, (100 * TS_SIZE));
   pPidScanner = new cPidScanner;
   // Initialize filter pointers
   memset(secfilters, '\0', sizeof(secfilters));
@@ -356,12 +355,11 @@ void cIptvDevice::CloseFilter(int Handle)
 bool cIptvDevice::OpenDvr(void)
 {
   debug("cIptvDevice::OpenDvr(%d)\n", deviceIndex);
-  mutex.Lock();
   isPacketDelivered = false;
   tsBuffer->Clear();
-  mutex.Unlock();
   ResetBuffering();
-  pIptvStreamer->Open();
+  if (pIptvStreamer)
+     pIptvStreamer->Open();
   if (sidScanEnabled && pSidScanner && IptvConfig.GetSectionFiltering())
      pSidScanner->SetStatus(true);
   isOpenDvr = true;
@@ -407,7 +405,7 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
 {
   int Count = 0;
   //debug("cIptvDevice::GetTSPacket(%d)\n", deviceIndex);
-  if (!IsBuffering()) {
+  if (tsBuffer && !IsBuffering()) {
      if (isPacketDelivered) {
         tsBuffer->Del(TS_SIZE);
         isPacketDelivered = false;
@@ -432,8 +430,8 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
         // Update pid statistics
         AddPidStatistic(ts_pid(p), payload(p));
         // Send data also to dvr fifo
-        if ((dvrFd >= 0) && (write(dvrFd, p, TS_SIZE) != TS_SIZE))
-           error("ERROR: write failed to FIFO\n");
+        if (dvrFd >= 0)
+           Count = write(dvrFd, p, TS_SIZE);
         // Analyze incomplete streams with built-in pid analyzer
         if (pidScanEnabled && pPidScanner)
            pPidScanner->Process(p);
@@ -446,7 +444,7 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
         }
      }
   // Reduce cpu load by preventing busylooping
-  cCondWait::SleepMs(100);
+  cCondWait::SleepMs(10);
   Data = NULL;
   return true;
 }

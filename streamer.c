@@ -11,13 +11,19 @@
 #include "common.h"
 #include "streamer.h"
 
-cIptvStreamer::cIptvStreamer(cRingBufferLinear* RingBuffer, cMutex* Mutex)
+cIptvStreamer::cIptvStreamer(cRingBufferLinear* RingBuffer, unsigned int PacketLen)
 : cThread("IPTV streamer"),
   ringBuffer(RingBuffer),
-  mutex(Mutex),
+  packetBufferLen(PacketLen),
   protocol(NULL)
 {
-  debug("cIptvStreamer::cIptvStreamer()\n");
+  debug("cIptvStreamer::cIptvStreamer(%d)\n", packetBufferLen);
+  // Allocate packet buffer
+  packetBuffer = MALLOC(unsigned char, packetBufferLen);
+  if (packetBuffer)
+      memset(packetBuffer, 0, packetBufferLen);
+  else
+     error("ERROR: MALLOC() failed for packet buffer");
 }
 
 cIptvStreamer::~cIptvStreamer()
@@ -25,32 +31,31 @@ cIptvStreamer::~cIptvStreamer()
   debug("cIptvStreamer::~cIptvStreamer()\n");
   // Close the protocol
   Close();
+  // Free allocated memory
+  free(packetBuffer);
 }
 
 void cIptvStreamer::Action(void)
 {
   debug("cIptvStreamer::Action(): Entering\n");
+  // Increase priority
+  //SetPriority(-1);
   // Do the thread loop
-  while (Running()) {
-    if (ringBuffer && mutex && protocol && ringBuffer->Free()) {
-       unsigned char *buffer = NULL;
-       mutex->Lock();
-       int length = protocol->Read(&buffer);
-       if (length >= 0) {
-          AddStreamerStatistic(length);
-          int p = ringBuffer->Put(buffer, length);
-          if (p != length && Running())
-             ringBuffer->ReportOverflow(length - p);
-          mutex->Unlock();
-          }
-       else {
-          mutex->Unlock();
-          sleep.Wait(100); // to reduce cpu load
-          }
-       }
-    else
-       sleep.Wait(100); // and avoid busy loop
-    }
+  while (packetBuffer && Running()) {
+        int length = -1;
+        if (protocol)
+           length = protocol->Read(packetBuffer, packetBufferLen);
+        if (length >= 0) {
+           AddStreamerStatistic(length);
+           if (ringBuffer) {
+              int p = ringBuffer->Put(packetBuffer, length);
+              if (p != length)
+                 ringBuffer->ReportOverflow(length - p);
+              }
+           }
+        else
+           sleep.Wait(10); // to avoid busy loop and reduce cpu load
+        }
   debug("cIptvStreamer::Action(): Exiting\n");
 }
 
@@ -72,15 +77,9 @@ bool cIptvStreamer::Close(void)
   sleep.Signal();
   if (Running())
      Cancel(3);
-  // Close the protocol. A mutex should be taken here to avoid a race condition
-  // where thread Action() may be in the process of accessing the protocol.
-  // Taking a mutex serializes the Close() and Action() -calls.
-  if (mutex)
-     mutex->Lock();
+  // Close the protocol
   if (protocol)
      protocol->Close();
-  if (mutex)
-     mutex->Unlock();
   return true;
 }
 

@@ -12,7 +12,7 @@ class cIptvProtocolIf {
 public:
   cIptvProtocolIf() {}
   virtual ~cIptvProtocolIf() {}
-  virtual int Read(unsigned char* *BufferAddr) = 0;
+  virtual int Read(unsigned char* BufferAddr, unsigned int BufferLen) = 0;
   virtual bool Set(const char* Location, const int Parameter, const int Index) = 0;
   virtual bool Open(void) = 0;
   virtual bool Close(void) = 0;

@@ -14,7 +14,6 @@
 class cIptvConfig
 {
 private:
-  unsigned int readBufferTsCount;
   unsigned int tsBufferSize;
   unsigned int tsBufferPrefillRatio;
   unsigned int extProtocolBasePort;
@@ -25,7 +24,6 @@ private:
 
 public:
   cIptvConfig();
-  unsigned int GetReadBufferTsCount(void) const { return readBufferTsCount; }
   unsigned int GetTsBufferSize(void) const { return tsBufferSize; }
   unsigned int GetTsBufferPrefillRatio(void) const { return tsBufferPrefillRatio; }
   unsigned int GetExtProtocolBasePort(void) const { return extProtocolBasePort; }
