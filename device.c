@@ -333,7 +333,7 @@ int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
   for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
       if (!secfilters[i]) {
          //debug("cIptvDevice::OpenFilter(%d): Pid=%d Tid=%02X Mask=%02X Index=%d\n", deviceIndex, Pid, Tid, Mask, i);
-         secfilters[i] = new cIptvSectionFilter(i, deviceIndex, Pid, Tid, Mask);
+         secfilters[i] = new cIptvSectionFilter(deviceIndex, i, Pid, Tid, Mask);
          return secfilters[i]->GetReadDesc();
          }
       }
@@ -438,7 +438,7 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
         // Run the data through all filters
         for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
             if (secfilters[i])
-               secfilters[i]->ProcessData(p);
+               secfilters[i]->Process(p);
             }
         return true;
         }

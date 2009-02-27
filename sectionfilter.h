@@ -8,18 +8,7 @@
 #ifndef __IPTV_SECTIONFILTER_H
 #define __IPTV_SECTIONFILTER_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <libgen.h>
-#include <stdint.h>
-#include <sys/param.h>
+#include <vdr/device.h>
 
 #include "common.h"
 #include "statistics.h"
@@ -27,19 +16,19 @@
 class cIptvSectionFilter : public cIptvSectionStatistics {
 private:
   enum dmx_success {
-    DMX_OK = 0, /* Received Ok */
-    DMX_LENGTH_ERROR, /* Incorrect length */
-    DMX_OVERRUN_ERROR, /* Receiver ring buffer overrun */
-    DMX_CRC_ERROR, /* Incorrect CRC */
-    DMX_FRAME_ERROR, /* Frame alignment error */
-    DMX_FIFO_ERROR, /* Receiver FIFO overrun */
-    DMX_MISSED_ERROR /* Receiver missed packet */
+    DMX_OK = 0,         // Received OK
+    DMX_LENGTH_ERROR,   // Incorrect length
+    DMX_OVERRUN_ERROR,  // Receiver ring buffer overrun
+    DMX_CRC_ERROR,      // Incorrect CRC
+    DMX_FRAME_ERROR,    // Frame alignment error
+    DMX_FIFO_ERROR,     // Receiver FIFO overrun
+    DMX_MISSED_ERROR    // Receiver missed packet
   };
 
   enum dmx_limits {
     DMX_MAX_FILTER_SIZE  = 18,
     DMX_MAX_SECTION_SIZE = 4096,
-    DMX_MAX_SECFEED_SIZE = (DMX_MAX_SECTION_SIZE + 188)
+    DMX_MAX_SECFEED_SIZE = (DMX_MAX_SECTION_SIZE + TS_SIZE)
   };
 
   int fifoDescriptor;
@@ -55,49 +44,32 @@ private:
   uint16_t seclen;
   uint16_t tsfeedp;
   uint16_t pid;
+
+  int devid;
   int id;
+  cString pipeName;
 
   uint8_t filter_value[DMX_MAX_FILTER_SIZE];
   uint8_t filter_mask[DMX_MAX_FILTER_SIZE];
   uint8_t filter_mode[DMX_MAX_FILTER_SIZE];
-   
+
   uint8_t maskandmode[DMX_MAX_FILTER_SIZE];
   uint8_t maskandnotmode[DMX_MAX_FILTER_SIZE];
 
-  cString pipeName;
-
-  inline uint16_t section_length(const uint8_t *buf);
-
-  int dmxdev_section_callback(const uint8_t *buffer1,
-                              size_t buffer1_len,
-                              const uint8_t *buffer2,
-                              size_t buffer2_len,
-                              enum dmx_success success);
-
-  void demux_swfilter_section_new();
-
-  int demux_swfilter_sectionfilter();
-
-  inline int demux_swfilter_section_feed();
-
-  int demux_swfilter_section_copy_dump(const uint8_t *buf,
-                                       uint8_t len);
-
-  int GetFifoDesc();
-  void ClearPipeName();
-  void SetPipeName(int deviceIndex);
+  inline uint16_t GetLength(const uint8_t *Data);
+  void New(void);
+  int Filter(void);
+  inline int Feed(void);
+  int CopyDump(const uint8_t *buf, uint8_t len);
 
 public:
   // constructor & destructor
-  cIptvSectionFilter(int Index, int devInd, u_short Pid, u_char Tid,
-                     u_char Mask);
-
+  cIptvSectionFilter(int Index, int DeviceIndex, u_short Pid,
+                     u_char Tid, u_char Mask);
   virtual ~cIptvSectionFilter();
-
-  void ProcessData(const uint8_t* buf);
-
-  int GetReadDesc();
-  uint16_t GetPid() { return pid; }
+  void Process(const uint8_t* Data);
+  int GetReadDesc(void);
+  uint16_t GetPid(void) { return pid; }
 };
 
 #endif // __IPTV_SECTIONFILTER_H

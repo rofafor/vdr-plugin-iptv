@@ -45,7 +45,7 @@ void cIptvStreamer::Action(void)
         int length = -1;
         if (protocol)
            length = protocol->Read(packetBuffer, packetBufferLen);
-        if (length >= 0) {
+        if (length > 0) {
            AddStreamerStatistic(length);
            if (ringBuffer) {
               int p = ringBuffer->Put(packetBuffer, length);

@@ -41,6 +41,8 @@
 
 #define SECTION_FILTER_TABLE_SIZE       7
 
+#define TS_SYNC_BYTE                    0x47
+
 #define ERROR_IF_FUNC(exp, errstr, func, ret) \
   do {                                                                     \
      if (exp) {                                                            \

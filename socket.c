@@ -51,10 +51,11 @@ bool cIptvSocket::OpenSocket(const int Port, const bool isUdp)
         socketDesc = socket(PF_INET, SOCK_STREAM, 0);
      ERROR_IF_RET(socketDesc < 0, "socket()", return false);
      // Make it use non-blocking I/O to avoid stuck read calls
-     ERROR_IF_FUNC(fcntl(socketDesc, F_SETFL, O_NONBLOCK), "fcntl()", CloseSocket(), return false);
+     ERROR_IF_FUNC(fcntl(socketDesc, F_SETFL, O_NONBLOCK), "fcntl()",
+                   CloseSocket(), return false);
      // Allow multiple sockets to use the same PORT number
-     ERROR_IF_FUNC(setsockopt(socketDesc, SOL_SOCKET, SO_REUSEADDR, &yes,
-                              sizeof(yes)) < 0, "setsockopt()", CloseSocket(), return false);
+     ERROR_IF_FUNC(setsockopt(socketDesc, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0, "setsockopt()",
+                   CloseSocket(), return false);
      // Bind socket
      memset(&sockAddr, '\0', sizeof(sockAddr));
      sockAddr.sin_family = AF_INET;
@@ -111,7 +112,7 @@ int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
   if (isActive)
      len = recvfrom(socketDesc, BufferAddr, BufferLen, MSG_DONTWAIT,
                     (struct sockaddr *)&sockAddr, &addrlen);
-  if ((len > 0) && (BufferAddr[0] == 0x47)) {
+  if ((len > 0) && (BufferAddr[0] == TS_SYNC_BYTE)) {
      return len;
      }
   else if (len > 3) {
@@ -129,12 +130,14 @@ int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
      // check if extension
      if (x) {
         // extension header length
-        unsigned int ehl = (((BufferAddr[headerlen + 2] & 0xFF) << 8) | (BufferAddr[headerlen + 3] & 0xFF));
+        unsigned int ehl = (((BufferAddr[headerlen + 2] & 0xFF) << 8) |
+                            (BufferAddr[headerlen + 3] & 0xFF));
         // update header length
         headerlen += (ehl + 1) * sizeof(uint32_t);
         }
      // Check that rtp is version 2 and payload contains multiple of TS packet data
-     if ((v == 2) && (((len - headerlen) % TS_SIZE) == 0) && (BufferAddr[headerlen] == 0x47)) {
+     if ((v == 2) && (((len - headerlen) % TS_SIZE) == 0) &&
+         (BufferAddr[headerlen] == TS_SYNC_BYTE)) {
         // Set argument point to payload in read buffer
         memmove(BufferAddr, &BufferAddr[headerlen], (len - headerlen));
         return (len - headerlen);

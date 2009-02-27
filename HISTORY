@@ -88,3 +88,4 @@ VDR Plugin 'iptv' Revision History
 2009-xx-xx: Version 0.2.4
 
 - Optimized TS packet data flow.
+- Refactored section filter class.
