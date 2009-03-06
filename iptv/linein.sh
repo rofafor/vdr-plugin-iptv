@@ -27,7 +27,7 @@
 
 if [ $# -ne 2 ]; then
     logger "$0: error: Invalid parameter count '$#' $*"
-    exit 1;
+    exit 1
 fi
 
 # Channels.conf parameter
@@ -46,9 +46,9 @@ LOG=/dev/null
 # PID 0x100/256 = Audio
 arecord -q -D hw:0,0 -f dat | \
 ffmpeg -v -1 \
- -f wav \
- -i - \
- -title "${TITLE}" \
- -f mpegts -acodec mp2 -ac 2 -ab 128k -ar 48000 \
- - | nc -nu 127.0.0.1 ${PORT}
+  -f wav \
+  -i - \
+  -title "${TITLE}" \
+  -f mpegts -acodec mp2 -ac 2 -ab 128k -ar 48000 \
+  - | nc -nu 127.0.0.1 ${PORT}
 } > ${LOG} 2>&1

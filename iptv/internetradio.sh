@@ -27,7 +27,7 @@
 
 if [ $# -ne 2 ]; then
     logger "$0: error: Invalid parameter count '$#' $*"
-    exit 1;
+    exit 1
 fi
 
 # Channels.conf parameter
@@ -49,8 +49,8 @@ rm -f "${FIFO}"
 mkfifo "${FIFO}"
 
 mplayer -dumpstream "${URL}" \
- -quiet -nolirc -noautosub -noconsolecontrols -novideo -nojoystick \
- -dumpfile "$FIFO" &
+  -quiet -nolirc -noautosub -noconsolecontrols -novideo -nojoystick \
+  -dumpfile "$FIFO" &
 
 # Time to connect and fill pipe
 sleep 3 
@@ -58,10 +58,10 @@ sleep 3
 # Build audio only stream
 # PID 0x100/256 = Audio
 ffmpeg -v -1 \
- -i "${FIFO}" \
- -title "${TITLE}" \
- -f mpegts -acodec mp2 -ac 2 -ab 96k -ar 48000 \
- - | nc -u 127.0.0.1 ${PORT}
+  -i "${FIFO}" \
+  -title "${TITLE}" \
+  -f mpegts -acodec mp2 -ac 2 -ab 96k -ar 48000 \
+  - | nc -u 127.0.0.1 ${PORT}
 
 rm -f "${FIFO}"
 } > ${LOG} 2>&1

@@ -37,7 +37,7 @@ AUDIO_BITRATE=320
 exit_with_error()
 {
     logger "vlc2iptv: error: $*"
-    exit 1;
+    exit 1
 }
 
 read_arguments()

@@ -22,7 +22,7 @@
 
 if [ $# -ne 2 ]; then
     logger "$0: error: Invalid parameter count '$#' $*"
-    exit 1;
+    exit 1
 fi
 
 # Channels.conf parameter
@@ -41,24 +41,24 @@ ABITRATE=320
 # then controlled by the extra parameter passed by IPTV plugin to the script
 case ${PARAMETER} in
     1)
-	URL=""
-	WIDTH=720
-	HEIGHT=576
-	;;
+        URL=""
+        WIDTH=720
+        HEIGHT=576
+        ;;
     2)
-	URL=""
-	;;
+        URL=""
+        ;;
     3)
-	URL=""
-	;;
+        URL=""
+        ;;
     *)
-	URL=""  # Default URL
-	;;
+        URL=""  # Default URL
+        ;;
 esac
 
 if [ -z "${URL}" ]; then
     logger "$0: error: URL not defined!"
-    exit 1;
+    exit 1
 fi
 
 # Create transcoding options
