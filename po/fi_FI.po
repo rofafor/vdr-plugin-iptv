@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: iptv 0.2.0\n"
+"Project-Id-Version: iptv 0.2.5\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2008-02-01 23:43+0200\n"
+"POT-Creation-Date: 2009-03-06 22:15+0200\n"
 "PO-Revision-Date: 2007-08-12 23:22+0300\n"
 "Last-Translator: Rolf Ahrenberg\n"
 "Language-Team: <vdr@linuxtv.org>\n"
@@ -74,6 +74,9 @@ msgstr "Etsi palvelu-ID"
 
 msgid "Scan pids"
 msgstr "Etsi pidit"
+
+msgid "Vtype"
+msgstr "Kuvatyyppi"
 
 msgid "Nid"
 msgstr "Verkko-ID"

@@ -6,9 +6,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: iptv 0.2.0\n"
+"Project-Id-Version: iptv 0.2.5\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2008-02-01 23:43+0200\n"
+"POT-Creation-Date: 2009-03-06 22:15+0200\n"
 "PO-Revision-Date: 2008-01-26 13:14+0100\n"
 "Last-Translator: NIVAL Michaël <mnival@club-internet.fr>\n"
 "Language-Team: French\n"
@@ -76,6 +76,9 @@ msgstr "Scanne les SID"
 
 msgid "Scan pids"
 msgstr "Scanne les PID"
+
+msgid "Vtype"
+msgstr "Vtype"
 
 msgid "Nid"
 msgstr "Nid"

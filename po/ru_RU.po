@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: iptv 0.2.0\n"
+"Project-Id-Version: iptv 0.2.5\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2008-02-01 23:43+0200\n"
+"POT-Creation-Date: 2009-03-06 22:15+0200\n"
 "PO-Revision-Date: 2008-03-16 12:14+0100\n"
 "Last-Translator: Alexander Gross <Bikalexander@gmail.com>\n"
 "Language-Team: Russian <de@li.org>\n"
@@ -76,6 +76,9 @@ msgstr "Сканировать SID"
 
 msgid "Scan pids"
 msgstr "Сканировать пиды"
+
+msgid "Vtype"
+msgstr "Vtype"
 
 msgid "Nid"
 msgstr "Nid"
@@ -165,4 +168,3 @@ msgstr "Неправильно работающий фильтр, занести
 
 msgid "Help"
 msgstr "Справка"
-

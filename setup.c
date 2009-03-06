@@ -127,7 +127,7 @@ void cIptvMenuEditChannel::GetChannelData(cChannel *Channel)
      data.source = Channel->Source();
      data.vpid = Channel->Vpid();
      data.ppid = Channel->Ppid();
-#if defined(APIVERSNUM) && APIVERSNUM >= 10700
+#if defined(APIVERSNUM) && APIVERSNUM >= 10704
      data.vtype = Channel->Vtype();
 #endif
      data.tpid = Channel->Tpid();
@@ -200,7 +200,7 @@ void cIptvMenuEditChannel::SetChannelData(cChannel *Channel)
             break;
        }
      char slangs[MAXSPIDS][MAXLANGCODE2] = { "" };
-#if defined(APIVERSNUM) && APIVERSNUM >= 10700
+#if defined(APIVERSNUM) && APIVERSNUM >= 10704
      Channel->SetPids(data.vpid, data.ppid, data.vtype, data.apid, alangs, data.dpid, dlangs, data.spid, slangs, data.tpid);
 #else
      Channel->SetPids(data.vpid, data.ppid, data.apid, alangs, data.dpid, dlangs, data.spid, slangs, data.tpid);
@@ -244,6 +244,9 @@ void cIptvMenuEditChannel::Setup(void)
   Add(new cMenuEditStrItem(trVDR("Name"),       data.name,     sizeof(data.name)));
   Add(new cMenuEditIntItem(trVDR("Frequency"), &data.frequency));
   Add(new cMenuEditIntItem(trVDR("Vpid"),      &data.vpid,     0, 0x1FFF));
+#if defined(APIVERSNUM) && APIVERSNUM >= 10704
+  Add(new cMenuEditIntItem(tr   ("Vtype"),     &data.vtype,    0, 0xFF));
+#endif
   Add(new cMenuEditIntItem(trVDR("Ppid"),      &data.ppid,     0, 0x1FFF));
   Add(new cMenuEditIntItem(trVDR("Apid1"),     &data.apid[0],  0, 0x1FFF));
   Add(new cMenuEditIntItem(trVDR("Apid2"),     &data.apid[1],  0, 0x1FFF));

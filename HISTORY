@@ -86,10 +86,10 @@ VDR Plugin 'iptv' Revision History
 - Set max IPTV device count to VDR's max devices.
 - Fixed a possible crash in sid and pid scanners.
 
-2009-xx-xx: Version 0.2.5
+2009-03-08: Version 0.2.5
 
 - Optimized TS packet data flow.
 - Refactored section filter class.
 - Cleaned up example scripts.
-- Fixed pid scanner to default MPEG2 video stream type
+- Fixed pid scanner to set the existing video stream type
   (Thanks to ua0lnj for reporting this one).
