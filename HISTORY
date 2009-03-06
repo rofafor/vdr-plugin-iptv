@@ -70,7 +70,8 @@ VDR Plugin 'iptv' Revision History
 - Updated Italian translation (Thanks to Diego Pierotto).
 - Tweaked pid scanner parameters for HD broadcasts.
 - Fixed opening of fifo tap.
-- Updated iptvstream.sh script to support optional video resolution settings.
+- Updated iptvstream.sh script to support optional video resolution
+  settings.
 - Optimized streamer thread termination.
 
 2008-12-16: Version 0.2.3
@@ -85,7 +86,10 @@ VDR Plugin 'iptv' Revision History
 - Set max IPTV device count to VDR's max devices.
 - Fixed a possible crash in sid and pid scanners.
 
-2009-xx-xx: Version 0.2.4
+2009-xx-xx: Version 0.2.5
 
 - Optimized TS packet data flow.
 - Refactored section filter class.
+- Cleaned up example scripts.
+- Fixed pid scanner to default MPEG2 video stream type
+  (Thanks to ua0lnj for reporting this one).

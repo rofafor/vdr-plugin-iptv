@@ -147,7 +147,8 @@ void cPidScanner::Process(const uint8_t* buf)
                   Spids[i] = IptvChannel->Spid(i);
               debug("cPidScanner::Process(): Vpid=0x%04X, Apid=0x%04X\n", Vpid, Apid);
 #if defined(APIVERSNUM) && APIVERSNUM >= 10700
-              IptvChannel->SetPids(Vpid, Ppid, 0, Apids, ALangs, Dpids, DLangs, Spids, SLangs, Tpid);
+              int Vtype = 0x02; // MPEG-2=0x02, H.264=0x1B
+              IptvChannel->SetPids(Vpid, Ppid, Vtype, Apids, ALangs, Dpids, DLangs, Spids, SLangs, Tpid);
 #else
               IptvChannel->SetPids(Vpid, Ppid, Apids, ALangs, Dpids, DLangs, Spids, SLangs, Tpid);
 #endif

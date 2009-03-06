@@ -171,4 +171,5 @@ Acknowledgements:
 
 - The IPTV section filtering code is derived from Linux kernel.
 
-- The pid scanning code is derived from Udo Richter's streamplayer plugin.
+- The pid scanning code is derived from Udo Richter's streamplayer plugin
+  and defaults to MPEG2 video stream type.
