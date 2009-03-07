@@ -93,3 +93,4 @@ VDR Plugin 'iptv' Revision History
 - Cleaned up example scripts.
 - Fixed pid scanner to set the existing video stream type
   (Thanks to ua0lnj for reporting this one).
+- Added optional patches to disable CA updates.
