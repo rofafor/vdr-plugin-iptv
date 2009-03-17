@@ -111,17 +111,17 @@ Configuration:
 
 - channels.conf
 
-  TV4;IPTV:4:IPTV|S1P0|EXT|iptvstream.sh|0:P:0:0:680:0:0:4:0:0:0
-  TV3;IPTV:3:IPTV|S0P1|FILE|/video/stream.ts|5:P:0:514:670:2321:0:3:0:0:0
-  TV2;IPTV:2:IPTV|S0P1|HTTP|127.0.0.1/TS/2|3000:P:0:513:660:2321:0:2:0:0:0
-  TV1;IPTV:1:IPTV|S1P0|UDP|127.0.0.1|1234:P:0:512:650:2321:0:1:0:0:0
-           ^ ^    ^    ^   ^         ^    ^
-           | |    |    |   |         |    Source type ("P")
-           | |    |    |   |         IP Port Number, File delay (ms), Script parameter
-           | |    |    |   IP Address, File location, Script location
-           | |    |    Protocol ("UDP", "HTTP", "FILE", "EXT")
-           | |    Parameters ("S" Sid scan, "P" Pid scan, "0" disable, "1" enable)
-           | Plugin ID ("IPTV")
+  TV4;IPTV:40:IPTV|S1P0|EXT|iptvstream.sh|0:P:0:0:680:0:0:4:0:0:0
+  TV3;IPTV:30:IPTV|S0P1|FILE|/video/stream.ts|5:P:0:514:670:2321:0:3:0:0:0
+  TV2;IPTV:20:IPTV|S0P1|HTTP|127.0.0.1/TS/2|3000:P:0:513:660:2321:0:2:0:0:0
+  TV1;IPTV:10:IPTV|S1P0|UDP|127.0.0.1|1234:P:0:512:650:2321:0:1:0:0:0
+           ^  ^    ^    ^   ^         ^    ^
+           |  |    |    |   |         |    Source type ("P")
+           |  |    |    |   |         IP Port Number, File delay (ms), Script parameter
+           |  |    |    |   IP Address, File location, Script location
+           |  |    |    Protocol ("UDP", "HTTP", "FILE", "EXT")
+           |  |    Parameters ("S" Sid scan, "P" Pid scan, "0" disable, "1" enable)
+           |  Plugin ID ("IPTV")
            Unique enumeration
 
 - UDP multicast rules for iptables firewall
@@ -166,6 +166,10 @@ Notes:
 - The IPTV devices look for a "/tmp/vdr-iptv<devicenumber>.dvr" fifo at
   startup. If the fifo is found and succesfully opened, the device writes
   the current data stream into it. This can be used for debugging purposes.
+
+- Multiple channels with identical service id should have frequency
+  difference of 4 or greater. It's recommended to use frequencies in decades
+  (10, 20, 30, 40, ...) for all IPTV channel entries.
 
 Acknowledgements:
 
