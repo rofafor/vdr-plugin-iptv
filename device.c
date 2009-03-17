@@ -329,6 +329,8 @@ int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
   // Blacklist check, refuse certain filters
   if (IsBlackListed(Pid, Tid, Mask))
      return -1;
+  // Lock
+  cMutexLock MutexLock(&mutex);
   // Search the next free filter slot
   for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
       if (!secfilters[i]) {
@@ -343,6 +345,9 @@ int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
 
 void cIptvDevice::CloseFilter(int Handle)
 {
+  // Lock
+  cMutexLock MutexLock(&mutex);
+  // Search the filter for deletion
   for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
       if (secfilters[i] && (Handle == secfilters[i]->GetReadDesc())) {
          //debug("cIptvDevice::CloseFilter(%d): %d\n", deviceIndex, Handle);
@@ -435,6 +440,8 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
         // Analyze incomplete streams with built-in pid analyzer
         if (pidScanEnabled && pPidScanner)
            pPidScanner->Process(p);
+        // Lock
+        cMutexLock MutexLock(&mutex);
         // Run the data through all filters
         for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
             if (secfilters[i])
