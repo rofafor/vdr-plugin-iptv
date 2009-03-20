@@ -62,8 +62,7 @@ bool cIptvProtocolHttp::Connect(void)
         sockAddr.sin_addr.s_addr = inet_addr(*host->h_addr_list);
         }
 
-     int err = connect(socketDesc, (struct sockaddr*)&sockAddr,
-		       sizeof(sockAddr));
+     int err = connect(socketDesc, (struct sockaddr *)&sockAddr, sizeof(sockAddr));
      // Non-blocking sockets always report in-progress error when connected
      ERROR_IF_FUNC(err < 0 && errno != EINPROGRESS, "connect()", CloseSocket(), return false);
      // Select with 800ms timeout on the socket completion, check if it is writable
@@ -123,7 +122,7 @@ bool cIptvProtocolHttp::Disconnect(void)
 }
 
 bool cIptvProtocolHttp::GetHeaderLine(char* dest, unsigned int destLen,
-				      unsigned int &recvLen)
+                                      unsigned int &recvLen)
 {
   debug("cIptvProtocolHttp::GetHeaderLine()\n");
   bool linefeed = false;

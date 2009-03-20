@@ -119,7 +119,7 @@ void cIptvPidStatistics::AddPidStatistic(u_short Pid, long Payload)
       mostActivePids[numberOfElements - 1].pid = Pid;
       mostActivePids[numberOfElements - 1].DataAmount = Payload;
      // Re-sort
-     qsort(&mostActivePids, numberOfElements, sizeof(pidStruct), SortPids);
+     qsort(mostActivePids, numberOfElements, sizeof(pidStruct), SortPids);
      }
 }
 

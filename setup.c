@@ -433,14 +433,14 @@ void cIptvMenuChannels::Setup(void)
 
 cChannel *cIptvMenuChannels::GetChannel(int Index)
 {
-  cIptvMenuChannelItem *p = (cIptvMenuChannelItem *)Get(Index);
+  cIptvMenuChannelItem *p = dynamic_cast<cIptvMenuChannelItem *>(Get(Index));
   return p ? (cChannel *)p->Channel() : NULL;
 }
 
 void cIptvMenuChannels::Propagate(void)
 {
   Channels.ReNumber();
-  for (cIptvMenuChannelItem *ci = (cIptvMenuChannelItem *)First(); ci; ci = (cIptvMenuChannelItem *)ci->Next())
+  for (cIptvMenuChannelItem *ci = dynamic_cast<cIptvMenuChannelItem *>(First()); ci; ci = dynamic_cast<cIptvMenuChannelItem *>(ci->Next()))
       ci->Set();
   Display();
   Channels.SetModified(true);
@@ -618,7 +618,7 @@ eOSState cIptvMenuInfo::ProcessKey(eKeys Key)
        case kYellow: page = IPTV_DEVICE_INFO_FILTERS;
                      UpdateInfo();
                      break;
-       case kBlue:   IptvConfig.SetUseBytes(!IptvConfig.GetUseBytes());
+       case kBlue:   IptvConfig.SetUseBytes(IptvConfig.GetUseBytes() ? 0 : 1);
                      UpdateInfo();
                      break;
        default:      if (timeout.TimedOut())

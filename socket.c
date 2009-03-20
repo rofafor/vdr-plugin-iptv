@@ -109,7 +109,7 @@ int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
   socklen_t addrlen = sizeof(sockAddr);
   int len = 0;
   // Read data from socket
-  if (isActive)
+  if (isActive && socketDesc && BufferAddr && (BufferLen > 0))
      len = recvfrom(socketDesc, BufferAddr, BufferLen, MSG_DONTWAIT,
                     (struct sockaddr *)&sockAddr, &addrlen);
   if ((len > 0) && (BufferAddr[0] == TS_SYNC_BYTE)) {
@@ -173,7 +173,7 @@ int cIptvTcpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
      }
   socklen_t addrlen = sizeof(sockAddr);
   // Read data from socket
-  if (isActive)
+  if (isActive && socketDesc && BufferAddr && (BufferLen > 0))
      return recvfrom(socketDesc, BufferAddr, BufferLen, MSG_DONTWAIT,
                      (struct sockaddr *)&sockAddr, &addrlen);
   return 0;

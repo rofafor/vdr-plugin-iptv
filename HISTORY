@@ -95,7 +95,8 @@ VDR Plugin 'iptv' Revision History
   (Thanks to ua0lnj for reporting this one).
 - Added optional patches to disable CA updates.
 
-2009-xx-xx: Version 0.2.6
+2009-03-22: Version 0.2.6
 
 - Added a note about recommended frequencies into README.
 - Fixed a locking bug with section filters.
+- Fixed some lint warnings.

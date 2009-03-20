@@ -20,8 +20,7 @@ private:
 private:
   bool Connect(void);
   bool Disconnect(void);
-  bool GetHeaderLine(char* dest, unsigned int destLen,
-		     unsigned int &recvLen);
+  bool GetHeaderLine(char* dest, unsigned int destLen, unsigned int &recvLen);
   bool ProcessHeaders(void);
 
 public:

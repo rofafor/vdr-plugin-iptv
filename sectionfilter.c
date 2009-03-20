@@ -68,6 +68,7 @@ cIptvSectionFilter::~cIptvSectionFilter()
   unlink(pipeName);
   fifoDescriptor = -1;
   readDescriptor = -1;
+  secbuf = NULL;
 }
 
 int cIptvSectionFilter::GetReadDesc(void)
@@ -91,24 +92,25 @@ int cIptvSectionFilter::Filter(void)
   uint8_t neq = 0;
   int i;
 
-  for (i = 0; i < DMX_MAX_FILTER_SIZE; ++i) {
-      uint8_t local_xor = filter_value[i] ^ secbuf[i];
-      if (maskandmode[i] & local_xor)
-         return 0;
-      neq |= maskandnotmode[i] & local_xor;
-      }
+  if (secbuf) {
+     for (i = 0; i < DMX_MAX_FILTER_SIZE; ++i) {
+         uint8_t local_xor = filter_value[i] ^ secbuf[i];
+         if (maskandmode[i] & local_xor)
+            return 0;
+         neq |= maskandnotmode[i] & local_xor;
+         }
 
-  if (doneq && !neq)
-     return 0;
+     if (doneq && !neq)
+        return 0;
 
-  // There is no data in the fifo, more can be written
-  if (!select_single_desc(fifoDescriptor, 0, false)) {
-     i = write(fifoDescriptor, secbuf, seclen);
-     ERROR_IF(i < 0, "write()");
-     // Update statistics
-     AddSectionStatistic(i, 1);
+     // There is no data in the fifo, more can be written
+     if (!select_single_desc(fifoDescriptor, 0, false)) {
+        i = write(fifoDescriptor, secbuf, seclen);
+        ERROR_IF(i < 0, "write()");
+        // Update statistics
+        AddSectionStatistic(i, 1);
+        }
      }
-
   return 0;
 }
 

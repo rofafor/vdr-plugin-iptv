@@ -31,6 +31,7 @@ cIptvStreamer::~cIptvStreamer()
   debug("cIptvStreamer::~cIptvStreamer()\n");
   // Close the protocol
   Close();
+  protocol = NULL;
   // Free allocated memory
   free(packetBuffer);
 }

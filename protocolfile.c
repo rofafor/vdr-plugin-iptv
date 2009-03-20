@@ -16,6 +16,7 @@
 
 cIptvProtocolFile::cIptvProtocolFile()
 : fileDelay(0),
+  fileStream(NULL),
   isActive(false)
 {
   debug("cIptvProtocolFile::cIptvProtocolFile()\n");

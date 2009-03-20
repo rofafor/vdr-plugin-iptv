@@ -24,7 +24,7 @@ cIptvConfig::cIptvConfig(void)
 unsigned int cIptvConfig::GetDisabledFiltersCount(void) const
 {
   unsigned int n = 0;
-  while ((disabledFilters[n] != -1) && (n < ARRAY_SIZE(disabledFilters)))
+  while ((n < ARRAY_SIZE(disabledFilters) && (disabledFilters[n] != -1)))
         n++;
   return n;
 }
