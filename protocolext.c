@@ -106,7 +106,7 @@ bool cIptvProtocolExt::Open(void)
 {
   debug("cIptvProtocolExt::Open()\n");
   // Reject empty script files
-  if (!strlen(scriptFile))
+  if (!strlen(*scriptFile))
      return false;
   // Create the listening socket
   OpenSocket(socketPort);
@@ -139,7 +139,7 @@ bool cIptvProtocolExt::Set(const char* Location, const int Parameter, const int 
      struct stat stbuf;
      // Update script file and parameter
      scriptFile = cString::sprintf("%s/%s", IptvConfig.GetConfigDirectory(), Location);
-     if ((stat(scriptFile, &stbuf) != 0) || (strstr(scriptFile, "..") != 0)) {
+     if ((stat(*scriptFile, &stbuf) != 0) || (strstr(*scriptFile, "..") != 0)) {
         error("ERROR: Non-existent or relative path script '%s'", *scriptFile);
         return false;
         }
