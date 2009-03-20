@@ -24,10 +24,12 @@ private:
   unsigned int packetBufferLen;
   cIptvProtocolIf* protocol;
 
+protected:
+  virtual void Action(void);
+
 public:
   cIptvStreamer(cRingBufferLinear* RingBuffer, unsigned int PacketLen);
   virtual ~cIptvStreamer();
-  virtual void Action(void);
   bool Set(const char* Location, const int Parameter, const int Index, cIptvProtocolIf* Protocol);
   bool Open(void);
   bool Close(void);

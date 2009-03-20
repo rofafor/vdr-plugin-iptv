@@ -17,10 +17,6 @@
 #include "device.h"
 #include "setup.h"
 
-#ifndef trVDR
-#define trVDR(s) tr(s)
-#endif
-
 // --- cIptvMenuEditChannel --------------------------------------------------
 
 class cIptvMenuEditChannel : public cOsdMenu
@@ -391,7 +387,7 @@ class cIptvMenuChannels : public cOsdMenu
 {
 private:
   void Setup(void);
-  cChannel *GetChannel(int Index);
+  cChannel *GetChannel(int Index) const;
   void Propagate(void);
 
 protected:
@@ -431,7 +427,7 @@ void cIptvMenuChannels::Setup(void)
   Display();
 }
 
-cChannel *cIptvMenuChannels::GetChannel(int Index)
+cChannel *cIptvMenuChannels::GetChannel(int Index) const
 {
   cIptvMenuChannelItem *p = dynamic_cast<cIptvMenuChannelItem *>(Get(Index));
   return p ? (cChannel *)p->Channel() : NULL;
@@ -712,7 +708,7 @@ eOSState cIptvPluginSetup::ProcessKey(eKeys Key)
        case kBlue: return ShowInfo();
        case kInfo: if (Current() < help.Size())
                       return AddSubMenu(new cMenuText(cString::sprintf("%s - %s '%s'", tr("Help"), trVDR("Plugin"), PLUGIN_NAME_I18N), help[Current()]));
-       default:    state = osContinue;
+       default:    state = osContinue; break;
        }
      }
 

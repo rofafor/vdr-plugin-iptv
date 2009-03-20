@@ -17,11 +17,13 @@ private:
 
 protected:
   virtual void Process(u_short Pid, u_char Tid, const u_char *Data, int Length);
+  virtual void SetStatus(bool On);
 
 public:
   cSidScanner(void);
-  virtual void SetStatus(bool On);
   void SetChannel(const cChannel *Channel);
+  void Open() { SetStatus(true); }
+  void Close() { SetStatus(false); }
 };
 
 #endif // __SIDSCANNER_H

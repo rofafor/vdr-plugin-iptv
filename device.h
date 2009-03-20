@@ -74,7 +74,7 @@ private:
   void ResetBuffering(void);
   bool IsBuffering(void);
   bool DeleteFilter(unsigned int Index);
-  bool IsBlackListed(u_short Pid, u_char Tid, u_char Mask);
+  bool IsBlackListed(u_short Pid, u_char Tid, u_char Mask) const;
 
   // for channel selection
 public:

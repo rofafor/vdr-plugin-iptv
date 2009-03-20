@@ -21,7 +21,7 @@ cIptvStreamer::cIptvStreamer(cRingBufferLinear* RingBuffer, unsigned int PacketL
   // Allocate packet buffer
   packetBuffer = MALLOC(unsigned char, packetBufferLen);
   if (packetBuffer)
-      memset(packetBuffer, 0, packetBufferLen);
+     memset(packetBuffer, 0, packetBufferLen);
   else
      error("ERROR: MALLOC() failed for packet buffer");
 }
@@ -32,6 +32,7 @@ cIptvStreamer::~cIptvStreamer()
   // Close the protocol
   Close();
   protocol = NULL;
+  ringBuffer = NULL;
   // Free allocated memory
   free(packetBuffer);
 }

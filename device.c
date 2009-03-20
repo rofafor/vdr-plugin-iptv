@@ -10,7 +10,7 @@
 
 #define IPTV_MAX_DEVICES MAXDEVICES
 
-cIptvDevice * IptvDevices[IPTV_MAX_DEVICES] = { NULL };
+static cIptvDevice * IptvDevices[IPTV_MAX_DEVICES] = { NULL };
 
 unsigned int cIptvDevice::deviceCount = 0;
 
@@ -304,7 +304,7 @@ bool cIptvDevice::DeleteFilter(unsigned int Index)
   return false;
 }
 
-bool cIptvDevice::IsBlackListed(u_short Pid, u_char Tid, u_char Mask)
+bool cIptvDevice::IsBlackListed(u_short Pid, u_char Tid, u_char Mask) const
 {
   //debug("cIptvDevice::IsBlackListed(%d) Pid=%d Tid=%02X Mask=%02X\n", deviceIndex, Pid, Tid, Mask);
   // loop through section filter table
@@ -366,7 +366,7 @@ bool cIptvDevice::OpenDvr(void)
   if (pIptvStreamer)
      pIptvStreamer->Open();
   if (sidScanEnabled && pSidScanner && IptvConfig.GetSectionFiltering())
-     pSidScanner->SetStatus(true);
+     pSidScanner->Open();
   isOpenDvr = true;
   return true;
 }
@@ -375,7 +375,7 @@ void cIptvDevice::CloseDvr(void)
 {
   debug("cIptvDevice::CloseDvr(%d)\n", deviceIndex);
   if (sidScanEnabled && pSidScanner && IptvConfig.GetSectionFiltering())
-     pSidScanner->SetStatus(false);
+     pSidScanner->Close();
   if (pIptvStreamer)
      pIptvStreamer->Close();
   isOpenDvr = false;

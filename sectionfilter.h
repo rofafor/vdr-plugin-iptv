@@ -15,16 +15,6 @@
 
 class cIptvSectionFilter : public cIptvSectionStatistics {
 private:
-  enum dmx_success {
-    DMX_OK = 0,         // Received OK
-    DMX_LENGTH_ERROR,   // Incorrect length
-    DMX_OVERRUN_ERROR,  // Receiver ring buffer overrun
-    DMX_CRC_ERROR,      // Incorrect CRC
-    DMX_FRAME_ERROR,    // Frame alignment error
-    DMX_FIFO_ERROR,     // Receiver FIFO overrun
-    DMX_MISSED_ERROR    // Receiver missed packet
-  };
-
   enum dmx_limits {
     DMX_MAX_FILTER_SIZE  = 18,
     DMX_MAX_SECTION_SIZE = 4096,
@@ -69,7 +59,7 @@ public:
   virtual ~cIptvSectionFilter();
   void Process(const uint8_t* Data);
   int GetReadDesc(void);
-  uint16_t GetPid(void) { return pid; }
+  uint16_t GetPid(void) const { return pid; }
 };
 
 #endif // __IPTV_SECTIONFILTER_H
