@@ -25,7 +25,7 @@ private:
 
   eOSState EditChannel(void);
   eOSState ShowInfo(void);
-  virtual void Setup(void);
+  void Setup(void);
   void StoreFilters(const char *Name, int *Values);
 
 protected:

@@ -140,7 +140,7 @@ int cIptvSectionFilter::CopyDump(const uint8_t *buf, uint8_t len)
 
   limit = tsfeedp;
   if (limit > DMX_MAX_SECFEED_SIZE)
-     return -1;	// internal error should never happen
+     return -1; // internal error should never happen
 
   // Always set secbuf
   secbuf = secbuf_base + secbufp;
