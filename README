@@ -171,6 +171,10 @@ Notes:
   difference of 4 or greater. It's recommended to use frequencies in decades
   (10, 20, 30, 40, ...) for all IPTV channel entries.
 
+- VLC processes won't get killed on some setups with the provided iptvstream.sh
+  script and the iptvstream-notrap.sh script should be used instead in these
+  cases.
+
 Acknowledgements:
 
 - The IPTV section filtering code is derived from Linux kernel.
