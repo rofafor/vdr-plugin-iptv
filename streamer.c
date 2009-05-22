@@ -89,16 +89,17 @@ bool cIptvStreamer::Set(const char* Location, const int Parameter, const int Ind
 {
   debug("cIptvStreamer::Set(): %s:%d\n", Location, Parameter);
   if (!isempty(Location)) {
-     // Update protocol; Close the existing one if changed
+     // Update protocol and set location and parameter; Close the existing one if changed
      if (protocol != Protocol) {
         if (protocol)
            protocol->Close();
         protocol = Protocol;
-        if (protocol)
+        if (protocol) {
+           protocol->Set(Location, Parameter, Index);
            protocol->Open();
+           }
         }
-     // Set protocol location and parameter
-     if (protocol)
+     else if (protocol)
         protocol->Set(Location, Parameter, Index);
      }
   return true;

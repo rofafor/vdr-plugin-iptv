@@ -63,7 +63,7 @@ ffmpeg -v -1 \
   -title "${TITLE}" \
   -f mpegts -intra -r 24 -vcodec mpeg2video -b 500k -s 352x288 \
   -acodec mp2 -ac 2 -ab 96k -ar 48000 \
-  - | nc -u 127.0.0.1 ${PORT}
+  "udp://127.0.0.1:${PORT}?pkt_size=16356"
 
 rm -f "${FIFO}"
 } > ${LOG} 2>&1

@@ -50,5 +50,5 @@ ffmpeg -v -1 \
   -i - \
   -title "${TITLE}" \
   -f mpegts -acodec mp2 -ac 2 -ab 128k -ar 48000 \
-  - | nc -nu 127.0.0.1 ${PORT}
+  "udp://127.0.0.1:${PORT}?pkt_size=16356"
 } > ${LOG} 2>&1
