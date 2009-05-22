@@ -1,6 +1,6 @@
-diff -Nru vdr-1.7.5-vanilla/channels.c vdr-1.7.5-pluginparam/channels.c
---- vdr-1.7.5-vanilla/channels.c	2009-04-14 12:37:47.000000000 +0300
-+++ vdr-1.7.5-pluginparam/channels.c	2009-04-14 12:52:46.000000000 +0300
+diff -Nru vdr-1.7.7-vanilla/channels.c vdr-1.7.7-pluginparam/channels.c
+--- vdr-1.7.7-vanilla/channels.c	2009-04-25 16:57:32.000000000 +0300
++++ vdr-1.7.7-pluginparam/channels.c	2009-05-22 10:57:39.000000000 +0300
 @@ -188,6 +188,7 @@
    shortName = strdup("");
    provider = strdup("");
@@ -122,9 +122,9 @@ diff -Nru vdr-1.7.5-vanilla/channels.c vdr-1.7.5-pluginparam/channels.c
  
          free(parambuf);
          free(sourcebuf);
-diff -Nru vdr-1.7.5-vanilla/channels.h vdr-1.7.5-pluginparam/channels.h
---- vdr-1.7.5-vanilla/channels.h	2009-04-14 12:37:47.000000000 +0300
-+++ vdr-1.7.5-pluginparam/channels.h	2009-04-14 12:52:46.000000000 +0300
+diff -Nru vdr-1.7.7-vanilla/channels.h vdr-1.7.7-pluginparam/channels.h
+--- vdr-1.7.7-vanilla/channels.h	2008-11-22 15:35:52.000000000 +0200
++++ vdr-1.7.7-pluginparam/channels.h	2009-05-22 10:57:39.000000000 +0300
 @@ -116,6 +116,7 @@
    char *shortName;
    char *provider;
@@ -164,21 +164,21 @@ diff -Nru vdr-1.7.5-vanilla/channels.h vdr-1.7.5-pluginparam/channels.h
    void SetPids(int Vpid, int Ppid, int Vtype, int *Apids, char ALangs[][MAXLANGCODE2], int *Dpids, char DLangs[][MAXLANGCODE2], int *Spids, char SLangs[][MAXLANGCODE2], int Tpid);
    void SetCaIds(const int *CaIds); // list must be zero-terminated
    void SetCaDescriptors(int Level);
-diff -Nru vdr-1.7.5-vanilla/config.h vdr-1.7.5-pluginparam/config.h
---- vdr-1.7.5-vanilla/config.h	2009-04-14 12:37:47.000000000 +0300
-+++ vdr-1.7.5-pluginparam/config.h	2009-04-14 12:52:46.000000000 +0300
+diff -Nru vdr-1.7.7-vanilla/config.h vdr-1.7.7-pluginparam/config.h
+--- vdr-1.7.7-vanilla/config.h	2009-05-03 16:15:35.000000000 +0300
++++ vdr-1.7.7-pluginparam/config.h	2009-05-22 10:57:39.000000000 +0300
 @@ -30,6 +30,8 @@
- #define APIVERSION  "1.7.5"
- #define APIVERSNUM   10705  // Version * 10000 + Major * 100 + Minor
+ #define APIVERSION  "1.7.7"
+ #define APIVERSNUM   10707  // Version * 10000 + Major * 100 + Minor
  
 +#define PLUGINPARAMPATCHVERSNUM 1
 +
  // When loading plugins, VDR searches them by their APIVERSION, which
  // may be smaller than VDRVERSION in case there have been no changes to
  // VDR header files since the last APIVERSION. This allows compiled
-diff -Nru vdr-1.7.5-vanilla/menu.c vdr-1.7.5-pluginparam/menu.c
---- vdr-1.7.5-vanilla/menu.c	2009-04-14 12:37:47.000000000 +0300
-+++ vdr-1.7.5-pluginparam/menu.c	2009-04-14 12:52:46.000000000 +0300
+diff -Nru vdr-1.7.7-vanilla/menu.c vdr-1.7.7-pluginparam/menu.c
+--- vdr-1.7.7-vanilla/menu.c	2009-05-03 16:30:13.000000000 +0300
++++ vdr-1.7.7-pluginparam/menu.c	2009-05-22 10:57:39.000000000 +0300
 @@ -190,6 +190,7 @@
    cChannel *channel;
    cChannel data;
@@ -211,9 +211,9 @@ diff -Nru vdr-1.7.5-vanilla/menu.c vdr-1.7.5-pluginparam/menu.c
             if (channel) {
                *channel = data;
                isyslog("edited channel %d %s", channel->Number(), *data.ToText());
-diff -Nru vdr-1.7.5-vanilla/po/fi_FI.po vdr-1.7.5-pluginparam/po/fi_FI.po
---- vdr-1.7.5-vanilla/po/fi_FI.po	2009-04-14 12:37:47.000000000 +0300
-+++ vdr-1.7.5-pluginparam/po/fi_FI.po	2009-04-14 12:52:46.000000000 +0300
+diff -Nru vdr-1.7.7-vanilla/po/fi_FI.po vdr-1.7.7-pluginparam/po/fi_FI.po
+--- vdr-1.7.7-vanilla/po/fi_FI.po	2009-05-03 17:15:20.000000000 +0300
++++ vdr-1.7.7-pluginparam/po/fi_FI.po	2009-05-22 10:57:39.000000000 +0300
 @@ -1010,3 +1010,6 @@
  #, c-format
  msgid "VDR will shut down in %s minutes"
@@ -221,9 +221,9 @@ diff -Nru vdr-1.7.5-vanilla/po/fi_FI.po vdr-1.7.5-pluginparam/po/fi_FI.po
 +
 +msgid "Parameters"
 +msgstr "Parametrit"
-diff -Nru vdr-1.7.5-vanilla/po/fr_FR.po vdr-1.7.5-pluginparam/po/fr_FR.po
---- vdr-1.7.5-vanilla/po/fr_FR.po	2009-04-14 12:37:47.000000000 +0300
-+++ vdr-1.7.5-pluginparam/po/fr_FR.po	2009-04-14 12:52:46.000000000 +0300
+diff -Nru vdr-1.7.7-vanilla/po/fr_FR.po vdr-1.7.7-pluginparam/po/fr_FR.po
+--- vdr-1.7.7-vanilla/po/fr_FR.po	2009-05-03 17:15:20.000000000 +0300
++++ vdr-1.7.7-pluginparam/po/fr_FR.po	2009-05-22 10:57:39.000000000 +0300
 @@ -1013,3 +1013,6 @@
  #, c-format
  msgid "VDR will shut down in %s minutes"
@@ -231,9 +231,9 @@ diff -Nru vdr-1.7.5-vanilla/po/fr_FR.po vdr-1.7.5-pluginparam/po/fr_FR.po
 +
 +msgid "Parameters"
 +msgstr "Paramètres"
-diff -Nru vdr-1.7.5-vanilla/sources.c vdr-1.7.5-pluginparam/sources.c
---- vdr-1.7.5-vanilla/sources.c	2009-04-14 12:37:47.000000000 +0300
-+++ vdr-1.7.5-pluginparam/sources.c	2009-04-14 12:52:46.000000000 +0300
+diff -Nru vdr-1.7.7-vanilla/sources.c vdr-1.7.7-pluginparam/sources.c
+--- vdr-1.7.7-vanilla/sources.c	2008-02-10 16:07:26.000000000 +0200
++++ vdr-1.7.7-pluginparam/sources.c	2009-05-22 10:57:39.000000000 +0300
 @@ -37,6 +37,7 @@
    char buffer[16];
    char *q = buffer;
@@ -250,9 +250,9 @@ diff -Nru vdr-1.7.5-vanilla/sources.c vdr-1.7.5-pluginparam/sources.c
      case 'C': type = stCable; break;
      case 'S': type = stSat;   break;
      case 'T': type = stTerr;  break;
-diff -Nru vdr-1.7.5-vanilla/sources.conf vdr-1.7.5-pluginparam/sources.conf
---- vdr-1.7.5-vanilla/sources.conf	2009-04-14 12:37:47.000000000 +0300
-+++ vdr-1.7.5-pluginparam/sources.conf	2009-04-14 12:52:46.000000000 +0300
+diff -Nru vdr-1.7.7-vanilla/sources.conf vdr-1.7.7-pluginparam/sources.conf
+--- vdr-1.7.7-vanilla/sources.conf	2008-08-16 13:02:27.000000000 +0300
++++ vdr-1.7.7-pluginparam/sources.conf	2009-05-22 10:57:39.000000000 +0300
 @@ -194,3 +194,7 @@
  # Terrestrial
  
@@ -261,9 +261,9 @@ diff -Nru vdr-1.7.5-vanilla/sources.conf vdr-1.7.5-pluginparam/sources.conf
 +# Plugin
 +
 +P       Plugin
-diff -Nru vdr-1.7.5-vanilla/sources.h vdr-1.7.5-pluginparam/sources.h
---- vdr-1.7.5-vanilla/sources.h	2009-04-14 12:37:47.000000000 +0300
-+++ vdr-1.7.5-pluginparam/sources.h	2009-04-14 12:52:46.000000000 +0300
+diff -Nru vdr-1.7.7-vanilla/sources.h vdr-1.7.7-pluginparam/sources.h
+--- vdr-1.7.7-vanilla/sources.h	2005-05-14 12:30:41.000000000 +0300
++++ vdr-1.7.7-pluginparam/sources.h	2009-05-22 10:57:39.000000000 +0300
 @@ -16,10 +16,11 @@
  public:
    enum eSourceType {
