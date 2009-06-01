@@ -101,7 +101,7 @@ VDR Plugin 'iptv' Revision History
 - Fixed a locking bug with section filters.
 - Fixed some lint warnings.
 
-2009-xx-xx: Version 0.3.0
+2009-06-01: Version 0.3.0
 
 - Added iptvstream-notrap.sh script.
 - Fixed setting parameters when protocol changes
