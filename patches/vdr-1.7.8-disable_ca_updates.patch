@@ -1,6 +1,6 @@
-diff -Nru vdr-1.7.7-vanilla/pat.c vdr-1.7.7-disable_ca_updates/pat.c
---- vdr-1.7.7-vanilla/pat.c	2008-07-06 17:01:32.000000000 +0300
-+++ vdr-1.7.7-disable_ca_updates/pat.c	2009-05-22 10:57:58.000000000 +0300
+diff -Nru vdr-1.7.8-vanilla/pat.c vdr-1.7.8-disable_ca_updates/pat.c
+--- vdr-1.7.8-vanilla/pat.c	2009-06-15 17:31:45.000000000 +0300
++++ vdr-1.7.8-disable_ca_updates/pat.c	2009-06-17 15:09:13.000000000 +0300
 @@ -444,6 +444,7 @@
              }
          if (Setup.UpdateChannels >= 2) {
