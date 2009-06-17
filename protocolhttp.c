@@ -127,7 +127,7 @@ bool cIptvProtocolHttp::GetHeaderLine(char* dest, unsigned int destLen,
   debug("cIptvProtocolHttp::GetHeaderLine()\n");
   bool linefeed = false;
   bool newline = false;
-  char buf[256];
+  char buf[4096];
   char *bufptr = buf;
   memset(buf, '\0', sizeof(buf));
   recvLen = 0;
@@ -160,6 +160,7 @@ bool cIptvProtocolHttp::GetHeaderLine(char* dest, unsigned int destLen,
        // Check that buffers won't be exceeded
        if (recvLen >= sizeof(buf) || recvLen >= destLen) {
           error("Header wouldn't fit into buffer\n");
+          recvLen = 0;
           return false;
           }
        }
@@ -178,13 +179,13 @@ bool cIptvProtocolHttp::ProcessHeaders(void)
   unsigned int lineLength = 0;
   int response = 0;
   bool responseFound = false;
-  char buf[256];
+  char buf[4096];
 
   while (!responseFound || lineLength != 0) {
     memset(buf, '\0', sizeof(buf));
     if (!GetHeaderLine(buf, sizeof(buf), lineLength))
        return false;
-    if (!responseFound && sscanf(buf, "HTTP/1.%*i %i ",&response) != 1) {
+    if (!responseFound && sscanf(buf, "HTTP/1.%*i %i ", &response) != 1) {
        error("Expected HTTP header not found\n");
        continue;
        }

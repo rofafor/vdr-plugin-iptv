@@ -108,3 +108,9 @@ VDR Plugin 'iptv' Revision History
   (Thanks to Peter Holik for reporting this one).
 - Updated example scripts to use ffmpeg's direct UDP output
   and added a new "image.sh" script (Thanks to Peter Holik).
+
+2009-xx-xx: Version 0.3.1
+
+- Updated patches.
+- Added optional patches to disable EIT scanning.
+- Fixed handling of HTTP protocol headers.
