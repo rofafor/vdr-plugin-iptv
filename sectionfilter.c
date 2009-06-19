@@ -8,7 +8,7 @@
 #include "sectionfilter.h"
 
 cIptvSectionFilter::cIptvSectionFilter(int DeviceIndex, int Index,
-                                       u_short Pid, u_char Tid, u_char Mask)
+                                       uint16_t Pid, uint8_t Tid, uint8_t Mask)
 : pusi_seen(0),
   feedcc(0),
   doneq(0),
@@ -42,8 +42,9 @@ cIptvSectionFilter::cIptvSectionFilter(int DeviceIndex, int Index,
   for (i = 0; i < DMX_MAX_FILTER_SIZE; ++i) {
       mode = filter_mode[i];
       mask = filter_mask[i];
-      maskandmode[i] = mask & mode;
-      local_doneq |= maskandnotmode[i] = mask & ~mode;
+      maskandmode[i] = (uint8_t)(mask & mode);
+      maskandnotmode[i] = (uint8_t)(mask & ~mode);
+      local_doneq |= maskandnotmode[i];
       }
   doneq = local_doneq ? 1 : 0;
 
@@ -78,7 +79,7 @@ int cIptvSectionFilter::GetReadDesc(void)
 
 inline uint16_t cIptvSectionFilter::GetLength(const uint8_t *Data)
 {
-  return 3 + ((Data[1] & 0x0f) << 8) + Data[2];
+  return (uint16_t)(3 + ((Data[1] & 0x0f) << 8) + Data[2]);
 }
 
 void cIptvSectionFilter::New(void)
@@ -94,10 +95,10 @@ int cIptvSectionFilter::Filter(void)
 
   if (secbuf) {
      for (i = 0; i < DMX_MAX_FILTER_SIZE; ++i) {
-         uint8_t local_xor = filter_value[i] ^ secbuf[i];
+         uint8_t local_xor = (uint8_t)(filter_value[i] ^ secbuf[i]);
          if (maskandmode[i] & local_xor)
             return 0;
-         neq |= maskandnotmode[i] & local_xor;
+         neq |= (maskandnotmode[i] & local_xor);
          }
 
      if (doneq && !neq)
@@ -105,10 +106,10 @@ int cIptvSectionFilter::Filter(void)
 
      // There is no data in the fifo, more can be written
      if (!select_single_desc(fifoDescriptor, 0, false)) {
-        i = write(fifoDescriptor, secbuf, seclen);
-        ERROR_IF(i < 0, "write()");
+        ssize_t len = write(fifoDescriptor, secbuf, seclen);
+        ERROR_IF(len < 0, "write()");
         // Update statistics
-        AddSectionStatistic(i, 1);
+        AddSectionStatistic(len, 1);
         }
      }
   return 0;
@@ -130,7 +131,7 @@ int cIptvSectionFilter::CopyDump(const uint8_t *buf, uint8_t len)
      return 0;
 
   if (tsfeedp + len > DMX_MAX_SECFEED_SIZE)
-     len = DMX_MAX_SECFEED_SIZE - tsfeedp;
+     len = (uint8_t)(DMX_MAX_SECFEED_SIZE - tsfeedp);
 
   if (len <= 0)
      return 0;
@@ -175,9 +176,9 @@ void cIptvSectionFilter::Process(const uint8_t* Data)
      return;
 
   // Payload start
-  uint8_t p = TS_SIZE - count;
+  uint8_t p = (uint8_t)(TS_SIZE - count);
 
-  uint8_t cc = Data[3] & 0x0f;
+  uint8_t cc = (uint8_t)(Data[3] & 0x0f);
   int ccok = ((feedcc + 1) & 0x0f) == cc;
   feedcc = cc;
 
@@ -201,7 +202,7 @@ void cIptvSectionFilter::Process(const uint8_t* Data)
         const uint8_t *before = &Data[p + 1];
         uint8_t before_len = Data[p];
         const uint8_t *after = &before[before_len];
-        uint8_t after_len = (count - 1) - before_len;
+        uint8_t after_len = (uint8_t)(count - 1 - before_len);
         CopyDump(before, before_len);
 
         // Before start of new section, set pusi_seen = 1

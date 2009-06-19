@@ -54,8 +54,8 @@ private:
 
 public:
   // constructor & destructor
-  cIptvSectionFilter(int Index, int DeviceIndex, u_short Pid,
-                     u_char Tid, u_char Mask);
+  cIptvSectionFilter(int Index, int DeviceIndex, uint16_t Pid,
+                     uint8_t Tid, uint8_t Mask);
   virtual ~cIptvSectionFilter();
   void Process(const uint8_t* Data);
   int GetReadDesc(void);

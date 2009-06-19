@@ -10,7 +10,7 @@
 
 uint16_t ts_pid(const uint8_t *buf)
 {
-  return ((buf[1] & 0x1f) << 8) + buf[2];
+  return (uint16_t)(((buf[1] & 0x1f) << 8) + buf[2]);
 }
 
 uint8_t payload(const uint8_t *tsp)
@@ -22,7 +22,7 @@ uint8_t payload(const uint8_t *tsp)
      if (tsp[4] > 183) // corrupted data?
         return 0;
      else
-        return (184 - 1) - tsp[4];
+        return (uint8_t)((184 - 1) - tsp[4]);
      }
 
   return 184;

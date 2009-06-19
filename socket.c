@@ -59,7 +59,7 @@ bool cIptvSocket::OpenSocket(const int Port, const bool isUdp)
      // Bind socket
      memset(&sockAddr, '\0', sizeof(sockAddr));
      sockAddr.sin_family = AF_INET;
-     sockAddr.sin_port = htons(Port);
+     sockAddr.sin_port = htons((uint16_t)(Port & 0xFFFF));
      sockAddr.sin_addr.s_addr = htonl(INADDR_ANY);
      if (isUdp) {
         int err = bind(socketDesc, (struct sockaddr *)&sockAddr, sizeof(sockAddr));
@@ -110,7 +110,7 @@ int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
   int len = 0;
   // Read data from socket
   if (isActive && socketDesc && BufferAddr && (BufferLen > 0))
-     len = recvfrom(socketDesc, BufferAddr, BufferLen, MSG_DONTWAIT,
+     len = (int)recvfrom(socketDesc, BufferAddr, BufferLen, MSG_DONTWAIT,
                     (struct sockaddr *)&sockAddr, &addrlen);
   if ((len > 0) && (BufferAddr[0] == TS_SYNC_BYTE)) {
      return len;
@@ -126,14 +126,14 @@ int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
      // payload type: MPEG2 TS = 33
      //unsigned int pt = readBuffer[1] & 0x7F;
      // header lenght
-     unsigned int headerlen = (3 + cc) * sizeof(uint32_t);
+     unsigned int headerlen = (3 + cc) * (unsigned int)sizeof(uint32_t);
      // check if extension
      if (x) {
         // extension header length
         unsigned int ehl = (((BufferAddr[headerlen + 2] & 0xFF) << 8) |
                             (BufferAddr[headerlen + 3] & 0xFF));
         // update header length
-        headerlen += (ehl + 1) * sizeof(uint32_t);
+        headerlen += (ehl + 1) * (unsigned int)sizeof(uint32_t);
         }
      // Check that rtp is version 2 and payload contains multiple of TS packet data
      if ((v == 2) && (((len - headerlen) % TS_SIZE) == 0) &&
@@ -174,7 +174,7 @@ int cIptvTcpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
   socklen_t addrlen = sizeof(sockAddr);
   // Read data from socket
   if (isActive && socketDesc && BufferAddr && (BufferLen > 0))
-     return recvfrom(socketDesc, BufferAddr, BufferLen, MSG_DONTWAIT,
+     return (int)recvfrom(socketDesc, BufferAddr, BufferLen, MSG_DONTWAIT,
                      (struct sockaddr *)&sockAddr, &addrlen);
   return 0;
 }

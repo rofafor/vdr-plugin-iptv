@@ -75,7 +75,7 @@ int cIptvProtocolFile::Read(unsigned char* BufferAddr, unsigned int BufferLen)
    // during the sleep and buffers are disposed. Check here that the plugin is
    // still active before accessing the buffers
    if (isActive)
-      return fread(BufferAddr, sizeof(unsigned char), BufferLen, fileStream);
+      return (int)fread(BufferAddr, sizeof(unsigned char), BufferLen, fileStream);
    return -1;
 }
 

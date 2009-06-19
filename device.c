@@ -436,7 +436,7 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
         AddPidStatistic(ts_pid(p), payload(p));
         // Send data also to dvr fifo
         if (dvrFd >= 0)
-           Count = write(dvrFd, p, TS_SIZE);
+           Count = (int)write(dvrFd, p, TS_SIZE);
         // Analyze incomplete streams with built-in pid analyzer
         if (pidScanEnabled && pPidScanner)
            pPidScanner->Process(p);

@@ -93,8 +93,8 @@ bool cIptvProtocolHttp::Connect(void)
                                        "\r\n", streamPath, streamAddr);
 
      debug("Sending http request: %s\n", *buffer);
-     err = send(socketDesc, buffer, strlen(buffer), 0);
-     ERROR_IF_FUNC(err < 0, "send()", CloseSocket(), return false);
+     ssize_t err2 = send(socketDesc, buffer, strlen(buffer), 0);
+     ERROR_IF_FUNC(err2 < 0, "send()", CloseSocket(), return false);
 
      // Now process headers
      if (!ProcessHeaders()) {
@@ -141,7 +141,7 @@ bool cIptvProtocolHttp::GetHeaderLine(char* dest, unsigned int destLen,
        return false;
     // Check if data available
     else if (retval) {
-       int retval = recvfrom(socketDesc, bufptr, 1, MSG_DONTWAIT,
+       ssize_t retval = recvfrom(socketDesc, bufptr, 1, MSG_DONTWAIT,
                              (struct sockaddr *)&sockAddr, &addrlen);
        if (retval <= 0)
           return false;
