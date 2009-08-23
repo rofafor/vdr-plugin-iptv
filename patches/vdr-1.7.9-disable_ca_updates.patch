@@ -1,0 +1,11 @@
+diff -Nru vdr-1.7.9-vanilla/pat.c vdr-1.7.9-disable_ca_updates/pat.c
+--- vdr-1.7.9-vanilla/pat.c	2009-08-23 18:12:33.000000000 +0300
++++ vdr-1.7.9-disable_ca_updates/pat.c	2009-08-23 18:20:58.000000000 +0300
+@@ -452,6 +452,7 @@
+             }
+         if (Setup.UpdateChannels >= 2) {
+            Channel->SetPids(Vpid, Ppid, Vtype, Apids, ALangs, Dpids, DLangs, Spids, SLangs, Tpid);
++           if (!Channel->IsPlug())
+            Channel->SetCaIds(CaDescriptors->CaIds());
+            Channel->SetSubtitlingDescriptors(SubtitlingTypes, CompositionPageIds, AncillaryPageIds);
+            }

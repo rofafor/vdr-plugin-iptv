@@ -1,6 +1,6 @@
-diff -Nru vdr-1.7.8-vanilla/channels.c vdr-1.7.8-pluginparam/channels.c
---- vdr-1.7.8-vanilla/channels.c	2009-06-15 17:31:45.000000000 +0300
-+++ vdr-1.7.8-pluginparam/channels.c	2009-06-17 15:07:55.000000000 +0300
+diff -Nru vdr-1.7.9-vanilla/channels.c vdr-1.7.9-pluginsparam/channels.c
+--- vdr-1.7.9-vanilla/channels.c	2009-08-23 18:12:32.000000000 +0300
++++ vdr-1.7.9-pluginsparam/channels.c	2009-08-23 18:18:54.000000000 +0300
 @@ -188,6 +188,7 @@
    shortName = strdup("");
    provider = strdup("");
@@ -79,7 +79,7 @@ diff -Nru vdr-1.7.8-vanilla/channels.c vdr-1.7.8-pluginparam/channels.c
  #define STRDIFF 0x01
  #define VALDIFF 0x02
  
-@@ -632,7 +665,7 @@
+@@ -648,7 +681,7 @@
    if (isdigit(type))
       type = 'S';
  #define ST(s) if (strchr(s, type))
@@ -88,7 +88,7 @@ diff -Nru vdr-1.7.8-vanilla/channels.c vdr-1.7.8-pluginparam/channels.c
    char *q = buffer;
    *q = 0;
    ST(" S ")  q += sprintf(q, "%c", polarization);
-@@ -646,6 +679,7 @@
+@@ -662,6 +695,7 @@
    ST(" S ")  q += PrintParameter(q, 'S', MapToUser(system, SystemValues));
    ST("  T")  q += PrintParameter(q, 'T', MapToUser(transmission, TransmissionValues));
    ST("  T")  q += PrintParameter(q, 'Y', MapToUser(hierarchy, HierarchyValues));
@@ -96,7 +96,7 @@ diff -Nru vdr-1.7.8-vanilla/channels.c vdr-1.7.8-pluginparam/channels.c
    return buffer;
  }
  
-@@ -674,7 +708,7 @@
+@@ -690,7 +724,7 @@
  
  bool cChannel::StringToParameters(const char *s)
  {
@@ -105,7 +105,7 @@ diff -Nru vdr-1.7.8-vanilla/channels.c vdr-1.7.8-pluginparam/channels.c
          switch (toupper(*s)) {
            case 'A': s = SkipDigits(s); break; // for compatibility with the "multiproto" approach - may be removed in future versions
            case 'B': s = ParseParameter(s, bandwidth, BandwidthValues); break;
-@@ -792,7 +826,7 @@
+@@ -808,7 +842,7 @@
          dpids[0] = 0;
          ok = false;
          if (parambuf && sourcebuf && vpidbuf && apidbuf) {
@@ -114,7 +114,7 @@ diff -Nru vdr-1.7.8-vanilla/channels.c vdr-1.7.8-pluginparam/channels.c
  
             char *p;
             if ((p = strchr(vpidbuf, '=')) != NULL) {
-@@ -887,6 +921,7 @@
+@@ -903,6 +937,7 @@
             shortName = strcpyrealloc(shortName, p);
             }
          name = strcpyrealloc(name, namebuf);
@@ -122,9 +122,9 @@ diff -Nru vdr-1.7.8-vanilla/channels.c vdr-1.7.8-pluginparam/channels.c
  
          free(parambuf);
          free(sourcebuf);
-diff -Nru vdr-1.7.8-vanilla/channels.h vdr-1.7.8-pluginparam/channels.h
---- vdr-1.7.8-vanilla/channels.h	2009-06-15 17:31:45.000000000 +0300
-+++ vdr-1.7.8-pluginparam/channels.h	2009-06-17 15:07:55.000000000 +0300
+diff -Nru vdr-1.7.9-vanilla/channels.h vdr-1.7.9-pluginsparam/channels.h
+--- vdr-1.7.9-vanilla/channels.h	2009-08-23 18:12:32.000000000 +0300
++++ vdr-1.7.9-pluginsparam/channels.h	2009-08-23 18:18:54.000000000 +0300
 @@ -116,6 +116,7 @@
    char *shortName;
    char *provider;
@@ -133,7 +133,7 @@ diff -Nru vdr-1.7.8-vanilla/channels.h vdr-1.7.8-pluginparam/channels.h
    int __BeginData__;
    int frequency; // MHz
    int source;
-@@ -171,6 +172,7 @@
+@@ -174,6 +175,7 @@
    int Frequency(void) const { return frequency; } ///< Returns the actual frequency, as given in 'channels.conf'
    int Transponder(void) const;                    ///< Returns the transponder frequency in MHz, plus the polarization in case of sat
    static int Transponder(int Frequency, char Polarization); ///< builds the transponder from the given Frequency and Polarization
@@ -141,7 +141,7 @@ diff -Nru vdr-1.7.8-vanilla/channels.h vdr-1.7.8-pluginparam/channels.h
    int Source(void) const { return source; }
    int Srate(void) const { return srate; }
    int Vpid(void) const { return vpid; }
-@@ -208,6 +210,7 @@
+@@ -214,6 +216,7 @@
    int RollOff(void) const { return rollOff; }
    const cLinkChannels* LinkChannels(void) const { return linkChannels; }
    const cChannel *RefChannel(void) const { return refChannel; }
@@ -149,7 +149,7 @@ diff -Nru vdr-1.7.8-vanilla/channels.h vdr-1.7.8-pluginparam/channels.h
    bool IsCable(void) const { return cSource::IsCable(source); }
    bool IsSat(void) const { return cSource::IsSat(source); }
    bool IsTerr(void) const { return cSource::IsTerr(source); }
-@@ -215,12 +218,14 @@
+@@ -221,12 +224,14 @@
    bool HasTimer(void) const;
    int Modification(int Mask = CHANNELMOD_ALL);
    void CopyTransponderData(const cChannel *Channel);
@@ -164,21 +164,21 @@ diff -Nru vdr-1.7.8-vanilla/channels.h vdr-1.7.8-pluginparam/channels.h
    void SetPids(int Vpid, int Ppid, int Vtype, int *Apids, char ALangs[][MAXLANGCODE2], int *Dpids, char DLangs[][MAXLANGCODE2], int *Spids, char SLangs[][MAXLANGCODE2], int Tpid);
    void SetCaIds(const int *CaIds); // list must be zero-terminated
    void SetCaDescriptors(int Level);
-diff -Nru vdr-1.7.8-vanilla/config.h vdr-1.7.8-pluginparam/config.h
---- vdr-1.7.8-vanilla/config.h	2009-06-15 17:31:45.000000000 +0300
-+++ vdr-1.7.8-pluginparam/config.h	2009-06-17 15:07:55.000000000 +0300
+diff -Nru vdr-1.7.9-vanilla/config.h vdr-1.7.9-pluginsparam/config.h
+--- vdr-1.7.9-vanilla/config.h	2009-08-23 18:12:32.000000000 +0300
++++ vdr-1.7.9-pluginsparam/config.h	2009-08-23 18:18:54.000000000 +0300
 @@ -30,6 +30,8 @@
- #define APIVERSION  "1.7.8"
- #define APIVERSNUM   10708  // Version * 10000 + Major * 100 + Minor
+ #define APIVERSION  "1.7.9"
+ #define APIVERSNUM   10709  // Version * 10000 + Major * 100 + Minor
  
 +#define PLUGINPARAMPATCHVERSNUM 1
 +
  // When loading plugins, VDR searches them by their APIVERSION, which
  // may be smaller than VDRVERSION in case there have been no changes to
  // VDR header files since the last APIVERSION. This allows compiled
-diff -Nru vdr-1.7.8-vanilla/menu.c vdr-1.7.8-pluginparam/menu.c
---- vdr-1.7.8-vanilla/menu.c	2009-06-15 17:31:45.000000000 +0300
-+++ vdr-1.7.8-pluginparam/menu.c	2009-06-17 15:07:55.000000000 +0300
+diff -Nru vdr-1.7.9-vanilla/menu.c vdr-1.7.9-pluginsparam/menu.c
+--- vdr-1.7.9-vanilla/menu.c	2009-08-23 18:12:32.000000000 +0300
++++ vdr-1.7.9-pluginsparam/menu.c	2009-08-23 18:18:54.000000000 +0300
 @@ -190,6 +190,7 @@
    cChannel *channel;
    cChannel data;
@@ -211,9 +211,9 @@ diff -Nru vdr-1.7.8-vanilla/menu.c vdr-1.7.8-pluginparam/menu.c
             if (channel) {
                *channel = data;
                isyslog("edited channel %d %s", channel->Number(), *data.ToText());
-diff -Nru vdr-1.7.8-vanilla/po/fi_FI.po vdr-1.7.8-pluginparam/po/fi_FI.po
---- vdr-1.7.8-vanilla/po/fi_FI.po	2009-06-15 17:31:45.000000000 +0300
-+++ vdr-1.7.8-pluginparam/po/fi_FI.po	2009-06-17 15:07:55.000000000 +0300
+diff -Nru vdr-1.7.9-vanilla/po/fi_FI.po vdr-1.7.9-pluginsparam/po/fi_FI.po
+--- vdr-1.7.9-vanilla/po/fi_FI.po	2009-08-23 18:12:33.000000000 +0300
++++ vdr-1.7.9-pluginsparam/po/fi_FI.po	2009-08-23 18:18:54.000000000 +0300
 @@ -1025,3 +1025,6 @@
  #, c-format
  msgid "VDR will shut down in %s minutes"
@@ -221,9 +221,9 @@ diff -Nru vdr-1.7.8-vanilla/po/fi_FI.po vdr-1.7.8-pluginparam/po/fi_FI.po
 +
 +msgid "Parameters"
 +msgstr "Parametrit"
-diff -Nru vdr-1.7.8-vanilla/po/fr_FR.po vdr-1.7.8-pluginparam/po/fr_FR.po
---- vdr-1.7.8-vanilla/po/fr_FR.po	2009-06-15 17:31:45.000000000 +0300
-+++ vdr-1.7.8-pluginparam/po/fr_FR.po	2009-06-17 15:07:55.000000000 +0300
+diff -Nru vdr-1.7.9-vanilla/po/fr_FR.po vdr-1.7.9-pluginsparam/po/fr_FR.po
+--- vdr-1.7.9-vanilla/po/fr_FR.po	2009-08-23 18:12:33.000000000 +0300
++++ vdr-1.7.9-pluginsparam/po/fr_FR.po	2009-08-23 18:18:54.000000000 +0300
 @@ -1028,3 +1028,6 @@
  #, c-format
  msgid "VDR will shut down in %s minutes"
@@ -231,9 +231,9 @@ diff -Nru vdr-1.7.8-vanilla/po/fr_FR.po vdr-1.7.8-pluginparam/po/fr_FR.po
 +
 +msgid "Parameters"
 +msgstr "Paramètres"
-diff -Nru vdr-1.7.8-vanilla/sources.c vdr-1.7.8-pluginparam/sources.c
---- vdr-1.7.8-vanilla/sources.c	2009-06-15 17:31:45.000000000 +0300
-+++ vdr-1.7.8-pluginparam/sources.c	2009-06-17 15:07:55.000000000 +0300
+diff -Nru vdr-1.7.9-vanilla/sources.c vdr-1.7.9-pluginsparam/sources.c
+--- vdr-1.7.9-vanilla/sources.c	2009-08-23 18:12:32.000000000 +0300
++++ vdr-1.7.9-pluginsparam/sources.c	2009-08-23 18:18:54.000000000 +0300
 @@ -37,6 +37,7 @@
    char buffer[16];
    char *q = buffer;
@@ -250,9 +250,9 @@ diff -Nru vdr-1.7.8-vanilla/sources.c vdr-1.7.8-pluginparam/sources.c
      case 'C': type = stCable; break;
      case 'S': type = stSat;   break;
      case 'T': type = stTerr;  break;
-diff -Nru vdr-1.7.8-vanilla/sources.conf vdr-1.7.8-pluginparam/sources.conf
---- vdr-1.7.8-vanilla/sources.conf	2009-06-15 17:31:45.000000000 +0300
-+++ vdr-1.7.8-pluginparam/sources.conf	2009-06-17 15:07:55.000000000 +0300
+diff -Nru vdr-1.7.9-vanilla/sources.conf vdr-1.7.9-pluginsparam/sources.conf
+--- vdr-1.7.9-vanilla/sources.conf	2009-08-23 18:12:32.000000000 +0300
++++ vdr-1.7.9-pluginsparam/sources.conf	2009-08-23 18:18:54.000000000 +0300
 @@ -194,3 +194,7 @@
  # Terrestrial
  
@@ -261,9 +261,9 @@ diff -Nru vdr-1.7.8-vanilla/sources.conf vdr-1.7.8-pluginparam/sources.conf
 +# Plugin
 +
 +P       Plugin
-diff -Nru vdr-1.7.8-vanilla/sources.h vdr-1.7.8-pluginparam/sources.h
---- vdr-1.7.8-vanilla/sources.h	2009-06-15 17:31:45.000000000 +0300
-+++ vdr-1.7.8-pluginparam/sources.h	2009-06-17 15:07:55.000000000 +0300
+diff -Nru vdr-1.7.9-vanilla/sources.h vdr-1.7.9-pluginsparam/sources.h
+--- vdr-1.7.9-vanilla/sources.h	2009-08-23 18:12:32.000000000 +0300
++++ vdr-1.7.9-pluginsparam/sources.h	2009-08-23 18:18:54.000000000 +0300
 @@ -16,10 +16,11 @@
  public:
    enum eSourceType {
