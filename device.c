@@ -272,7 +272,7 @@ bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
   debug("cIptvDevice::SetChannelDevice(%d)\n", deviceIndex);
   location = GetChannelSettings(Channel->PluginParam(), &parameter, &sidscan, &pidscan, &protocol);
   if (isempty(location)) {
-     error("ERROR: Unrecognized IPTV channel settings: %s", Channel->PluginParam());
+     error("Unrecognized IPTV channel settings: %s", Channel->PluginParam());
      return false;
      }
   sidScanEnabled = sidscan ? true : false;
@@ -427,7 +427,7 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
                   }
                }
            tsBuffer->Del(Count);
-           error("ERROR: skipped %d bytes to sync on TS packet\n", Count);
+           error("Skipped %d bytes to sync on TS packet\n", Count);
            return false;
            }
         isPacketDelivered = true;

@@ -32,7 +32,7 @@ cString cIptvSectionStatistics::GetSectionStatistic()
   cMutexLock MutexLock(&mutex);
   uint64_t elapsed = timer.Elapsed(); /* in milliseconds */
   timer.Set();
-  long bitrate = elapsed ? (1000L * filteredData / KILOBYTE(1) / elapsed) : 0L;
+  long bitrate = elapsed ? (long)(1000.0L * filteredData / KILOBYTE(1) / elapsed) : 0L;
   if (!IptvConfig.GetUseBytes())
      bitrate *= 8;
   // no trailing linefeed here!
@@ -75,7 +75,7 @@ cString cIptvPidStatistics::GetPidStatistic()
   cString info("Active pids:\n");
   for (unsigned int i = 0; i < IPTV_STATS_ACTIVE_PIDS_COUNT; ++i) {
       if (mostActivePids[i].pid) {
-         long bitrate = elapsed ? (1000L * mostActivePids[i].DataAmount / KILOBYTE(1) / elapsed) : 0L;
+         long bitrate = elapsed ? (long)(1000.0L * mostActivePids[i].DataAmount / KILOBYTE(1) / elapsed) : 0L;
          if (!IptvConfig.GetUseBytes())
             bitrate *= 8;
          info = cString::sprintf("%sPid %d: %4d (%4ld k%s/s)\n", *info, i,
@@ -145,7 +145,7 @@ cString cIptvStreamerStatistics::GetStreamerStatistic()
   cMutexLock MutexLock(&mutex);
   uint64_t elapsed = timer.Elapsed(); /* in milliseconds */
   timer.Set();
-  long bitrate = elapsed ? (1000L * dataBytes / KILOBYTE(1) / elapsed) : 0L;
+  long bitrate = elapsed ? (long)(1000.0L * dataBytes / KILOBYTE(1) / elapsed) : 0L;
   if (!IptvConfig.GetUseBytes())
      bitrate *= 8;
   cString info = cString::sprintf("Stream bitrate: %ld k%s/s\n", bitrate, IptvConfig.GetUseBytes() ? "B" : "bit");
@@ -182,7 +182,7 @@ cString cIptvBufferStatistics::GetBufferStatistic()
   cMutexLock MutexLock(&mutex);
   uint64_t elapsed = timer.Elapsed(); /* in milliseconds */
   timer.Set();
-  long bitrate = elapsed ? (1000L * dataBytes / KILOBYTE(1) / elapsed) : 0L;
+  long bitrate = elapsed ? (long)(1000.0L * dataBytes / KILOBYTE(1) / elapsed) : 0L;
   long totalSpace = MEGABYTE(IptvConfig.GetTsBufferSize());
   float percentage = (float)((float)usedSpace / (float)totalSpace * 100.0);
   long totalKilos = totalSpace / KILOBYTE(1);

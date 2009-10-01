@@ -53,9 +53,8 @@ bool cIptvProtocolHttp::Connect(void)
         struct hostent *host;
         host = gethostbyname(streamAddr);
         if (!host) {
-           error("%s is not valid address\n", streamAddr);
            char tmp[64];
-           error("ERROR: %s", strerror_r(h_errno, tmp, sizeof(tmp)));
+           error("%s is not valid address: %s", streamAddr, strerror_r(h_errno, tmp, sizeof(tmp)));
            return false;
            }
 
@@ -77,9 +76,8 @@ bool cIptvProtocolHttp::Connect(void)
 
      // If not any errors, then socket must be ready and connected
      if (socketStatus != 0) {
-        error("Cannot connect to %s\n", streamAddr);
         char tmp[64];
-        error("ERROR: %s", strerror_r(socketStatus, tmp, sizeof(tmp)));
+        error("Cannot connect to %s: %s", streamAddr, strerror_r(socketStatus, tmp, sizeof(tmp)));
         CloseSocket();
         return false;
         }
@@ -192,7 +190,7 @@ bool cIptvProtocolHttp::ProcessHeaders(void)
     else
        responseFound = true;
     if (response != 200) {
-       error("ERROR: %s\n", buf);
+       error("%s\n", buf);
        return false;
        }
     }

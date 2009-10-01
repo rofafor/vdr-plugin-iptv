@@ -21,9 +21,6 @@ private:
     DMX_MAX_SECFEED_SIZE = (DMX_MAX_SECTION_SIZE + TS_SIZE)
   };
 
-  int fifoDescriptor;
-  int readDescriptor;
-
   int pusi_seen;
   int feedcc;
   int doneq;
@@ -37,7 +34,7 @@ private:
 
   int devid;
   int id;
-  cString pipeName;
+  int socket[2];
 
   uint8_t filter_value[DMX_MAX_FILTER_SIZE];
   uint8_t filter_mask[DMX_MAX_FILTER_SIZE];

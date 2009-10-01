@@ -18,8 +18,7 @@ cIptvSectionFilter::cIptvSectionFilter(int DeviceIndex, int Index,
   tsfeedp(0),
   pid(Pid),
   devid(DeviceIndex),
-  id(Index),
-  pipeName("")
+  id(Index)
 {
   //debug("cIptvSectionFilter::cIptvSectionFilter(%d, %d)\n", devid, id);
   int i;
@@ -48,33 +47,35 @@ cIptvSectionFilter::cIptvSectionFilter(int DeviceIndex, int Index,
       }
   doneq = local_doneq ? 1 : 0;
 
-  struct stat sb;
-  pipeName = cString::sprintf(IPTV_FILTER_FILENAME, devid, id);
-  stat(pipeName, &sb);
-  if (S_ISFIFO(sb.st_mode))
-     unlink(pipeName);
-  i = mknod(pipeName, 0644 | S_IFIFO, 0);
-  ERROR_IF_RET(i < 0, "mknod()", return);
-
-  // Create descriptors
-  fifoDescriptor = open(pipeName, O_RDWR | O_NONBLOCK);
-  readDescriptor = open(pipeName, O_RDONLY | O_NONBLOCK);
+  // Create sockets
+  socket[0] = socket[1] = -1;
+  if (socketpair(AF_UNIX, SOCK_DGRAM, 0, socket) != 0) {
+     char tmp[64];
+     error("Opening section filter sockets failed (device=%d id=%d): %s\n", devid, id, strerror_r(errno, tmp, sizeof(tmp)));
+     }
+  else if ((fcntl(socket[0], F_SETFL, O_NONBLOCK) != 0) || (fcntl(socket[1], F_SETFL, O_NONBLOCK) != 0)) {
+     char tmp[64];
+     error("Setting section filter socket to non-blocking mode failed (device=%d id=%d): %s", devid, id, strerror_r(errno, tmp, sizeof(tmp)));
+     }
 }
 
 cIptvSectionFilter::~cIptvSectionFilter()
 {
   //debug("cIptvSectionFilter::~cIptvSectionfilter(%d, %d)\n", devid, id);
-  close(fifoDescriptor);
-  close(readDescriptor);
-  unlink(pipeName);
-  fifoDescriptor = -1;
-  readDescriptor = -1;
+  int tmp = socket[1];
+  socket[1] = -1;
+  if (tmp >= 0)
+     close(tmp);
+  tmp = socket[0];
+  socket[0] = -1;
+  if (tmp >= 0)
+     close(tmp);
   secbuf = NULL;
 }
 
 int cIptvSectionFilter::GetReadDesc(void)
 {
-  return readDescriptor;
+  return socket[0];
 }
 
 inline uint16_t cIptvSectionFilter::GetLength(const uint8_t *Data)
@@ -104,9 +105,9 @@ int cIptvSectionFilter::Filter(void)
      if (doneq && !neq)
         return 0;
 
-     // There is no data in the fifo, more can be written
-     if (!select_single_desc(fifoDescriptor, 0, false)) {
-        ssize_t len = write(fifoDescriptor, secbuf, seclen);
+     // There is no data in the read socket, more can be written
+     if ((socket[0] >= 0) && (socket[1] >= 0) /*&& !select_single_desc(socket[0], 0, false)*/) {
+        ssize_t len = write(socket[1], secbuf, seclen);
         ERROR_IF(len < 0, "write()");
         // Update statistics
         AddSectionStatistic(len, 1);
@@ -148,8 +149,7 @@ int cIptvSectionFilter::CopyDump(const uint8_t *buf, uint8_t len)
 
   for (n = 0; secbufp + 2 < limit; ++n) {
       seclen_local = GetLength(secbuf);
-      if (seclen_local <= 0 || seclen_local > DMX_MAX_SECTION_SIZE ||
-         seclen_local + secbufp > limit)
+      if ((seclen_local <= 0) || (seclen_local > DMX_MAX_SECTION_SIZE) || ((seclen_local + secbufp) > limit))
          return 0;
       seclen = seclen_local;
       if (pusi_seen)

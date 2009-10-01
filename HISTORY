@@ -114,3 +114,5 @@ VDR Plugin 'iptv' Revision History
 - Updated patches.
 - Added optional patches to disable EIT scanning.
 - Fixed handling of HTTP protocol headers.
+- Modified sectionfilters to use socket pair instead of
+  filesystem fifos.

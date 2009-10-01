@@ -23,7 +23,7 @@ cIptvStreamer::cIptvStreamer(cRingBufferLinear* RingBuffer, unsigned int PacketL
   if (packetBuffer)
      memset(packetBuffer, 0, packetBufferLen);
   else
-     error("ERROR: MALLOC() failed for packet buffer");
+     error("MALLOC() failed for packet buffer");
 }
 
 cIptvStreamer::~cIptvStreamer()

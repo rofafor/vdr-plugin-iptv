@@ -14,10 +14,10 @@
 
 #ifdef DEBUG
 #define debug(x...) dsyslog("IPTV: " x);
-#define error(x...) esyslog("IPTV: " x);
+#define error(x...) esyslog("ERROR: " x);
 #else
 #define debug(x...) ;
-#define error(x...) esyslog("IPTV: " x);
+#define error(x...) esyslog("ERROR: " x);
 #endif
 
 #ifndef trNOOP
@@ -28,7 +28,6 @@
 #define trVDR(s) tr(s)
 #endif
 
-#define IPTV_FILTER_FILENAME            "/tmp/vdr-iptv%d.filter%d"
 #define IPTV_DVR_FILENAME               "/tmp/vdr-iptv%d.dvr"
 
 #define IPTV_DEVICE_INFO_ALL            0
@@ -42,13 +41,13 @@
 #define SECTION_FILTER_TABLE_SIZE       7
 
 #define ERROR_IF_FUNC(exp, errstr, func, ret) \
-  do {                                                                     \
-     if (exp) {                                                            \
-        char tmp[64];                                                      \
-        error("ERROR: "errstr": %s", strerror_r(errno, tmp, sizeof(tmp))); \
-        func;                                                              \
-        ret;                                                               \
-        }                                                                  \
+  do {                                                            \
+     if (exp) {                                                   \
+        char tmp[64];                                             \
+        error(errstr": %s", strerror_r(errno, tmp, sizeof(tmp))); \
+        func;                                                     \
+        ret;                                                      \
+        }                                                         \
   } while (0)
 
 
