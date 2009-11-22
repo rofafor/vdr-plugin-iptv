@@ -1,6 +1,6 @@
-diff -Nru vdr-1.7.9-vanilla/eitscan.c vdr-1.7.9-disable_eitscan/eitscan.c
---- vdr-1.7.9-vanilla/eitscan.c	2009-08-23 18:12:32.000000000 +0300
-+++ vdr-1.7.9-disable_eitscan/eitscan.c	2009-08-23 18:20:42.000000000 +0300
+diff -Nru vdr-1.7.10-vanilla/eitscan.c vdr-1.7.10-disable_eitscan/eitscan.c
+--- vdr-1.7.10-vanilla/eitscan.c	2009-11-22 18:06:18.000000000 +0200
++++ vdr-1.7.10-disable_eitscan/eitscan.c	2009-11-22 18:20:57.000000000 +0200
 @@ -146,7 +146,7 @@
                 if (Device) {
                    for (cScanData *ScanData = scanList->First(); ScanData; ScanData = scanList->Next(ScanData)) {
