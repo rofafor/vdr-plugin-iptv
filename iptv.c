@@ -20,7 +20,7 @@
 #error "VDR-1.6.0 API version or greater is required!"
 #endif
 
-static const char VERSION[]     = "0.3.1";
+static const char VERSION[]     = "0.3.2";
 static const char DESCRIPTION[] = trNOOP("Experience the IPTV");
 
 class cPluginIptv : public cPlugin {
@@ -78,7 +78,7 @@ bool cPluginIptv::ProcessArgs(int argc, char *argv[])
   // Implement command line argument processing here if applicable.
   static const struct option long_options[] = {
     { "devices", required_argument, NULL, 'd' },
-    { NULL, 0, NULL, 0 }
+    { NULL,      no_argument,       NULL,  0  }
     };
 
   int c;

@@ -116,3 +116,8 @@ VDR Plugin 'iptv' Revision History
 - Fixed handling of HTTP protocol headers.
 - Modified sectionfilters to use socket pair instead of
   filesystem fifos.
+
+2010-xx-xx: Version 0.3.2
+
+- Updated patches.
+- Fixed argument corruption.
