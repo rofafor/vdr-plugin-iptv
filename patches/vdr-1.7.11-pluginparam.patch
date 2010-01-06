@@ -1,6 +1,6 @@
-diff -Nru vdr-1.7.10-vanilla/channels.c vdr-1.7.10-pluginparam/channels.c
---- vdr-1.7.10-vanilla/channels.c	2009-11-22 18:06:18.000000000 +0200
-+++ vdr-1.7.10-pluginparam/channels.c	2009-11-22 18:18:42.000000000 +0200
+diff -Nru vdr-1.7.11-vanilla/channels.c vdr-1.7.11-pluginparam/channels.c
+--- vdr-1.7.11-vanilla/channels.c	2010-01-06 17:06:01.000000000 +0200
++++ vdr-1.7.11-pluginparam/channels.c	2010-01-06 17:10:48.000000000 +0200
 @@ -188,6 +188,7 @@
    shortName = strdup("");
    provider = strdup("");
@@ -33,7 +33,7 @@ diff -Nru vdr-1.7.10-vanilla/channels.c vdr-1.7.10-pluginparam/channels.c
    memcpy(&__BeginData__, &Channel.__BeginData__, (char *)&Channel.__EndData__ - (char *)&Channel.__BeginData__);
    return *this;
  }
-@@ -306,9 +310,26 @@
+@@ -307,9 +311,26 @@
       guard        = Channel->guard;
       hierarchy    = Channel->hierarchy;
       rollOff      = Channel->rollOff;
@@ -60,7 +60,7 @@ diff -Nru vdr-1.7.10-vanilla/channels.c vdr-1.7.10-pluginparam/channels.c
  bool cChannel::SetSatTransponderData(int Source, int Frequency, char Polarization, int Srate, int CoderateH, int Modulation, int System, int RollOff)
  {
    // Workarounds for broadcaster stupidity:
-@@ -438,6 +459,18 @@
+@@ -439,6 +460,18 @@
       }
  }
  
@@ -79,7 +79,7 @@ diff -Nru vdr-1.7.10-vanilla/channels.c vdr-1.7.10-pluginparam/channels.c
  #define STRDIFF 0x01
  #define VALDIFF 0x02
  
-@@ -651,7 +684,7 @@
+@@ -652,7 +685,7 @@
    if (isdigit(type))
       type = 'S';
  #define ST(s) if (strchr(s, type))
@@ -88,7 +88,7 @@ diff -Nru vdr-1.7.10-vanilla/channels.c vdr-1.7.10-pluginparam/channels.c
    char *q = buffer;
    *q = 0;
    ST(" S ")  q += sprintf(q, "%c", polarization);
-@@ -665,6 +698,7 @@
+@@ -666,6 +699,7 @@
    ST(" S ")  q += PrintParameter(q, 'S', MapToUser(system, SystemValues));
    ST("  T")  q += PrintParameter(q, 'T', MapToUser(transmission, TransmissionValues));
    ST("  T")  q += PrintParameter(q, 'Y', MapToUser(hierarchy, HierarchyValues));
@@ -96,7 +96,7 @@ diff -Nru vdr-1.7.10-vanilla/channels.c vdr-1.7.10-pluginparam/channels.c
    return buffer;
  }
  
-@@ -693,7 +727,7 @@
+@@ -694,7 +728,7 @@
  
  bool cChannel::StringToParameters(const char *s)
  {
@@ -105,7 +105,7 @@ diff -Nru vdr-1.7.10-vanilla/channels.c vdr-1.7.10-pluginparam/channels.c
          switch (toupper(*s)) {
            case 'A': s = SkipDigits(s); break; // for compatibility with the "multiproto" approach - may be removed in future versions
            case 'B': s = ParseParameter(s, bandwidth, BandwidthValues); break;
-@@ -811,7 +845,7 @@
+@@ -814,7 +848,7 @@
          dpids[0] = 0;
          ok = false;
          if (parambuf && sourcebuf && vpidbuf && apidbuf) {
@@ -114,7 +114,7 @@ diff -Nru vdr-1.7.10-vanilla/channels.c vdr-1.7.10-pluginparam/channels.c
  
             char *p;
             if ((p = strchr(vpidbuf, '=')) != NULL) {
-@@ -906,6 +940,7 @@
+@@ -911,6 +945,7 @@
             shortName = strcpyrealloc(shortName, p);
             }
          name = strcpyrealloc(name, namebuf);
@@ -122,9 +122,9 @@ diff -Nru vdr-1.7.10-vanilla/channels.c vdr-1.7.10-pluginparam/channels.c
  
          free(parambuf);
          free(sourcebuf);
-diff -Nru vdr-1.7.10-vanilla/channels.h vdr-1.7.10-pluginparam/channels.h
---- vdr-1.7.10-vanilla/channels.h	2009-11-22 18:06:18.000000000 +0200
-+++ vdr-1.7.10-pluginparam/channels.h	2009-11-22 18:18:42.000000000 +0200
+diff -Nru vdr-1.7.11-vanilla/channels.h vdr-1.7.11-pluginparam/channels.h
+--- vdr-1.7.11-vanilla/channels.h	2010-01-06 17:06:01.000000000 +0200
++++ vdr-1.7.11-pluginparam/channels.h	2010-01-06 17:10:48.000000000 +0200
 @@ -116,6 +116,7 @@
    char *shortName;
    char *provider;
@@ -164,21 +164,21 @@ diff -Nru vdr-1.7.10-vanilla/channels.h vdr-1.7.10-pluginparam/channels.h
    void SetPids(int Vpid, int Ppid, int Vtype, int *Apids, char ALangs[][MAXLANGCODE2], int *Dpids, char DLangs[][MAXLANGCODE2], int *Spids, char SLangs[][MAXLANGCODE2], int Tpid);
    void SetCaIds(const int *CaIds); // list must be zero-terminated
    void SetCaDescriptors(int Level);
-diff -Nru vdr-1.7.10-vanilla/config.h vdr-1.7.10-pluginparam/config.h
---- vdr-1.7.10-vanilla/config.h	2009-11-22 18:06:18.000000000 +0200
-+++ vdr-1.7.10-pluginparam/config.h	2009-11-22 18:18:42.000000000 +0200
+diff -Nru vdr-1.7.11-vanilla/config.h vdr-1.7.11-pluginparam/config.h
+--- vdr-1.7.11-vanilla/config.h	2010-01-06 17:06:01.000000000 +0200
++++ vdr-1.7.11-pluginparam/config.h	2010-01-06 17:10:48.000000000 +0200
 @@ -30,6 +30,8 @@
- #define APIVERSION  "1.7.10"
- #define APIVERSNUM   10710  // Version * 10000 + Major * 100 + Minor
+ #define APIVERSION  "1.7.11"
+ #define APIVERSNUM   10711  // Version * 10000 + Major * 100 + Minor
  
 +#define PLUGINPARAMPATCHVERSNUM 1
 +
  // When loading plugins, VDR searches them by their APIVERSION, which
  // may be smaller than VDRVERSION in case there have been no changes to
  // VDR header files since the last APIVERSION. This allows compiled
-diff -Nru vdr-1.7.10-vanilla/menu.c vdr-1.7.10-pluginparam/menu.c
---- vdr-1.7.10-vanilla/menu.c	2009-11-22 18:06:18.000000000 +0200
-+++ vdr-1.7.10-pluginparam/menu.c	2009-11-22 18:18:42.000000000 +0200
+diff -Nru vdr-1.7.11-vanilla/menu.c vdr-1.7.11-pluginparam/menu.c
+--- vdr-1.7.11-vanilla/menu.c	2010-01-06 17:06:00.000000000 +0200
++++ vdr-1.7.11-pluginparam/menu.c	2010-01-06 17:10:48.000000000 +0200
 @@ -190,6 +190,7 @@
    cChannel *channel;
    cChannel data;
@@ -211,29 +211,29 @@ diff -Nru vdr-1.7.10-vanilla/menu.c vdr-1.7.10-pluginparam/menu.c
             if (channel) {
                *channel = data;
                isyslog("edited channel %d %s", channel->Number(), *data.ToText());
-diff -Nru vdr-1.7.10-vanilla/po/fi_FI.po vdr-1.7.10-pluginparam/po/fi_FI.po
---- vdr-1.7.10-vanilla/po/fi_FI.po	2009-11-22 18:06:18.000000000 +0200
-+++ vdr-1.7.10-pluginparam/po/fi_FI.po	2009-11-22 18:18:42.000000000 +0200
-@@ -1031,3 +1031,6 @@
+diff -Nru vdr-1.7.11-vanilla/po/fi_FI.po vdr-1.7.11-pluginparam/po/fi_FI.po
+--- vdr-1.7.11-vanilla/po/fi_FI.po	2010-01-06 17:06:01.000000000 +0200
++++ vdr-1.7.11-pluginparam/po/fi_FI.po	2010-01-06 17:10:48.000000000 +0200
+@@ -1272,3 +1272,6 @@
  #, c-format
  msgid "VDR will shut down in %s minutes"
  msgstr "VDR sammuu %s minuutin kuluttua"
 +
 +msgid "Parameters"
 +msgstr "Parametrit"
-diff -Nru vdr-1.7.10-vanilla/po/fr_FR.po vdr-1.7.10-pluginparam/po/fr_FR.po
---- vdr-1.7.10-vanilla/po/fr_FR.po	2009-11-22 18:06:18.000000000 +0200
-+++ vdr-1.7.10-pluginparam/po/fr_FR.po	2009-11-22 18:18:42.000000000 +0200
-@@ -1034,3 +1034,6 @@
+diff -Nru vdr-1.7.11-vanilla/po/fr_FR.po vdr-1.7.11-pluginparam/po/fr_FR.po
+--- vdr-1.7.11-vanilla/po/fr_FR.po	2010-01-06 17:06:01.000000000 +0200
++++ vdr-1.7.11-pluginparam/po/fr_FR.po	2010-01-06 17:10:48.000000000 +0200
+@@ -1275,3 +1275,6 @@
  #, c-format
  msgid "VDR will shut down in %s minutes"
  msgstr "VDR s'arrêtera dans %s minutes"
 +
 +msgid "Parameters"
 +msgstr "Paramètres"
-diff -Nru vdr-1.7.10-vanilla/sources.c vdr-1.7.10-pluginparam/sources.c
---- vdr-1.7.10-vanilla/sources.c	2009-11-22 18:06:18.000000000 +0200
-+++ vdr-1.7.10-pluginparam/sources.c	2009-11-22 18:18:42.000000000 +0200
+diff -Nru vdr-1.7.11-vanilla/sources.c vdr-1.7.11-pluginparam/sources.c
+--- vdr-1.7.11-vanilla/sources.c	2010-01-06 17:06:01.000000000 +0200
++++ vdr-1.7.11-pluginparam/sources.c	2010-01-06 17:10:48.000000000 +0200
 @@ -37,6 +37,7 @@
    char buffer[16];
    char *q = buffer;
@@ -250,10 +250,10 @@ diff -Nru vdr-1.7.10-vanilla/sources.c vdr-1.7.10-pluginparam/sources.c
      case 'C': type = stCable; break;
      case 'S': type = stSat;   break;
      case 'T': type = stTerr;  break;
-diff -Nru vdr-1.7.10-vanilla/sources.conf vdr-1.7.10-pluginparam/sources.conf
---- vdr-1.7.10-vanilla/sources.conf	2009-11-22 18:06:18.000000000 +0200
-+++ vdr-1.7.10-pluginparam/sources.conf	2009-11-22 18:18:42.000000000 +0200
-@@ -194,3 +194,7 @@
+diff -Nru vdr-1.7.11-vanilla/sources.conf vdr-1.7.11-pluginparam/sources.conf
+--- vdr-1.7.11-vanilla/sources.conf	2010-01-06 17:06:01.000000000 +0200
++++ vdr-1.7.11-pluginparam/sources.conf	2010-01-06 17:10:48.000000000 +0200
+@@ -195,3 +195,7 @@
  # Terrestrial
  
  T       Terrestrial
@@ -261,9 +261,9 @@ diff -Nru vdr-1.7.10-vanilla/sources.conf vdr-1.7.10-pluginparam/sources.conf
 +# Plugin
 +
 +P       Plugin
-diff -Nru vdr-1.7.10-vanilla/sources.h vdr-1.7.10-pluginparam/sources.h
---- vdr-1.7.10-vanilla/sources.h	2009-11-22 18:06:18.000000000 +0200
-+++ vdr-1.7.10-pluginparam/sources.h	2009-11-22 18:18:42.000000000 +0200
+diff -Nru vdr-1.7.11-vanilla/sources.h vdr-1.7.11-pluginparam/sources.h
+--- vdr-1.7.11-vanilla/sources.h	2010-01-06 17:06:00.000000000 +0200
++++ vdr-1.7.11-pluginparam/sources.h	2010-01-06 17:10:48.000000000 +0200
 @@ -16,10 +16,11 @@
  public:
    enum eSourceType {
