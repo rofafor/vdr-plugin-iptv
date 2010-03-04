@@ -117,7 +117,7 @@ VDR Plugin 'iptv' Revision History
 - Modified sectionfilters to use socket pair instead of
   filesystem fifos.
 
-2010-xx-xx: Version 0.3.2
+2010-03-05: Version 0.3.2
 
 - Updated patches.
 - Fixed argument corruption.
