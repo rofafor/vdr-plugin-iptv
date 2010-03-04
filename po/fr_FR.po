@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: iptv 0.4.0\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2010-03-04 16:42+0200\n"
+"POT-Creation-Date: 2010-03-04 18:12+0200\n"
 "PO-Revision-Date: 2008-01-26 13:14+0100\n"
 "Last-Translator: NIVAL Michaël <mnival@club-internet.fr>\n"
 "Language-Team: French\n"
@@ -143,7 +143,15 @@ msgstr "FICHIER"
 msgid "EXT"
 msgstr "EXT"
 
-#, fuzzy
+msgid "Nid"
+msgstr "Nid"
+
+msgid "Tid"
+msgstr "Tid"
+
+msgid "Rid"
+msgstr "Rid"
+
 msgid "Scan sid"
 msgstr "Scanne les SID"
 
@@ -158,34 +166,3 @@ msgstr "Adresse"
 
 msgid "Parameter"
 msgstr "Paramètre"
-
-#, fuzzy
-#~ msgid "File"
-#~ msgstr "Filtres"
-
-#~ msgid "Delay (ms)"
-#~ msgstr "Délai (ms)"
-
-#~ msgid "Script"
-#~ msgstr "Script"
-
-#~ msgid "Port"
-#~ msgstr "Port"
-
-#~ msgid "Vtype"
-#~ msgstr "Vtype"
-
-#~ msgid "Nid"
-#~ msgstr "Nid"
-
-#~ msgid "Tid"
-#~ msgstr "Tid"
-
-#~ msgid "Rid"
-#~ msgstr "Rid"
-
-#~ msgid "Cannot find unique channel settings!"
-#~ msgstr "Impossible de trouver un paramètre de chaîne unique !"
-
-#~ msgid "IPTV Channels"
-#~ msgstr "Canal IPTV"

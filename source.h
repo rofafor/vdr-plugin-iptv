@@ -50,6 +50,9 @@ class cIptvSourceParam : public cSourceParam
 {
 private:
   int param;
+  int nid;
+  int tid;
+  int rid;
   cChannel data;
   cIptvTransponderParameters itp;
   const char *protocols[cIptvTransponderParameters::eProtocolCount];
