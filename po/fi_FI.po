@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: iptv 0.2.5\n"
+"Project-Id-Version: iptv 0.4.0\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2009-03-06 22:15+0200\n"
+"POT-Creation-Date: 2010-03-04 16:42+0200\n"
 "PO-Revision-Date: 2007-08-12 23:22+0300\n"
 "Last-Translator: Rolf Ahrenberg\n"
 "Language-Team: <vdr@linuxtv.org>\n"
@@ -38,60 +38,6 @@ msgstr "TDT (0x70)"
 
 msgid "Experience the IPTV"
 msgstr "Koe IPTV:n ihmeellinen maailma"
-
-msgid "UDP"
-msgstr "UDP"
-
-msgid "HTTP"
-msgstr "HTTP"
-
-msgid "FILE"
-msgstr "FILE"
-
-msgid "EXT"
-msgstr "EXT"
-
-msgid "Protocol"
-msgstr "Protokolla"
-
-msgid "Delay (ms)"
-msgstr "Viive (ms)"
-
-msgid "Script"
-msgstr "Skripti"
-
-msgid "Parameter"
-msgstr "Parametri"
-
-msgid "Address"
-msgstr "Osoite"
-
-msgid "Port"
-msgstr "Portti"
-
-msgid "Scan Sid"
-msgstr "Etsi palvelu-ID"
-
-msgid "Scan pids"
-msgstr "Etsi pidit"
-
-msgid "Vtype"
-msgstr "Kuvatyyppi"
-
-msgid "Nid"
-msgstr "Verkko-ID"
-
-msgid "Tid"
-msgstr "Lähete-ID"
-
-msgid "Rid"
-msgstr "Radio-ID"
-
-msgid "Cannot find unique channel settings!"
-msgstr "Yksilöllisiä kanava-asetuksia ei löydetä!"
-
-msgid "IPTV Channels"
-msgstr "IPTV-kanavat"
 
 msgid "IPTV Information"
 msgstr "IPTV-tiedot"
@@ -182,3 +128,30 @@ msgstr "Määrittele käytöstä poistettava suodatin, joka lisätään mustalle
 
 msgid "Help"
 msgstr "Opaste"
+
+msgid "UDP"
+msgstr "UDP"
+
+msgid "HTTP"
+msgstr "HTTP"
+
+msgid "FILE"
+msgstr "FILE"
+
+msgid "EXT"
+msgstr "EXT"
+
+msgid "Scan sid"
+msgstr "Etsi palvelu-ID"
+
+msgid "Scan pids"
+msgstr "Etsi pidit"
+
+msgid "Protocol"
+msgstr "Protokolla"
+
+msgid "Address"
+msgstr "Osoite"
+
+msgid "Parameter"
+msgstr "Parametri"

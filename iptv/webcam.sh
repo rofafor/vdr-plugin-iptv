@@ -7,7 +7,7 @@
 # http://www.vdr-wiki.de/wiki/index.php/Iptv-plugin
 #
 # An example channels.conf entry:
-# webcam;IPTV:3:IPTV|S0P0|EXT|webcam.sh|0:P:0:256:257:0:0:3:0:0:0
+# webcam;IPTV:3:S=0|P=0|F=EXT|U=webcam.sh|A=0:I:0:256:257:0:0:3:0:0:0
 #
 # webcam.sh is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

@@ -1,0 +1,152 @@
+/*
+ * source.c: IPTV plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ */
+
+#include "common.h"
+#include "source.h"
+
+// --- cIptvTransponderParameters --------------------------------------------
+
+cIptvTransponderParameters::cIptvTransponderParameters(const char *Parameters)
+: sidscan(0),
+  pidscan(0),
+  protocol(eProtocolUDP),
+  parameter(0)
+{
+  debug("cIptvTransponderParameters::cIptvTransponderParameters(): Parameters=%s\n", Parameters);
+
+  memset(&address, 0, sizeof(address));
+  Parse(Parameters);
+}
+
+cString cIptvTransponderParameters::ToString(char Type) const
+{
+  debug("cIptvTransponderParameters::ToString() Type=%c\n", Type);
+
+  const char *protocolstr;
+
+  switch (protocol) {
+    case eProtocolEXT:
+         protocolstr = "EXT";
+         break;
+    case eProtocolHTTP:
+         protocolstr = "HTTP";
+         break;
+    case eProtocolFILE:
+         protocolstr = "FILE";
+         break;
+    default:
+    case eProtocolUDP:
+         protocolstr = "UDP";
+         break;
+  }
+  return cString::sprintf("S=%d|P=%d|F=%s|U=%s|A=%d", sidscan, pidscan, protocolstr, address, parameter);
+}
+
+bool cIptvTransponderParameters::Parse(const char *s)
+{
+  debug("cIptvTransponderParameters::Parse(): s=%s\n", s);
+
+  const char *delim = "|";
+  char *str = (char *)s;
+  char *saveptr = NULL;
+  char *token = NULL;
+  bool found_s = false;
+  bool found_p = false;
+  bool found_f = true;
+  bool found_u = false;
+  bool found_a = false;
+
+  while ((token = (char *)strtok_r(str, delim, &saveptr)) != NULL) {
+    char *data = token + 1;
+
+    if (data && (*data == '=')) {
+       ++data;
+       switch (*token) {
+         case 'S':
+              sidscan = strtol(data, (char **)NULL, 10);
+              found_s = true;
+              break;
+         case 'P':
+              pidscan = strtol(data, (char **)NULL, 10);
+              found_p = true;
+              break;
+         case 'F':
+              if (strstr(data, "UDP"))
+                  protocol = eProtocolUDP;
+              else if (strstr(data, "HTTP"))
+                  protocol = eProtocolHTTP;
+              else if (strstr(data, "FILE"))
+                  protocol = eProtocolFILE;
+              else if (strstr(data, "EXT"))
+                  protocol = eProtocolEXT;
+              else
+                 found_u = false;
+              break;
+         case 'U':
+              strn0cpy(address, data, sizeof(address));
+              found_u = true;
+              break;
+         case 'A':
+              parameter = strtol(data, (char **)NULL, 10);
+              found_a = true;
+              break;
+         default:
+              break;
+         }
+    }
+    str = NULL;
+  }
+
+  if (found_s && found_p && found_f && found_u && found_a)
+     return (true);
+
+  error("Invalid channel parameters: %s\n", s);
+  return (false);
+}
+
+// --- cIptvSourceParam ------------------------------------------------------
+
+cIptvSourceParam::cIptvSourceParam(char Source, const char *Description)
+  : cSourceParam(Source, Description),
+    param(0)
+{
+  debug("cIptvSourceParam::cIptvSourceParam(): Source=%c Description=%s\n", Source, Description);
+
+  protocols[cIptvTransponderParameters::eProtocolUDP]  = tr("UDP");
+  protocols[cIptvTransponderParameters::eProtocolHTTP] = tr("HTTP");
+  protocols[cIptvTransponderParameters::eProtocolFILE] = tr("FILE");
+  protocols[cIptvTransponderParameters::eProtocolEXT]  = tr("EXT");
+}
+
+void cIptvSourceParam::SetData(cChannel *Channel)
+{
+  debug("cIptvSourceParam::SetData(): Channel=%s)\n", Channel->Parameters());
+  data = *Channel;
+  itp.Parse(data.Parameters());
+  param = 0;
+}
+
+void cIptvSourceParam::GetData(cChannel *Channel)
+{
+  debug("cIptvSourceParam::GetData(): Channel=%s\n", Channel->Parameters());
+  data.SetTransponderData(Channel->Source(), Channel->Frequency(), data.Srate(), itp.ToString(Source()), true);
+  *Channel = data;
+}
+
+cOsdItem *cIptvSourceParam::GetOsdItem(void)
+{
+  debug("cIptvSourceParam::GetOsdItem()\n");
+  switch (param++) {
+    case  0: return new cMenuEditBoolItem(tr("Scan sid"),  &itp.sidscan);
+    case  1: return new cMenuEditBoolItem(tr("Scan pids"), &itp.pidscan);
+    case  2: return new cMenuEditStraItem(tr("Protocol"),  &itp.protocol,  ELEMENTS(protocols), protocols);
+    case  3: return new cMenuEditStrItem( tr("Address"),    itp.address,   sizeof(itp.address));
+    case  4: return new cMenuEditIntItem( tr("Parameter"), &itp.parameter, 0,                   0xFFFF);
+    default: return NULL;
+    }
+  return NULL;
+}

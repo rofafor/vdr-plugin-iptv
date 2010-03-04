@@ -69,8 +69,6 @@ private:
 
   // for channel parsing & buffering
 private:
-  cString GetChannelSettings(const char *IptvParam, int *Parameter, int *SidScan, int *PidScan, cIptvProtocolIf* *Protocol);
-  bool ProvidesIptv(const char *Param) const;
   void ResetBuffering(void);
   bool IsBuffering(void);
   bool DeleteFilter(unsigned int Index);

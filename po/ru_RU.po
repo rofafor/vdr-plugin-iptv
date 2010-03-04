@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: iptv 0.2.5\n"
+"Project-Id-Version: iptv 0.4.0\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2009-03-06 22:15+0200\n"
+"POT-Creation-Date: 2010-03-04 16:42+0200\n"
 "PO-Revision-Date: 2008-03-16 12:14+0100\n"
 "Last-Translator: Alexander Gross <Bikalexander@gmail.com>\n"
 "Language-Team: Russian <de@li.org>\n"
@@ -40,60 +40,6 @@ msgstr "TDT (0x70)"
 
 msgid "Experience the IPTV"
 msgstr "Попробуй IPTV"
-
-msgid "UDP"
-msgstr "UDP"
-
-msgid "HTTP"
-msgstr "HTTP"
-
-msgid "FILE"
-msgstr "ФАЙЛ"
-
-msgid "EXT"
-msgstr "EXT"
-
-msgid "Protocol"
-msgstr "Протокол"
-
-msgid "Delay (ms)"
-msgstr "Задержка (мс)"
-
-msgid "Script"
-msgstr "Скрипт"
-
-msgid "Parameter"
-msgstr "Параметр"
-
-msgid "Address"
-msgstr "Адрес"
-
-msgid "Port"
-msgstr "Порт"
-
-msgid "Scan Sid"
-msgstr "Сканировать SID"
-
-msgid "Scan pids"
-msgstr "Сканировать пиды"
-
-msgid "Vtype"
-msgstr "Vtype"
-
-msgid "Nid"
-msgstr "Nid"
-
-msgid "Tid"
-msgstr "Tid"
-
-msgid "Rid"
-msgstr "Rid"
-
-msgid "Cannot find unique channel settings!"
-msgstr "Невозможно найти уникальные настройки канала!"
-
-msgid "IPTV Channels"
-msgstr "IPTV каналы"
 
 msgid "IPTV Information"
 msgstr "IPTV информация"
@@ -168,3 +114,30 @@ msgstr "Неправильно работающий фильтр, занести
 
 msgid "Help"
 msgstr "Справка"
+
+msgid "UDP"
+msgstr "UDP"
+
+msgid "HTTP"
+msgstr "HTTP"
+
+msgid "FILE"
+msgstr "ФАЙЛ"
+
+msgid "EXT"
+msgstr "EXT"
+
+msgid "Scan sid"
+msgstr "Сканировать SID"
+
+msgid "Scan pids"
+msgstr "Сканировать пиды"
+
+msgid "Protocol"
+msgstr "Протокол"
+
+msgid "Address"
+msgstr "Адрес"
+
+msgid "Parameter"
+msgstr "Параметр"

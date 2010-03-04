@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: iptv 0.2.5\n"
+"Project-Id-Version: iptv 0.4.0\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2009-03-06 22:15+0200\n"
+"POT-Creation-Date: 2010-03-04 16:42+0200\n"
 "PO-Revision-Date: 2007-10-29 21:19+0100\n"
 "Last-Translator: Tobias Grimm <tg@e-tobi.net>\n"
 "Language-Team: German\n"
@@ -39,60 +39,6 @@ msgstr "TDT (0x70)"
 
 msgid "Experience the IPTV"
 msgstr "Erlebe IPTV"
-
-msgid "UDP"
-msgstr "UDP"
-
-msgid "HTTP"
-msgstr "HTTP"
-
-msgid "FILE"
-msgstr "DATEI"
-
-msgid "EXT"
-msgstr "EXT"
-
-msgid "Protocol"
-msgstr "Protokoll"
-
-msgid "Delay (ms)"
-msgstr "Verzögerung (ms)"
-
-msgid "Script"
-msgstr "Skript"
-
-msgid "Parameter"
-msgstr "Parameter"
-
-msgid "Address"
-msgstr "Adresse"
-
-msgid "Port"
-msgstr "Port"
-
-msgid "Scan Sid"
-msgstr "Scanne SID"
-
-msgid "Scan pids"
-msgstr "Scanne PIDS"
-
-msgid "Vtype"
-msgstr "Vtype"
-
-msgid "Nid"
-msgstr "Nid"
-
-msgid "Tid"
-msgstr "Tid"
-
-msgid "Rid"
-msgstr "Rid"
-
-msgid "Cannot find unique channel settings!"
-msgstr "Kann eindeutige Kanaleinstellungen nicht finden!"
-
-msgid "IPTV Channels"
-msgstr "IPTV Kanäle"
 
 msgid "IPTV Information"
 msgstr "IPTV Informationen"
@@ -167,3 +113,30 @@ msgstr ""
 
 msgid "Help"
 msgstr "Hilfe"
+
+msgid "UDP"
+msgstr "UDP"
+
+msgid "HTTP"
+msgstr "HTTP"
+
+msgid "FILE"
+msgstr "DATEI"
+
+msgid "EXT"
+msgstr "EXT"
+
+msgid "Scan sid"
+msgstr "Scanne SID"
+
+msgid "Scan pids"
+msgstr "Scanne PIDS"
+
+msgid "Protocol"
+msgstr "Protokoll"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Parameter"
+msgstr "Parameter"

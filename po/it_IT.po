@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: iptv 0.2.5\n"
+"Project-Id-Version: iptv 0.4.0\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2009-03-06 22:15+0200\n"
+"POT-Creation-Date: 2010-03-04 16:42+0200\n"
 "PO-Revision-Date: 2008-07-13 03:28+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team: Italian\n"
@@ -39,60 +39,6 @@ msgstr "TDT (0x70)"
 
 msgid "Experience the IPTV"
 msgstr "Scopri la IPTV"
-
-msgid "UDP"
-msgstr "UDP"
-
-msgid "HTTP"
-msgstr "HTTP"
-
-msgid "FILE"
-msgstr "FILE"
-
-msgid "EXT"
-msgstr "EXT"
-
-msgid "Protocol"
-msgstr "Protocollo"
-
-msgid "Delay (ms)"
-msgstr "Ritardo (ms)"
-
-msgid "Script"
-msgstr "Script"
-
-msgid "Parameter"
-msgstr "Parametro"
-
-msgid "Address"
-msgstr "Indirizzo"
-
-msgid "Port"
-msgstr "Porta"
-
-msgid "Scan Sid"
-msgstr "Scansione Sid"
-
-msgid "Scan pids"
-msgstr "Scansione Pids"
-
-msgid "Vtype"
-msgstr "Vtype"
-
-msgid "Nid"
-msgstr "Nid"
-
-msgid "Tid"
-msgstr "Tid"
-
-msgid "Rid"
-msgstr "Rid"
-
-msgid "Cannot find unique channel settings!"
-msgstr "Impossibile trovare impostazioni canale unico!"
-
-msgid "IPTV Channels"
-msgstr "Canali IPTV"
 
 msgid "IPTV Information"
 msgstr "Informazione IPTV"
@@ -183,3 +129,30 @@ msgstr "Definisci un filtro corrotto che sarà messo nella lista nera."
 
 msgid "Help"
 msgstr "Aiuto"
+
+msgid "UDP"
+msgstr "UDP"
+
+msgid "HTTP"
+msgstr "HTTP"
+
+msgid "FILE"
+msgstr "FILE"
+
+msgid "EXT"
+msgstr "EXT"
+
+msgid "Scan sid"
+msgstr "Scansione Sid"
+
+msgid "Scan pids"
+msgstr "Scansione Pids"
+
+msgid "Protocol"
+msgstr "Protocollo"
+
+msgid "Address"
+msgstr "Indirizzo"
+
+msgid "Parameter"
+msgstr "Parametro"

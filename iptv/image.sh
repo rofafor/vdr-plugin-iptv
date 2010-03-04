@@ -8,12 +8,12 @@ set -e
 # The script originates from Peter Holik
 #
 # Example channels.conf entries:
-# Energy;IPTV:50:IPTV|S0P0|EXT|png.sh|1:P:0:256:257:0:0:3:0:0:0
-# Temperature;IPTV:60:IPTV|S0P0|EXT|png.sh|2:P:0:256:257:0:0:3:0:0:0
-# Temperature Week;IPTV:70:IPTV|S0P0|EXT|png.sh|3:P:0:256:257:0:0:3:0:0:0
-# Server Temperature;IPTV:80:IPTV|S0P0|EXT|png.sh|4:P:0:256:257:0:0:3:0:0:0
-# Server Temperature Week;IPTV:90:IPTV|S0P0|EXT|png.sh|5:P:0:256:257:0:0:3:0:0:0
-# Traffic;IPTV:100:IPTV|S0P0|EXT|png.sh|6:P:0:256:257:0:0:3:0:0:0
+# Energy;IPTV:50:S=0|P=0|F=EXT|U=png.sh|A=1:I:0:256:257:0:0:3:0:0:0
+# Temperature;IPTV:60:S=0|P=0|EXT|U=png.sh|A=2:I:0:256:257:0:0:3:0:0:0
+# Temperature Week;IPTV:70:S=0|P=0|EXT|U=png.sh|A=3:I:0:256:257:0:0:3:0:0:0
+# Server Temperature;IPTV:80:S=0|P=0|EXT|U=png.sh|A=4:I:0:256:257:0:0:3:0:0:0
+# Server Temperature Week;IPTV:90:S=0|P=0|EXT|U=png.sh|A=5:I:0:256:257:0:0:3:0:0:0
+# Traffic;IPTV:100:S=0|P=0|EXT|U=png.sh|A=6:I:0:256:257:0:0:3:0:0:0
 #
 # webcam.sh is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

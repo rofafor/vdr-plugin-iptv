@@ -31,6 +31,10 @@ VDRDIR = ../../..
 LIBDIR = ../../lib
 TMPDIR = /tmp
 
+### Make sure that necessary options are included:
+
+include $(VDRDIR)/Make.global
+
 ### Allow user defined options to overwrite defaults:
 
 -include $(VDRDIR)/Make.config
@@ -61,7 +65,7 @@ all-redirect: all
 
 OBJS = $(PLUGIN).o config.o setup.o device.o streamer.o protocoludp.o \
 	protocolhttp.o protocolfile.o protocolext.o sectionfilter.o \
-	sidscanner.o pidscanner.o statistics.o common.o socket.o
+	sidscanner.o pidscanner.o statistics.o common.o socket.o source.o
 
 ### The main target:
 

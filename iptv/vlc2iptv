@@ -52,7 +52,7 @@ lookup_channel_and_pids()
     [ ! -e "$CHANNELS_CONF" ] && \
       exit_with_error "channels.conf not found ($CHANNELS_CONF)"
 
-    local CHANNEL_RECORD=`grep "[:]IPTV[|][SP][10][SP][10][|]EXT[|]vlc2iptv[|]$PARAMETER[:]" $CHANNELS_CONF`
+    local CHANNEL_RECORD=`grep "[:]S=[10][|]P=[10][|]F=EXT[|]U=vlc2iptv[|]A=$PARAMETER[:]I" $CHANNELS_CONF`
     [ -z "$CHANNEL_RECORD" ] && \
       exit_with_error "no iptv channel with parameter $PARAMETER found"
 

@@ -7,7 +7,7 @@
 # http://www.vdr-wiki.de/wiki/index.php/Iptv-plugin
 #
 # An example channels.conf entry:
-# internetradio;IPTV:2:IPTV|S0P0|EXT|internetradio.sh|0:P:0:0:256:0:0:2:0:0:0
+# internetradio;IPTV:2:S=0|P=0|F=EXT|U=internetradio.sh|A=0:P:0:0:256:0:0:2:0:0:0
 #
 # internetradio.sh is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

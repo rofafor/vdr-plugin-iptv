@@ -26,7 +26,7 @@ void cSidScanner::SetStatus(bool On)
 void cSidScanner::SetChannel(const cChannel *Channel)
 {
   if (Channel) {
-     debug("cSidScanner::SetChannel(): %s\n", Channel->PluginParam());
+     debug("cSidScanner::SetChannel(): %s\n", Channel->Parameters());
      channel = *Channel;
      }
   else {

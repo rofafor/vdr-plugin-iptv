@@ -33,7 +33,7 @@ cPidScanner::~cPidScanner()
 void cPidScanner::SetChannel(const cChannel *Channel)
 {
   if (Channel) {
-     debug("cPidScanner::SetChannel(): %s\n", Channel->PluginParam());
+     debug("cPidScanner::SetChannel(): %s\n", Channel->Parameters());
      channel = *Channel;
      }
   else {
@@ -146,12 +146,8 @@ void cPidScanner::Process(const uint8_t* buf)
               for (unsigned int i = 0; i < MAXSPIDS; ++i)
                   Spids[i] = IptvChannel->Spid(i);
               debug("cPidScanner::Process(): Vpid=0x%04X, Apid=0x%04X\n", Vpid, Apid);
-#if defined(APIVERSNUM) && APIVERSNUM >= 10704
               int Vtype = IptvChannel->Vtype();
               IptvChannel->SetPids(Vpid, Ppid, Vtype, Apids, ALangs, Dpids, DLangs, Spids, SLangs, Tpid);
-#else
-              IptvChannel->SetPids(Vpid, Ppid, Apids, ALangs, Dpids, DLangs, Spids, SLangs, Tpid);
-#endif
               }
            Channels.Unlock();
            process = false;

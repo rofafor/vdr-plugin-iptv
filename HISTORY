@@ -1,5 +1,6 @@
+==================================
 VDR Plugin 'iptv' Revision History
-----------------------------------
+==================================
 
 2007-10-14: Version 0.0.1
 
@@ -117,7 +118,13 @@ VDR Plugin 'iptv' Revision History
 - Modified sectionfilters to use socket pair instead of
   filesystem fifos.
 
-2010-xx-xx: Version 0.3.2
 
-- Updated patches.
+================================== 
+VDR Plugin 'iptv' Revision History
+================================== 
+
+2010-03-05: Version 0.4.0
+
+- Updated for vdr-1.7.13.
+  Notice: channels.conf format has changed!
 - Fixed argument corruption.

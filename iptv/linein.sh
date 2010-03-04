@@ -7,7 +7,7 @@
 # http://www.vdr-wiki.de/wiki/index.php/Iptv-plugin
 #
 # An example channels.conf entry:
-# linein;IPTV:5:IPTV|S0P0|EXT|linein.sh|0:P:27500:0:256:0:0:5:5:5:0
+# linein;IPTV:5:S=0|P=0|F=EXT|U=linein.sh|A=0:I:27500:0:256:0:0:5:5:5:0
 #
 # linein.sh is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

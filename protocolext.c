@@ -53,7 +53,7 @@ void cIptvProtocolExt::ExecuteScript(void)
      // Execute the external script
      cString cmd = cString::sprintf("%s %d %d", *scriptFile, scriptParameter, socketPort);
      debug("cIptvProtocolExt::ExecuteScript(child): %s\n", *cmd);
-     if (execl("/bin/sh", "sh", "-c", *cmd, NULL) == -1) {
+     if (execl("/bin/sh", "sh", "-c", *cmd, (char *)NULL) == -1) {
         error("Script execution failed: %s", *cmd);
         _exit(-1);
         }

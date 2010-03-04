@@ -20,15 +20,11 @@
 #define error(x...) esyslog("ERROR: " x);
 #endif
 
-#ifndef trNOOP
-#define trNOOP(s) (s)
-#endif
-
-#ifndef trVDR
-#define trVDR(s) tr(s)
-#endif
+#define ELEMENTS(x)                     (sizeof(x) / sizeof(x[0]))
 
 #define IPTV_DVR_FILENAME               "/tmp/vdr-iptv%d.dvr"
+
+#define IPTV_SOURCE_CHARACTER           'I'
 
 #define IPTV_DEVICE_INFO_ALL            0
 #define IPTV_DEVICE_INFO_GENERAL        1

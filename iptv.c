@@ -12,15 +12,11 @@
 #include "setup.h"
 #include "device.h"
 
-#ifndef PLUGINPARAMPATCHVERSNUM
-#error "You must apply the pluginparam patch for VDR!"
+#if defined(APIVERSNUM) && APIVERSNUM < 10713
+#error "VDR-1.7.13 API version or greater is required!"
 #endif
 
-#if defined(APIVERSNUM) && APIVERSNUM < 10600
-#error "VDR-1.6.0 API version or greater is required!"
-#endif
-
-static const char VERSION[]     = "0.3.2";
+static const char VERSION[]     = "0.4.0";
 static const char DESCRIPTION[] = trNOOP("Experience the IPTV");
 
 class cPluginIptv : public cPlugin {

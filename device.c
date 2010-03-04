@@ -6,6 +6,7 @@
  */
 
 #include "config.h"
+#include "source.h"
 #include "device.h"
 
 #define IPTV_MAX_DEVICES MAXDEVICES
@@ -22,7 +23,7 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   sidScanEnabled(false),
   pidScanEnabled(false)
 {
-  unsigned int bufsize = MEGABYTE(IptvConfig.GetTsBufferSize());
+  unsigned int bufsize = (unsigned int)MEGABYTE(IptvConfig.GetTsBufferSize());
   bufsize -= (bufsize % TS_SIZE);
   isyslog("creating IPTV device %d (CardIndex=%d)", deviceIndex, CardIndex());
   tsBuffer = new cRingBufferLinear(bufsize + 1, TS_SIZE, false,
@@ -85,6 +86,7 @@ cIptvDevice::~cIptvDevice()
 bool cIptvDevice::Initialize(unsigned int DeviceCount)
 {
   debug("cIptvDevice::Initialize(): DeviceCount=%d\n", DeviceCount);
+  new cIptvSourceParam(IPTV_SOURCE_CHARACTER, "IPTV");
   if (DeviceCount > IPTV_MAX_DEVICES)
      DeviceCount = IPTV_MAX_DEVICES;
   for (unsigned int i = 0; i < DeviceCount; ++i)
@@ -176,73 +178,16 @@ cString cIptvDevice::GetInformation(unsigned int Page)
   return info;
 }
 
-cString cIptvDevice::GetChannelSettings(const char *IptvParam, int *Parameter, int *SidScan, int *PidScan, cIptvProtocolIf* *Protocol)
-{
-  debug("cIptvDevice::GetChannelSettings(%d)\n", deviceIndex);
-  char *tag = NULL;
-  char *proto = NULL;
-  char *loc = NULL;
-  if (sscanf(IptvParam, "%a[^|]|S%dP%d|%a[^|]|%a[^|]|%u", &tag, SidScan, PidScan, &proto, &loc, Parameter) == 6) {
-     cString tagstr(tag, true);
-     cString protostr(proto, true);
-     cString locstr(loc, true);
-     // check if IPTV tag
-     if (strncasecmp(*tagstr, "IPTV", 4) == 0) {
-        // check if protocol is supported and update the pointer
-        if (strncasecmp(*protostr, "UDP", 3) == 0)
-           *Protocol = pUdpProtocol;
-        else if (strncasecmp(*protostr, "HTTP", 4) == 0)
-           *Protocol = pHttpProtocol;
-        else if (strncasecmp(*protostr, "FILE", 4) == 0)
-           *Protocol = pFileProtocol;
-        else if (strncasecmp(*protostr, "EXT", 3) == 0)
-           *Protocol = pExtProtocol;
-        else
-           return NULL;
-        // return location
-        return locstr;
-        }
-     }
-  else if (sscanf(IptvParam, "%a[^|]|P%dS%d|%a[^|]|%a[^|]|%u", &tag, PidScan, SidScan, &proto, &loc, Parameter) == 6) {
-     cString tagstr(tag, true);
-     cString protostr(proto, true);
-     cString locstr(loc, true);
-     // check if IPTV tag
-     if (strncasecmp(*tagstr, "IPTV", 4) == 0) {
-        // check if protocol is supported and update the pointer
-        if (strncasecmp(*protostr, "UDP", 3) == 0)
-           *Protocol = pUdpProtocol;
-        else if (strncasecmp(*protostr, "HTTP", 4) == 0)
-           *Protocol = pHttpProtocol;
-        else if (strncasecmp(*protostr, "FILE", 4) == 0)
-           *Protocol = pFileProtocol;
-        else if (strncasecmp(*protostr, "EXT", 3) == 0)
-           *Protocol = pExtProtocol;
-        else
-           return NULL;
-        // return location
-        return locstr;
-        }
-     }
-  return NULL;
-}
-
-bool cIptvDevice::ProvidesIptv(const char *Param) const
-{
-  debug("cIptvDevice::ProvidesIptv(%d)\n", deviceIndex);
-  return (strncasecmp(Param, "IPTV", 4) == 0);
-}
-
 bool cIptvDevice::ProvidesSource(int Source) const
 {
   debug("cIptvDevice::ProvidesSource(%d)\n", deviceIndex);
-  return (cSource::IsPlug(Source));
+  return ((Source & cSource::st_Mask) == (IPTV_SOURCE_CHARACTER << 24));
 }
 
 bool cIptvDevice::ProvidesTransponder(const cChannel *Channel) const
 {
   debug("cIptvDevice::ProvidesTransponder(%d)\n", deviceIndex);
-  return (ProvidesSource(Channel->Source()) && ProvidesIptv(Channel->PluginParam()));
+  return (ProvidesSource(Channel->Source()));
 }
 
 bool cIptvDevice::ProvidesChannel(const cChannel *Channel, int Priority, bool *NeedsDetachReceivers) const
@@ -265,19 +210,36 @@ int cIptvDevice::NumProvidedSystems(void) const
 
 bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
 {
-  int parameter, sidscan, pidscan;
-  cString location;
   cIptvProtocolIf *protocol;
+  cIptvTransponderParameters itp(Channel->Parameters());
 
   debug("cIptvDevice::SetChannelDevice(%d)\n", deviceIndex);
-  location = GetChannelSettings(Channel->PluginParam(), &parameter, &sidscan, &pidscan, &protocol);
-  if (isempty(location)) {
-     error("Unrecognized IPTV channel settings: %s", Channel->PluginParam());
+  
+  if (isempty(itp.Address())) {
+     error("Unrecognized IPTV address: %s", Channel->Parameters());
      return false;
      }
-  sidScanEnabled = sidscan ? true : false;
-  pidScanEnabled = pidscan ? true : false;
-  if (pIptvStreamer->Set(location, parameter, deviceIndex, protocol)) {
+  switch (itp.Protocol()) {
+    case cIptvTransponderParameters::eProtocolUDP:
+         protocol = pUdpProtocol;
+         break;
+    case cIptvTransponderParameters::eProtocolHTTP:
+         protocol = pHttpProtocol;
+         break;
+    case cIptvTransponderParameters::eProtocolFILE:
+         protocol = pFileProtocol;
+         break;
+    case cIptvTransponderParameters::eProtocolEXT:
+         protocol = pExtProtocol;
+         break;
+    default:
+         error("Unrecognized IPTV protocol: %s", Channel->Parameters());
+         return false;
+         break;
+  }
+  sidScanEnabled = itp.SidScan() ? true : false;
+  pidScanEnabled = itp.PidScan() ? true : false;
+  if (pIptvStreamer->Set(itp.Address(), itp.Parameter(), deviceIndex, protocol)) {
      if (sidScanEnabled && pSidScanner && IptvConfig.GetSectionFiltering())
         pSidScanner->SetChannel(Channel);
      if (pidScanEnabled && pPidScanner)
@@ -391,7 +353,7 @@ void cIptvDevice::ResetBuffering(void)
 {
   debug("cIptvDevice::ResetBuffering(%d)\n", deviceIndex);
   // pad prefill to multiple of TS_SIZE
-  tsBufferPrefill = MEGABYTE(IptvConfig.GetTsBufferSize()) *
+  tsBufferPrefill = (unsigned int)MEGABYTE(IptvConfig.GetTsBufferSize()) *
                     IptvConfig.GetTsBufferPrefillRatio() / 100;
   tsBufferPrefill -= (tsBufferPrefill % TS_SIZE);
 }

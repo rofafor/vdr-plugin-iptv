@@ -6,9 +6,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: iptv 0.2.5\n"
+"Project-Id-Version: iptv 0.4.0\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2009-03-06 22:15+0200\n"
+"POT-Creation-Date: 2010-03-04 16:42+0200\n"
 "PO-Revision-Date: 2008-01-26 13:14+0100\n"
 "Last-Translator: NIVAL Michaël <mnival@club-internet.fr>\n"
 "Language-Team: French\n"
@@ -40,60 +40,6 @@ msgstr "TDT (0x70)"
 
 msgid "Experience the IPTV"
 msgstr "L'expérience IPTV"
-
-msgid "UDP"
-msgstr "UDP"
-
-msgid "HTTP"
-msgstr "HTTP"
-
-msgid "FILE"
-msgstr "FICHIER"
-
-msgid "EXT"
-msgstr "EXT"
-
-msgid "Protocol"
-msgstr "Protocole"
-
-msgid "Delay (ms)"
-msgstr "Délai (ms)"
-
-msgid "Script"
-msgstr "Script"
-
-msgid "Parameter"
-msgstr "Paramètre"
-
-msgid "Address"
-msgstr "Adresse"
-
-msgid "Port"
-msgstr "Port"
-
-msgid "Scan Sid"
-msgstr "Scanne les SID"
-
-msgid "Scan pids"
-msgstr "Scanne les PID"
-
-msgid "Vtype"
-msgstr "Vtype"
-
-msgid "Nid"
-msgstr "Nid"
-
-msgid "Tid"
-msgstr "Tid"
-
-msgid "Rid"
-msgstr "Rid"
-
-msgid "Cannot find unique channel settings!"
-msgstr "Impossible de trouver un paramètre de chaîne unique !"
-
-msgid "IPTV Channels"
-msgstr "Canal IPTV"
 
 msgid "IPTV Information"
 msgstr "Information sur IPTV"
@@ -184,3 +130,62 @@ msgstr "Définit les mauvais comportement qui doivent être désactivé."
 
 msgid "Help"
 msgstr "Aide"
+
+msgid "UDP"
+msgstr "UDP"
+
+msgid "HTTP"
+msgstr "HTTP"
+
+msgid "FILE"
+msgstr "FICHIER"
+
+msgid "EXT"
+msgstr "EXT"
+
+#, fuzzy
+msgid "Scan sid"
+msgstr "Scanne les SID"
+
+msgid "Scan pids"
+msgstr "Scanne les PID"
+
+msgid "Protocol"
+msgstr "Protocole"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Parameter"
+msgstr "Paramètre"
+
+#, fuzzy
+#~ msgid "File"
+#~ msgstr "Filtres"
+
+#~ msgid "Delay (ms)"
+#~ msgstr "Délai (ms)"
+
+#~ msgid "Script"
+#~ msgstr "Script"
+
+#~ msgid "Port"
+#~ msgstr "Port"
+
+#~ msgid "Vtype"
+#~ msgstr "Vtype"
+
+#~ msgid "Nid"
+#~ msgstr "Nid"
+
+#~ msgid "Tid"
+#~ msgstr "Tid"
+
+#~ msgid "Rid"
+#~ msgstr "Rid"
+
+#~ msgid "Cannot find unique channel settings!"
+#~ msgstr "Impossible de trouver un paramètre de chaîne unique !"
+
+#~ msgid "IPTV Channels"
+#~ msgstr "Canal IPTV"

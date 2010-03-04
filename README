@@ -44,7 +44,6 @@ cd /put/your/path/here/VDR/PLUGINS/src
 tar -xzf /put/your/path/here/vdr-iptv-X.Y.Z.tgz
 ln -s iptv-X.Y.Z iptv
 cd /put/your/path/here/VDR
-patch -p1 < PLUGINS/src/iptv/patches/vdr-X.Y.Z-pluginparam.patch
 cp sources.conf /path/to/vdrconf/
 cp -R PLUGINS/src/iptv/iptv /path/to/vdrconf/plugins/
 make
@@ -77,28 +76,7 @@ Setup menu:
                                    options which allow you to disable the
                                    individual section filters.
                                    Valid range: 0...7
-- [Red:Channels]                   Opens IPTV channel editor.
 - [Blue:Info]                      Opens IPTV information/statistics menu.
-
-Channel editor menu:
-
-- Because of the different nature and content the VDR channel editor is not
-  best suited for editing of IPTV channels. Therefore an alternative editor
-  is provided which allows more IPTV centric editing of channel information.
-  An IPTV channel editor is accessible via "Setup -> Plugins -> IPTV" and
-  pressing the Red button. The channel editor is functionally similar to
-  VDR's built-in channel editor.
-
-- Scan Sid:  [yes|no]              Defines whether service id shall be
-                                   scanned automatically. Service id is
-                                   used in channel identification and
-                                   EPG information is set according to it.
-                                   This option requires section filtering.
-
-- Scan pids: [yes|no]              Defines whether video and audio pids
-                                   shall be scanned automatically. This
-                                   option is useful with streams missing
-                                   correct PAT/PMT information.
 
 Information menu:
 
@@ -111,17 +89,20 @@ Configuration:
 
 - channels.conf
 
-  TV4;IPTV:40:IPTV|S1P0|EXT|iptvstream.sh|0:P:0:0:680:0:0:4:0:0:0
-  TV3;IPTV:30:IPTV|S0P1|FILE|/video/stream.ts|5:P:0:514:670:2321:0:3:0:0:0
-  TV2;IPTV:20:IPTV|S0P1|HTTP|127.0.0.1/TS/2|3000:P:0:513:660:2321:0:2:0:0:0
-  TV1;IPTV:10:IPTV|S1P0|UDP|127.0.0.1|1234:P:0:512:650:2321:0:1:0:0:0
-           ^  ^    ^    ^   ^         ^    ^
-           |  |    |    |   |         |    Source type ("P")
-           |  |    |    |   |         IP Port Number, File delay (ms), Script parameter
-           |  |    |    |   IP Address, File location, Script location
-           |  |    |    Protocol ("UDP", "HTTP", "FILE", "EXT")
-           |  |    Parameters ("S" Sid scan, "P" Pid scan, "0" disable, "1" enable)
-           |  Plugin ID ("IPTV")
+  TV4;IPTV:40:S=1|P=0|F=EXT|U=iptvstream.sh|A=0:I:0:0:680:0:0:4:0:0:0
+  TV3;IPTV:30:S=0|P=1|F=FILE|U=/video/stream.ts|A=5:I:0:514:670:2321:0:3:0:0:0
+  TV2;IPTV:20:S=0|P=1|F=HTTP|U=127.0.0.1/TS/2|A=3000:I:0:513:660:2321:0:2:0:0:0
+  TV1;IPTV:10:S=1|P=0|F=UDP|U=127.0.0.1|A=1234:I:0:512:650:2321:0:1:0:0:0
+           ^  ^   ^   ^     ^           ^    ^
+           |  |   |   |     |           |    Source type ("I")
+           |  |   |   |     |           Stream parameter (multicast port
+           |  |   |   |     |           number, HTTP port number, file delay
+           |  |   |   |     |           (ms), script parameter)
+           |  |   |   |     Stream address (multicast address, URL, file
+           |  |   |   |     location, script location)
+           |  |   |   Stream protocol ("UDP", "HTTP", "FILE", "EXT")
+           |  |   PID Scan ("0" disable, "1" enable)
+           |  SID Scan ("0" disable, "1" enable)
            Unique enumeration
 
 - UDP multicast rules for iptables firewall
@@ -151,8 +132,7 @@ External streaming:
   devices can be used simultaneously.
 
 - IPTV plugin includes an example script which uses VLC media player for
-  receiving streams, transcoding and handing the result to IPTV plugin. The
-  plugin was tested with VLC version 0.8.6c.
+  receiving streams, transcoding and handing the result to IPTV plugin.
 
 Notes:
 
