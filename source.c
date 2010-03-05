@@ -67,11 +67,11 @@ bool cIptvTransponderParameters::Parse(const char *s)
        ++data;
        switch (*token) {
          case 'S':
-              sidscan = strtol(data, (char **)NULL, 10);
+              sidscan = (int)strtol(data, (char **)NULL, 10);
               found_s = true;
               break;
          case 'P':
-              pidscan = strtol(data, (char **)NULL, 10);
+              pidscan = (int)strtol(data, (char **)NULL, 10);
               found_p = true;
               break;
          case 'F':
@@ -91,7 +91,7 @@ bool cIptvTransponderParameters::Parse(const char *s)
               found_u = true;
               break;
          case 'A':
-              parameter = strtol(data, (char **)NULL, 10);
+              parameter = (int)strtol(data, (char **)NULL, 10);
               found_a = true;
               break;
          default:
