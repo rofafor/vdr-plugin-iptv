@@ -76,13 +76,13 @@ bool cIptvTransponderParameters::Parse(const char *s)
               break;
          case 'F':
               if (strstr(data, "UDP"))
-                  protocol = eProtocolUDP;
+                 protocol = eProtocolUDP;
               else if (strstr(data, "HTTP"))
-                  protocol = eProtocolHTTP;
+                 protocol = eProtocolHTTP;
               else if (strstr(data, "FILE"))
-                  protocol = eProtocolFILE;
+                 protocol = eProtocolFILE;
               else if (strstr(data, "EXT"))
-                  protocol = eProtocolEXT;
+                 protocol = eProtocolEXT;
               else
                  found_u = false;
               break;
@@ -97,9 +97,9 @@ bool cIptvTransponderParameters::Parse(const char *s)
          default:
               break;
          }
-    }
+       }
     str = NULL;
-  }
+    }
 
   if (found_s && found_p && found_f && found_u && found_a)
      return (true);
