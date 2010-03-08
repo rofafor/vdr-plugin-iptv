@@ -49,63 +49,77 @@ cString cIptvTransponderParameters::ToString(char Type) const
 bool cIptvTransponderParameters::Parse(const char *s)
 {
   debug("cIptvTransponderParameters::Parse(): s=%s\n", s);
+  bool result = false;
 
-  const char *delim = "|";
-  char *str = (char *)s;
-  char *saveptr = NULL;
-  char *token = NULL;
-  bool found_s = false;
-  bool found_p = false;
-  bool found_f = true;
-  bool found_u = false;
-  bool found_a = false;
+  if (s && *s) {
+     const char *delim = "|";
+     char *str = strdup(s);
+     char *saveptr = NULL;
+     char *token = NULL;
+     bool found_s = false;
+     bool found_p = false;
+     bool found_f = false;
+     bool found_u = false;
+     bool found_a = false;
 
-  while ((token = (char *)strtok_r(str, delim, &saveptr)) != NULL) {
-    char *data = token + 1;
-
-    if (data && (*data == '=')) {
+     while ((token = strtok_r(str, delim, &saveptr)) != NULL) {
+       char *data = token;
        ++data;
-       switch (*token) {
-         case 'S':
-              sidscan = (int)strtol(data, (char **)NULL, 10);
-              found_s = true;
-              break;
-         case 'P':
-              pidscan = (int)strtol(data, (char **)NULL, 10);
-              found_p = true;
-              break;
-         case 'F':
-              if (strstr(data, "UDP"))
-                 protocol = eProtocolUDP;
-              else if (strstr(data, "HTTP"))
-                 protocol = eProtocolHTTP;
-              else if (strstr(data, "FILE"))
-                 protocol = eProtocolFILE;
-              else if (strstr(data, "EXT"))
-                 protocol = eProtocolEXT;
-              else
-                 found_u = false;
-              break;
-         case 'U':
-              strn0cpy(address, data, sizeof(address));
-              found_u = true;
-              break;
-         case 'A':
-              parameter = (int)strtol(data, (char **)NULL, 10);
-              found_a = true;
-              break;
-         default:
-              break;
-         }
+       if (data && (*data == '=')) {
+          ++data;
+          switch (*token) {
+            case 'S':
+                 sidscan = (int)strtol(data, (char **)NULL, 10);
+                 found_s = true;
+                 break;
+            case 'P':
+                 pidscan = (int)strtol(data, (char **)NULL, 10);
+                 found_p = true;
+                 break;
+            case 'F':
+                 if (strstr(data, "UDP")) {
+                    protocol = eProtocolUDP;
+                    found_f = true;
+                    }
+                 else if (strstr(data, "HTTP")) {
+                    protocol = eProtocolHTTP;
+                    found_f = true;
+                    }
+                 else if (strstr(data, "FILE")) {
+                    protocol = eProtocolFILE;
+                    found_f = true;
+                    }
+                 else if (strstr(data, "EXT")) {
+                    protocol = eProtocolEXT;
+                    found_f = true;
+                    }
+                 break;
+            case 'U':
+                 strn0cpy(address, data, sizeof(address));
+                 found_u = true;
+                 break;
+            case 'A':
+                 parameter = (int)strtol(data, (char **)NULL, 10);
+                 found_a = true;
+                 break;
+            default:
+                 break;
+            }
+          }
+       str = NULL;
        }
-    str = NULL;
-    }
 
-  if (found_s && found_p && found_f && found_u && found_a)
-     return (true);
+     free(str);
 
-  error("Invalid channel parameters: %s\n", s);
-  return (false);
+     if (found_s && found_p && found_f && found_u && found_a)
+        result = true;
+     else
+        error("Invalid channel parameters: %s\n", str);
+     }
+  else
+     error("No channel parameters\n");
+
+  return (result);
 }
 
 // --- cIptvSourceParam ------------------------------------------------------
