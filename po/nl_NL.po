@@ -1,0 +1,166 @@
+# VDR plugin language source file.
+# Copyright (C) 2007 Rolf Ahrenberg & Antti Seppala
+# This file is distributed under the same license as the iptv package.
+# Carel, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: iptv 0.4.0\n"
+"Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
+"POT-Creation-Date: 2010-03-05 09:42+0100\n"
+"PO-Revision-Date: 2007-10-29 21:19+0100\n"
+"Last-Translator: Carel\n"
+"Language-Team: Dutch\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "PAT (0x00)"
+msgstr "PAT (0x00)"
+
+msgid "NIT (0x40)"
+msgstr "NIT (0x40)"
+
+msgid "SDT (0x42)"
+msgstr "SDT (0x42)"
+
+msgid "EIT (0x4E/0x4F)"
+msgstr "EIT (0x4E/0x4F)"
+
+msgid "EIT (0x5X)"
+msgstr "EIT (0x5X)"
+
+msgid "EIT (0x6X)"
+msgstr "EIT (0x6X)"
+
+msgid "TDT (0x70)"
+msgstr "TDT (0x70)"
+
+msgid "Experience the IPTV"
+msgstr "TV programma's via IP"
+
+msgid "IPTV Information"
+msgstr "IPTV informatie"
+
+msgid "General"
+msgstr "Algemeen"
+
+msgid "Pids"
+msgstr "Pids"
+
+msgid "Filters"
+msgstr "Filter"
+
+msgid "Bits/bytes"
+msgstr "Bits/Bytes"
+
+msgid "IPTV information not available!"
+msgstr "IPTV informatie niet beschikbaar!"
+
+msgid "TS buffer size [MB]"
+msgstr "TS buffergrootte [MB]"
+
+msgid ""
+"Define a ringbuffer size for transport streams in megabytes.\n"
+"\n"
+"Smaller sizes help memory consumption, but are more prone to buffer overflows."
+msgstr ""
+"Stel de grootte van de ringbuffer vast voor transportstreams in megabytes.\n"
+"\n"
+"Bij lage waarden zapt VDR sneller maar kunnen leiden tot bufferoverschreidingen en dus dropouts."
+
+msgid "TS buffer prefill ratio [%]"
+msgstr "TS buffer-preload [%]"
+
+msgid ""
+"Define a prefill ratio of the ringbuffer for transport streams before data is transferred to VDR.\n"
+"\n"
+"This is useful if streaming media over a slow or unreliable connection."
+msgstr ""
+"Stel een 'prefil ratio' in voor de ringbuffer voor transportstreams voor de data naar VDR wordt verstuurd.\n"
+"\n"
+"Dit is aan te bevelen bij onbetrouwbare of langzame verbindingen."
+
+msgid "EXT protocol base port"
+msgstr "EXT protocol basispoort"
+
+msgid ""
+"Define a base port used by EXT protocol.\n"
+"\n"
+"The port range is defined by the number of IPTV devices. This setting sets the port which is listened for connections from external applications when using the EXT protocol."
+msgstr ""
+"Bepaal de basispoort voor het EXT protocol.\n"
+"\n"
+"De poortrange wordt bepaald door het aantal IPTV apparaten. Deze poort luistert naar inkomende verbindingen wanneer het EXT protocol wordt gebruikt."
+
+msgid "Use section filtering"
+msgstr "Benutze Abschnittsfilterung"
+
+msgid ""
+"Define whether the section filtering shall be used.\n"
+"\n"
+"Section filtering means that IPTV plugin tries to parse and provide VDR with secondary data about the currently active stream. VDR can then use this data for providing various functionalities such as automatic pid change detection and EPG etc.\n"
+"Enabling this feature does not affect streams that do not contain section data."
+msgstr ""
+"Bepaal of er sectionfilterimg moet worden gebrukt.\n"
+"\n"
+"Bij sectiefiltering zal de IPTV plugin VDR van extra informatie over de stream voorzien. VDR kan dan bijvoorbeeld automatisch de PIDs wijzigen of de EPG tonen.Het gebruik van deze mogelijkheid heeft geen effect op streams die geen sectiedata bevatten."
+
+msgid "Disable filters"
+msgstr "Deactiveer filter"
+
+msgid ""
+"Define number of section filters to be disabled.\n"
+"\n"
+"Certain section filters might cause some unwanted behaviour to VDR such as time being falsely synchronized. By black-listing the filters here useful section data can be left intact for VDR to process."
+msgstr ""
+"Bepaal het aantal de de-activeren sectiefilters.\n"
+"\n"
+"Sommige sctiefilters kunnen ongewenste effecten veroorzaken. Door ze hier op te nemen blijft de data intact zodat VDR het kan blijven gebruiken."
+
+#. TRANSLATORS: note the singular!
+msgid "Disable filter"
+msgstr "Deactiveer filter"
+
+msgid "Define an ill-behaving filter to be blacklisted."
+msgstr "Blacklist een probleem veroorzakend filter "
+
+msgid "Help"
+msgstr "Help"
+
+msgid "UDP"
+msgstr "UDP"
+
+msgid "HTTP"
+msgstr "HTTP"
+
+msgid "FILE"
+msgstr "BESTAND"
+
+msgid "EXT"
+msgstr "EXT"
+
+msgid "Nid"
+msgstr "Nid"
+
+msgid "Tid"
+msgstr "Tid"
+
+msgid "Rid"
+msgstr "Rid"
+
+msgid "Scan sid"
+msgstr "Scan SID"
+
+msgid "Scan pids"
+msgstr "Scan PIDS"
+
+msgid "Protocol"
+msgstr "Protocol"
+
+msgid "Address"
+msgstr "Adres"
+
+msgid "Parameter"
+msgstr "Parameter"
