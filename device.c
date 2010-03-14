@@ -181,7 +181,7 @@ cString cIptvDevice::GetInformation(unsigned int Page)
 bool cIptvDevice::ProvidesSource(int Source) const
 {
   debug("cIptvDevice::ProvidesSource(%d)\n", deviceIndex);
-  return ((Source & cSource::st_Mask) == (IPTV_SOURCE_CHARACTER << 24));
+  return (cSource::IsType(Source, IPTV_SOURCE_CHARACTER));
 }
 
 bool cIptvDevice::ProvidesTransponder(const cChannel *Channel) const

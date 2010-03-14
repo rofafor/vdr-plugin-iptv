@@ -12,11 +12,11 @@
 #include "setup.h"
 #include "device.h"
 
-#if defined(APIVERSNUM) && APIVERSNUM < 10713
-#error "VDR-1.7.13 API version or greater is required!"
+#if defined(APIVERSNUM) && APIVERSNUM < 10714
+#error "VDR-1.7.14 API version or greater is required!"
 #endif
 
-static const char VERSION[]     = "0.4.1";
+static const char VERSION[]     = "0.4.2";
 static const char DESCRIPTION[] = trNOOP("Experience the IPTV");
 
 class cPluginIptv : public cPlugin {

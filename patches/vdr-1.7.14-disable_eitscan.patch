@@ -1,12 +1,12 @@
-diff -Nru vdr-1.7.13-vanilla/eitscan.c vdr-1.7.13-disable_eitscan/eitscan.c
---- vdr-1.7.13-vanilla/eitscan.c	2010-02-07 14:12:05.000000000 +0200
-+++ vdr-1.7.13-disable_eitscan/eitscan.c	2010-03-09 16:30:02.000000000 +0200
+diff -Nru vdr-1.7.14-vanilla/eitscan.c vdr-1.7.14-disable_eitscan/eitscan.c
+--- vdr-1.7.14-vanilla/eitscan.c	2010-03-14 16:57:06.000000000 +0200
++++ vdr-1.7.14-disable_eitscan/eitscan.c	2010-03-14 17:34:16.000000000 +0200
 @@ -146,7 +146,7 @@
                 if (Device) {
                    for (cScanData *ScanData = scanList->First(); ScanData; ScanData = scanList->Next(ScanData)) {
                        const cChannel *Channel = ScanData->GetChannel();
 -                      if (Channel) {
-+                      if (Channel && ((Channel->Source() & cSource::st_Mask) != ('I' << 24))) {
++                      if (Channel && !cSource::IsType(Channel->Source(), 'I')) {
                           if (!Channel->Ca() || Channel->Ca() == Device->DeviceNumber() + 1 || Channel->Ca() >= CA_ENCRYPTED_MIN) {
                              if (Device->ProvidesTransponder(Channel)) {
                                 if (!Device->Receiving()) {
