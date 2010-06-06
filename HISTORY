@@ -138,6 +138,6 @@ VDR Plugin 'iptv' Revision History
 - Fixed channel parameter corruption.
 - Added Dutch translation (Thanks to Carel).
 
-2010-xx-xx: Version 0.4.2
+2010-06-06: Version 0.4.2
 
-- Updated for vdr-1.7.14.
+- Updated for vdr-1.7.15.

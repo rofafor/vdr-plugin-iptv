@@ -122,7 +122,9 @@ void cPidScanner::Process(const uint8_t* buf)
            cChannel *IptvChannel = Channels.GetByChannelID(channel.GetChannelID());
            if (IptvChannel) {
               int Apids[MAXAPIDS + 1] = { 0 }; // these lists are zero-terminated
+              int Atypes[MAXAPIDS + 1] = { 0 };
               int Dpids[MAXDPIDS + 1] = { 0 };
+              int Dtypes[MAXDPIDS + 1] = { 0 };
               int Spids[MAXSPIDS + 1] = { 0 };
               char ALangs[MAXAPIDS][MAXLANGCODE2] = { "" };
               char DLangs[MAXDPIDS][MAXLANGCODE2] = { "" };
@@ -136,18 +138,23 @@ void cPidScanner::Process(const uint8_t* buf)
                  Apid = 0; // No detected audio pid
               for (unsigned int i = 1; i < MAXAPIDS; ++i) {
                   Apids[i] = IptvChannel->Apid(i);
+                  Atypes[i] = IptvChannel->Atype(i);
                   if (Apids[i] && (Apids[i] == Apid))
                      foundApid = true;
                   }
-              if (!foundApid)
+              if (!foundApid) {
                  Apids[0] = Apid;
-              for (unsigned int i = 0; i < MAXDPIDS; ++i)
+                 Atypes[0] = 4;
+                 }
+              for (unsigned int i = 0; i < MAXDPIDS; ++i) {
                   Dpids[i] = IptvChannel->Dpid(i);
+                  Dtypes[i] = IptvChannel->Dtype(i);
+                  }
               for (unsigned int i = 0; i < MAXSPIDS; ++i)
                   Spids[i] = IptvChannel->Spid(i);
               debug("cPidScanner::Process(): Vpid=0x%04X, Apid=0x%04X\n", Vpid, Apid);
               int Vtype = IptvChannel->Vtype();
-              IptvChannel->SetPids(Vpid, Ppid, Vtype, Apids, ALangs, Dpids, DLangs, Spids, SLangs, Tpid);
+              IptvChannel->SetPids(Vpid, Ppid, Vtype, Apids, Atypes, ALangs, Dpids, Dtypes, DLangs, Spids, SLangs, Tpid);
               }
            Channels.Unlock();
            process = false;
