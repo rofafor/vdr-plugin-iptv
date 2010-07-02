@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: iptv 0.4.0\n"
+"Project-Id-Version: iptv 0.4.3\n"
 "Report-Msgid-Bugs-To: Rolf Ahrenberg\n"
-"POT-Creation-Date: 2010-03-04 18:12+0200\n"
+"POT-Creation-Date: 2010-07-02 15:45+0300\n"
 "PO-Revision-Date: 2008-07-13 03:28+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team: Italian\n"
@@ -151,8 +151,9 @@ msgstr "Tid"
 msgid "Rid"
 msgstr "Rid"
 
-msgid "Scan sid"
-msgstr "Scansione Sid"
+#, fuzzy
+msgid "Scan section ids"
+msgstr "Scansione Pids"
 
 msgid "Scan pids"
 msgstr "Scansione Pids"
@@ -165,3 +166,6 @@ msgstr "Indirizzo"
 
 msgid "Parameter"
 msgstr "Parametro"
+
+#~ msgid "Scan Sid/Nid/Tid"
+#~ msgstr "Scansione Sid/Nid/Tid"

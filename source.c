@@ -160,14 +160,14 @@ cOsdItem *cIptvSourceParam::GetOsdItem(void)
 {
   debug("cIptvSourceParam::GetOsdItem()\n");
   switch (param++) {
-    case  0: return new cMenuEditIntItem( tr("Nid"),       &nid,      0);
-    case  1: return new cMenuEditIntItem( tr("Tid"),       &tid,      0);
-    case  2: return new cMenuEditIntItem( tr("Rid"),       &rid,      0);
-    case  3: return new cMenuEditBoolItem(tr("Scan sid"),  &itp.sidscan);
-    case  4: return new cMenuEditBoolItem(tr("Scan pids"), &itp.pidscan);
-    case  5: return new cMenuEditStraItem(tr("Protocol"),  &itp.protocol,  ELEMENTS(protocols), protocols);
-    case  6: return new cMenuEditStrItem( tr("Address"),    itp.address,   sizeof(itp.address));
-    case  7: return new cMenuEditIntItem( tr("Parameter"), &itp.parameter, 0,                   0xFFFF);
+    case  0: return new cMenuEditIntItem( tr("Nid"),              &nid, 0);
+    case  1: return new cMenuEditIntItem( tr("Tid"),              &tid, 0);
+    case  2: return new cMenuEditIntItem( tr("Rid"),              &rid, 0);
+    case  3: return new cMenuEditBoolItem(tr("Scan section ids"), &itp.sidscan);
+    case  4: return new cMenuEditBoolItem(tr("Scan pids"),        &itp.pidscan);
+    case  5: return new cMenuEditStraItem(tr("Protocol"),         &itp.protocol,  ELEMENTS(protocols), protocols);
+    case  6: return new cMenuEditStrItem( tr("Address"),           itp.address,   sizeof(itp.address));
+    case  7: return new cMenuEditIntItem( tr("Parameter"),        &itp.parameter, 0,                   0xFFFF);
     default: return NULL;
     }
   return NULL;

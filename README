@@ -100,8 +100,8 @@ Configuration:
            |  |   |   |     Stream address (multicast address, URL, file
            |  |   |   |     location, script location)
            |  |   |   Stream protocol ("UDP", "HTTP", "FILE", "EXT")
-           |  |   PID Scan ("0" disable, "1" enable)
-           |  SID Scan ("0" disable, "1" enable)
+           |  |   Pid scanner ("0" disable, "1" enable)
+           |  Section id (Sid/Nid/Tid) scanner ("0" disable, "1" enable)
            Unique enumeration
 
 - UDP multicast rules for iptables firewall

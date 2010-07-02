@@ -14,6 +14,9 @@
 class cSidScanner : public cFilter {
 private:
   cChannel channel;
+  bool sidFound;
+  bool nidFound;
+  bool tidFound;
 
 protected:
   virtual void Process(u_short Pid, u_char Tid, const u_char *Data, int Length);
