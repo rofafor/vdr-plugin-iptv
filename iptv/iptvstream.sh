@@ -44,6 +44,7 @@ case ${PARAMETER} in
         URL=""
         WIDTH=720
         HEIGHT=576
+        FPS=25
         ;;
     2)
         URL=""
@@ -65,6 +66,9 @@ fi
 TRANSCODE_OPTS="vcodec=${VCODEC},acodec=${ACODEC},vb=${VBITRATE},ab=${ABITRATE}"
 if [ -n "${WIDTH}" -a -n "${HEIGHT}" ] ; then
     TRANSCODE_OPTS="${TRANSCODE_OPTS},width=${WIDTH},height=${HEIGHT}"
+fi
+if [ -n "${FPS}" ] ; then
+    TRANSCODE_OPTS="${TRANSCODE_OPTS},fps=${FPS}"
 fi
 
 # Create unique pids for the stream
