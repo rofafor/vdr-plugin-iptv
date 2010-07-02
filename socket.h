@@ -12,13 +12,14 @@
 
 class cIptvSocket {
 protected:
-  int socketPort;
   int socketDesc;
+  int socketPort;
+  in_addr_t inetAddr;
   struct sockaddr_in sockAddr;
   bool isActive;
 
 protected:
-  bool OpenSocket(const int Port, const bool isUdp);
+  bool OpenSocket(const in_addr_t InetAddr, const int Port, const bool isUdp);
   void CloseSocket(void);
 
 public:
@@ -31,7 +32,7 @@ public:
   cIptvUdpSocket();
   virtual ~cIptvUdpSocket();
   virtual int Read(unsigned char* BufferAddr, unsigned int BufferLen);
-  bool OpenSocket(const int Port);
+  bool OpenSocket(const in_addr_t InetAddr, const int Port);
 };
 
 class cIptvTcpSocket : public cIptvSocket {
@@ -39,7 +40,7 @@ public:
   cIptvTcpSocket();
   virtual ~cIptvTcpSocket();
   virtual int Read(unsigned char* BufferAddr, unsigned int BufferLen);
-  bool OpenSocket(const int Port);
+  bool OpenSocket(const in_addr_t InetAddr, const int Port);
 };
 
 #endif // __IPTV_SOCKET_H

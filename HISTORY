@@ -146,3 +146,4 @@ VDR Plugin 'iptv' Revision History
 
 - Renamed Sid scanner to section id scanner and added
   experimental Tid/Nid support into it.
+- Added validation for source addresses of socket data.

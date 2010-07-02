@@ -18,11 +18,13 @@
 #include "socket.h"
 
 cIptvSocket::cIptvSocket()
-: socketPort(0),
-  socketDesc(-1),
+: socketDesc(-1),
+  socketPort(0),
+  inetAddr(INADDR_NONE),
   isActive(false)
 {
   debug("cIptvSocket::cIptvSocket()\n");
+  memset(&sockAddr, 0, sizeof(sockAddr));
 }
 
 cIptvSocket::~cIptvSocket()
@@ -32,9 +34,11 @@ cIptvSocket::~cIptvSocket()
   CloseSocket();
 }
 
-bool cIptvSocket::OpenSocket(const int Port, const bool isUdp)
+bool cIptvSocket::OpenSocket(const in_addr_t InetAddr, const int Port, const bool isUdp)
 {
   debug("cIptvSocket::OpenSocket()\n");
+  if (inetAddr != InetAddr)
+     inetAddr = InetAddr;
   // If socket is there already and it is bound to a different port, it must
   // be closed first
   if (Port != socketPort) {
@@ -57,7 +61,7 @@ bool cIptvSocket::OpenSocket(const int Port, const bool isUdp)
      ERROR_IF_FUNC(setsockopt(socketDesc, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0, "setsockopt()",
                    CloseSocket(), return false);
      // Bind socket
-     memset(&sockAddr, '\0', sizeof(sockAddr));
+     memset(&sockAddr, 0, sizeof(sockAddr));
      sockAddr.sin_family = AF_INET;
      sockAddr.sin_port = htons((uint16_t)(Port & 0xFFFF));
      sockAddr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -78,6 +82,9 @@ void cIptvSocket::CloseSocket(void)
   if (socketDesc >= 0) {
      close(socketDesc);
      socketDesc = -1;
+     socketPort = 0;
+     inetAddr = INADDR_NONE;
+     memset(&sockAddr, 0, sizeof(sockAddr));
      }
 }
 
@@ -92,10 +99,10 @@ cIptvUdpSocket::~cIptvUdpSocket()
   debug("cIptvUdpSocket::~cIptvUdpSocket()\n");
 }
 
-bool cIptvUdpSocket::OpenSocket(const int Port)
+bool cIptvUdpSocket::OpenSocket(const in_addr_t InetAddr, const int Port)
 {
   debug("cIptvUdpSocket::OpenSocket()\n");
-  return cIptvSocket::OpenSocket(Port, true);
+  return cIptvSocket::OpenSocket(InetAddr, Port, true);
 }
 
 int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
@@ -108,40 +115,67 @@ int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
      }
   socklen_t addrlen = sizeof(sockAddr);
   int len = 0;
+  struct msghdr msgh;
+  struct cmsghdr *cmsg;
+  struct iovec iov;
+  char cbuf[256];
+  // Initialize iov and msgh structures
+  memset(&msgh, 0, sizeof(struct msghdr));
+  iov.iov_base = BufferAddr;
+  iov.iov_len = BufferLen;
+  msgh.msg_control = cbuf;
+  msgh.msg_controllen = sizeof(cbuf);
+  msgh.msg_name = &sockAddr;
+  msgh.msg_namelen = addrlen;
+  msgh.msg_iov  = &iov;
+  msgh.msg_iovlen = 1;
+  msgh.msg_flags = 0;
   // Read data from socket
   if (isActive && socketDesc && BufferAddr && (BufferLen > 0))
-     len = (int)recvfrom(socketDesc, BufferAddr, BufferLen, MSG_DONTWAIT,
-                    (struct sockaddr *)&sockAddr, &addrlen);
-  if ((len > 0) && (BufferAddr[0] == TS_SYNC_BYTE)) {
-     return len;
-     }
-  else if (len > 3) {
-     // http://www.networksorcery.com/enp/rfc/rfc2250.txt
-     // version
-     unsigned int v = (BufferAddr[0] >> 6) & 0x03;
-     // extension bit
-     unsigned int x = (BufferAddr[0] >> 4) & 0x01;
-     // cscr count
-     unsigned int cc = BufferAddr[0] & 0x0F;
-     // payload type: MPEG2 TS = 33
-     //unsigned int pt = readBuffer[1] & 0x7F;
-     // header lenght
-     unsigned int headerlen = (3 + cc) * (unsigned int)sizeof(uint32_t);
-     // check if extension
-     if (x) {
-        // extension header length
-        unsigned int ehl = (((BufferAddr[headerlen + 2] & 0xFF) << 8) |
-                            (BufferAddr[headerlen + 3] & 0xFF));
-        // update header length
-        headerlen += (ehl + 1) * (unsigned int)sizeof(uint32_t);
-        }
-     // Check that rtp is version 2 and payload contains multiple of TS packet data
-     if ((v == 2) && (((len - headerlen) % TS_SIZE) == 0) &&
-         (BufferAddr[headerlen] == TS_SYNC_BYTE)) {
-        // Set argument point to payload in read buffer
-        memmove(BufferAddr, &BufferAddr[headerlen], (len - headerlen));
-        return (len - headerlen);
-        }
+     len = (int)recvmsg(socketDesc, &msgh, MSG_DONTWAIT);
+  if (len < 0)
+     return -1;
+  else if (len > 0) {
+     // Process auxiliary received data
+     for (cmsg = CMSG_FIRSTHDR(&msgh); cmsg != NULL; cmsg = CMSG_NXTHDR(&msgh, cmsg)) {
+         if ((cmsg->cmsg_level == SOL_IP) && (cmsg->cmsg_type == IP_PKTINFO)) {
+            struct in_pktinfo *i = (struct in_pktinfo *)CMSG_DATA(cmsg);
+            // Validate source address
+            if (i->ipi_addr.s_addr == inetAddr) {
+               if (BufferAddr[0] == TS_SYNC_BYTE)
+                  return len;
+               else if (len > 3) {
+                  // http://www.networksorcery.com/enp/rfc/rfc2250.txt
+                  // version
+                  unsigned int v = (BufferAddr[0] >> 6) & 0x03;
+                  // extension bit
+                  unsigned int x = (BufferAddr[0] >> 4) & 0x01;
+                  // cscr count
+                  unsigned int cc = BufferAddr[0] & 0x0F;
+                  // payload type: MPEG2 TS = 33
+                  //unsigned int pt = readBuffer[1] & 0x7F;
+                  // header lenght
+                  unsigned int headerlen = (3 + cc) * (unsigned int)sizeof(uint32_t);
+                  // check if extension
+                  if (x) {
+                     // extension header length
+                     unsigned int ehl = (((BufferAddr[headerlen + 2] & 0xFF) << 8) |
+                                         (BufferAddr[headerlen + 3] & 0xFF));
+                     // update header length
+                     headerlen += (ehl + 1) * (unsigned int)sizeof(uint32_t);
+                     }
+                  // Check that rtp is version 2 and payload contains multiple of TS packet data
+                  if ((v == 2) && (((len - headerlen) % TS_SIZE) == 0) &&
+                      (BufferAddr[headerlen] == TS_SYNC_BYTE)) {
+                     // Set argument point to payload in read buffer
+                     memmove(BufferAddr, &BufferAddr[headerlen], (len - headerlen));
+                     return (len - headerlen);
+                     }
+                  }
+               return 0;
+               }
+            }
+         }
      }
   return 0;
 }
@@ -157,10 +191,10 @@ cIptvTcpSocket::~cIptvTcpSocket()
   debug("cIptvTcpSocket::~cIptvTcpSocket()\n");
 }
 
-bool cIptvTcpSocket::OpenSocket(const int Port)
+bool cIptvTcpSocket::OpenSocket(const in_addr_t InetAddr, const int Port)
 {
   debug("cIptvTcpSocket::OpenSocket()\n");
-  return cIptvSocket::OpenSocket(Port, false);
+  return cIptvSocket::OpenSocket(InetAddr, Port, false);
 }
 
 int cIptvTcpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
@@ -171,10 +205,13 @@ int cIptvTcpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
      error("Invalid socket in %s\n", __FUNCTION__);
      return -1;
      }
+  int len = 0;
   socklen_t addrlen = sizeof(sockAddr);
   // Read data from socket
   if (isActive && socketDesc && BufferAddr && (BufferLen > 0))
-     return (int)recvfrom(socketDesc, BufferAddr, BufferLen, MSG_DONTWAIT,
-                     (struct sockaddr *)&sockAddr, &addrlen);
-  return 0;
+     len = recvfrom(socketDesc, BufferAddr, BufferLen, MSG_DONTWAIT,
+                    (struct sockaddr *)&sockAddr, &addrlen);
+  //if (inetAddr != sockAddr.sin_addr.s_addr)
+  //   return -1;
+  return len;
 }

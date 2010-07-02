@@ -40,9 +40,6 @@ bool cIptvProtocolHttp::Connect(void)
   debug("cIptvProtocolHttp::Connect()\n");
   // Check that stream address is valid
   if (!isActive && !isempty(streamAddr) && !isempty(streamPath)) {
-     // Ensure that socket is valid
-     OpenSocket(socketPort);
-
      // First try only the IP address
      sockAddr.sin_addr.s_addr = inet_addr(streamAddr);
 
@@ -60,6 +57,9 @@ bool cIptvProtocolHttp::Connect(void)
 
         sockAddr.sin_addr.s_addr = inet_addr(*host->h_addr_list);
         }
+
+     // Ensure that socket is valid
+     OpenSocket(sockAddr.sin_addr.s_addr, socketPort);
 
      int err = connect(socketDesc, (struct sockaddr *)&sockAddr, sizeof(sockAddr));
      // Non-blocking sockets always report in-progress error when connected

@@ -39,7 +39,7 @@ bool cIptvProtocolUdp::JoinMulticast(void)
   // Check that stream address is valid
   if (!isActive && !isempty(streamAddr)) {
      // Ensure that socket is valid
-     OpenSocket(socketPort);
+     OpenSocket(inet_addr(streamAddr), socketPort);
      // Join a new multicast group
      struct ip_mreq mreq;
      mreq.imr_multiaddr.s_addr = inet_addr(streamAddr);
@@ -59,7 +59,7 @@ bool cIptvProtocolUdp::DropMulticast(void)
   // Check that stream address is valid
   if (isActive && !isempty(streamAddr)) {
       // Ensure that socket is valid
-      OpenSocket(socketPort);
+      OpenSocket(inet_addr(streamAddr), socketPort);
       // Drop the multicast group
       struct ip_mreq mreq;
       mreq.imr_multiaddr.s_addr = inet_addr(streamAddr);
