@@ -193,7 +193,7 @@ bool cIptvDevice::ProvidesTransponder(const cChannel *Channel) const
 bool cIptvDevice::ProvidesChannel(const cChannel *Channel, int Priority, bool *NeedsDetachReceivers) const
 {
   bool result = false;
-  bool needsDetachReceivers = false;
+  bool needsDetachReceivers = true;
 
   debug("cIptvDevice::ProvidesChannel(%d)\n", deviceIndex);
   if (ProvidesTransponder(Channel))

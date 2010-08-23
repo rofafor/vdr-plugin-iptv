@@ -148,3 +148,5 @@ VDR Plugin 'iptv' Revision History
   experimental Tid/Nid support into it.
 - Added validation for source addresses of socket data.
 - Fixed audio pid detection in pid scanner.
+- Changed ProvidesChannel() to set the need of detaching
+  receivers due to VDR's channel selection mechanism.
