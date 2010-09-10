@@ -16,7 +16,7 @@
 #error "VDR-1.7.15 API version or greater is required!"
 #endif
 
-static const char VERSION[]     = "0.4.3";
+       const char VERSION[]     = "0.4.3";
 static const char DESCRIPTION[] = trNOOP("Experience the IPTV");
 
 class cPluginIptv : public cPlugin {

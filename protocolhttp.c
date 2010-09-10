@@ -85,10 +85,10 @@ bool cIptvProtocolHttp::Connect(void)
      // Formulate and send HTTP request
      cString buffer = cString::sprintf("GET %s HTTP/1.1\r\n"
                                        "Host: %s\r\n"
-                                       "User-Agent: vdr-iptv\r\n"
+                                       "User-Agent: vdr-%s/%s\r\n"
                                        "Range: bytes=0-\r\n"
                                        "Connection: Close\r\n"
-                                       "\r\n", streamPath, streamAddr);
+                                       "\r\n", streamPath, streamAddr, PLUGIN_NAME_I18N, VERSION);
 
      debug("Sending http request: %s\n", *buffer);
      ssize_t err2 = send(socketDesc, buffer, strlen(buffer), 0);
@@ -189,8 +189,9 @@ bool cIptvProtocolHttp::ProcessHeaders(void)
        }
     else
        responseFound = true;
-    if (response != 200) {
-       error("%s\n", buf);
+    // Allow only 'OK' and 'Partial Content'
+    if ((response != 200) && (response != 206)) {
+       error("Invalid HTTP response (%d): %s\n", response, buf);
        return false;
        }
     }

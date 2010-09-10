@@ -154,6 +154,13 @@ Notes:
   script and the iptvstream-notrap.sh script should be used instead in these
   cases.
 
+- If received MPEG-2 TS streams carry CA descriptors, you'll have to apply
+  "disable_ca_updates" patch to the VDR in order to get rid of "Channel not
+  available" messages.
+
+- EIT scanning functionality can be disabled for all IPTV channels by applying
+  the "disable_eitscan" patch to the VDR.
+
 Acknowledgements:
 
 - The IPTV section filtering code is derived from Linux kernel.

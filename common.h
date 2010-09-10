@@ -77,5 +77,7 @@ struct section_filter_table_type {
 
 extern const section_filter_table_type section_filter_table[SECTION_FILTER_TABLE_SIZE];
 
+extern const char VERSION[];
+
 #endif // __IPTV_COMMON_H
 
