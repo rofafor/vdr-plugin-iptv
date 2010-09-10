@@ -37,14 +37,15 @@ cIptvSocket::~cIptvSocket()
 bool cIptvSocket::OpenSocket(const in_addr_t InetAddr, const int Port, const bool isUdp)
 {
   debug("cIptvSocket::OpenSocket()\n");
-  if (inetAddr != InetAddr)
-     inetAddr = InetAddr;
   // If socket is there already and it is bound to a different port, it must
   // be closed first
   if (Port != socketPort) {
      debug("cIptvSocket::OpenSocket(): Socket tear-down\n");
      CloseSocket();
      }
+  // inetAddr must be set after CloseSocket()
+  if (inetAddr != InetAddr)
+     inetAddr = InetAddr;
   // Bind to the socket if it is not active already
   if (socketDesc < 0) {
      int yes = 1;
