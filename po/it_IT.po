@@ -151,9 +151,8 @@ msgstr "Tid"
 msgid "Rid"
 msgstr "Rid"
 
-#, fuzzy
 msgid "Scan section ids"
-msgstr "Scansione Pids"
+msgstr "Scansione Section Ids"
 
 msgid "Scan pids"
 msgstr "Scansione Pids"
@@ -166,6 +165,3 @@ msgstr "Indirizzo"
 
 msgid "Parameter"
 msgstr "Parametro"
-
-#~ msgid "Scan Sid/Nid/Tid"
-#~ msgstr "Scansione Sid/Nid/Tid"

@@ -59,7 +59,10 @@ bool cIptvSocket::OpenSocket(const in_addr_t InetAddr, const int Port, const boo
      ERROR_IF_FUNC(fcntl(socketDesc, F_SETFL, O_NONBLOCK), "fcntl()",
                    CloseSocket(), return false);
      // Allow multiple sockets to use the same PORT number
-     ERROR_IF_FUNC(setsockopt(socketDesc, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0, "setsockopt()",
+     ERROR_IF_FUNC(setsockopt(socketDesc, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0, "setsockopt(SO_REUSEADDR)",
+                   CloseSocket(), return false);
+     // Allow packet information to be fetched
+     ERROR_IF_FUNC(setsockopt(socketDesc, SOL_IP, IP_PKTINFO, &yes, sizeof(yes)) < 0, "setsockopt(IP_PKTINFO)",
                    CloseSocket(), return false);
      // Bind socket
      memset(&sockAddr, 0, sizeof(sockAddr));
