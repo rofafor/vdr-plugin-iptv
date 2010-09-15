@@ -45,7 +45,11 @@ public:
   cIptvTcpSocket();
   virtual ~cIptvTcpSocket();
   virtual int Read(unsigned char* BufferAddr, unsigned int BufferLen);
-  bool OpenSocket(const int Port);
+  bool OpenSocket(const int Port, const char *StreamAddr);
+  void CloseSocket(void);
+  bool ConnectSocket(void);
+  bool ReadChar(unsigned char* BufferAddr, unsigned int TimeoutMs);
+  bool Write(const char* BufferAddr, unsigned int BufferLen);
 };
 
 #endif // __IPTV_SOCKET_H

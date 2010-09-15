@@ -164,6 +164,9 @@ Notes:
 - Source address validation can be enabled for UDP protocol separated by 
   adding the source address after a ';' character: "U=239.192.0.1;239.192.0.2"
 
+- Section id and pid scanners should be disabled after the correct data is
+  found. This can be made via VDR's channel editor.
+
 Acknowledgements:
 
 - The IPTV section filtering code is derived from Linux kernel.

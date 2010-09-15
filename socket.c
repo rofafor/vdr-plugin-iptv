@@ -52,7 +52,7 @@ bool cIptvSocket::OpenSocket(const int Port, const bool isUdp)
         socketDesc = socket(PF_INET, SOCK_STREAM, 0);
      ERROR_IF_RET(socketDesc < 0, "socket()", return false);
      // Make it use non-blocking I/O to avoid stuck read calls
-     ERROR_IF_FUNC(fcntl(socketDesc, F_SETFL, O_NONBLOCK), "fcntl()",
+     ERROR_IF_FUNC(fcntl(socketDesc, F_SETFL, O_NONBLOCK), "fcntl(O_NONBLOCK)",
                    CloseSocket(), return false);
      // Allow multiple sockets to use the same PORT number
      ERROR_IF_FUNC(setsockopt(socketDesc, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0, "setsockopt(SO_REUSEADDR)",
@@ -174,8 +174,11 @@ int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
   // Read data from socket
   if (isActive && socketDesc && BufferAddr && (BufferLen > 0))
      len = (int)recvmsg(socketDesc, &msgh, MSG_DONTWAIT);
-  ERROR_IF_RET(len < 0, "recvmsg()", return -1);
-  if (len > 0) {
+  if (len < 0) {
+     ERROR_IF(errno != EAGAIN, "recvmsg()");
+     return -1;
+     }
+  else if (len > 0) {
      // Process auxiliary received data and validate source address
      for (cmsg = CMSG_FIRSTHDR(&msgh); (sourceAddr != INADDR_ANY) && (cmsg != NULL); cmsg = CMSG_NXTHDR(&msgh, cmsg)) {
          if ((cmsg->cmsg_level == SOL_IP) && (cmsg->cmsg_type == IP_PKTINFO)) {
@@ -231,10 +234,64 @@ cIptvTcpSocket::~cIptvTcpSocket()
   debug("cIptvTcpSocket::~cIptvTcpSocket()\n");
 }
 
-bool cIptvTcpSocket::OpenSocket(const int Port)
+bool cIptvTcpSocket::OpenSocket(const int Port, const char *StreamAddr)
 {
   debug("cIptvTcpSocket::OpenSocket()\n");
+
+  // First try only the IP address
+  sockAddr.sin_addr.s_addr = inet_addr(StreamAddr);
+
+  if (sockAddr.sin_addr.s_addr == INADDR_NONE) {
+     debug("Cannot convert %s directly to internet address\n", StreamAddr);
+
+     // It may be a host name, get the name
+     struct hostent *host;
+     host = gethostbyname(StreamAddr);
+     if (!host) {
+        char tmp[64];
+        error("gethostbyname() failed: %s is not valid address: %s", StreamAddr, strerror_r(h_errno, tmp, sizeof(tmp)));
+        return false;
+        }
+
+     sockAddr.sin_addr.s_addr = inet_addr(*host->h_addr_list);
+     }
+
   return cIptvSocket::OpenSocket(Port, false);
+}
+
+void cIptvTcpSocket::CloseSocket(void)
+{
+  debug("cIptvTcpSocket::CloseSocket()\n");
+  isActive = false;
+  cIptvSocket::CloseSocket();
+}
+
+bool cIptvTcpSocket::ConnectSocket(void)
+{
+  //debug("cIptvTcpSocket::ConnectSocket()\n");
+  if (!isActive && (socketDesc >= 0)) {
+     int retval = connect(socketDesc, (struct sockaddr *)&sockAddr, sizeof(sockAddr));
+     // Non-blocking sockets always report in-progress error when connected
+     ERROR_IF_RET(retval < 0 && errno != EINPROGRESS, "connect()", return false);
+     // Select with 800ms timeout on the socket completion, check if it is writable
+     retval = select_single_desc(socketDesc, 800000, true);
+     if (retval < 0)
+        return retval;
+     // Select has returned. Get socket errors if there are any
+     retval = 0;
+     socklen_t len = sizeof(retval);
+     getsockopt(socketDesc, SOL_SOCKET, SO_ERROR, &retval, &len);
+     // If not any errors, then socket must be ready and connected
+     if (retval != 0) {
+        char tmp[64];
+        error("Connect() failed: %s", strerror_r(retval, tmp, sizeof(tmp)));
+        return false;
+        }
+     // Update connection flag
+     isActive = true;
+     }
+
+  return true;
 }
 
 int cIptvTcpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
@@ -252,4 +309,42 @@ int cIptvTcpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
      len = (int)recvfrom(socketDesc, BufferAddr, BufferLen, MSG_DONTWAIT,
                          (struct sockaddr *)&sockAddr, &addrlen);
   return len;
+}
+
+bool cIptvTcpSocket::ReadChar(unsigned char* BufferAddr, unsigned int TimeoutMs)
+{
+  //debug("cIptvTcpSocket::ReadChar()\n");
+  // Error out if socket not initialized
+  if (socketDesc <= 0) {
+     error("Invalid socket in %s\n", __FUNCTION__);
+     return false;
+     }
+  socklen_t addrlen = sizeof(sockAddr);
+  // Wait 500ms for data
+  int retval = select_single_desc(socketDesc, 1000 * TimeoutMs, false);
+  // Check if error
+  if (retval < 0)
+     return false;
+  // Check if data available
+  else if (retval) {
+     retval = (int)recvfrom(socketDesc, BufferAddr, 1, MSG_DONTWAIT,
+                            (struct sockaddr *)&sockAddr, &addrlen);
+     if (retval <= 0)
+        return false;
+     }
+
+  return true;
+}
+
+bool cIptvTcpSocket::Write(const char* BufferAddr, unsigned int BufferLen)
+{
+  //debug("cIptvTcpSocket::Write()\n");
+  // Error out if socket not initialized
+  if (socketDesc <= 0) {
+     error("Invalid socket in %s\n", __FUNCTION__);
+     return false;
+     }
+  ERROR_IF_RET(send(socketDesc, BufferAddr, BufferLen, 0) < 0, "send()", return false);
+
+  return true;
 }
