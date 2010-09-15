@@ -36,6 +36,8 @@ public:
   virtual int Read(unsigned char* BufferAddr, unsigned int BufferLen);
   bool OpenSocket(const int Port, const in_addr_t SourceAddr = INADDR_ANY);
   void CloseSocket(void);
+  bool JoinMulticast(const in_addr_t StreamAddr);
+  bool DropMulticast(const in_addr_t StreamAddr);
 };
 
 class cIptvTcpSocket : public cIptvSocket {

@@ -35,59 +35,25 @@ cIptvProtocolUdp::~cIptvProtocolUdp()
   free(sourceAddr);
 }
 
-bool cIptvProtocolUdp::JoinMulticast(void)
-{
-  debug("cIptvProtocolUdp::JoinMulticast()\n");
-  // Check that stream address is valid
-  if (!isActive && !isempty(streamAddr)) {
-     // Ensure that socket is valid
-     OpenSocket(socketPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
-     // Join a new multicast group
-     struct ip_mreq mreq;
-     mreq.imr_multiaddr.s_addr = inet_addr(streamAddr);
-     mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-     int err = setsockopt(socketDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq,
-                          sizeof(mreq));
-     ERROR_IF_RET(err < 0, "setsockopt()", return false);
-     // Update multicasting flag
-     isActive = true;
-     }
-  return true;
-}
-
-bool cIptvProtocolUdp::DropMulticast(void)
-{
-  debug("cIptvProtocolUdp::DropMulticast()\n");
-  // Check that stream address is valid
-  if (isActive && !isempty(streamAddr)) {
-      // Ensure that socket is valid
-      OpenSocket(socketPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
-      // Drop the multicast group
-      struct ip_mreq mreq;
-      mreq.imr_multiaddr.s_addr = inet_addr(streamAddr);
-      mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-      int err = setsockopt(socketDesc, IPPROTO_IP, IP_DROP_MEMBERSHIP, &mreq,
-                           sizeof(mreq));
-      ERROR_IF_RET(err < 0, "setsockopt()", return false);
-      // Update multicasting flag
-      isActive = false;
-     }
-  return true;
-}
-
 bool cIptvProtocolUdp::Open(void)
 {
   debug("cIptvProtocolUdp::Open()\n");
-  // Join a new multicast group
-  JoinMulticast();
+  if (!isempty(streamAddr)) {
+     // Join a new multicast group
+     OpenSocket(socketPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
+     JoinMulticast(inet_addr(streamAddr));
+     }
   return true;
 }
 
 bool cIptvProtocolUdp::Close(void)
 {
   debug("cIptvProtocolUdp::Close()\n");
-  // Drop the multicast group
-  DropMulticast();
+  if (!isempty(streamAddr)) {
+     // Drop the multicast group
+     OpenSocket(socketPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
+     DropMulticast(inet_addr(streamAddr));
+     }
   // Close the socket
   CloseSocket();
   return true;
@@ -103,7 +69,10 @@ bool cIptvProtocolUdp::Set(const char* Location, const int Parameter, const int 
   debug("cIptvProtocolUdp::Set(): Location=%s Parameter=%d Index=%d\n", Location, Parameter, Index);
   if (!isempty(Location)) {
      // Drop the multicast group
-     DropMulticast();
+     if (!isempty(streamAddr)) {
+        OpenSocket(socketPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
+        DropMulticast(inet_addr(streamAddr));
+        }
      // Update stream address and port
      streamAddr = strcpyrealloc(streamAddr, Location);
      char *p = strstr(streamAddr, ";");
@@ -115,7 +84,10 @@ bool cIptvProtocolUdp::Set(const char* Location, const int Parameter, const int 
         sourceAddr = strcpyrealloc(sourceAddr, "");
      socketPort = Parameter;
      // Join a new multicast group
-     JoinMulticast();
+     if (!isempty(streamAddr)) {
+        OpenSocket(socketPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
+        JoinMulticast(inet_addr(streamAddr));
+        }
      }
   return true;
 }

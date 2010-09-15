@@ -113,6 +113,39 @@ void cIptvUdpSocket::CloseSocket(void)
   cIptvSocket::CloseSocket();
 }
 
+bool cIptvUdpSocket::JoinMulticast(const in_addr_t StreamAddr)
+{
+  debug("cIptvUdpSocket::JoinMulticast()\n");
+  // Check if socket exists
+  if (!isActive && (socketDesc >= 0)) {
+     // Join a new multicast group
+     struct ip_mreq mreq;
+     mreq.imr_multiaddr.s_addr = StreamAddr;
+     mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+     ERROR_IF_RET(setsockopt(socketDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0, "setsockopt(IP_ADD_MEMBERSHIP)", return false);
+     // Update multicasting flag
+     isActive = true;
+     }
+  return true;
+}
+
+bool cIptvUdpSocket::DropMulticast(const in_addr_t StreamAddr)
+{
+  debug("cIptvUdpSocket::DropMulticast()\n");
+  // Check if socket exists
+  if (isActive && (socketDesc >= 0)) {
+     // Drop the existing multicast group
+     struct ip_mreq mreq;
+     mreq.imr_multiaddr.s_addr = StreamAddr;
+     mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+     ERROR_IF_RET(setsockopt(socketDesc, IPPROTO_IP, IP_DROP_MEMBERSHIP, &mreq, sizeof(mreq)) < 0, "setsockopt(IP_DROP_MEMBERSHIP)", return false);
+     // Update multicasting flag
+     isActive = false;
+     }
+  return true;
+}
+
+
 int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
 {
   //debug("cIptvUdpSocket::Read()\n");

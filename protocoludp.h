@@ -17,10 +17,6 @@ private:
   char* streamAddr;
   char* sourceAddr;
 
-private:
-  bool JoinMulticast(void);
-  bool DropMulticast(void);
-
 public:
   cIptvProtocolUdp();
   virtual ~cIptvProtocolUdp();
