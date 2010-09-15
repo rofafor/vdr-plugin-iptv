@@ -19,9 +19,10 @@
 #include "socket.h"
 
 cIptvProtocolUdp::cIptvProtocolUdp()
+: streamAddr(strdup("")),
+  sourceAddr(strdup(""))
 {
   debug("cIptvProtocolUdp::cIptvProtocolUdp()\n");
-  streamAddr = strdup("");
 }
 
 cIptvProtocolUdp::~cIptvProtocolUdp()
@@ -31,6 +32,7 @@ cIptvProtocolUdp::~cIptvProtocolUdp()
   cIptvProtocolUdp::Close();
   // Free allocated memory
   free(streamAddr);
+  free(sourceAddr);
 }
 
 bool cIptvProtocolUdp::JoinMulticast(void)
@@ -39,7 +41,7 @@ bool cIptvProtocolUdp::JoinMulticast(void)
   // Check that stream address is valid
   if (!isActive && !isempty(streamAddr)) {
      // Ensure that socket is valid
-     OpenSocket(inet_addr(streamAddr), socketPort);
+     OpenSocket(socketPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
      // Join a new multicast group
      struct ip_mreq mreq;
      mreq.imr_multiaddr.s_addr = inet_addr(streamAddr);
@@ -59,7 +61,7 @@ bool cIptvProtocolUdp::DropMulticast(void)
   // Check that stream address is valid
   if (isActive && !isempty(streamAddr)) {
       // Ensure that socket is valid
-      OpenSocket(inet_addr(streamAddr), socketPort);
+      OpenSocket(socketPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
       // Drop the multicast group
       struct ip_mreq mreq;
       mreq.imr_multiaddr.s_addr = inet_addr(streamAddr);
@@ -100,14 +102,21 @@ bool cIptvProtocolUdp::Set(const char* Location, const int Parameter, const int 
 {
   debug("cIptvProtocolUdp::Set(): Location=%s Parameter=%d Index=%d\n", Location, Parameter, Index);
   if (!isempty(Location)) {
-    // Drop the multicast group
-    DropMulticast();
-    // Update stream address and port
-    streamAddr = strcpyrealloc(streamAddr, Location);
-    socketPort = Parameter;
-    // Join a new multicast group
-    JoinMulticast();
-    }
+     // Drop the multicast group
+     DropMulticast();
+     // Update stream address and port
+     streamAddr = strcpyrealloc(streamAddr, Location);
+     char *p = strstr(streamAddr, ";");
+     if (p) {
+        sourceAddr = strcpyrealloc(sourceAddr, p + 1);
+        *p = 0;
+        }
+    else
+        sourceAddr = strcpyrealloc(sourceAddr, "");
+     socketPort = Parameter;
+     // Join a new multicast group
+     JoinMulticast();
+     }
   return true;
 }
 

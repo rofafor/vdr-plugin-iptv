@@ -15,6 +15,7 @@
 class cIptvProtocolUdp : public cIptvUdpSocket, public cIptvProtocolIf {
 private:
   char* streamAddr;
+  char* sourceAddr;
 
 private:
   bool JoinMulticast(void);

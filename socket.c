@@ -20,11 +20,10 @@
 cIptvSocket::cIptvSocket()
 : socketDesc(-1),
   socketPort(0),
-  inetAddr(INADDR_NONE),
   isActive(false)
 {
   debug("cIptvSocket::cIptvSocket()\n");
-  memset(&sockAddr, 0, sizeof(sockAddr));
+  memset(&sockAddr, '\0', sizeof(sockAddr));
 }
 
 cIptvSocket::~cIptvSocket()
@@ -34,7 +33,7 @@ cIptvSocket::~cIptvSocket()
   CloseSocket();
 }
 
-bool cIptvSocket::OpenSocket(const in_addr_t InetAddr, const int Port, const bool isUdp)
+bool cIptvSocket::OpenSocket(const int Port, const bool isUdp)
 {
   debug("cIptvSocket::OpenSocket()\n");
   // If socket is there already and it is bound to a different port, it must
@@ -43,9 +42,6 @@ bool cIptvSocket::OpenSocket(const in_addr_t InetAddr, const int Port, const boo
      debug("cIptvSocket::OpenSocket(): Socket tear-down\n");
      CloseSocket();
      }
-  // inetAddr must be set after CloseSocket()
-  if (inetAddr != InetAddr)
-     inetAddr = InetAddr;
   // Bind to the socket if it is not active already
   if (socketDesc < 0) {
      int yes = 1;
@@ -65,7 +61,7 @@ bool cIptvSocket::OpenSocket(const in_addr_t InetAddr, const int Port, const boo
      ERROR_IF_FUNC(setsockopt(socketDesc, SOL_IP, IP_PKTINFO, &yes, sizeof(yes)) < 0, "setsockopt(IP_PKTINFO)",
                    CloseSocket(), return false);
      // Bind socket
-     memset(&sockAddr, 0, sizeof(sockAddr));
+     memset(&sockAddr, '\0', sizeof(sockAddr));
      sockAddr.sin_family = AF_INET;
      sockAddr.sin_port = htons((uint16_t)(Port & 0xFFFF));
      sockAddr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -87,13 +83,13 @@ void cIptvSocket::CloseSocket(void)
      close(socketDesc);
      socketDesc = -1;
      socketPort = 0;
-     inetAddr = INADDR_NONE;
      memset(&sockAddr, 0, sizeof(sockAddr));
      }
 }
 
 // UDP socket class
 cIptvUdpSocket::cIptvUdpSocket()
+: sourceAddr(INADDR_ANY)
 {
   debug("cIptvUdpSocket::cIptvUdpSocket()\n");
 }
@@ -103,10 +99,18 @@ cIptvUdpSocket::~cIptvUdpSocket()
   debug("cIptvUdpSocket::~cIptvUdpSocket()\n");
 }
 
-bool cIptvUdpSocket::OpenSocket(const in_addr_t InetAddr, const int Port)
+bool cIptvUdpSocket::OpenSocket(const int Port, const in_addr_t SourceAddr)
 {
   debug("cIptvUdpSocket::OpenSocket()\n");
-  return cIptvSocket::OpenSocket(InetAddr, Port, true);
+  sourceAddr = SourceAddr;
+  return cIptvSocket::OpenSocket(Port, true);
+}
+
+void cIptvUdpSocket::CloseSocket(void)
+{
+  debug("cIptvUdpSocket::CloseSocket()\n");
+  sourceAddr = INADDR_ANY;
+  cIptvSocket::CloseSocket();
 }
 
 int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
@@ -137,15 +141,16 @@ int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
   // Read data from socket
   if (isActive && socketDesc && BufferAddr && (BufferLen > 0))
      len = (int)recvmsg(socketDesc, &msgh, MSG_DONTWAIT);
-  if (len < 0)
-     return -1;
-  else if (len > 0) {
+  ERROR_IF_RET(len < 0, "recvmsg()", return -1);
+  if (len > 0) {
      // Process auxiliary received data and validate source address
-     for (cmsg = CMSG_FIRSTHDR(&msgh); cmsg != NULL; cmsg = CMSG_NXTHDR(&msgh, cmsg)) {
+     for (cmsg = CMSG_FIRSTHDR(&msgh); (sourceAddr != INADDR_ANY) && (cmsg != NULL); cmsg = CMSG_NXTHDR(&msgh, cmsg)) {
          if ((cmsg->cmsg_level == SOL_IP) && (cmsg->cmsg_type == IP_PKTINFO)) {
             struct in_pktinfo *i = (struct in_pktinfo *)CMSG_DATA(cmsg);
-            if (i->ipi_addr.s_addr != inetAddr)
+            if (i->ipi_addr.s_addr != sourceAddr) {
+               //debug("Discard packet due to invalid source address: %s", inet_ntoa(i->ipi_addr));
                return 0;
+               }
             }
          }
      if (BufferAddr[0] == TS_SYNC_BYTE)
@@ -193,10 +198,10 @@ cIptvTcpSocket::~cIptvTcpSocket()
   debug("cIptvTcpSocket::~cIptvTcpSocket()\n");
 }
 
-bool cIptvTcpSocket::OpenSocket(const in_addr_t InetAddr, const int Port)
+bool cIptvTcpSocket::OpenSocket(const int Port)
 {
   debug("cIptvTcpSocket::OpenSocket()\n");
-  return cIptvSocket::OpenSocket(InetAddr, Port, false);
+  return cIptvSocket::OpenSocket(Port, false);
 }
 
 int cIptvTcpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
@@ -213,7 +218,5 @@ int cIptvTcpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
   if (isActive && socketDesc && BufferAddr && (BufferLen > 0))
      len = (int)recvfrom(socketDesc, BufferAddr, BufferLen, MSG_DONTWAIT,
                          (struct sockaddr *)&sockAddr, &addrlen);
-  //if (inetAddr != sockAddr.sin_addr.s_addr)
-  //   return -1;
   return len;
 }

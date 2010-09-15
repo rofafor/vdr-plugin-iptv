@@ -19,10 +19,10 @@
 #include "protocolhttp.h"
 
 cIptvProtocolHttp::cIptvProtocolHttp()
+: streamAddr(NULL),
+  streamPath(strdup("/"))
 {
   debug("cIptvProtocolHttp::cIptvProtocolHttp()\n");
-  streamAddr = strdup("");
-  streamPath = strdup("/");
 }
 
 cIptvProtocolHttp::~cIptvProtocolHttp()
@@ -59,7 +59,7 @@ bool cIptvProtocolHttp::Connect(void)
         }
 
      // Ensure that socket is valid
-     OpenSocket(sockAddr.sin_addr.s_addr, socketPort);
+     OpenSocket(socketPort);
 
      int err = connect(socketDesc, (struct sockaddr *)&sockAddr, sizeof(sockAddr));
      // Non-blocking sockets always report in-progress error when connected

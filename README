@@ -161,6 +161,9 @@ Notes:
 - EIT scanning functionality can be disabled for all IPTV channels by applying
   the "disable_eitscan" patch to the VDR.
 
+- Source address validation can be enabled for UDP protocol separated by 
+  adding the source address after a ';' character: "U=239.192.0.1;239.192.0.2"
+
 Acknowledgements:
 
 - The IPTV section filtering code is derived from Linux kernel.

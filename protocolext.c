@@ -109,7 +109,7 @@ bool cIptvProtocolExt::Open(void)
   if (!strlen(*scriptFile))
      return false;
   // Create the listening socket
-  OpenSocket(INADDR_LOOPBACK, socketPort);
+  OpenSocket(socketPort);
   // Execute the external script
   ExecuteScript();
   isActive = true;
