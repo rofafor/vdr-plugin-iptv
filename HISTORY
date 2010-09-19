@@ -151,3 +151,7 @@ VDR Plugin 'iptv' Revision History
 - Changed ProvidesChannel() to set the need of detaching
   receivers due to VDR's channel selection mechanism.
 - Enabled partial content responses for HTTP protocol.
+
+2010-xx-xx: Version 0.4.4
+
+- Updated for vdr-1.7.16.
