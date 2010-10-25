@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # internetradio.sh is used by the VDR iptv plugin to transcode an internet
 # radio stream.

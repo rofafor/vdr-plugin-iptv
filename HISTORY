@@ -142,7 +142,7 @@ VDR Plugin 'iptv' Revision History
 
 - Updated for vdr-1.7.15.
 
-2010-09-19: Version 0.4.3
+2010-xx-xx: Version 0.4.3
 
 - Updated for vdr-1.7.16.
 - Renamed Sid scanner to section id scanner and added
@@ -152,3 +152,5 @@ VDR Plugin 'iptv' Revision History
 - Changed ProvidesChannel() to set the need of detaching
   receivers due to VDR's channel selection mechanism.
 - Enabled partial content responses for HTTP protocol.
+- Fixed EXT protocol execution (Thanks to Peter Holik).
+- Changed scripts to use bash instead of sh.

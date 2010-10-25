@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # vlc2iptv is used by the VDR iptv plugin to transcode external sources
 #

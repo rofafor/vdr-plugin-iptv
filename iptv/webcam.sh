@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # webcam.sh is used by the VDR iptv plugin to transcode an internet radio
 # stream remuxed with images (e.g. webcam) to provide a video stream.
