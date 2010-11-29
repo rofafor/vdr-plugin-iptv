@@ -153,4 +153,3 @@ VDR Plugin 'iptv' Revision History
   receivers due to VDR's channel selection mechanism.
 - Enabled partial content responses for HTTP protocol.
 - Fixed EXT protocol execution (Thanks to Peter Holik).
-- Changed scripts to use bash instead of sh.

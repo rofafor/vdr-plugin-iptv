@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # iptvstream.sh can be used by the VDR iptv plugin to transcode external
 # sources

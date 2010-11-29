@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # linein.sh is used by the VDR iptv plugin to transcode line-in of
 # a soundcard.
