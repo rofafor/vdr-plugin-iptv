@@ -38,9 +38,9 @@ cIptvProtocolUdp::~cIptvProtocolUdp()
 bool cIptvProtocolUdp::Open(void)
 {
   debug("cIptvProtocolUdp::Open()\n");
+  OpenSocket(socketPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
   if (!isempty(streamAddr)) {
      // Join a new multicast group
-     OpenSocket(socketPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
      JoinMulticast(inet_addr(streamAddr));
      }
   return true;
@@ -56,6 +56,9 @@ bool cIptvProtocolUdp::Close(void)
      }
   // Close the socket
   CloseSocket();
+  // Reset stream and source addresses
+  streamAddr = strcpyrealloc(streamAddr, "");
+  sourceAddr = strcpyrealloc(sourceAddr, "");
   return true;
 }
 
@@ -80,7 +83,7 @@ bool cIptvProtocolUdp::Set(const char* Location, const int Parameter, const int 
         sourceAddr = strcpyrealloc(sourceAddr, p + 1);
         *p = 0;
         }
-    else
+     else
         sourceAddr = strcpyrealloc(sourceAddr, "");
      socketPort = Parameter;
      // Join a new multicast group
