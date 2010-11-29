@@ -41,6 +41,7 @@ private:
   bool pidScanEnabled;
   cRingBufferLinear *tsBuffer;
   int tsBufferPrefill;
+  tChannelID channelId;
   cIptvProtocolUdp *pUdpProtocol;
   cIptvProtocolHttp *pHttpProtocol;
   cIptvProtocolFile *pFileProtocol;
@@ -49,7 +50,7 @@ private:
   cPidScanner *pPidScanner;
   cSidScanner *pSidScanner;
   cMutex mutex;
-  cIptvSectionFilter* secfilters[eMaxSecFilterCount];
+  cIptvSectionFilter *secfilters[eMaxSecFilterCount];
 
   // constructor & destructor
 public:

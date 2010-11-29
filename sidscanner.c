@@ -11,14 +11,19 @@
 #include "sidscanner.h"
 
 cSidScanner::cSidScanner(void)
+: channelId(tChannelID::InvalidID),
+  sidFound(false),
+  nidFound(false),
+  tidFound(false)
 {
   debug("cSidScanner::cSidScanner()\n");
-  channel = cChannel();
-  sidFound = false;
-  nidFound = false;
-  tidFound = false;
   Set(0x00, 0x00);  // PAT
   Set(0x10, 0x40);  // NIT
+}
+
+cSidScanner::~cSidScanner()
+{
+  debug("cSidScanner::~cSidScanner()\n");
 }
 
 void cSidScanner::SetStatus(bool On)
@@ -27,19 +32,13 @@ void cSidScanner::SetStatus(bool On)
   cFilter::SetStatus(On);
 }
 
-void cSidScanner::SetChannel(const cChannel *Channel)
+void cSidScanner::SetChannel(const tChannelID &ChannelId)
 {
+  debug("cSidScanner::SetChannel(): %s\n", *ChannelId->ToString());
+  channelId = ChannelId;
   sidFound = false;
   nidFound = false;
   tidFound = false;
-  if (Channel) {
-     debug("cSidScanner::SetChannel(): %s\n", Channel->Parameters());
-     channel = *Channel;
-     }
-  else {
-     debug("cSidScanner::SetChannel()\n");
-     channel = cChannel();
-     }
 }
 
 void cSidScanner::Process(u_short Pid, u_char Tid, const u_char *Data, int Length)
@@ -47,7 +46,7 @@ void cSidScanner::Process(u_short Pid, u_char Tid, const u_char *Data, int Lengt
   int newSid = -1, newNid = -1, newTid = -1;
 
   //debug("cSidScanner::Process()\n");
-  if (channel.GetChannelID().Valid()) {
+  if (channelId.Valid()) {
      if ((Pid == 0x00) && (Tid == 0x00)) {
         debug("cSidScanner::Process(): Pid=%d Tid=%02X\n", Pid, Tid);
         SI::PAT pat(Data, false);
@@ -56,7 +55,7 @@ void cSidScanner::Process(u_short Pid, u_char Tid, const u_char *Data, int Lengt
         SI::PAT::Association assoc;
         for (SI::Loop::Iterator it; pat.associationLoop.getNext(assoc, it); ) {
             if (!assoc.isNITPid()) {
-               if (assoc.getServiceId() != channel.Sid()) {
+               if (assoc.getServiceId() != channelId.Sid()) {
                   debug("cSidScanner::Process(): Sid=%d\n", assoc.getServiceId());
                   newSid = assoc.getServiceId();
                   }
@@ -72,14 +71,14 @@ void cSidScanner::Process(u_short Pid, u_char Tid, const u_char *Data, int Lengt
            return;
         SI::NIT::TransportStream ts;
         for (SI::Loop::Iterator it; nit.transportStreamLoop.getNext(ts, it); ) {
-            if (ts.getTransportStreamId() != channel.Tid()) {
+            if (ts.getTransportStreamId() != channelId.Tid()) {
                debug("cSidScanner::Process(): TSid=%d\n", ts.getTransportStreamId());
                newTid = ts.getTransportStreamId();
                }
             tidFound = true;
             break; // default to the first one
             }
-        if (nit.getNetworkId() != channel.Nid()) {
+        if (nit.getNetworkId() != channelId.Nid()) {
            debug("cSidScanner::Process(): Nid=%d\n", ts.getTransportStreamId());
            newNid = nit.getNetworkId();
            }
@@ -89,14 +88,14 @@ void cSidScanner::Process(u_short Pid, u_char Tid, const u_char *Data, int Lengt
   if ((newSid >= 0) || (newNid >= 0) || (newTid >= 0)) {
      if (!Channels.Lock(true, 10))
         return;
-     cChannel *IptvChannel = Channels.GetByChannelID(channel.GetChannelID());
+     cChannel *IptvChannel = Channels.GetByChannelID(channelId);
      if (IptvChannel)
         IptvChannel->SetId((newNid < 0) ? IptvChannel->Nid() : newNid, (newTid < 0) ? IptvChannel->Tid() : newTid,
                            (newSid < 0) ? IptvChannel->Sid() : newSid, IptvChannel->Rid());
      Channels.Unlock();
      }
   if (sidFound && nidFound && tidFound) {
-     SetChannel(NULL);
+     SetChannel(tChannelID::InvalidID);
      SetStatus(false);
      }
 }

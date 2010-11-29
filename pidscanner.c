@@ -13,8 +13,9 @@
 #define PIDSCANNER_VPID_COUNT      5     /* minimum count of video pid samples for pid detection */
 #define PIDSCANNER_PID_DELTA_COUNT 100   /* minimum count of pid samples for audio/video only pid detection */
 
-cPidScanner::cPidScanner(void) 
+cPidScanner::cPidScanner(void)
 : timeout(0),
+  channelId(tChannelID::InvalidID),
   process(true),
   Vpid(0xFFFF),
   Apid(0xFFFF),
@@ -22,24 +23,17 @@ cPidScanner::cPidScanner(void)
   numApids(0)
 {
   debug("cPidScanner::cPidScanner()\n");
-  channel = cChannel();
 }
 
-cPidScanner::~cPidScanner() 
+cPidScanner::~cPidScanner()
 {
   debug("cPidScanner::~cPidScanner()\n");
 }
 
-void cPidScanner::SetChannel(const cChannel *Channel)
+void cPidScanner::SetChannel(const tChannelID &ChannelId)
 {
-  if (Channel) {
-     debug("cPidScanner::SetChannel(): %s\n", Channel->Parameters());
-     channel = *Channel;
-     }
-  else {
-     debug("cPidScanner::SetChannel()\n");
-     channel = cChannel();
-     }
+  debug("cPidScanner::SetChannel(): %s\n", *ChannelId->ToString());
+  channelId = ChannelId;
   Vpid = 0xFFFF;
   numVpids = 0;
   Apid = 0xFFFF;
@@ -119,7 +113,7 @@ void cPidScanner::Process(const uint8_t* buf)
               timeout.Set(PIDSCANNER_TIMEOUT_IN_MS);
               return;
               }
-           cChannel *IptvChannel = Channels.GetByChannelID(channel.GetChannelID());
+           cChannel *IptvChannel = Channels.GetByChannelID(channelId);
            if (IptvChannel) {
               int Apids[MAXAPIDS + 1] = { 0 }; // these lists are zero-terminated
               int Atypes[MAXAPIDS + 1] = { 0 };

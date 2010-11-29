@@ -14,7 +14,7 @@
 class cPidScanner {
 private:
   cTimeMs timeout;
-  cChannel channel;
+  tChannelID channelId;
   bool process;
   int Vpid;
   int Apid;
@@ -24,7 +24,7 @@ private:
 public:
   cPidScanner(void);
   ~cPidScanner();
-  void SetChannel(const cChannel *Channel);
+  void SetChannel(const tChannelID &ChannelId);
   void Process(const uint8_t* buf);
 };
 

@@ -21,7 +21,8 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   isPacketDelivered(false),
   isOpenDvr(false),
   sidScanEnabled(false),
-  pidScanEnabled(false)
+  pidScanEnabled(false),
+  channelId(tChannelID::InvalidID)
 {
   unsigned int bufsize = (unsigned int)MEGABYTE(IptvConfig.GetTsBufferSize());
   bufsize -= (bufsize % TS_SIZE);
@@ -35,13 +36,13 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   pFileProtocol = new cIptvProtocolFile();
   pExtProtocol = new cIptvProtocolExt();
   pIptvStreamer = new cIptvStreamer(tsBuffer, (100 * TS_SIZE));
-  pPidScanner = new cPidScanner;
+  pPidScanner = new cPidScanner();
   // Initialize filter pointers
   memset(secfilters, '\0', sizeof(secfilters));
   // Start section handler for iptv device
   StartSectionHandler();
   // Sid scanner must be created after the section handler
-  pSidScanner = new cSidScanner;
+  pSidScanner = new cSidScanner();
   if (pSidScanner)
      AttachFilter(pSidScanner);
   // Check if dvr fifo exists
@@ -193,7 +194,7 @@ bool cIptvDevice::ProvidesTransponder(const cChannel *Channel) const
 bool cIptvDevice::ProvidesChannel(const cChannel *Channel, int Priority, bool *NeedsDetachReceivers) const
 {
   bool result = false;
-  bool needsDetachReceivers = Receiving(true);
+  bool needsDetachReceivers = Receiving(true) && Channel && !(Channel->GetChannelID() == channelId);
 
   debug("cIptvDevice::ProvidesChannel(%d)\n", deviceIndex);
   if (ProvidesTransponder(Channel))
@@ -240,10 +241,11 @@ bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
   sidScanEnabled = itp.SidScan() ? true : false;
   pidScanEnabled = itp.PidScan() ? true : false;
   if (pIptvStreamer->Set(itp.Address(), itp.Parameter(), deviceIndex, protocol)) {
+     channelId = Channel->GetChannelID();
      if (sidScanEnabled && pSidScanner && IptvConfig.GetSectionFiltering())
-        pSidScanner->SetChannel(Channel);
+        pSidScanner->SetChannel(channelId);
      if (pidScanEnabled && pPidScanner)
-        pPidScanner->SetChannel(Channel);
+        pPidScanner->SetChannel(channelId);
      }
   return true;
 }

@@ -13,7 +13,7 @@
 
 class cSidScanner : public cFilter {
 private:
-  cChannel channel;
+  tChannelID channelId;
   bool sidFound;
   bool nidFound;
   bool tidFound;
@@ -24,7 +24,8 @@ protected:
 
 public:
   cSidScanner(void);
-  void SetChannel(const cChannel *Channel);
+  ~cSidScanner();
+  void SetChannel(const tChannelID &ChannelId);
   void Open() { SetStatus(true); }
   void Close() { SetStatus(false); }
 };
