@@ -34,7 +34,7 @@ void cSidScanner::SetStatus(bool On)
 
 void cSidScanner::SetChannel(const tChannelID &ChannelId)
 {
-  debug("cSidScanner::SetChannel(): %s\n", *ChannelId->ToString());
+  debug("cSidScanner::SetChannel(): %s\n", *ChannelId.ToString());
   channelId = ChannelId;
   sidFound = false;
   nidFound = false;

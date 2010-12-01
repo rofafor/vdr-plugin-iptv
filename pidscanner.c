@@ -32,7 +32,7 @@ cPidScanner::~cPidScanner()
 
 void cPidScanner::SetChannel(const tChannelID &ChannelId)
 {
-  debug("cPidScanner::SetChannel(): %s\n", *ChannelId->ToString());
+  debug("cPidScanner::SetChannel(): %s\n", *ChannelId.ToString());
   channelId = ChannelId;
   Vpid = 0xFFFF;
   numVpids = 0;
