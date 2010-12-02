@@ -39,7 +39,7 @@ bool cIptvProtocolHttp::Connect(void)
 {
   debug("cIptvProtocolHttp::Connect()\n");
   // Check that stream address is valid
-  if (!isempty(streamAddr) && !isempty(streamPath)) {
+  if (!isActive && !isempty(streamAddr) && !isempty(streamPath)) {
      // Ensure that socket is valid and connect
      OpenSocket(socketPort, streamAddr);
      if (!ConnectSocket()) {
@@ -58,12 +58,13 @@ bool cIptvProtocolHttp::Connect(void)
         CloseSocket();
         return false;
         }
-
      // Now process headers
      if (!ProcessHeaders()) {
         CloseSocket();
         return false;
         }
+     // Update active flag
+     isActive = true;
      }
   return true;
 }
@@ -71,8 +72,12 @@ bool cIptvProtocolHttp::Connect(void)
 bool cIptvProtocolHttp::Disconnect(void)
 {
   debug("cIptvProtocolHttp::Disconnect()\n");
-  // Close the socket
-  CloseSocket();
+  if (isActive) {
+     // Close the socket
+     CloseSocket();
+     // Update active flag
+     isActive = false;
+     }
   return true;
 }
 
@@ -82,10 +87,11 @@ bool cIptvProtocolHttp::GetHeaderLine(char* dest, unsigned int destLen,
   debug("cIptvProtocolHttp::GetHeaderLine()\n");
   bool linefeed = false;
   bool newline = false;
-  unsigned char buf[4096];
-  unsigned char *bufptr = buf;
-  memset(buf, '\0', sizeof(buf));
+  char *bufptr = dest;
   recvLen = 0;
+
+  if (!dest)
+     return false;
 
   while (!newline || !linefeed) {
     // Wait 500ms for data
@@ -102,8 +108,8 @@ bool cIptvProtocolHttp::GetHeaderLine(char* dest, unsigned int destLen,
           ++recvLen;
           }
        ++bufptr;
-       // Check that buffers won't be exceeded
-       if (recvLen >= sizeof(buf) || recvLen >= destLen) {
+       // Check that buffer won't be exceeded
+       if (recvLen >= destLen) {
           error("Header wouldn't fit into buffer\n");
           recvLen = 0;
           return false;
@@ -114,7 +120,6 @@ bool cIptvProtocolHttp::GetHeaderLine(char* dest, unsigned int destLen,
        return false;
        }
     }
-  memcpy(dest, buf, recvLen);
   return true;
 }
 

@@ -48,7 +48,7 @@ public:
   bool OpenSocket(const int Port, const char *StreamAddr);
   void CloseSocket(void);
   bool ConnectSocket(void);
-  bool ReadChar(unsigned char* BufferAddr, unsigned int TimeoutMs);
+  bool ReadChar(char* BufferAddr, unsigned int TimeoutMs);
   bool Write(const char* BufferAddr, unsigned int BufferLen);
 };
 

@@ -262,7 +262,6 @@ bool cIptvTcpSocket::OpenSocket(const int Port, const char *StreamAddr)
 void cIptvTcpSocket::CloseSocket(void)
 {
   debug("cIptvTcpSocket::CloseSocket()\n");
-  isActive = false;
   cIptvSocket::CloseSocket();
 }
 
@@ -287,8 +286,6 @@ bool cIptvTcpSocket::ConnectSocket(void)
         error("Connect() failed: %s", strerror_r(retval, tmp, sizeof(tmp)));
         return false;
         }
-     // Update connection flag
-     isActive = true;
      }
 
   return true;
@@ -311,7 +308,7 @@ int cIptvTcpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
   return len;
 }
 
-bool cIptvTcpSocket::ReadChar(unsigned char* BufferAddr, unsigned int TimeoutMs)
+bool cIptvTcpSocket::ReadChar(char* BufferAddr, unsigned int TimeoutMs)
 {
   //debug("cIptvTcpSocket::ReadChar()\n");
   // Error out if socket not initialized
