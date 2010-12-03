@@ -20,7 +20,7 @@ private:
   unsigned int useBytes;
   unsigned int sectionFiltering;
   int disabledFilters[SECTION_FILTER_TABLE_SIZE];
-  char configDirectory[255];
+  char configDirectory[PATH_MAX];
 
 public:
   cIptvConfig();

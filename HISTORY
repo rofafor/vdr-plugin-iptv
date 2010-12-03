@@ -155,3 +155,4 @@ VDR Plugin 'iptv' Revision History
 - Fixed EXT protocol execution (Thanks to Peter Holik).
 - Disable detaching of receivers if retuned to an existing
   channel (Thanks to Zdeněk Kopřivík).
+- Canonicalized the configuration directory.
