@@ -267,7 +267,7 @@ void cIptvTcpSocket::CloseSocket(void)
 
 bool cIptvTcpSocket::ConnectSocket(void)
 {
-  //debug("cIptvTcpSocket::ConnectSocket()\n");
+  debug("cIptvTcpSocket::ConnectSocket()\n");
   if (!isActive && (socketDesc >= 0)) {
      int retval = connect(socketDesc, (struct sockaddr *)&sockAddr, sizeof(sockAddr));
      // Non-blocking sockets always report in-progress error when connected
