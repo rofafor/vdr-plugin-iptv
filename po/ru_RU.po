@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: iptv 0.4.3\n"
+"Project-Id-Version: vdr-iptv 0.4.3\n"
 "Report-Msgid-Bugs-To: <see README>\n"
 "POT-Creation-Date: 2010-10-06 21:49+0300\n"
 "PO-Revision-Date: 2010-09-09 09:09+0300\n"
