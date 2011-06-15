@@ -130,3 +130,6 @@ dist: $(I18Npo) clean
 
 clean:
 	@-rm -f $(OBJS) $(DEPFILE) *.so *.tgz core* *~ $(PODIR)/*.mo $(PODIR)/*.pot
+
+cppcheck: $(OBJS)
+	@cppcheck --enable=information,style,unusedFunction -v -f $(OBJS:%.o=%.c)

@@ -215,7 +215,7 @@ bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
   cIptvTransponderParameters itp(Channel->Parameters());
 
   debug("cIptvDevice::SetChannelDevice(%d)\n", deviceIndex);
-  
+
   if (isempty(itp.Address())) {
      error("Unrecognized IPTV address: %s", Channel->Parameters());
      return false;
@@ -372,7 +372,6 @@ bool cIptvDevice::IsBuffering(void)
 
 bool cIptvDevice::GetTSPacket(uchar *&Data)
 {
-  int Count = 0;
   //debug("cIptvDevice::GetTSPacket(%d)\n", deviceIndex);
   if (tsBuffer && !IsBuffering()) {
      if (isPacketDelivered) {
@@ -381,6 +380,7 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
         // Update buffer statistics
         AddBufferStatistic(TS_SIZE, tsBuffer->Available());
         }
+     int Count = 0;
      uchar *p = tsBuffer->Get(Count);
      if (p && Count >= TS_SIZE) {
         if (*p != TS_SYNC_BYTE) {

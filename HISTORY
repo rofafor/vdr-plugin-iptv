@@ -157,3 +157,4 @@ VDR Plugin 'iptv' Revision History
   channel (Thanks to Zdeněk Kopřivík).
 - Canonicalized the configuration directory.
 - Added support for LDFLAGS.
+- Added cppcheck target into Makefile.

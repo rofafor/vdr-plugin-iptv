@@ -91,10 +91,10 @@ void cIptvSectionFilter::New(void)
 
 int cIptvSectionFilter::Filter(void)
 {
-  uint8_t neq = 0;
-  int i;
-
   if (secbuf) {
+     int i;
+     uint8_t neq = 0;
+
      for (i = 0; i < DMX_MAX_FILTER_SIZE; ++i) {
          uint8_t local_xor = (uint8_t)(filter_value[i] ^ secbuf[i]);
          if (maskandmode[i] & local_xor)
