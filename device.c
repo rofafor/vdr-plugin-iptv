@@ -179,6 +179,18 @@ cString cIptvDevice::GetInformation(unsigned int Page)
   return info;
 }
 
+int cIptvDevice::SignalStrength(void) const
+{
+  debug("cIptvDevice::SignalStrength(%d)\n", deviceIndex);
+  return (100);
+}
+
+int cIptvDevice::SignalQuality(void) const
+{
+  debug("cIptvDevice::SignalQuality(%d)\n", deviceIndex);
+  return (100);
+}
+
 bool cIptvDevice::ProvidesSource(int Source) const
 {
   debug("cIptvDevice::ProvidesSource(%d)\n", deviceIndex);

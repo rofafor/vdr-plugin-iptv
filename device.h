@@ -75,6 +75,10 @@ private:
   bool DeleteFilter(unsigned int Index);
   bool IsBlackListed(u_short Pid, u_char Tid, u_char Mask) const;
 
+  // for channel info
+  virtual int SignalStrength(void) const;
+  virtual int SignalQuality(void) const;
+
   // for channel selection
 public:
   virtual bool ProvidesSource(int Source) const;
