@@ -144,7 +144,7 @@ VDR Plugin 'iptv' Revision History
 
 2010-xx-xx: Version 0.4.3
 
-- Updated for vdr-1.7.16.
+- Updated for vdr-1.7.21.
 - Renamed Sid scanner to section id scanner and added
   experimental Tid/Nid support into it.
 - Added optional source address validation for UDP protocol.
