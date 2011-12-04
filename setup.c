@@ -66,7 +66,7 @@ void cIptvMenuInfo::Display(void)
 
 eOSState cIptvMenuInfo::ProcessKey(eKeys Key)
 {
-  switch (Key) {
+  switch (int(Key)) {
     case kUp|k_Repeat:
     case kUp:
     case kDown|k_Repeat:
