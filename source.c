@@ -127,7 +127,9 @@ cIptvSourceParam::cIptvSourceParam(char Source, const char *Description)
     param(0),
     nid(0),
     tid(0),
-    rid(0)
+    rid(0),
+    data(),
+    itp()
 {
   debug("cIptvSourceParam::cIptvSourceParam(): Source=%c Description=%s\n", Source, Description);
 
