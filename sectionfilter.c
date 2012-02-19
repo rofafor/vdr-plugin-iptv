@@ -138,7 +138,7 @@ int cIptvSectionFilter::CopyDump(const uint8_t *buf, uint8_t len)
      return 0;
 
   memcpy(secbuf_base + tsfeedp, buf, len);
-  tsfeedp += len;
+  tsfeedp = uint16_t(tsfeedp + len);
 
   limit = tsfeedp;
   if (limit > DMX_MAX_SECFEED_SIZE)
@@ -154,7 +154,7 @@ int cIptvSectionFilter::CopyDump(const uint8_t *buf, uint8_t len)
       seclen = seclen_local;
       if (pusi_seen)
          Feed();
-      secbufp += seclen_local;
+      secbufp = uint16_t(secbufp + seclen_local);
       secbuf += seclen_local;
       }
   return 0;
