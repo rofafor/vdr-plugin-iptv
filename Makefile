@@ -24,7 +24,7 @@ GITTAG  = $(shell git describe --always 2>/dev/null)
 ### The C++ compiler and options:
 
 CXX      ?= g++
-CXXFLAGS ?= -fPIC -g -O3 -Wall -Wextra -Wswitch-default -Wfloat-equal -Wundef -Wpointer-arith -Wconversion -Wcast-align -Wredundant-decls -Wno-unused-parameter -Woverloaded-virtual -Wno-parentheses
+CXXFLAGS ?= -fPIC -g -O3 -Wall -Wextra -Wswitch-default -Wfloat-equal -Wundef -Wpointer-arith -Wconversion -Wcast-align -Wredundant-decls -Wno-unused-parameter -Werror=overloaded-virtual -Wno-parentheses
 LDFLAGS  ?= -Wl,--as-needed
 
 ### The directory environment:
