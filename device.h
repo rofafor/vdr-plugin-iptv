@@ -76,6 +76,7 @@ private:
   bool IsBlackListed(u_short Pid, u_char Tid, u_char Mask) const;
 
   // for channel info
+  virtual cString DeviceName(void) const;
   virtual int SignalStrength(void) const;
   virtual int SignalQuality(void) const;
 

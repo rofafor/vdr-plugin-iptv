@@ -12,8 +12,8 @@
 #include "setup.h"
 #include "device.h"
 
-#if defined(APIVERSNUM) && APIVERSNUM < 10721
-#error "VDR-1.7.21 API version or greater is required!"
+#if defined(APIVERSNUM) && APIVERSNUM < 10727
+#error "VDR-1.7.27 API version or greater is required!"
 #endif
 
 #ifndef GITVERSION

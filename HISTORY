@@ -159,6 +159,6 @@ VDR Plugin 'iptv' Revision History
 - Added support for LDFLAGS.
 - Added cppcheck target into Makefile.
 
-2012-03-10: Version 0.5.1
+2012-03-25: Version 0.5.1
 
-- Updated for vdr-1.7.26.
+- Updated for vdr-1.7.27.
