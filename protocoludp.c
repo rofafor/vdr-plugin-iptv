@@ -37,7 +37,7 @@ cIptvProtocolUdp::~cIptvProtocolUdp()
 
 bool cIptvProtocolUdp::Open(void)
 {
-  debug("cIptvProtocolUdp::Open()\n");
+  debug("cIptvProtocolUdp::Open(): sourceAddr=%s streamAddr=%s\n", sourceAddr, streamAddr);
   OpenSocket(socketPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
   if (!isempty(streamAddr)) {
      // Join a new multicast group
@@ -48,7 +48,7 @@ bool cIptvProtocolUdp::Open(void)
 
 bool cIptvProtocolUdp::Close(void)
 {
-  debug("cIptvProtocolUdp::Close()\n");
+  debug("cIptvProtocolUdp::Close(): sourceAddr=%s streamAddr=%s\n", sourceAddr, streamAddr);
   if (!isempty(streamAddr)) {
      // Drop the multicast group
      OpenSocket(socketPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
@@ -56,9 +56,9 @@ bool cIptvProtocolUdp::Close(void)
      }
   // Close the socket
   CloseSocket();
-  // Reset stream and source addresses
-  streamAddr = strcpyrealloc(streamAddr, "");
-  sourceAddr = strcpyrealloc(sourceAddr, "");
+  // Do NOT reset stream and source addresses
+  //streamAddr = strcpyrealloc(streamAddr, "");
+  //sourceAddr = strcpyrealloc(sourceAddr, "");
   return true;
 }
 

@@ -162,3 +162,4 @@ VDR Plugin 'iptv' Revision History
 2012-03-25: Version 0.5.1
 
 - Updated for vdr-1.7.27.
+- Fixed channel switching in UDP protocol.

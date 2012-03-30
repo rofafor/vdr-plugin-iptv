@@ -42,6 +42,6 @@ void cIptvConfig::SetDisabledFilters(unsigned int Index, int Number)
 
 void cIptvConfig::SetConfigDirectory(const char *directoryP)
 {
-  debug("cIptvConfig::SetConfigDirectory(%s)", directoryP);
+  debug("cIptvConfig::SetConfigDirectory(%s)\n", directoryP);
   ERROR_IF(!realpath(directoryP, configDirectory), "Cannot canonicalize configuration directory");
 }
