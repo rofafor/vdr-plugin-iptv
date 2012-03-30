@@ -181,7 +181,8 @@ cString cIptvDevice::GetInformation(unsigned int Page)
 
 cString cIptvDevice::DeviceName(void) const
 {
-  return "IPTV";
+  debug("cIptvDevice::DeviceName(%d)\n", deviceIndex);
+  return cString::sprintf("IPTV %d", deviceIndex);
 }
 
 int cIptvDevice::SignalStrength(void) const
