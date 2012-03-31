@@ -20,7 +20,8 @@
 
 cIptvProtocolUdp::cIptvProtocolUdp()
 : streamAddr(strdup("")),
-  sourceAddr(strdup(""))
+  sourceAddr(strdup("")),
+  streamPort(0)
 {
   debug("cIptvProtocolUdp::cIptvProtocolUdp()\n");
 }
@@ -38,7 +39,7 @@ cIptvProtocolUdp::~cIptvProtocolUdp()
 bool cIptvProtocolUdp::Open(void)
 {
   debug("cIptvProtocolUdp::Open(): sourceAddr=%s streamAddr=%s\n", sourceAddr, streamAddr);
-  OpenSocket(socketPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
+  OpenSocket(streamPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
   if (!isempty(streamAddr)) {
      // Join a new multicast group
      JoinMulticast(inet_addr(streamAddr));
@@ -51,7 +52,7 @@ bool cIptvProtocolUdp::Close(void)
   debug("cIptvProtocolUdp::Close(): sourceAddr=%s streamAddr=%s\n", sourceAddr, streamAddr);
   if (!isempty(streamAddr)) {
      // Drop the multicast group
-     OpenSocket(socketPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
+     OpenSocket(streamPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
      DropMulticast(inet_addr(streamAddr));
      }
   // Close the socket
@@ -73,7 +74,7 @@ bool cIptvProtocolUdp::Set(const char* Location, const int Parameter, const int 
   if (!isempty(Location)) {
      // Drop the multicast group
      if (!isempty(streamAddr)) {
-        OpenSocket(socketPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
+        OpenSocket(streamPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
         DropMulticast(inet_addr(streamAddr));
         }
      // Update stream address and port
@@ -85,10 +86,10 @@ bool cIptvProtocolUdp::Set(const char* Location, const int Parameter, const int 
         }
      else
         sourceAddr = strcpyrealloc(sourceAddr, "");
-     socketPort = Parameter;
+     streamPort = Parameter;
      // Join a new multicast group
      if (!isempty(streamAddr)) {
-        OpenSocket(socketPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
+        OpenSocket(streamPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
         JoinMulticast(inet_addr(streamAddr));
         }
      }
@@ -98,5 +99,5 @@ bool cIptvProtocolUdp::Set(const char* Location, const int Parameter, const int 
 cString cIptvProtocolUdp::GetInformation(void)
 {
   //debug("cIptvProtocolUdp::GetInformation()");
-  return cString::sprintf("udp://%s:%d", streamAddr, socketPort);
+  return cString::sprintf("udp://%s:%d", streamAddr, streamPort);
 }

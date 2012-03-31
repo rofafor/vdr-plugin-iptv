@@ -17,6 +17,7 @@ private:
   int pid;
   cString scriptFile;
   int scriptParameter;
+  int streamPort;
 
 private:
   void TerminateScript(void);

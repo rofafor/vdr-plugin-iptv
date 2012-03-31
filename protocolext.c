@@ -22,7 +22,8 @@
 cIptvProtocolExt::cIptvProtocolExt()
 : pid(-1),
   scriptFile(""),
-  scriptParameter(0)
+  scriptParameter(0),
+  streamPort(0)
 {
   debug("cIptvProtocolExt::cIptvProtocolExt()\n");
 }
@@ -53,7 +54,7 @@ void cIptvProtocolExt::ExecuteScript(void)
      for (int i = STDERR_FILENO + 1; i < MaxPossibleFileDescriptors; i++)
          close(i);
      // Execute the external script
-     cString cmd = cString::sprintf("%s %d %d", *scriptFile, scriptParameter, socketPort);
+     cString cmd = cString::sprintf("%s %d %d", *scriptFile, scriptParameter, streamPort);
      debug("cIptvProtocolExt::ExecuteScript(child): %s\n", *cmd);
      if (execl("/bin/bash", "sh", "-c", *cmd, (char *)NULL) == -1) {
         error("Script execution failed: %s", *cmd);
@@ -113,7 +114,7 @@ bool cIptvProtocolExt::Open(void)
   if (!strlen(*scriptFile))
      return false;
   // Create the listening socket
-  OpenSocket(socketPort);
+  OpenSocket(streamPort);
   // Execute the external script
   ExecuteScript();
   isActive = true;
@@ -149,7 +150,7 @@ bool cIptvProtocolExt::Set(const char* Location, const int Parameter, const int 
         }
      scriptParameter = Parameter;
      // Update listen port
-     socketPort = IptvConfig.GetExtProtocolBasePort() + Index;
+     streamPort = IptvConfig.GetExtProtocolBasePort() + Index;
      }
   return true;
 }

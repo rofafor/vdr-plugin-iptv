@@ -16,6 +16,7 @@ class cIptvProtocolUdp : public cIptvUdpSocket, public cIptvProtocolIf {
 private:
   char* streamAddr;
   char* sourceAddr;
+  int streamPort;
 
 public:
   cIptvProtocolUdp();

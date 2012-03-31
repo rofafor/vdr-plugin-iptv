@@ -16,6 +16,7 @@ class cIptvProtocolHttp : public cIptvTcpSocket, public cIptvProtocolIf {
 private:
   char* streamAddr;
   char* streamPath;
+  int streamPort;
 
 private:
   bool Connect(void);

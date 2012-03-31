@@ -20,7 +20,8 @@
 
 cIptvProtocolHttp::cIptvProtocolHttp()
 : streamAddr(strdup("")),
-  streamPath(strdup("/"))
+  streamPath(strdup("/")),
+  streamPort(0)
 {
   debug("cIptvProtocolHttp::cIptvProtocolHttp()\n");
 }
@@ -41,7 +42,7 @@ bool cIptvProtocolHttp::Connect(void)
   // Check that stream address is valid
   if (!isActive && !isempty(streamAddr) && !isempty(streamPath)) {
      // Ensure that socket is valid and connect
-     OpenSocket(socketPort, streamAddr);
+     OpenSocket(streamPort, streamAddr);
      if (!ConnectSocket()) {
         CloseSocket();
         return false;
@@ -185,8 +186,8 @@ bool cIptvProtocolHttp::Set(const char* Location, const int Parameter, const int
         }
      else
         streamPath = strcpyrealloc(streamPath, "/");
-     socketPort = Parameter;
-     //debug("http://%s:%d%s\n", streamAddr, socketPort, streamPath);
+     streamPort = Parameter;
+     //debug("http://%s:%d%s\n", streamAddr, streamPort, streamPath);
      // Re-connect the socket
      Connect();
      }
@@ -196,5 +197,5 @@ bool cIptvProtocolHttp::Set(const char* Location, const int Parameter, const int
 cString cIptvProtocolHttp::GetInformation(void)
 {
   //debug("cIptvProtocolHttp::GetInformation()");
-  return cString::sprintf("http://%s:%d%s", streamAddr, socketPort, streamPath);
+  return cString::sprintf("http://%s:%d%s", streamAddr, streamPort, streamPath);
 }
