@@ -60,6 +60,7 @@ bool cIptvProtocolUdp::Close(void)
   // Do NOT reset stream and source addresses
   //streamAddr = strcpyrealloc(streamAddr, "");
   //sourceAddr = strcpyrealloc(sourceAddr, "");
+  //streamPort = 0;
   return true;
 }
 
