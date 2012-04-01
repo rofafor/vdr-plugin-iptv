@@ -128,7 +128,7 @@ bool cIptvProtocolHttp::ProcessHeaders(void)
 {
   debug("cIptvProtocolHttp::ProcessHeaders()\n");
   unsigned int lineLength = 0;
-  int response = 0;
+  int version = 0, response = 0;
   bool responseFound = false;
   char buf[4096];
 
@@ -136,7 +136,7 @@ bool cIptvProtocolHttp::ProcessHeaders(void)
     memset(buf, '\0', sizeof(buf));
     if (!GetHeaderLine(buf, sizeof(buf), lineLength))
        return false;
-    if (!responseFound && sscanf(buf, "HTTP/1.%*i %i ", &response) != 1) {
+    if (!responseFound && sscanf(buf, "HTTP/1.%1i %3i ", &version, &response) != 1) {
        error("Expected HTTP header not found\n");
        continue;
        }
