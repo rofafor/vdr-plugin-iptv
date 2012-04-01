@@ -20,7 +20,6 @@
 
 cIptvProtocolUdp::cIptvProtocolUdp()
 : streamAddr(strdup("")),
-  sourceAddr(strdup("")),
   streamPort(0)
 {
   debug("cIptvProtocolUdp::cIptvProtocolUdp()\n");
@@ -33,33 +32,31 @@ cIptvProtocolUdp::~cIptvProtocolUdp()
   cIptvProtocolUdp::Close();
   // Free allocated memory
   free(streamAddr);
-  free(sourceAddr);
 }
 
 bool cIptvProtocolUdp::Open(void)
 {
-  debug("cIptvProtocolUdp::Open(): sourceAddr=%s streamAddr=%s\n", sourceAddr, streamAddr);
-  OpenSocket(streamPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
+  debug("cIptvProtocolUdp::Open(): streamAddr=%s\n", streamAddr);
+  OpenSocket(streamPort, inet_addr(streamAddr));
   if (!isempty(streamAddr)) {
      // Join a new multicast group
-     JoinMulticast(inet_addr(streamAddr));
+     JoinMulticast();
      }
   return true;
 }
 
 bool cIptvProtocolUdp::Close(void)
 {
-  debug("cIptvProtocolUdp::Close(): sourceAddr=%s streamAddr=%s\n", sourceAddr, streamAddr);
+  debug("cIptvProtocolUdp::Close(): streamAddr=%s\n", streamAddr);
   if (!isempty(streamAddr)) {
      // Drop the multicast group
-     OpenSocket(streamPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
-     DropMulticast(inet_addr(streamAddr));
+     OpenSocket(streamPort, inet_addr(streamAddr));
+     DropMulticast();
      }
   // Close the socket
   CloseSocket();
   // Do NOT reset stream and source addresses
   //streamAddr = strcpyrealloc(streamAddr, "");
-  //sourceAddr = strcpyrealloc(sourceAddr, "");
   //streamPort = 0;
   return true;
 }
@@ -75,23 +72,16 @@ bool cIptvProtocolUdp::Set(const char* Location, const int Parameter, const int 
   if (!isempty(Location)) {
      // Drop the multicast group
      if (!isempty(streamAddr)) {
-        OpenSocket(streamPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
-        DropMulticast(inet_addr(streamAddr));
+        OpenSocket(streamPort, inet_addr(streamAddr));
+        DropMulticast();
         }
      // Update stream address and port
      streamAddr = strcpyrealloc(streamAddr, Location);
-     char *p = strstr(streamAddr, ";");
-     if (p) {
-        sourceAddr = strcpyrealloc(sourceAddr, p + 1);
-        *p = 0;
-        }
-     else
-        sourceAddr = strcpyrealloc(sourceAddr, "");
      streamPort = Parameter;
      // Join a new multicast group
      if (!isempty(streamAddr)) {
-        OpenSocket(streamPort, isempty(sourceAddr) ? INADDR_ANY : inet_addr(sourceAddr));
-        JoinMulticast(inet_addr(streamAddr));
+        OpenSocket(streamPort, inet_addr(streamAddr));
+        JoinMulticast();
         }
      }
   return true;

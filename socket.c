@@ -18,8 +18,8 @@
 #include "socket.h"
 
 cIptvSocket::cIptvSocket()
-: socketDesc(-1),
-  socketPort(0),
+: socketPort(0),
+  socketDesc(-1),
   isActive(false)
 {
   debug("cIptvSocket::cIptvSocket()\n");
@@ -89,7 +89,7 @@ void cIptvSocket::CloseSocket(void)
 
 // UDP socket class
 cIptvUdpSocket::cIptvUdpSocket()
-: sourceAddr(INADDR_ANY)
+: streamAddr(INADDR_ANY)
 {
   debug("cIptvUdpSocket::cIptvUdpSocket()\n");
 }
@@ -99,28 +99,28 @@ cIptvUdpSocket::~cIptvUdpSocket()
   debug("cIptvUdpSocket::~cIptvUdpSocket()\n");
 }
 
-bool cIptvUdpSocket::OpenSocket(const int Port, const in_addr_t SourceAddr)
+bool cIptvUdpSocket::OpenSocket(const int Port, const in_addr_t StreamAddr)
 {
   debug("cIptvUdpSocket::OpenSocket()\n");
-  sourceAddr = SourceAddr;
+  streamAddr = StreamAddr;
   return cIptvSocket::OpenSocket(Port, true);
 }
 
 void cIptvUdpSocket::CloseSocket(void)
 {
   debug("cIptvUdpSocket::CloseSocket()\n");
-  sourceAddr = INADDR_ANY;
+  streamAddr = INADDR_ANY;
   cIptvSocket::CloseSocket();
 }
 
-bool cIptvUdpSocket::JoinMulticast(const in_addr_t StreamAddr)
+bool cIptvUdpSocket::JoinMulticast(void)
 {
   debug("cIptvUdpSocket::JoinMulticast()\n");
   // Check if socket exists
   if (!isActive && (socketDesc >= 0)) {
      // Join a new multicast group
      struct ip_mreq mreq;
-     mreq.imr_multiaddr.s_addr = StreamAddr;
+     mreq.imr_multiaddr.s_addr = streamAddr;
      mreq.imr_interface.s_addr = htonl(INADDR_ANY);
      ERROR_IF_RET(setsockopt(socketDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0, "setsockopt(IP_ADD_MEMBERSHIP)", return false);
      // Update multicasting flag
@@ -129,14 +129,14 @@ bool cIptvUdpSocket::JoinMulticast(const in_addr_t StreamAddr)
   return true;
 }
 
-bool cIptvUdpSocket::DropMulticast(const in_addr_t StreamAddr)
+bool cIptvUdpSocket::DropMulticast(void)
 {
   debug("cIptvUdpSocket::DropMulticast()\n");
   // Check if socket exists
   if (isActive && (socketDesc >= 0)) {
      // Drop the existing multicast group
      struct ip_mreq mreq;
-     mreq.imr_multiaddr.s_addr = StreamAddr;
+     mreq.imr_multiaddr.s_addr = streamAddr;
      mreq.imr_interface.s_addr = htonl(INADDR_ANY);
      ERROR_IF_RET(setsockopt(socketDesc, IPPROTO_IP, IP_DROP_MEMBERSHIP, &mreq, sizeof(mreq)) < 0, "setsockopt(IP_DROP_MEMBERSHIP)", return false);
      // Update multicasting flag
@@ -180,10 +180,10 @@ int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
      }
   else if (len > 0) {
      // Process auxiliary received data and validate source address
-     for (cmsg = CMSG_FIRSTHDR(&msgh); (sourceAddr != INADDR_ANY) && (cmsg != NULL); cmsg = CMSG_NXTHDR(&msgh, cmsg)) {
+     for (cmsg = CMSG_FIRSTHDR(&msgh); (streamAddr != INADDR_ANY) && (cmsg != NULL); cmsg = CMSG_NXTHDR(&msgh, cmsg)) {
          if ((cmsg->cmsg_level == SOL_IP) && (cmsg->cmsg_type == IP_PKTINFO)) {
             struct in_pktinfo *i = (struct in_pktinfo *)CMSG_DATA(cmsg);
-            if (i->ipi_addr.s_addr != sourceAddr) {
+            if (i->ipi_addr.s_addr != streamAddr) {
                //debug("Discard packet due to invalid source address: %s", inet_ntoa(i->ipi_addr));
                return 0;
                }

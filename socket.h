@@ -11,9 +11,11 @@
 #include <arpa/inet.h>
 
 class cIptvSocket {
+private:
+  int socketPort;
+
 protected:
   int socketDesc;
-  int socketPort;
   struct sockaddr_in sockAddr;
   bool isActive;
 
@@ -28,16 +30,16 @@ public:
 
 class cIptvUdpSocket : public cIptvSocket {
 private:
-  in_addr_t sourceAddr;
+  in_addr_t streamAddr;
 
 public:
   cIptvUdpSocket();
   virtual ~cIptvUdpSocket();
   virtual int Read(unsigned char* BufferAddr, unsigned int BufferLen);
-  bool OpenSocket(const int Port, const in_addr_t SourceAddr = INADDR_ANY);
+  bool OpenSocket(const int Port, const in_addr_t StreamAddr = INADDR_ANY);
   void CloseSocket(void);
-  bool JoinMulticast(const in_addr_t StreamAddr);
-  bool DropMulticast(const in_addr_t StreamAddr);
+  bool JoinMulticast(void);
+  bool DropMulticast(void);
 };
 
 class cIptvTcpSocket : public cIptvSocket {
