@@ -123,7 +123,7 @@ cIptvDevice *cIptvDevice::GetIptvDevice(int CardIndex)
 cString cIptvDevice::GetGeneralInformation(void)
 {
   //debug("cIptvDevice::GetGeneralInformation(%d)\n", deviceIndex);
-  return cString::sprintf("IPTV device: %d\nCardIndex: %d\n%s%s%sChannel: %s",
+  return cString::sprintf("IPTV device: %d\nCardIndex: %d\nStream: %s\nStream bitrate: %s\n%sChannel: %s",
                           deviceIndex, CardIndex(),
                           pIptvStreamer ? *pIptvStreamer->GetInformation() : "",
                           pIptvStreamer ? *pIptvStreamer->GetStreamerStatistic() : "",
@@ -168,6 +168,12 @@ cString cIptvDevice::GetInformation(unsigned int Page)
          break;
     case IPTV_DEVICE_INFO_FILTERS:
          info = GetFiltersInformation();
+         break;
+    case IPTV_DEVICE_INFO_PROTOCOL:
+         info = pIptvStreamer ? *pIptvStreamer->GetInformation() : "";
+         break;
+    case IPTV_DEVICE_INFO_BITRATE:
+         info = pIptvStreamer ? *pIptvStreamer->GetStreamerStatistic() : "";
          break;
     default:
          info = cString::sprintf("%s%s%s",

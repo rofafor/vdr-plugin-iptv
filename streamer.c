@@ -108,8 +108,8 @@ bool cIptvStreamer::Set(const char* Location, const int Parameter, const int Ind
 cString cIptvStreamer::GetInformation(void)
 {
   //debug("cIptvStreamer::GetInformation()");
-  cString info("Stream:");
+  cString info;
   if (protocol)
-     info = cString::sprintf("%s %s", *info, *protocol->GetInformation());
-  return cString::sprintf("%s\n", *info);
+     info = protocol->GetInformation();
+  return info;
 }

@@ -148,7 +148,7 @@ cString cIptvStreamerStatistics::GetStreamerStatistic()
   long bitrate = elapsed ? (long)(1000.0L * dataBytes / KILOBYTE(1) / elapsed) : 0L;
   if (!IptvConfig.GetUseBytes())
      bitrate *= 8;
-  cString info = cString::sprintf("Stream bitrate: %ld k%s/s\n", bitrate, IptvConfig.GetUseBytes() ? "B" : "bit");
+  cString info = cString::sprintf("%ld k%s/s", bitrate, IptvConfig.GetUseBytes() ? "B" : "bit");
   dataBytes = 0;
   return info;
 }

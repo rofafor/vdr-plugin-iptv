@@ -11,6 +11,7 @@
 #include "config.h"
 #include "setup.h"
 #include "device.h"
+#include "iptvservice.h"
 
 #if defined(APIVERSNUM) && APIVERSNUM < 10727
 #error "VDR-1.7.27 API version or greater is required!"
@@ -200,8 +201,18 @@ bool cPluginIptv::SetupParse(const char *Name, const char *Value)
 
 bool cPluginIptv::Service(const char *Id, void *Data)
 {
-  //debug("cPluginIptv::Service()\n");
-  // Handle custom service requests from other plugins
+  debug("cPluginIptv::Service()\n");
+  if (strcmp(Id,"IptvService-v1.0") == 0) {
+     if (Data) {
+        IptvService_v1_0 *data = (IptvService_v1_0*)Data;
+        cIptvDevice *dev = cIptvDevice::GetIptvDevice(data->cardIndex);
+        if (!dev)
+           return false;
+        data->protocol = dev->GetInformation(IPTV_DEVICE_INFO_PROTOCOL);
+        data->bitrate  = dev->GetInformation(IPTV_DEVICE_INFO_BITRATE);
+        }
+     return true;
+     }
   return false;
 }
 
