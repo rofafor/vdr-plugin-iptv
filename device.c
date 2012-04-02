@@ -185,6 +185,12 @@ cString cIptvDevice::GetInformation(unsigned int Page)
   return info;
 }
 
+cString cIptvDevice::DeviceType(void) const
+{
+  debug("cIptvDevice::DeviceType(%d)\n", deviceIndex);
+  return "IPTV";
+}
+
 cString cIptvDevice::DeviceName(void) const
 {
   debug("cIptvDevice::DeviceName(%d)\n", deviceIndex);
