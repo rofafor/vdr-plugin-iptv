@@ -130,13 +130,17 @@ bool cIptvProtocolHttp::ProcessHeaders(void)
   unsigned int lineLength = 0;
   int version = 0, response = 0;
   bool responseFound = false;
+  char fmt[32];
   char buf[4096];
+
+  // Generate HTTP response format string with 2 arguments
+  snprintf(fmt, sizeof(fmt), "HTTP/1.%%%ldi %%%ldi ", sizeof(version) - 1, sizeof(response) - 1);
 
   while (!responseFound || lineLength != 0) {
     memset(buf, '\0', sizeof(buf));
     if (!GetHeaderLine(buf, sizeof(buf), lineLength))
        return false;
-    if (!responseFound && sscanf(buf, "HTTP/1.%1i %3i ", &version, &response) != 1) {
+    if (!responseFound && sscanf(buf, fmt, &version, &response) != 2) {
        error("Expected HTTP header not found\n");
        continue;
        }
