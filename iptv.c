@@ -21,7 +21,7 @@
 #define GITVERSION ""
 #endif
 
-       const char VERSION[]     = "0.5.1" GITVERSION;
+       const char VERSION[]     = "0.5.2" GITVERSION;
 static const char DESCRIPTION[] = trNOOP("Experience the IPTV");
 
 class cPluginIptv : public cPlugin {

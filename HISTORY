@@ -168,3 +168,7 @@ VDR Plugin 'iptv' Revision History
 - Added support for a service interface.
 - Changed UDP protocol to always utilize the source address
   validation.
+
+2012-04-26: Version 0.5.2
+
+- Fixed response header parsing in HTTP protocol.
