@@ -238,6 +238,9 @@ bool cIptvTcpSocket::OpenSocket(const int Port, const char *StreamAddr)
 {
   debug("cIptvTcpSocket::OpenSocket()\n");
 
+  // Socket must be opened before setting the host address
+  bool retval = cIptvSocket::OpenSocket(Port, false);
+
   // First try only the IP address
   sockAddr.sin_addr.s_addr = inet_addr(StreamAddr);
 
@@ -256,7 +259,7 @@ bool cIptvTcpSocket::OpenSocket(const int Port, const char *StreamAddr)
      sockAddr.sin_addr.s_addr = inet_addr(*host->h_addr_list);
      }
 
-  return cIptvSocket::OpenSocket(Port, false);
+  return retval;
 }
 
 void cIptvTcpSocket::CloseSocket(void)

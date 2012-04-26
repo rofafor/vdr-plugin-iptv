@@ -134,7 +134,7 @@ bool cIptvProtocolHttp::ProcessHeaders(void)
   char buf[4096];
 
   // Generate HTTP response format string with 2 arguments
-  snprintf(fmt, sizeof(fmt), "HTTP/1.%%%ldi %%%ldi ", sizeof(version) - 1, sizeof(response) - 1);
+  snprintf(fmt, sizeof(fmt), "HTTP/1.%%%zui %%%zui ", sizeof(version) - 1, sizeof(response) - 1);
 
   while (!responseFound || lineLength != 0) {
     memset(buf, '\0', sizeof(buf));

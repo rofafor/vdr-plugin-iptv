@@ -171,4 +171,4 @@ VDR Plugin 'iptv' Revision History
 
 2012-04-26: Version 0.5.2
 
-- Fixed response header parsing in HTTP protocol.
+- Fixed connection problems in HTTP protocol.
