@@ -224,11 +224,20 @@ bool cIptvDevice::ProvidesTransponder(const cChannel *Channel) const
 bool cIptvDevice::ProvidesChannel(const cChannel *Channel, int Priority, bool *NeedsDetachReceivers) const
 {
   bool result = false;
-  bool needsDetachReceivers = Receiving(true) && Channel && !(Channel->GetChannelID() == channelId);
+  bool hasPriority = Priority == IDLEPRIORITY || Priority > this->Priority();
+  bool needsDetachReceivers = false;
 
   debug("cIptvDevice::ProvidesChannel(%d)\n", deviceIndex);
-  if (ProvidesTransponder(Channel))
-     result = true;
+
+  if (Channel && ProvidesTransponder(Channel)) {
+     result = hasPriority;
+     if (Receiving()) {
+        if (Channel->GetChannelID() == channelId)
+           result = true;
+        else
+           needsDetachReceivers = Receiving();
+        }
+     }
   if (NeedsDetachReceivers)
      *NeedsDetachReceivers = needsDetachReceivers;
   return result;

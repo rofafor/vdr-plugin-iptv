@@ -176,3 +176,4 @@ VDR Plugin 'iptv' Revision History
 2012-xx-xx: Version 0.5.3
 
 - Tweaked reading from UDP sockets.
+- Updated device selection.
