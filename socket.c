@@ -180,45 +180,43 @@ int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
      }
   else if (len > 0) {
      // Process auxiliary received data and validate source address
-     for (cmsg = CMSG_FIRSTHDR(&msgh); (streamAddr != INADDR_ANY) && (cmsg != NULL); cmsg = CMSG_NXTHDR(&msgh, cmsg)) {
+     for (cmsg = CMSG_FIRSTHDR(&msgh); cmsg != NULL; cmsg = CMSG_NXTHDR(&msgh, cmsg)) {
          if ((cmsg->cmsg_level == SOL_IP) && (cmsg->cmsg_type == IP_PKTINFO)) {
             struct in_pktinfo *i = (struct in_pktinfo *)CMSG_DATA(cmsg);
-            if (i->ipi_addr.s_addr != streamAddr) {
-               //debug("Discard packet due to invalid source address: %s", inet_ntoa(i->ipi_addr));
-               return 0;
+            if ((i->ipi_addr.s_addr == streamAddr) || (INADDR_ANY == streamAddr)) {
+               if (BufferAddr[0] == TS_SYNC_BYTE)
+                  return len;
+               else if (len > 3) {
+                  // http://www.networksorcery.com/enp/rfc/rfc2250.txt
+                  // version
+                  unsigned int v = (BufferAddr[0] >> 6) & 0x03;
+                  // extension bit
+                  unsigned int x = (BufferAddr[0] >> 4) & 0x01;
+                  // cscr count
+                  unsigned int cc = BufferAddr[0] & 0x0F;
+                  // payload type: MPEG2 TS = 33
+                  //unsigned int pt = readBuffer[1] & 0x7F;
+                  // header lenght
+                  unsigned int headerlen = (3 + cc) * (unsigned int)sizeof(uint32_t);
+                  // check if extension
+                  if (x) {
+                     // extension header length
+                     unsigned int ehl = (((BufferAddr[headerlen + 2] & 0xFF) << 8) |
+                                         (BufferAddr[headerlen + 3] & 0xFF));
+                     // update header length
+                     headerlen += (ehl + 1) * (unsigned int)sizeof(uint32_t);
+                     }
+                  // Check that rtp is version 2 and payload contains multiple of TS packet data
+                  if ((v == 2) && (((len - headerlen) % TS_SIZE) == 0) &&
+                      (BufferAddr[headerlen] == TS_SYNC_BYTE)) {
+                     // Set argument point to payload in read buffer
+                     memmove(BufferAddr, &BufferAddr[headerlen], (len - headerlen));
+                     return (len - headerlen);
+                     }
+                  }
                }
             }
          }
-     if (BufferAddr[0] == TS_SYNC_BYTE)
-        return len;
-     else if (len > 3) {
-        // http://www.networksorcery.com/enp/rfc/rfc2250.txt
-        // version
-        unsigned int v = (BufferAddr[0] >> 6) & 0x03;
-        // extension bit
-        unsigned int x = (BufferAddr[0] >> 4) & 0x01;
-        // cscr count
-        unsigned int cc = BufferAddr[0] & 0x0F;
-        // payload type: MPEG2 TS = 33
-        //unsigned int pt = readBuffer[1] & 0x7F;
-        // header lenght
-        unsigned int headerlen = (3 + cc) * (unsigned int)sizeof(uint32_t);
-        // check if extension
-        if (x) {
-           // extension header length
-           unsigned int ehl = (((BufferAddr[headerlen + 2] & 0xFF) << 8) |
-                               (BufferAddr[headerlen + 3] & 0xFF));
-           // update header length
-           headerlen += (ehl + 1) * (unsigned int)sizeof(uint32_t);
-           }
-        // Check that rtp is version 2 and payload contains multiple of TS packet data
-        if ((v == 2) && (((len - headerlen) % TS_SIZE) == 0) &&
-            (BufferAddr[headerlen] == TS_SYNC_BYTE)) {
-           // Set argument point to payload in read buffer
-           memmove(BufferAddr, &BufferAddr[headerlen], (len - headerlen));
-           return (len - headerlen);
-           }
-        }
      }
   return 0;
 }

@@ -172,3 +172,7 @@ VDR Plugin 'iptv' Revision History
 2012-04-26: Version 0.5.2
 
 - Fixed connection problems in HTTP protocol.
+
+2012-xx-xx: Version 0.5.3
+
+- Tweaked reading from UDP sockets.
