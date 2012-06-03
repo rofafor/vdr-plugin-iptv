@@ -106,11 +106,14 @@ Configuration:
 
 - UDP multicast rules for iptables firewall
 
-  # Multicast UDP -packets
+  # Multicast UDP packets
   iptables -A INPUT -i eth0 -p udp -d 224.0.0.0/4 --dport 1234 -j ACCEPT
 
   # IGMP required by multicasts
   iptables -A INPUT -i eth0 -p igmp -d 224.0.0.0/4 -j ACCEPT
+
+  # Default routing for multicast
+  route add -net 224.0.0.0 netmask 224.0.0.0 eth0
 
 External streaming:
 
