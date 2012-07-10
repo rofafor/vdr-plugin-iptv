@@ -8,6 +8,9 @@
 #ifndef __IPTV_SECTIONFILTER_H
 #define __IPTV_SECTIONFILTER_H
 
+#ifdef __FreeBSD__
+#include <sys/socket.h>
+#endif // __FreeBSD__
 #include <vdr/device.h>
 
 #include "common.h"

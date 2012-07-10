@@ -9,6 +9,9 @@
 #define __IPTV_SOCKET_H
 
 #include <arpa/inet.h>
+#ifdef __FreeBSD__
+#include <netinet/in.h>
+#endif // __FreeBSD__
 
 class cIptvSocket {
 private:

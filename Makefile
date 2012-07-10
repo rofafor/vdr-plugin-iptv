@@ -5,8 +5,14 @@
 # Debugging on/off 
 #IPTV_DEBUG = 1
 
+# Default shell for EXT protocol
+#IPTV_EXTSHELL = /bin/bash
+
 # Strip debug symbols?  Set eg. to /bin/true if not
 STRIP = strip
+
+# Install command
+INSTALL = cp --remove-destination
 
 # The official name of this plugin.
 # This name will be used in the '-P...' option of VDR to load the plugin.
@@ -58,6 +64,10 @@ DEFINES += -D_GNU_SOURCE -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
 
 ifdef IPTV_DEBUG
 DEFINES += -DDEBUG
+endif
+
+ifdef IPTV_EXTSHELL
+DEFINES += -DEXTSHELL='"$(IPTV_EXTSHELL)"'
 endif
 
 ifneq ($(strip $(GITTAG)),)
@@ -123,7 +133,7 @@ libvdr-$(PLUGIN).so: $(OBJS)
 ifndef IPTV_DEBUG
 	@$(STRIP) $@
 endif
-	@cp --remove-destination $@ $(LIBDIR)/$@.$(APIVERSION)
+	@$(INSTALL) $@ $(LIBDIR)/$@.$(APIVERSION)
 
 dist: $(I18Npo) clean
 	@-rm -rf $(TMPDIR)/$(ARCHIVE)

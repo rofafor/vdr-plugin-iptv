@@ -19,6 +19,10 @@
 #include "config.h"
 #include "protocolext.h"
 
+#ifndef EXTSHELL
+#define EXTSHELL "/bin/bash"
+#endif
+
 cIptvProtocolExt::cIptvProtocolExt()
 : pid(-1),
   scriptFile(""),
@@ -56,7 +60,9 @@ void cIptvProtocolExt::ExecuteScript(void)
      // Execute the external script
      cString cmd = cString::sprintf("%s %d %d", *scriptFile, scriptParameter, streamPort);
      debug("cIptvProtocolExt::ExecuteScript(child): %s\n", *cmd);
-     if (execl("/bin/bash", "sh", "-c", *cmd, (char *)NULL) == -1) {
+     // Create a new session for a process group
+     ERROR_IF_RET(setsid() == -1, "setsid()", _exit(-1));
+     if (execl(EXTSHELL, "sh", "-c", *cmd, (char *)NULL) == -1) {
         error("Script execution failed: %s", *cmd);
         _exit(-1);
         }
@@ -75,27 +81,36 @@ void cIptvProtocolExt::TerminateScript(void)
   if (pid > 0) {
      const unsigned int timeoutms = 100;
      unsigned int waitms = 0;
-     siginfo_t waitStatus;
      bool waitOver = false;
-     // signal and wait for termination
-     int retval = kill(pid, SIGINT);
+     // Signal and wait for termination
+     int retval = killpg(pid, SIGINT);
      ERROR_IF_RET(retval < 0, "kill()", waitOver = true);
      while (!waitOver) {
        retval = 0;
        waitms += timeoutms;
        if ((waitms % 2000) == 0) {
           error("Script '%s' won't terminate - killing it!", *scriptFile);
-          kill(pid, SIGKILL);
+          killpg(pid, SIGKILL);
           }
        // Clear wait status to make sure child exit status is accessible
+       // and wait for child termination
+#ifdef __FreeBSD__
+       int waitStatus = 0;
+       retval = waitpid(pid, &waitStatus, WNOHANG);
+#else  // __FreeBSD__
+       siginfo_t waitStatus;
        memset(&waitStatus, '\0', sizeof(waitStatus));
-       // Wait for child termination
        retval = waitid(P_PID, pid, &waitStatus, (WNOHANG | WEXITED));
+#endif // __FreeBSD__
        ERROR_IF_RET(retval < 0, "waitid()", waitOver = true);
        // These are the acceptable conditions under which child exit is
        // regarded as successful
+#ifdef __FreeBSD__
+       if (retval > 0 && (WIFEXITED(waitStatus) || WIFSIGNALED(waitStatus))) {
+#else  // __FreeBSD__
        if (!retval && waitStatus.si_pid && (waitStatus.si_pid == pid) &&
           ((waitStatus.si_code == CLD_EXITED) || (waitStatus.si_code == CLD_KILLED))) {
+#endif // __FreeBSD__
           debug("Child (%d) exited as expected\n", pid);
           waitOver = true;
           }

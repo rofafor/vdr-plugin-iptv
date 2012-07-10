@@ -57,9 +57,11 @@ bool cIptvSocket::OpenSocket(const int Port, const bool isUdp)
      // Allow multiple sockets to use the same PORT number
      ERROR_IF_FUNC(setsockopt(socketDesc, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0, "setsockopt(SO_REUSEADDR)",
                    CloseSocket(), return false);
+#ifndef __FreeBSD__
      // Allow packet information to be fetched
      ERROR_IF_FUNC(setsockopt(socketDesc, SOL_IP, IP_PKTINFO, &yes, sizeof(yes)) < 0, "setsockopt(IP_PKTINFO)",
                    CloseSocket(), return false);
+#endif // __FreeBSD__
      // Bind socket
      memset(&sockAddr, '\0', sizeof(sockAddr));
      sockAddr.sin_family = AF_INET;
@@ -180,11 +182,13 @@ int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
     else
        break;
     if (len > 0) {
+#ifndef __FreeBSD__
        // Process auxiliary received data and validate source address
        for (cmsg = CMSG_FIRSTHDR(&msgh); cmsg != NULL; cmsg = CMSG_NXTHDR(&msgh, cmsg)) {
            if ((cmsg->cmsg_level == SOL_IP) && (cmsg->cmsg_type == IP_PKTINFO)) {
               struct in_pktinfo *i = (struct in_pktinfo *)CMSG_DATA(cmsg);
               if ((i->ipi_addr.s_addr == streamAddr) || (INADDR_ANY == streamAddr)) {
+#endif // __FreeBSD__
                  if (BufferAddr[0] == TS_SYNC_BYTE)
                     return len;
                  else if (len > 3) {
@@ -215,9 +219,11 @@ int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
                        return (len - headerlen);
                        }
                     }
+#ifndef __FreeBSD__
                  }
               }
            }
+#endif // __FreeBSD__
        }
     } while (len > 0);
   ERROR_IF_RET(len < 0 && errno != EAGAIN, "recvmsg()", return -1);
