@@ -76,6 +76,7 @@ private:
   bool IsBlackListed(u_short Pid, u_char Tid, u_char Mask) const;
 
   // for channel info
+public:
   virtual cString DeviceType(void) const;
   virtual cString DeviceName(void) const;
   virtual int SignalStrength(void) const;
@@ -101,11 +102,16 @@ protected:
   // for section filtering
 public:
   virtual int OpenFilter(u_short Pid, u_char Tid, u_char Mask);
+  virtual int ReadFilter(int Handle, void *Buffer, size_t Length);
   virtual void CloseFilter(int Handle);
 
   // for transponder lock
 public:
   virtual bool HasLock(int);
+
+  // for common interface
+public:
+  virtual bool HasInternalCam(void);
 };
 
 #endif // __IPTV_DEVICE_H

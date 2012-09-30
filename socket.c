@@ -7,6 +7,7 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <net/if.h>
 #include <netdb.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -63,7 +64,7 @@ bool cIptvSocket::OpenSocket(const int Port, const bool isUdp)
                    CloseSocket(), return false);
 #endif // __FreeBSD__
      // Bind socket
-     memset(&sockAddr, '\0', sizeof(sockAddr));
+     memset(&sockAddr, 0, sizeof(sockAddr));
      sockAddr.sin_family = AF_INET;
      sockAddr.sin_port = htons((uint16_t)(Port & 0xFFFF));
      sockAddr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -89,9 +90,33 @@ void cIptvSocket::CloseSocket(void)
      }
 }
 
+bool cIptvSocket::CheckAddress(const char *Addr, in_addr_t *InAddr)
+{
+  if (InAddr) {
+     // First try only the IP address
+     *InAddr = htonl(inet_addr(Addr));
+     if (*InAddr == htonl(INADDR_NONE)) {
+        debug("Cannot convert %s directly to internet address\n", Addr);
+        // It may be a host name, get the name
+        struct hostent *host;
+        host = gethostbyname(Addr);
+        if (!host) {
+           char tmp[64];
+           error("gethostbyname() failed: %s is not valid address: %s", Addr, strerror_r(h_errno, tmp, sizeof(tmp)));
+           return false;
+           }
+        *InAddr = htonl(inet_addr(*host->h_addr_list));
+        }
+     return true;
+     }
+  return false;
+}
+
 // UDP socket class
 cIptvUdpSocket::cIptvUdpSocket()
-: streamAddr(INADDR_ANY)
+: streamAddr(htonl(INADDR_ANY)),
+  sourceAddr(htonl(INADDR_ANY)),
+  useIGMPv3(false)
 {
   debug("cIptvUdpSocket::cIptvUdpSocket()\n");
 }
@@ -101,17 +126,30 @@ cIptvUdpSocket::~cIptvUdpSocket()
   debug("cIptvUdpSocket::~cIptvUdpSocket()\n");
 }
 
-bool cIptvUdpSocket::OpenSocket(const int Port, const in_addr_t StreamAddr)
+bool cIptvUdpSocket::OpenSocket(const int Port)
 {
   debug("cIptvUdpSocket::OpenSocket()\n");
-  streamAddr = StreamAddr;
+  streamAddr = htonl(INADDR_ANY);
+  sourceAddr = htonl(INADDR_ANY);
+  useIGMPv3 = false;
+  return cIptvSocket::OpenSocket(Port, true);
+}
+
+bool cIptvUdpSocket::OpenSocket(const int Port, const char *StreamAddr, const char *SourceAddr, bool UseIGMPv3)
+{
+  debug("cIptvUdpSocket::OpenSocket()\n");
+  CheckAddress(StreamAddr, &streamAddr);
+  CheckAddress(SourceAddr, &sourceAddr);
+  useIGMPv3 = UseIGMPv3;
   return cIptvSocket::OpenSocket(Port, true);
 }
 
 void cIptvUdpSocket::CloseSocket(void)
 {
   debug("cIptvUdpSocket::CloseSocket()\n");
-  streamAddr = INADDR_ANY;
+  streamAddr = htonl(INADDR_ANY);
+  sourceAddr = htonl(INADDR_ANY);
+  useIGMPv3 = false;
   cIptvSocket::CloseSocket();
 }
 
@@ -121,10 +159,28 @@ bool cIptvUdpSocket::JoinMulticast(void)
   // Check if socket exists
   if (!isActive && (socketDesc >= 0)) {
      // Join a new multicast group
-     struct ip_mreq mreq;
-     mreq.imr_multiaddr.s_addr = streamAddr;
-     mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-     ERROR_IF_RET(setsockopt(socketDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0, "setsockopt(IP_ADD_MEMBERSHIP)", return false);
+     if (useIGMPv3) {
+        // Source-specific multicast (SSM) is used
+        struct group_source_req gsr;
+        struct sockaddr_in *grp;
+        struct sockaddr_in *src;
+        gsr.gsr_interface = 0; // if_nametoindex("any") ?
+        grp = (struct sockaddr_in*)&gsr.gsr_group;
+        grp->sin_family = AF_INET;
+        grp->sin_addr.s_addr = streamAddr;
+        grp->sin_port = 0;
+        src = (struct sockaddr_in*)&gsr.gsr_source;
+        src->sin_family = AF_INET;
+        src->sin_addr.s_addr = sourceAddr;
+        src->sin_port = 0;
+        ERROR_IF_RET(setsockopt(socketDesc, SOL_IP, MCAST_JOIN_SOURCE_GROUP, &gsr, sizeof(gsr)) < 0, "setsockopt(MCAST_JOIN_SOURCE_GROUP)", return false);
+        }
+     else {
+        struct ip_mreq mreq;
+        mreq.imr_multiaddr.s_addr = streamAddr;
+        mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+        ERROR_IF_RET(setsockopt(socketDesc, SOL_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0, "setsockopt(IP_ADD_MEMBERSHIP)", return false);
+        }
      // Update multicasting flag
      isActive = true;
      }
@@ -137,10 +193,28 @@ bool cIptvUdpSocket::DropMulticast(void)
   // Check if socket exists
   if (isActive && (socketDesc >= 0)) {
      // Drop the existing multicast group
-     struct ip_mreq mreq;
-     mreq.imr_multiaddr.s_addr = streamAddr;
-     mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-     ERROR_IF_RET(setsockopt(socketDesc, IPPROTO_IP, IP_DROP_MEMBERSHIP, &mreq, sizeof(mreq)) < 0, "setsockopt(IP_DROP_MEMBERSHIP)", return false);
+     if (useIGMPv3) {
+        // Source-specific multicast (SSM) is used
+        struct group_source_req gsr;
+        struct sockaddr_in *grp;
+        struct sockaddr_in *src;
+        gsr.gsr_interface = 0; // if_nametoindex("any") ?
+        grp = (struct sockaddr_in*)&gsr.gsr_group;
+        grp->sin_family = AF_INET;
+        grp->sin_addr.s_addr = streamAddr;
+        grp->sin_port = 0;
+        src = (struct sockaddr_in*)&gsr.gsr_source;
+        src->sin_family = AF_INET;
+        src->sin_addr.s_addr = sourceAddr;
+        src->sin_port = 0;
+        ERROR_IF_RET(setsockopt(socketDesc, SOL_IP, MCAST_LEAVE_SOURCE_GROUP, &gsr, sizeof(gsr)) < 0, "setsockopt(MCAST_LEAVE_SOURCE_GROUP)", return false);
+        }
+     else {
+        struct ip_mreq mreq;
+        mreq.imr_multiaddr.s_addr = streamAddr;
+        mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+        ERROR_IF_RET(setsockopt(socketDesc, SOL_IP, IP_DROP_MEMBERSHIP, &mreq, sizeof(mreq)) < 0, "setsockopt(IP_DROP_MEMBERSHIP)", return false);
+        }
      // Update multicasting flag
      isActive = false;
      }
@@ -161,7 +235,6 @@ int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
   do {
     socklen_t addrlen = sizeof(sockAddr);
     struct msghdr msgh;
-    struct cmsghdr *cmsg;
     struct iovec iov;
     char cbuf[256];
     len = 0;
@@ -184,10 +257,10 @@ int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
     if (len > 0) {
 #ifndef __FreeBSD__
        // Process auxiliary received data and validate source address
-       for (cmsg = CMSG_FIRSTHDR(&msgh); cmsg != NULL; cmsg = CMSG_NXTHDR(&msgh, cmsg)) {
+       for (struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msgh); cmsg != NULL; cmsg = CMSG_NXTHDR(&msgh, cmsg)) {
            if ((cmsg->cmsg_level == SOL_IP) && (cmsg->cmsg_type == IP_PKTINFO)) {
               struct in_pktinfo *i = (struct in_pktinfo *)CMSG_DATA(cmsg);
-              if ((i->ipi_addr.s_addr == streamAddr) || (INADDR_ANY == streamAddr)) {
+              if ((i->ipi_addr.s_addr == streamAddr) || (htonl(INADDR_ANY) == streamAddr)) {
 #endif // __FreeBSD__
                  if (BufferAddr[0] == TS_SYNC_BYTE)
                     return len;
@@ -245,29 +318,8 @@ cIptvTcpSocket::~cIptvTcpSocket()
 bool cIptvTcpSocket::OpenSocket(const int Port, const char *StreamAddr)
 {
   debug("cIptvTcpSocket::OpenSocket()\n");
-
   // Socket must be opened before setting the host address
-  bool retval = cIptvSocket::OpenSocket(Port, false);
-
-  // First try only the IP address
-  sockAddr.sin_addr.s_addr = inet_addr(StreamAddr);
-
-  if (sockAddr.sin_addr.s_addr == INADDR_NONE) {
-     debug("Cannot convert %s directly to internet address\n", StreamAddr);
-
-     // It may be a host name, get the name
-     struct hostent *host;
-     host = gethostbyname(StreamAddr);
-     if (!host) {
-        char tmp[64];
-        error("gethostbyname() failed: %s is not valid address: %s", StreamAddr, strerror_r(h_errno, tmp, sizeof(tmp)));
-        return false;
-        }
-
-     sockAddr.sin_addr.s_addr = inet_addr(*host->h_addr_list);
-     }
-
-  return retval;
+  return (cIptvSocket::OpenSocket(Port, false) && CheckAddress(StreamAddr, &sockAddr.sin_addr.s_addr));
 }
 
 void cIptvTcpSocket::CloseSocket(void)

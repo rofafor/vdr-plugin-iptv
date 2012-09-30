@@ -44,7 +44,7 @@ cd /put/your/path/here/VDR/PLUGINS/src
 tar -xzf /put/your/path/here/vdr-iptv-X.Y.Z.tgz
 ln -s iptv-X.Y.Z iptv
 cd /put/your/path/here/VDR
-cp -R PLUGINS/src/iptv/iptv /path/to/vdrconf/plugins/
+cp -R PLUGINS/src/iptv/iptv /path/to/vdrresource/plugins/
 make
 make plugins
 ./vdr -P iptv
@@ -91,14 +91,15 @@ Configuration:
   TV4;IPTV:40:S=1|P=0|F=EXT|U=iptvstream.sh|A=0:I:0:0:680:0:0:4:0:0:0
   TV3;IPTV:30:S=0|P=1|F=FILE|U=/video/stream.ts|A=5:I:0:514:670:2321:0:3:0:0:0
   TV2;IPTV:20:S=0|P=1|F=HTTP|U=127.0.0.1/TS/2|A=3000:I:0:513:660:2321:0:2:0:0:0
+  TV1;IPTV:10:S=1|P=0|F=UDP|U=127.0.0.1@127.0.0.1|A=1234:I:0:512:650:2321:0:1:0:0:0
   TV1;IPTV:10:S=1|P=0|F=UDP|U=127.0.0.1|A=1234:I:0:512:650:2321:0:1:0:0:0
            ^  ^   ^   ^     ^           ^    ^
            |  |   |   |     |           |    Source type ("I")
            |  |   |   |     |           Stream parameter (multicast port
            |  |   |   |     |           number, HTTP port number, file delay
            |  |   |   |     |           (ms), script parameter)
-           |  |   |   |     Stream address (multicast address, URL, file
-           |  |   |   |     location, script location)
+           |  |   |   |     Stream address (multicast source@group address,
+           |  |   |   |     URL, file location, script location)
            |  |   |   Stream protocol ("UDP", "HTTP", "FILE", "EXT")
            |  |   Pid scanner ("0" disable, "1" enable)
            |  Section id (Sid/Nid/Tid) scanner ("0" disable, "1" enable)
@@ -119,9 +120,9 @@ External streaming:
 
 - To watch an externally received channel add an EXT entry to channels.conf
   and specify a script name and parameter. The specified script is executed
-  from plugin configuration directory when VDR tunes to the channel. The
-  specified script parameter is passed to the script and it can be used to
-  select for example between different URLs.
+  from plugin resource directory when VDR tunes to the channel. The specified
+  script parameter is passed to the script and it can be used to select for
+  example between different URLs.
 
 - When an EXT channel is opened the IPTV plugin opens an UDP listening port
   on the localhost. The external script is responsible for supplying IPTV
@@ -166,6 +167,11 @@ Notes:
 
 - Section id and pid scanners should be disabled after the correct data is
   found. This can be made via VDR's channel editor.
+
+- Source-specific multicast (SSM) can be enabled by defining both the source
+  address and the group address separated by a '@' character. This will use
+  IGMP v3 protocol:
+  "U=<source address>@<group address>"
 
 Acknowledgements:
 

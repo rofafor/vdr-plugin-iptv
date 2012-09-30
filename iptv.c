@@ -13,15 +13,15 @@
 #include "device.h"
 #include "iptvservice.h"
 
-#if defined(APIVERSNUM) && APIVERSNUM < 10727
-#error "VDR-1.7.27 API version or greater is required!"
+#if defined(APIVERSNUM) && APIVERSNUM < 10730
+#error "VDR-1.7.30 API version or greater is required!"
 #endif
 
 #ifndef GITVERSION
 #define GITVERSION ""
 #endif
 
-       const char VERSION[]     = "1.0.1" GITVERSION;
+       const char VERSION[]     = "1.1.0" GITVERSION;
 static const char DESCRIPTION[] = trNOOP("Experience the IPTV");
 
 class cPluginIptv : public cPlugin {
@@ -99,7 +99,7 @@ bool cPluginIptv::Initialize(void)
 {
   debug("cPluginIptv::Initialize()\n");
   // Initialize any background activities the plugin shall perform.
-  IptvConfig.SetConfigDirectory(cPlugin::ConfigDirectory(PLUGIN_NAME_I18N));
+  IptvConfig.SetConfigDirectory(cPlugin::ResourceDirectory(PLUGIN_NAME_I18N));
   return cIptvDevice::Initialize(deviceCount);
 }
 

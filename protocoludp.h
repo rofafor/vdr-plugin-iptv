@@ -14,6 +14,8 @@
 
 class cIptvProtocolUdp : public cIptvUdpSocket, public cIptvProtocolIf {
 private:
+  bool isIGMPv3;
+  char* sourceAddr;
   char* streamAddr;
   int streamPort;
 

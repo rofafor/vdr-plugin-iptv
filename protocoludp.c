@@ -19,7 +19,9 @@
 #include "socket.h"
 
 cIptvProtocolUdp::cIptvProtocolUdp()
-: streamAddr(strdup("")),
+: isIGMPv3(false),
+  sourceAddr(strdup("")),
+  streamAddr(strdup("")),
   streamPort(0)
 {
   debug("cIptvProtocolUdp::cIptvProtocolUdp()\n");
@@ -32,12 +34,13 @@ cIptvProtocolUdp::~cIptvProtocolUdp()
   cIptvProtocolUdp::Close();
   // Free allocated memory
   free(streamAddr);
+  free(sourceAddr);
 }
 
 bool cIptvProtocolUdp::Open(void)
 {
   debug("cIptvProtocolUdp::Open(): streamAddr=%s\n", streamAddr);
-  OpenSocket(streamPort, inet_addr(streamAddr));
+  OpenSocket(streamPort, streamAddr, sourceAddr, isIGMPv3);
   if (!isempty(streamAddr)) {
      // Join a new multicast group
      JoinMulticast();
@@ -50,12 +53,13 @@ bool cIptvProtocolUdp::Close(void)
   debug("cIptvProtocolUdp::Close(): streamAddr=%s\n", streamAddr);
   if (!isempty(streamAddr)) {
      // Drop the multicast group
-     OpenSocket(streamPort, inet_addr(streamAddr));
+     OpenSocket(streamPort, streamAddr, sourceAddr, isIGMPv3);
      DropMulticast();
      }
   // Close the socket
   CloseSocket();
   // Do NOT reset stream and source addresses
+  //sourceAddr = strcpyrealloc(sourceAddr, "");
   //streamAddr = strcpyrealloc(streamAddr, "");
   //streamPort = 0;
   return true;
@@ -72,15 +76,27 @@ bool cIptvProtocolUdp::Set(const char* Location, const int Parameter, const int 
   if (!isempty(Location)) {
      // Drop the multicast group
      if (!isempty(streamAddr)) {
-        OpenSocket(streamPort, inet_addr(streamAddr));
+        OpenSocket(streamPort, streamAddr, sourceAddr, isIGMPv3);
         DropMulticast();
         }
      // Update stream address and port
      streamAddr = strcpyrealloc(streamAddr, Location);
+     // <group address> or <source address>@<group address>
+     char *p = strstr(streamAddr, "@");
+     if (p) {
+        *p = 0;
+        sourceAddr = strcpyrealloc(sourceAddr, streamAddr);
+        streamAddr = strcpyrealloc(streamAddr, p + 1);
+        isIGMPv3 = true;
+        }
+     else {
+        sourceAddr = strcpyrealloc(sourceAddr, streamAddr);
+        isIGMPv3 = false;
+        }
      streamPort = Parameter;
      // Join a new multicast group
      if (!isempty(streamAddr)) {
-        OpenSocket(streamPort, inet_addr(streamAddr));
+        OpenSocket(streamPort, streamAddr, sourceAddr, isIGMPv3);
         JoinMulticast();
         }
      }
@@ -90,5 +106,7 @@ bool cIptvProtocolUdp::Set(const char* Location, const int Parameter, const int 
 cString cIptvProtocolUdp::GetInformation(void)
 {
   //debug("cIptvProtocolUdp::GetInformation()");
+  if (isIGMPv3)
+     return cString::sprintf("udp://%s@%s:%d", sourceAddr, streamAddr, streamPort);
   return cString::sprintf("udp://%s:%d", streamAddr, streamPort);
 }

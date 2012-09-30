@@ -36,8 +36,6 @@ private:
   uint16_t pid;
 
   int devid;
-  int id;
-  int socket[2];
 
   uint8_t filter_value[DMX_MAX_FILTER_SIZE];
   uint8_t filter_mask[DMX_MAX_FILTER_SIZE];
@@ -45,6 +43,8 @@ private:
 
   uint8_t maskandmode[DMX_MAX_FILTER_SIZE];
   uint8_t maskandnotmode[DMX_MAX_FILTER_SIZE];
+
+  cRingBufferLinear *ringbuffer;
 
   inline uint16_t GetLength(const uint8_t *Data);
   void New(void);
@@ -54,11 +54,10 @@ private:
 
 public:
   // constructor & destructor
-  cIptvSectionFilter(int Index, int DeviceIndex, uint16_t Pid,
-                     uint8_t Tid, uint8_t Mask);
+  cIptvSectionFilter(int DeviceIndex, uint16_t Pid, uint8_t Tid, uint8_t Mask);
   virtual ~cIptvSectionFilter();
   void Process(const uint8_t* Data);
-  int GetReadDesc(void);
+  int Read(void *Buffer, size_t Length);
   uint16_t GetPid(void) const { return pid; }
 };
 

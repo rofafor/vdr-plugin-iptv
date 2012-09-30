@@ -25,6 +25,7 @@ protected:
 protected:
   bool OpenSocket(const int Port, const bool isUdp);
   void CloseSocket(void);
+  bool CheckAddress(const char *Addr, in_addr_t *InAddr);
 
 public:
   cIptvSocket();
@@ -34,12 +35,15 @@ public:
 class cIptvUdpSocket : public cIptvSocket {
 private:
   in_addr_t streamAddr;
+  in_addr_t sourceAddr;
+  bool useIGMPv3;
 
 public:
   cIptvUdpSocket();
   virtual ~cIptvUdpSocket();
   virtual int Read(unsigned char* BufferAddr, unsigned int BufferLen);
-  bool OpenSocket(const int Port, const in_addr_t StreamAddr = INADDR_ANY);
+  bool OpenSocket(const int Port);
+  bool OpenSocket(const int Port, const char *StreamAddr, const char *SourceAddr, bool UseIGMPv3);
   void CloseSocket(void);
   bool JoinMulticast(void);
   bool DropMulticast(void);

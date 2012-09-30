@@ -5,10 +5,10 @@
  *
  */
 
+#include "config.h"
 #include "sectionfilter.h"
 
-cIptvSectionFilter::cIptvSectionFilter(int DeviceIndex, int Index,
-                                       uint16_t Pid, uint8_t Tid, uint8_t Mask)
+cIptvSectionFilter::cIptvSectionFilter(int DeviceIndex, uint16_t Pid, uint8_t Tid, uint8_t Mask)
 : pusi_seen(0),
   feedcc(0),
   doneq(0),
@@ -17,10 +17,9 @@ cIptvSectionFilter::cIptvSectionFilter(int DeviceIndex, int Index,
   seclen(0),
   tsfeedp(0),
   pid(Pid),
-  devid(DeviceIndex),
-  id(Index)
+  devid(DeviceIndex)
 {
-  //debug("cIptvSectionFilter::cIptvSectionFilter(%d, %d)\n", devid, id);
+  //debug("cIptvSectionFilter::cIptvSectionFilter(%d, %d)\n", devid, pid);
   int i;
 
   memset(secbuf_base, '\0', sizeof(secbuf_base));
@@ -47,35 +46,30 @@ cIptvSectionFilter::cIptvSectionFilter(int DeviceIndex, int Index,
       }
   doneq = local_doneq ? 1 : 0;
 
-  // Create sockets
-  socket[0] = socket[1] = -1;
-  if (socketpair(AF_UNIX, SOCK_DGRAM, 0, socket) != 0) {
-     char tmp[64];
-     error("Opening section filter sockets failed (device=%d id=%d): %s\n", devid, id, strerror_r(errno, tmp, sizeof(tmp)));
-     }
-  else if ((fcntl(socket[0], F_SETFL, O_NONBLOCK) != 0) || (fcntl(socket[1], F_SETFL, O_NONBLOCK) != 0)) {
-     char tmp[64];
-     error("Setting section filter socket to non-blocking mode failed (device=%d id=%d): %s", devid, id, strerror_r(errno, tmp, sizeof(tmp)));
-     }
+  // Create filtering buffer
+  ringbuffer = new cRingBufferLinear(KILOBYTE(128), 0, false, *cString::sprintf("IPTV SECTION %d/%d", devid, pid));
+  if (ringbuffer)
+     ringbuffer->SetTimeouts(10, 10);
+  else
+     error("Failed to allocate buffer for section filter (device=%d pid=%d): ", devid, pid);
 }
 
 cIptvSectionFilter::~cIptvSectionFilter()
 {
-  //debug("cIptvSectionFilter::~cIptvSectionfilter(%d, %d)\n", devid, id);
-  int tmp = socket[1];
-  socket[1] = -1;
-  if (tmp >= 0)
-     close(tmp);
-  tmp = socket[0];
-  socket[0] = -1;
-  if (tmp >= 0)
-     close(tmp);
+  //debug("cIptvSectionFilter::~cIptvSectionfilter(%d, %d)\n", devid, pid);
+  DELETE_POINTER(ringbuffer);
   secbuf = NULL;
 }
 
-int cIptvSectionFilter::GetReadDesc(void)
+int cIptvSectionFilter::Read(void *Data, size_t Length)
 {
-  return socket[0];
+  int count = 0;
+  uchar *p = ringbuffer->Get(count);
+  if (p && count > 0) {
+     memcpy(Data, p, count);
+     ringbuffer->Del(count);
+     }
+  return count;
 }
 
 inline uint16_t cIptvSectionFilter::GetLength(const uint8_t *Data)
@@ -105,10 +99,10 @@ int cIptvSectionFilter::Filter(void)
      if (doneq && !neq)
         return 0;
 
-     // There is no data in the read socket, more can be written
-     if ((socket[0] >= 0) && (socket[1] >= 0) /*&& !select_single_desc(socket[0], 0, false)*/) {
-        ssize_t len = write(socket[1], secbuf, seclen);
-        ERROR_IF(len < 0, "write()");
+     if (ringbuffer) {
+        int len = ringbuffer->Put(secbuf, seclen);
+        if (len != seclen)
+           ringbuffer->ReportOverflow(seclen - len);
         // Update statistics
         AddSectionStatistic(len, 1);
         }

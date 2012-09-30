@@ -343,26 +343,37 @@ int cIptvDevice::OpenFilter(u_short Pid, u_char Tid, u_char Mask)
   for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
       if (!secfilters[i]) {
          //debug("cIptvDevice::OpenFilter(%d): Pid=%d Tid=%02X Mask=%02X Index=%d\n", deviceIndex, Pid, Tid, Mask, i);
-         secfilters[i] = new cIptvSectionFilter(deviceIndex, i, Pid, Tid, Mask);
-         return secfilters[i]->GetReadDesc();
+         secfilters[i] = new cIptvSectionFilter(deviceIndex, Pid, Tid, Mask);
+         if (secfilters[i])
+            return i;
+         break;
          }
       }
   // No free filter slot found
   return -1;
 }
 
+int cIptvDevice::ReadFilter(int Handle, void *Buffer, size_t Length)
+{
+  // Lock
+  cMutexLock MutexLock(&mutex);
+  // ... and load
+  if (secfilters[Handle]) {
+     return secfilters[Handle]->Read(Buffer, Length);
+     //debug("cIptvDevice::ReadFilter(%d): %d %d\n", deviceIndex, Handle, Length);
+     }
+  return 0;
+}
+
 void cIptvDevice::CloseFilter(int Handle)
 {
   // Lock
   cMutexLock MutexLock(&mutex);
-  // Search the filter for deletion
-  for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
-      if (secfilters[i] && (Handle == secfilters[i]->GetReadDesc())) {
-         //debug("cIptvDevice::CloseFilter(%d): %d\n", deviceIndex, Handle);
-         DeleteFilter(i);
-         break;
-         }
-      }
+  // ... and load
+  if (secfilters[Handle]) {
+     //debug("cIptvDevice::CloseFilter(%d): %d\n", deviceIndex, Handle);
+     DeleteFilter(Handle);
+     }
 }
 
 bool cIptvDevice::OpenDvr(void)
@@ -393,6 +404,12 @@ bool cIptvDevice::HasLock(int TimeoutMs)
 {
   //debug("cIptvDevice::HasLock(%d): %d\n", deviceIndex, TimeoutMs);
   return (!IsBuffering());
+}
+
+bool cIptvDevice::HasInternalCam(void)
+{
+  //debug("cIptvDevice::HasInternalCam(%d)\n", deviceIndex);
+  return true;
 }
 
 void cIptvDevice::ResetBuffering(void)

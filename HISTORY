@@ -181,3 +181,10 @@ VDR Plugin 'iptv' Revision History
 2012-07-10: Version 1.0.1
 
 - Added FreeBSD support (Thanks to Jürgen Lock).
+
+2012-09-30: Version 1.1.0
+
+- Updated for vdr-1.7.30.
+- Added support for source-specific multicasts (SSM).
+- Changed default external script directory from the
+  configuration to the resource.
