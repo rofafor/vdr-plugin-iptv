@@ -227,7 +227,7 @@ int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
   //debug("cIptvUdpSocket::Read()\n");
   // Error out if socket not initialized
   if (socketDesc <= 0) {
-     error("Invalid socket in %s\n", __FUNCTION__);
+     error("Invalid socket in cIptvUdpSocket::%s()\n", __FUNCTION__);
      return -1;
      }
   int len = 0;
@@ -359,7 +359,7 @@ int cIptvTcpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
   //debug("cIptvTcpSocket::Read()\n");
   // Error out if socket not initialized
   if (socketDesc <= 0) {
-     error("Invalid socket in %s\n", __FUNCTION__);
+     error("Invalid socket in cIptvTcpSocket::%s()\n", __FUNCTION__);
      return -1;
      }
   int len = 0;
@@ -376,7 +376,7 @@ bool cIptvTcpSocket::ReadChar(char* BufferAddr, unsigned int TimeoutMs)
   //debug("cIptvTcpSocket::ReadChar()\n");
   // Error out if socket not initialized
   if (socketDesc <= 0) {
-     error("Invalid socket in %s\n", __FUNCTION__);
+     error("Invalid socket in cIptvTcpSocket::%s()\n", __FUNCTION__);
      return false;
      }
   socklen_t addrlen = sizeof(sockAddr);
@@ -401,7 +401,7 @@ bool cIptvTcpSocket::Write(const char* BufferAddr, unsigned int BufferLen)
   //debug("cIptvTcpSocket::Write()\n");
   // Error out if socket not initialized
   if (socketDesc <= 0) {
-     error("Invalid socket in %s\n", __FUNCTION__);
+     error("Invalid socket in cIptvTcpSocket::%s()\n", __FUNCTION__);
      return false;
      }
   ERROR_IF_RET(send(socketDesc, BufferAddr, BufferLen, 0) < 0, "send()", return false);

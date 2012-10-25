@@ -38,15 +38,14 @@
 
 #define SECTION_FILTER_TABLE_SIZE       7
 
-#define ERROR_IF_FUNC(exp, errstr, func, ret) \
-  do {                                        \
-     if (exp) {                               \
-        char tmp[64];                         \
-        strerror_r(errno, tmp, sizeof(tmp));  \
-        error(errstr": %s", tmp);             \
-        func;                                 \
-        ret;                                  \
-        }                                     \
+#define ERROR_IF_FUNC(exp, errstr, func, ret)                     \
+  do {                                                            \
+     if (exp) {                                                   \
+        char tmp[64];                                             \
+        error(errstr": %s", strerror_r(errno, tmp, sizeof(tmp))); \
+        func;                                                     \
+        ret;                                                      \
+        }                                                         \
   } while (0)
 
 
