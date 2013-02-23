@@ -2,24 +2,22 @@
 # Makefile for IPTV plugin
 #
 
-# Debugging on/off 
+# Debugging on/off
+
 #IPTV_DEBUG = 1
 
 # Default shell for EXT protocol
+
 #IPTV_EXTSHELL = /bin/bash
 
 # Strip debug symbols?  Set eg. to /bin/true if not
-STRIP = strip
 
-# Install command
-INSTALL = cp --remove-destination
+STRIP = strip
 
 # The official name of this plugin.
 # This name will be used in the '-P...' option of VDR to load the plugin.
 # By default the main source file also carries this name.
-# IMPORTANT: the presence of this macro is important for the Make.config
-# file. So it must be defined, even if it is not used here!
-#
+
 PLUGIN = iptv
 
 ### The version number of this plugin (taken from the main source file):
@@ -27,40 +25,47 @@ PLUGIN = iptv
 VERSION = $(shell grep 'const char VERSION\[\] *=' $(PLUGIN).c | awk '{ print $$5 }' | sed -e 's/[";]//g')
 GITTAG  = $(shell git describe --always 2>/dev/null)
 
-### The C++ compiler and options:
-
-CXX      ?= g++
-CXXFLAGS ?= -fPIC -g -O3 -Wall -Wextra -Wswitch-default -Wfloat-equal -Wundef -Wpointer-arith -Wconversion -Wcast-align -Wredundant-decls -Wno-unused-parameter -Werror=overloaded-virtual -Wno-parentheses
-LDFLAGS  ?= -Wl,--as-needed
-
 ### The directory environment:
 
-VDRDIR ?= ../../..
-LIBDIR ?= ../../lib
+# Use package data if installed...otherwise assume we're under the VDR source directory:
+PKGCFG = $(if $(VDRDIR),$(shell pkg-config --variable=$(1) $(VDRDIR)/vdr.pc),$(shell pkg-config --variable=$(1) vdr || pkg-config --variable=$(1) ../../../vdr.pc))
+LIBDIR = $(call PKGCFG,libdir)
+LOCDIR = $(call PKGCFG,locdir)
+PLGCFG = $(call PKGCFG,plgcfg)
+#
 TMPDIR ?= /tmp
 
-### Make sure that necessary options are included:
+### The compiler options:
 
--include $(VDRDIR)/Make.global
+export CFLAGS   = $(call PKGCFG,cflags)
+export CXXFLAGS = $(call PKGCFG,cxxflags)
+
+### The version number of VDR's plugin API:
+
+APIVERSION = $(call PKGCFG,apiversion)
 
 ### Allow user defined options to overwrite defaults:
 
--include $(VDRDIR)/Make.config
-
-### The version number of VDR's plugin API (taken from VDR's "config.h"):
-
-APIVERSION = $(shell sed -ne '/define APIVERSION/s/^.*"\(.*\)".*$$/\1/p' $(VDRDIR)/config.h)
+-include $(PLGCFG)
 
 ### The name of the distribution archive:
 
 ARCHIVE = $(PLUGIN)-$(VERSION)
 PACKAGE = vdr-$(ARCHIVE)
 
+### The name of the shared object file:
+
+SOFILE = libvdr-$(PLUGIN).so
+
+### Libraries
+
+LIBS = $(shell curl-config --libs)
+
 ### Includes and Defines (add further entries here):
 
-INCLUDES += -I$(VDRDIR)/include
+INCLUDES +=
 
-DEFINES += -D_GNU_SOURCE -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
+DEFINES += -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
 
 ifdef IPTV_DEBUG
 DEFINES += -DDEBUG
@@ -79,61 +84,67 @@ all-redirect: all
 
 ### The object files (add further files here):
 
-OBJS = $(PLUGIN).o config.o setup.o device.o streamer.o protocoludp.o \
-	protocolhttp.o protocolfile.o protocolext.o sectionfilter.o \
-	sidscanner.o pidscanner.o statistics.o common.o socket.o source.o
+OBJS = $(PLUGIN).o common.o config.o device.o pidscanner.o \
+	protocolcurl.o protocolext.o protocolfile.o protocolhttp.o \
+	protocoludp.o sectionfilter.o setup.o sidscanner.o socket.o \
+	source.o statistics.o streamer.o
 
 ### The main target:
 
-all: libvdr-$(PLUGIN).so i18n
+all: $(SOFILE) i18n
 
 ### Implicit rules:
 
-%.o: %.c Makefile
-	$(CXX) $(CXXFLAGS) -c $(DEFINES) $(INCLUDES) $<
+%.o: %.c
+	$(CXX) $(CXXFLAGS) -c $(DEFINES) $(INCLUDES) -o $@ $<
 
 ### Dependencies:
 
 MAKEDEP = $(CXX) -MM -MG
 DEPFILE = .dependencies
 $(DEPFILE): Makefile
-	@$(MAKEDEP) $(DEFINES) $(INCLUDES) $(OBJS:%.o=%.c) > $@
+	@$(MAKEDEP) $(CXXFLAGS) $(DEFINES) $(INCLUDES) $(OBJS:%.o=%.c) > $@
 
 -include $(DEPFILE)
 
 ### Internationalization (I18N):
 
 PODIR     = po
-LOCALEDIR = $(VDRDIR)/locale
 I18Npo    = $(wildcard $(PODIR)/*.po)
-I18Nmsgs  = $(addprefix $(LOCALEDIR)/, $(addsuffix /LC_MESSAGES/vdr-$(PLUGIN).mo, $(notdir $(foreach file, $(I18Npo), $(basename $(file))))))
+I18Nmo    = $(addsuffix .mo, $(foreach file, $(I18Npo), $(basename $(file))))
+I18Nmsgs  = $(addprefix $(DESTDIR)$(LOCDIR)/, $(addsuffix /LC_MESSAGES/vdr-$(PLUGIN).mo, $(notdir $(foreach file, $(I18Npo), $(basename $(file))))))
 I18Npot   = $(PODIR)/$(PLUGIN).pot
 
 %.mo: %.po
 	msgfmt -c -o $@ $<
 
 $(I18Npot): $(wildcard *.c)
-	xgettext -C -cTRANSLATORS --no-wrap --no-location -k -ktr -ktrNOOP --package-name='vdr-$(PLUGIN)' --package-version='$(VERSION)' --msgid-bugs-address='<see README>' -o $@ `ls $^`
+	xgettext -C -cTRANSLATORS --no-wrap --no-location -k -ktr -ktrNOOP --package-name=vdr-$(PLUGIN) --package-version=$(VERSION) --msgid-bugs-address='<see README>' -o $@ `ls $^`
 
 %.po: $(I18Npot)
-	msgmerge -U --no-wrap --no-location --backup=none -q $@ $<
+	msgmerge -U --no-wrap --no-location --backup=none -q -N $@ $<
 	@touch $@
 
-$(I18Nmsgs): $(LOCALEDIR)/%/LC_MESSAGES/vdr-$(PLUGIN).mo: $(PODIR)/%.mo
-	@mkdir -p $(dir $@)
-	cp $< $@
+$(I18Nmsgs): $(DESTDIR)$(LOCDIR)/%/LC_MESSAGES/vdr-$(PLUGIN).mo: $(PODIR)/%.mo
+	install -D -m644 $< $@
 
 .PHONY: i18n
-i18n: $(I18Nmsgs) $(I18Npot)
+i18n: $(I18Nmo) $(I18Npot)
+
+install-i18n: $(I18Nmsgs)
 
 ### Targets:
 
-libvdr-$(PLUGIN).so: $(OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(OBJS) -o $@
+$(SOFILE): $(OBJS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(OBJS) $(LIBS) -o $@
 ifndef IPTV_DEBUG
 	@$(STRIP) $@
 endif
-	@$(INSTALL) $@ $(LIBDIR)/$@.$(APIVERSION)
+
+install-lib: $(SOFILE)
+	install -D $^ $(DESTDIR)$(LIBDIR)/$^.$(APIVERSION)
+
+install: install-lib install-i18n
 
 dist: $(I18Npo) clean
 	@-rm -rf $(TMPDIR)/$(ARCHIVE)
@@ -144,7 +155,9 @@ dist: $(I18Npo) clean
 	@echo Distribution package created as $(PACKAGE).tgz
 
 clean:
-	@-rm -f $(OBJS) $(DEPFILE) *.so *.tgz core* *~ $(PODIR)/*.mo $(PODIR)/*.pot
+	@-rm -f $(PODIR)/*.mo $(PODIR)/*.pot
+	@-rm -f $(OBJS) $(DEPFILE) *.so *.tgz core* *~
 
-cppcheck: $(OBJS)
-	@cppcheck --enable=information,style,unusedFunction -v -f $(OBJS:%.o=%.c)
+.PHONY: cppcheck
+cppcheck:
+	@cppcheck --language=c++ --enable=all -v -f $(OBJS:%.o=%.c)

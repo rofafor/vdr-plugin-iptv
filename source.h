@@ -20,12 +20,13 @@ private:
   int sidscan;
   int pidscan;
   int protocol;
-  char address[MaxFileName];
+  char address[NAME_MAX];
   int parameter;
 
 public:
   enum {
     eProtocolUDP,
+    eProtocolCURL,
     eProtocolHTTP,
     eProtocolFILE,
     eProtocolEXT,

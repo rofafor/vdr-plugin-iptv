@@ -44,14 +44,18 @@ int select_single_desc(int descriptor, const int usecs, const bool selectWrite)
   tv.tv_sec = 0;
   tv.tv_usec = usecs;
   // Use select
-  fd_set fds;
-  FD_ZERO(&fds);
-  FD_SET(descriptor, &fds);
-  int retval = 0;
+  fd_set infd;
+  fd_set outfd;
+  fd_set errfd;
+  FD_ZERO(&infd);
+  FD_ZERO(&outfd);
+  FD_ZERO(&errfd);
+  FD_SET(descriptor, &errfd);
   if (selectWrite)
-     retval = select(descriptor + 1, NULL, &fds, NULL, &tv);
+     FD_SET(descriptor, &outfd);
   else
-     retval = select(descriptor + 1, &fds, NULL, NULL, &tv);
+     FD_SET(descriptor, &infd);
+  int retval = select(descriptor + 1, &infd, &outfd, &errfd, &tv);
   // Check if error
   ERROR_IF_RET(retval < 0, "select()", return retval);
   return retval;

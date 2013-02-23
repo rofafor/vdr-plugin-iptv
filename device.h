@@ -11,6 +11,7 @@
 #include <vdr/device.h>
 #include "common.h"
 #include "protocoludp.h"
+#include "protocolcurl.h"
 #include "protocolhttp.h"
 #include "protocolfile.h"
 #include "protocolext.h"
@@ -37,12 +38,14 @@ private:
   int dvrFd;
   bool isPacketDelivered;
   bool isOpenDvr;
+  bool isBuffering;
   bool sidScanEnabled;
   bool pidScanEnabled;
   cRingBufferLinear *tsBuffer;
   int tsBufferPrefill;
   tChannelID channelId;
   cIptvProtocolUdp *pUdpProtocol;
+  cIptvProtocolCurl *pCurlProtocol;
   cIptvProtocolHttp *pHttpProtocol;
   cIptvProtocolFile *pFileProtocol;
   cIptvProtocolExt *pExtProtocol;
@@ -71,7 +74,7 @@ private:
   // for channel parsing & buffering
 private:
   void ResetBuffering(void);
-  bool IsBuffering(void);
+  void CheckBuffering(void);
   bool DeleteFilter(unsigned int Index);
   bool IsBlackListed(u_short Pid, u_char Tid, u_char Mask) const;
 
@@ -107,7 +110,7 @@ public:
 
   // for transponder lock
 public:
-  virtual bool HasLock(int);
+  virtual bool HasLock(int) const;
 
   // for common interface
 public:

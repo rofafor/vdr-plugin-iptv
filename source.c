@@ -32,6 +32,9 @@ cString cIptvTransponderParameters::ToString(char Type) const
     case eProtocolEXT:
          protocolstr = "EXT";
          break;
+    case eProtocolCURL:
+         protocolstr = "CURL";
+         break;
     case eProtocolHTTP:
          protocolstr = "HTTP";
          break;
@@ -79,6 +82,10 @@ bool cIptvTransponderParameters::Parse(const char *s)
             case 'F':
                  if (strstr(data, "UDP")) {
                     protocol = eProtocolUDP;
+                    found_f = true;
+                    }
+                 else if (strstr(data, "CURL")) {
+                    protocol = eProtocolCURL;
                     found_f = true;
                     }
                  else if (strstr(data, "HTTP")) {
@@ -134,6 +141,7 @@ cIptvSourceParam::cIptvSourceParam(char Source, const char *Description)
   debug("cIptvSourceParam::cIptvSourceParam(): Source=%c Description=%s\n", Source, Description);
 
   protocols[cIptvTransponderParameters::eProtocolUDP]  = tr("UDP");
+  protocols[cIptvTransponderParameters::eProtocolCURL] = tr("CURL");
   protocols[cIptvTransponderParameters::eProtocolHTTP] = tr("HTTP");
   protocols[cIptvTransponderParameters::eProtocolFILE] = tr("FILE");
   protocols[cIptvTransponderParameters::eProtocolEXT]  = tr("EXT");

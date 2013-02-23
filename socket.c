@@ -265,7 +265,8 @@ int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
                  if (BufferAddr[0] == TS_SYNC_BYTE)
                     return len;
                  else if (len > 3) {
-                    // http://www.networksorcery.com/enp/rfc/rfc2250.txt
+                    // http://tools.ietf.org/html/rfc3550
+                    // http://tools.ietf.org/html/rfc2250
                     // version
                     unsigned int v = (BufferAddr[0] >> 6) & 0x03;
                     // extension bit

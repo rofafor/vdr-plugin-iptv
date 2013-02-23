@@ -188,3 +188,8 @@ VDR Plugin 'iptv' Revision History
 - Added support for source-specific multicasts (SSM).
 - Changed default external script directory from the
   configuration to the resource.
+
+2013-02-24: Version 1.2.0
+
+- Updated for vdr-1.7.38.
+- Added a new CURL protocol for HTTP/HTTPS.

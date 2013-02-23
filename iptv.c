@@ -13,15 +13,15 @@
 #include "device.h"
 #include "iptvservice.h"
 
-#if defined(APIVERSNUM) && APIVERSNUM < 10730
-#error "VDR-1.7.30 API version or greater is required!"
+#if defined(APIVERSNUM) && APIVERSNUM < 10738
+#error "VDR-1.7.38 API version or greater is required!"
 #endif
 
 #ifndef GITVERSION
 #define GITVERSION ""
 #endif
 
-       const char VERSION[]     = "1.1.0" GITVERSION;
+       const char VERSION[]     = "1.2.0" GITVERSION;
 static const char DESCRIPTION[] = trNOOP("Experience the IPTV");
 
 class cPluginIptv : public cPlugin {
@@ -107,6 +107,10 @@ bool cPluginIptv::Start(void)
 {
   debug("cPluginIptv::Start()\n");
   // Start any background activities the plugin shall perform.
+  if (curl_global_init(CURL_GLOBAL_ALL) == CURLE_OK) {
+     curl_version_info_data *data = curl_version_info(CURLVERSION_NOW);
+     info("Using CURL %s", data->version);
+     }
   return true;
 }
 
@@ -114,6 +118,7 @@ void cPluginIptv::Stop(void)
 {
   debug("cPluginIptv::Stop()\n");
   // Stop any background activities the plugin is performing.
+  curl_global_cleanup();
 }
 
 void cPluginIptv::Housekeeping(void)
@@ -204,7 +209,7 @@ bool cPluginIptv::Service(const char *Id, void *Data)
   debug("cPluginIptv::Service()\n");
   if (strcmp(Id,"IptvService-v1.0") == 0) {
      if (Data) {
-        IptvService_v1_0 *data = (IptvService_v1_0*)Data;
+        IptvService_v1_0 *data = reinterpret_cast<IptvService_v1_0*>(Data);
         cIptvDevice *dev = cIptvDevice::GetIptvDevice(data->cardIndex);
         if (!dev)
            return false;

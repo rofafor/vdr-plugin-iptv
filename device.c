@@ -20,6 +20,7 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   dvrFd(-1),
   isPacketDelivered(false),
   isOpenDvr(false),
+  isBuffering(true),
   sidScanEnabled(false),
   pidScanEnabled(false),
   channelId(tChannelID::InvalidID)
@@ -32,6 +33,7 @@ cIptvDevice::cIptvDevice(unsigned int Index)
   tsBuffer->SetTimeouts(10, 10);
   ResetBuffering();
   pUdpProtocol = new cIptvProtocolUdp();
+  pCurlProtocol = new cIptvProtocolCurl();
   pHttpProtocol = new cIptvProtocolHttp();
   pFileProtocol = new cIptvProtocolFile();
   pExtProtocol = new cIptvProtocolExt();
@@ -63,6 +65,7 @@ cIptvDevice::~cIptvDevice()
   StopSectionHandler();
   DELETE_POINTER(pIptvStreamer);
   DELETE_POINTER(pUdpProtocol);
+  DELETE_POINTER(pCurlProtocol);
   DELETE_POINTER(pHttpProtocol);
   DELETE_POINTER(pFileProtocol);
   DELETE_POINTER(pExtProtocol);
@@ -141,48 +144,48 @@ cString cIptvDevice::GetFiltersInformation(void)
 {
   //debug("cIptvDevice::GetFiltersInformation(%d)\n", deviceIndex);
   unsigned int count = 0;
-  cString info("Active section filters:\n");
+  cString s("Active section filters:\n");
   // loop through active section filters
   for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
       if (secfilters[i]) {
-         info = cString::sprintf("%sFilter %d: %s Pid=0x%02X (%s)\n", *info, i,
-                                 *secfilters[i]->GetSectionStatistic(), secfilters[i]->GetPid(),
-                                 id_pid(secfilters[i]->GetPid()));
+         s = cString::sprintf("%sFilter %d: %s Pid=0x%02X (%s)\n", *s, i,
+                              *secfilters[i]->GetSectionStatistic(), secfilters[i]->GetPid(),
+                              id_pid(secfilters[i]->GetPid()));
          if (++count > IPTV_STATS_ACTIVE_FILTERS_COUNT)
             break;
          }
       }
-  return info;
+  return s;
 }
 
 cString cIptvDevice::GetInformation(unsigned int Page)
 {
   // generate information string
-  cString info;
+  cString s;
   switch (Page) {
     case IPTV_DEVICE_INFO_GENERAL:
-         info = GetGeneralInformation();
+         s = GetGeneralInformation();
          break;
     case IPTV_DEVICE_INFO_PIDS:
-         info = GetPidsInformation();
+         s = GetPidsInformation();
          break;
     case IPTV_DEVICE_INFO_FILTERS:
-         info = GetFiltersInformation();
+         s = GetFiltersInformation();
          break;
     case IPTV_DEVICE_INFO_PROTOCOL:
-         info = pIptvStreamer ? *pIptvStreamer->GetInformation() : "";
+         s = pIptvStreamer ? *pIptvStreamer->GetInformation() : "";
          break;
     case IPTV_DEVICE_INFO_BITRATE:
-         info = pIptvStreamer ? *pIptvStreamer->GetStreamerStatistic() : "";
+         s = pIptvStreamer ? *pIptvStreamer->GetStreamerStatistic() : "";
          break;
     default:
-         info = cString::sprintf("%s%s%s",
-                                 *GetGeneralInformation(),
-                                 *GetPidsInformation(),
-                                 *GetFiltersInformation());
+         s = cString::sprintf("%s%s%s",
+                              *GetGeneralInformation(),
+                              *GetPidsInformation(),
+                              *GetFiltersInformation());
          break;
     }
-  return info;
+  return s;
 }
 
 cString cIptvDevice::DeviceType(void) const
@@ -267,6 +270,9 @@ bool cIptvDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
   switch (itp.Protocol()) {
     case cIptvTransponderParameters::eProtocolUDP:
          protocol = pUdpProtocol;
+         break;
+    case cIptvTransponderParameters::eProtocolCURL:
+         protocol = pCurlProtocol;
          break;
     case cIptvTransponderParameters::eProtocolHTTP:
          protocol = pHttpProtocol;
@@ -400,10 +406,10 @@ void cIptvDevice::CloseDvr(void)
   isOpenDvr = false;
 }
 
-bool cIptvDevice::HasLock(int TimeoutMs)
+bool cIptvDevice::HasLock(int TimeoutMs) const
 {
   //debug("cIptvDevice::HasLock(%d): %d\n", deviceIndex, TimeoutMs);
-  return (!IsBuffering());
+  return (!isBuffering);
 }
 
 bool cIptvDevice::HasInternalCam(void)
@@ -415,26 +421,29 @@ bool cIptvDevice::HasInternalCam(void)
 void cIptvDevice::ResetBuffering(void)
 {
   debug("cIptvDevice::ResetBuffering(%d)\n", deviceIndex);
+  isBuffering = true;
   // pad prefill to multiple of TS_SIZE
   tsBufferPrefill = (unsigned int)MEGABYTE(IptvConfig.GetTsBufferSize()) *
                     IptvConfig.GetTsBufferPrefillRatio() / 100;
   tsBufferPrefill -= (tsBufferPrefill % TS_SIZE);
 }
 
-bool cIptvDevice::IsBuffering(void)
+void cIptvDevice::CheckBuffering(void)
 {
-  //debug("cIptvDevice::IsBuffering(%d): %d\n", deviceIndex);
-  if (tsBufferPrefill && tsBuffer->Available() < tsBufferPrefill)
-     return true;
-  else
+  //debug("cIptvDevice::CheckBuffering(%d): %d\n", deviceIndex);
+  if (tsBufferPrefill && tsBuffer && tsBuffer->Available() < tsBufferPrefill)
+     isBuffering = true;
+  else {
+     isBuffering = false;
      tsBufferPrefill = 0;
-  return false;
+     }
 }
 
 bool cIptvDevice::GetTSPacket(uchar *&Data)
 {
   //debug("cIptvDevice::GetTSPacket(%d)\n", deviceIndex);
-  if (tsBuffer && !IsBuffering()) {
+  CheckBuffering();
+  if (tsBuffer && !isBuffering) {
      if (isPacketDelivered) {
         tsBuffer->Del(TS_SIZE);
         isPacketDelivered = false;

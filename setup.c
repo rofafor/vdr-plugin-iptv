@@ -36,6 +36,7 @@ public:
 cIptvMenuInfo::cIptvMenuInfo()
 :cOsdMenu(tr("IPTV Information")), text(""), timeout(), page(IPTV_DEVICE_INFO_GENERAL)
 {
+  SetMenuCategory(mcText);
   timeout.Set(INFO_TIMEOUT_MS);
   UpdateInfo();
   SetHelp(tr("General"), tr("Pids"), tr("Filters"), tr("Bits/bytes"));

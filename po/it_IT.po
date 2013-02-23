@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vdr-iptv 1.0.0\n"
+"Project-Id-Version: vdr-iptv 1.2.0\n"
 "Report-Msgid-Bugs-To: <see README>\n"
 "POT-Creation-Date: 2012-06-03 06:03+0300\n"
 "PO-Revision-Date: 2012-06-03 06:03+0300\n"
@@ -133,6 +133,9 @@ msgstr "Aiuto"
 
 msgid "UDP"
 msgstr "UDP"
+
+msgid "CURL"
+msgstr "CURL"
 
 msgid "HTTP"
 msgstr "HTTP"

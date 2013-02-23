@@ -17,7 +17,8 @@ See the file COPYING for more information.
 
 Requirements:
 
-DVB compatible MPEG1/2 or H.264 network video streams.
+- Libcurl - the multiprotocol file transfer library
+  http://curl.haxx.se/libcurl/
 
 Description:
 
@@ -91,16 +92,24 @@ Configuration:
   TV4;IPTV:40:S=1|P=0|F=EXT|U=iptvstream.sh|A=0:I:0:0:680:0:0:4:0:0:0
   TV3;IPTV:30:S=0|P=1|F=FILE|U=/video/stream.ts|A=5:I:0:514:670:2321:0:3:0:0:0
   TV2;IPTV:20:S=0|P=1|F=HTTP|U=127.0.0.1/TS/2|A=3000:I:0:513:660:2321:0:2:0:0:0
+  TV1;IPTV:10:S=1|P=0|F=CURL|U=http%3A//foo%3Abar@127.0.0.1%3A3000/TS/2|A=0:I:0:512:650:2321:0:1:0:0:0
   TV1;IPTV:10:S=1|P=0|F=UDP|U=127.0.0.1@127.0.0.1|A=1234:I:0:512:650:2321:0:1:0:0:0
   TV1;IPTV:10:S=1|P=0|F=UDP|U=127.0.0.1|A=1234:I:0:512:650:2321:0:1:0:0:0
-           ^  ^   ^   ^     ^           ^    ^
-           |  |   |   |     |           |    Source type ("I")
-           |  |   |   |     |           Stream parameter (multicast port
-           |  |   |   |     |           number, HTTP port number, file delay
-           |  |   |   |     |           (ms), script parameter)
-           |  |   |   |     Stream address (multicast source@group address,
-           |  |   |   |     URL, file location, script location)
-           |  |   |   Stream protocol ("UDP", "HTTP", "FILE", "EXT")
+           ^  ^   ^   ^     ^           ^      ^
+           |  |   |   |     |           |      Source type ("I")
+           |  |   |   |     |           Stream parameter
+           |  |   |   |     |            UDP:  multicast port
+           |  |   |   |     |            CURL: <<to be defined>>
+           |  |   |   |     |            HTTP: HTTP port number
+           |  |   |   |     |            FILE: file delay (ms)
+           |  |   |   |     |            EXT:  script parameter
+           |  |   |   |     Stream address
+           |  |   |   |      UDP:  multicast [source@]group address
+           |  |   |   |      CURL: HTTP/HTTPS URL; colons (%3A) and pipes (%7C) shall be URL encoded
+           |  |   |   |      HTTP: URL; missing the scheme name part and possible port declaration
+           |  |   |   |      FILE: file location
+           |  |   |   |      EXT:  script location
+           |  |   |   Stream protocol ("UDP", "CURL", "HTTP", "FILE", "EXT")
            |  |   Pid scanner ("0" disable, "1" enable)
            |  Section id (Sid/Nid/Tid) scanner ("0" disable, "1" enable)
            Unique enumeration
@@ -173,6 +182,11 @@ Notes:
   IGMP v3 protocol:
   "U=<source address>@<group address>"
 
+- The CURL implementation supports only HTTP/HTTPS protocols and an optional
+  netrc configuration file for authentication:
+  $(CONFDIR)/iptv/netrc
+
+- CURL implementation
 Acknowledgements:
 
 - The IPTV section filtering code is derived from Linux kernel.

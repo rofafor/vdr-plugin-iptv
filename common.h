@@ -14,9 +14,11 @@
 
 #ifdef DEBUG
 #define debug(x...) dsyslog("IPTV: " x);
+#define info(x...)  isyslog("IPTV: " x);
 #define error(x...) esyslog("ERROR: " x);
 #else
 #define debug(x...) ;
+#define info(x...)  isyslog("IPTV: " x);
 #define error(x...) esyslog("ERROR: " x);
 #endif
 
