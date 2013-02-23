@@ -11,24 +11,24 @@
 #include "statistics.h"
 #include "config.h"
 
-// Section statistic class
+// Section statistics class
 cIptvSectionStatistics::cIptvSectionStatistics()
 : filteredDataM(0),
   numberOfCallsM(0),
   timerM(),
   mutexM()
 {
-  //debug("cIptvSectionStatistics::cIptvSectionStatistics()\n");
+  //debug("cIptvSectionStatistics::%s()", __FUNCTION__);
 }
 
 cIptvSectionStatistics::~cIptvSectionStatistics()
 {
-  //debug("cIptvSectionStatistics::~cIptvSectionStatistics()\n");
+  //debug("cIptvSectionStatistics::%s()", __FUNCTION__);
 }
 
 cString cIptvSectionStatistics::GetSectionStatistic()
 {
-  //debug("cIptvSectionStatistics::GetStatistic()\n");
+  //debug("cIptvSectionStatistics::%s()", __FUNCTION__);
   cMutexLock MutexLock(&mutexM);
   uint64_t elapsed = timerM.Elapsed(); /* in milliseconds */
   timerM.Set();
@@ -44,7 +44,7 @@ cString cIptvSectionStatistics::GetSectionStatistic()
 
 void cIptvSectionStatistics::AddSectionStatistic(long bytesP, long callsP)
 {
-  //debug("cIptvSectionStatistics::AddStatistic(%ld, %ld)\n", bytesP, callsP); 
+  //debug("cIptvSectionStatistics::%s(%ld, %ld)", __FUNCTION__, bytesP, callsP); 
   cMutexLock MutexLock(&mutexM);
   filteredDataM += bytesP;
   numberOfCallsM += callsP;
@@ -52,23 +52,23 @@ void cIptvSectionStatistics::AddSectionStatistic(long bytesP, long callsP)
 
 // --- cIptvPidStatistics ----------------------------------------------------
 
-// Device statistic class
+// Device statistics class
 cIptvPidStatistics::cIptvPidStatistics()
 : timerM(),
   mutexM()
 {
-  debug("cIptvPidStatistics::cIptvPidStatistics()\n");
-  memset(mostActivePidsM, '\0', sizeof(mostActivePidsM));
+  debug("cIptvPidStatistics::%s()", __FUNCTION__);
+  memset(mostActivePidsM, 0, sizeof(mostActivePidsM));
 }
 
 cIptvPidStatistics::~cIptvPidStatistics()
 {
-  debug("cIptvPidStatistics::~cIptvPidStatistics()\n");
+  debug("cIptvPidStatistics::%s()", __FUNCTION__);
 }
 
 cString cIptvPidStatistics::GetPidStatistic()
 {
-  //debug("cIptvPidStatistics::GetStatistic()\n");
+  //debug("cIptvPidStatistics::%s()", __FUNCTION__);
   cMutexLock MutexLock(&mutexM);
   uint64_t elapsed = timerM.Elapsed(); /* in milliseconds */
   timerM.Set();
@@ -83,13 +83,13 @@ cString cIptvPidStatistics::GetPidStatistic()
                               IptvConfig.GetUseBytes() ? "B" : "bit");
          }
       }
-  memset(mostActivePidsM, '\0', sizeof(mostActivePidsM));
+  memset(mostActivePidsM, 0, sizeof(mostActivePidsM));
   return s;
 }
 
 int cIptvPidStatistics::SortPids(const void* data1P, const void* data2P)
 {
-  //debug("cIptvPidStatistics::SortPids()\n");
+  //debug("cIptvPidStatistics::%s()", __FUNCTION__);
   const pidStruct *comp1 = reinterpret_cast<const pidStruct*>(data1P);
   const pidStruct *comp2 = reinterpret_cast<const pidStruct*>(data2P);
   if (comp1->DataAmount > comp2->DataAmount)
@@ -101,7 +101,7 @@ int cIptvPidStatistics::SortPids(const void* data1P, const void* data2P)
 
 void cIptvPidStatistics::AddPidStatistic(u_short pidP, long payloadP)
 {
-  //debug("cIptvPidStatistics::AddStatistic(%ld, %ld)\n", pidP, payloadP);
+  //debug("cIptvPidStatistics::%s(%ld, %ld)", __FUNCTION__, pidP, payloadP);
   cMutexLock MutexLock(&mutexM);
   const int numberOfElements = sizeof(mostActivePidsM) / sizeof(pidStruct);
   // If our statistic already is in the array, update it and quit
@@ -125,23 +125,23 @@ void cIptvPidStatistics::AddPidStatistic(u_short pidP, long payloadP)
 
 // --- cIptvStreamerStatistics -----------------------------------------------
 
-// Streamer statistic class
+// Streamer statistics class
 cIptvStreamerStatistics::cIptvStreamerStatistics()
 : dataBytesM(0),
   timerM(),
   mutexM()
 {
-  debug("cIptvStreamerStatistics::cIptvStreamerStatistics()\n");
+  debug("cIptvStreamerStatistics::%s()", __FUNCTION__);
 }
 
 cIptvStreamerStatistics::~cIptvStreamerStatistics()
 {
-  debug("cIptvStreamerStatistics::~cIptvStreamerStatistics()\n");
+  debug("cIptvStreamerStatistics::%s()", __FUNCTION__);
 }
 
 cString cIptvStreamerStatistics::GetStreamerStatistic()
 {
-  //debug("cIptvStreamerStatistics::GetStatistic()\n");
+  //debug("cIptvStreamerStatistics::%s()", __FUNCTION__);
   cMutexLock MutexLock(&mutexM);
   uint64_t elapsed = timerM.Elapsed(); /* in milliseconds */
   timerM.Set();
@@ -155,13 +155,13 @@ cString cIptvStreamerStatistics::GetStreamerStatistic()
 
 void cIptvStreamerStatistics::AddStreamerStatistic(long bytesP)
 {
-  //debug("cIptvStreamerStatistics::AddStatistic(%ld)\n", bytesP);
+  //debug("cIptvStreamerStatistics::%s(%ld)", __FUNCTION__, bytesP);
   cMutexLock MutexLock(&mutexM);
   dataBytesM += bytesP;
 }
 
 
-// Buffer statistic class
+// Buffer statistics class
 cIptvBufferStatistics::cIptvBufferStatistics()
 : dataBytesM(0),
   freeSpaceM(0),
@@ -169,17 +169,17 @@ cIptvBufferStatistics::cIptvBufferStatistics()
   timerM(),
   mutexM()
 {
-  debug("cIptvBufferStatistics::cIptvBufferStatistics()\n");
+  debug("cIptvBufferStatistics::%s()", __FUNCTION__);
 }
 
 cIptvBufferStatistics::~cIptvBufferStatistics()
 {
-  debug("cIptvBufferStatistics::~cIptvBufferStatistics()\n");
+  debug("cIptvBufferStatistics::%s()", __FUNCTION__);
 }
 
 cString cIptvBufferStatistics::GetBufferStatistic()
 {
-  //debug("cIptvBufferStatistics::GetStatistic()\n");
+  //debug("cIptvBufferStatistics::%s()", __FUNCTION__);
   cMutexLock MutexLock(&mutexM);
   uint64_t elapsed = timerM.Elapsed(); /* in milliseconds */
   timerM.Set();
@@ -203,7 +203,7 @@ cString cIptvBufferStatistics::GetBufferStatistic()
 
 void cIptvBufferStatistics::AddBufferStatistic(long bytesP, long usedP)
 {
-  //debug("cIptvBufferStatistics::AddStatistic(%ld, %ld)\n", bytesP, usedP);
+  //debug("cIptvBufferStatistics::%s(%ld, %ld)", __FUNCTION__, bytesP, usedP);
   cMutexLock MutexLock(&mutexM);
   dataBytesM += bytesP;
   if (usedP > usedSpaceM)

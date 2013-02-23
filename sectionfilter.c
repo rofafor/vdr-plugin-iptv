@@ -19,7 +19,7 @@ cIptvSectionFilter::cIptvSectionFilter(int deviceIndexP, uint16_t pidP, uint8_t 
   pidM(pidP),
   devIdM(deviceIndexP)
 {
-  //debug("cIptvSectionFilter::cIptvSectionFilter(%d, %d)\n", devIdM, pidM);
+  //debug("cIptvSectionFilter::%s(%d, %d)", __FUNCTION__, devIdM, pidM);
   int i;
 
   memset(secBufBaseM,     0, sizeof(secBufBaseM));
@@ -56,7 +56,7 @@ cIptvSectionFilter::cIptvSectionFilter(int deviceIndexP, uint16_t pidP, uint8_t 
 
 cIptvSectionFilter::~cIptvSectionFilter()
 {
-  //debug("cIptvSectionFilter::~cIptvSectionfilter(%d, %d)\n", devIdM, pidM);
+  //debug("cIptvSectionFilter::%s(%d, %d)", __FUNCTION__, devIdM, pidM);
   DELETE_POINTER(ringbufferM);
   secBufM = NULL;
 }

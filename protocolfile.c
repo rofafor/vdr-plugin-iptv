@@ -20,12 +20,12 @@ cIptvProtocolFile::cIptvProtocolFile()
   fileStreamM(NULL),
   isActiveM(false)
 {
-  debug("cIptvProtocolFile::cIptvProtocolFile()\n");
+  debug("cIptvProtocolFile::%s()", __FUNCTION__);
 }
 
 cIptvProtocolFile::~cIptvProtocolFile()
 {
-  debug("cIptvProtocolFile::~cIptvProtocolFile()\n");
+  debug("cIptvProtocolFile::%s()", __FUNCTION__);
   // Drop open handles
   cIptvProtocolFile::Close();
   // Free allocated memory
@@ -34,7 +34,7 @@ cIptvProtocolFile::~cIptvProtocolFile()
 
 bool cIptvProtocolFile::OpenFile(void)
 {
-  debug("cIptvProtocolFile::OpenFile()\n");
+  debug("cIptvProtocolFile::%s()", __FUNCTION__);
   // Check that stream address is valid
   if (!isActiveM && !isempty(fileLocationM)) {
      fileStreamM = fopen(fileLocationM, "rb");
@@ -47,7 +47,7 @@ bool cIptvProtocolFile::OpenFile(void)
 
 void cIptvProtocolFile::CloseFile(void)
 {
-  debug("cIptvProtocolFile::CloseFile()\n");
+  debug("cIptvProtocolFile::%s()", __FUNCTION__);
   // Check that file stream is valid
   if (isActiveM && !isempty(fileLocationM)) {
      fclose(fileStreamM);
@@ -58,10 +58,10 @@ void cIptvProtocolFile::CloseFile(void)
 
 int cIptvProtocolFile::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
 {
-   //debug("cIptvProtocolFile::Read()\n");
+   //debug("cIptvProtocolFile::%s()", __FUNCTION__);
    // Check errors
    if (ferror(fileStreamM)) {
-      debug("Read error\n");
+      debug("cIptvProtocolFile::%s(): stream error", __FUNCTION__);
       return -1;
       }
    // Rewind if EOF
@@ -81,7 +81,7 @@ int cIptvProtocolFile::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
 
 bool cIptvProtocolFile::Open(void)
 {
-  debug("cIptvProtocolFile::Open()\n");
+  debug("cIptvProtocolFile::%s()", __FUNCTION__);
   // Open the file stream
   OpenFile();
   return true;
@@ -89,7 +89,7 @@ bool cIptvProtocolFile::Open(void)
 
 bool cIptvProtocolFile::Close(void)
 {
-  debug("cIptvProtocolFile::Close()\n");
+  debug("cIptvProtocolFile::%s()", __FUNCTION__);
   // Close the file stream
   CloseFile();
   return true;
@@ -97,7 +97,7 @@ bool cIptvProtocolFile::Close(void)
 
 bool cIptvProtocolFile::Set(const char* locationP, const int parameterP, const int indexP)
 {
-  debug("cIptvProtocolFile::Set('%s', %d, %d)\n", locationP, parameterP, indexP);
+  debug("cIptvProtocolFile::%s(%s, %d, %d)", __FUNCTION__, locationP, parameterP, indexP);
   if (!isempty(locationP)) {
      // Close the file stream
      CloseFile();
@@ -112,6 +112,6 @@ bool cIptvProtocolFile::Set(const char* locationP, const int parameterP, const i
 
 cString cIptvProtocolFile::GetInformation(void)
 {
-  //debug("cIptvProtocolFile::GetInformation()");
+  //debug("cIptvProtocolFile::%s()", __FUNCTION__);
   return cString::sprintf("file://%s:%d", fileLocationM, fileDelayM);
 }

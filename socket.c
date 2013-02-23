@@ -19,93 +19,90 @@
 #include "socket.h"
 
 cIptvSocket::cIptvSocket()
-: socketPort(0),
-  socketDesc(-1),
-  isActive(false)
+: socketPortM(0),
+  socketDescM(-1),
+  isActiveM(false)
 {
-  debug("cIptvSocket::cIptvSocket()\n");
-  memset(&sockAddr, '\0', sizeof(sockAddr));
+  debug("cIptvSocket::%s()", __FUNCTION__);
+  memset(&sockAddrM, 0, sizeof(sockAddrM));
 }
 
 cIptvSocket::~cIptvSocket()
 {
-  debug("cIptvSocket::~cIptvSocket()\n");
+  debug("cIptvSocket::%s()", __FUNCTION__);
   // Close the socket
   CloseSocket();
 }
 
-bool cIptvSocket::OpenSocket(const int Port, const bool isUdp)
+bool cIptvSocket::OpenSocket(const int portP, const bool isUdpP)
 {
-  debug("cIptvSocket::OpenSocket()\n");
+  debug("cIptvSocket::%s()", __FUNCTION__);
   // If socket is there already and it is bound to a different port, it must
   // be closed first
-  if (Port != socketPort) {
-     debug("cIptvSocket::OpenSocket(): Socket tear-down\n");
+  if (portP != socketPortM) {
+     debug("cIptvSocket::%s(): socket tear-down", __FUNCTION__);
      CloseSocket();
      }
   // Bind to the socket if it is not active already
-  if (socketDesc < 0) {
+  if (socketDescM < 0) {
      int yes = 1;
      // Create socket
-     if (isUdp)
-        socketDesc = socket(PF_INET, SOCK_DGRAM, 0);
+     if (isUdpP)
+        socketDescM = socket(PF_INET, SOCK_DGRAM, 0);
      else
-        socketDesc = socket(PF_INET, SOCK_STREAM, 0);
-     ERROR_IF_RET(socketDesc < 0, "socket()", return false);
+        socketDescM = socket(PF_INET, SOCK_STREAM, 0);
+     ERROR_IF_RET(socketDescM < 0, "socket()", return false);
      // Make it use non-blocking I/O to avoid stuck read calls
-     ERROR_IF_FUNC(fcntl(socketDesc, F_SETFL, O_NONBLOCK), "fcntl(O_NONBLOCK)",
+     ERROR_IF_FUNC(fcntl(socketDescM, F_SETFL, O_NONBLOCK), "fcntl(O_NONBLOCK)",
                    CloseSocket(), return false);
      // Allow multiple sockets to use the same PORT number
-     ERROR_IF_FUNC(setsockopt(socketDesc, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0, "setsockopt(SO_REUSEADDR)",
+     ERROR_IF_FUNC(setsockopt(socketDescM, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0, "setsockopt(SO_REUSEADDR)",
                    CloseSocket(), return false);
 #ifndef __FreeBSD__
      // Allow packet information to be fetched
-     ERROR_IF_FUNC(setsockopt(socketDesc, SOL_IP, IP_PKTINFO, &yes, sizeof(yes)) < 0, "setsockopt(IP_PKTINFO)",
+     ERROR_IF_FUNC(setsockopt(socketDescM, SOL_IP, IP_PKTINFO, &yes, sizeof(yes)) < 0, "setsockopt(IP_PKTINFO)",
                    CloseSocket(), return false);
 #endif // __FreeBSD__
      // Bind socket
-     memset(&sockAddr, 0, sizeof(sockAddr));
-     sockAddr.sin_family = AF_INET;
-     sockAddr.sin_port = htons((uint16_t)(Port & 0xFFFF));
-     sockAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-     if (isUdp) {
-        int err = bind(socketDesc, (struct sockaddr *)&sockAddr, sizeof(sockAddr));
-        ERROR_IF_FUNC(err < 0, "bind()", CloseSocket(), return false);
-        }
+     memset(&sockAddrM, 0, sizeof(sockAddrM));
+     sockAddrM.sin_family = AF_INET;
+     sockAddrM.sin_port = htons((uint16_t)(portP & 0xFFFF));
+     sockAddrM.sin_addr.s_addr = htonl(INADDR_ANY);
+     if (isUdpP)
+        ERROR_IF_FUNC(bind(socketDescM, (struct sockaddr *)&sockAddrM, sizeof(sockAddrM)) < 0, "bind()", CloseSocket(), return false);
      // Update socket port
-     socketPort = Port;
+     socketPortM = portP;
      }
   return true;
 }
 
 void cIptvSocket::CloseSocket(void)
 {
-  debug("cIptvSocket::CloseSocket()\n");
+  debug("cIptvSocket::%s()", __FUNCTION__);
   // Check if socket exists
-  if (socketDesc >= 0) {
-     close(socketDesc);
-     socketDesc = -1;
-     socketPort = 0;
-     memset(&sockAddr, 0, sizeof(sockAddr));
+  if (socketDescM >= 0) {
+     close(socketDescM);
+     socketDescM = -1;
+     socketPortM = 0;
+     memset(&sockAddrM, 0, sizeof(sockAddrM));
      }
 }
 
-bool cIptvSocket::CheckAddress(const char *Addr, in_addr_t *InAddr)
+bool cIptvSocket::CheckAddress(const char *addrP, in_addr_t *inAddrP)
 {
-  if (InAddr) {
+  if (inAddrP) {
      // First try only the IP address
-     *InAddr = htonl(inet_addr(Addr));
-     if (*InAddr == htonl(INADDR_NONE)) {
-        debug("Cannot convert %s directly to internet address\n", Addr);
+     *inAddrP = htonl(inet_addr(addrP));
+     if (*inAddrP == htonl(INADDR_NONE)) {
+        debug("cIptvSocket::%s(%s): cannot convert to address", __FUNCTION__, addrP);
         // It may be a host name, get the name
-        struct hostent *host;
-        host = gethostbyname(Addr);
+        struct hostent *host = gethostbyname(addrP);
         if (!host) {
            char tmp[64];
-           error("gethostbyname() failed: %s is not valid address: %s", Addr, strerror_r(h_errno, tmp, sizeof(tmp)));
+           error("gethostbyname() failed: %s is not valid address: %s", addrP, strerror_r(h_errno, tmp, sizeof(tmp)));
            return false;
            }
-        *InAddr = htonl(inet_addr(*host->h_addr_list));
+        *inAddrP = htonl(inet_addr(*host->h_addr_list));
         }
      return true;
      }
@@ -114,52 +111,52 @@ bool cIptvSocket::CheckAddress(const char *Addr, in_addr_t *InAddr)
 
 // UDP socket class
 cIptvUdpSocket::cIptvUdpSocket()
-: streamAddr(htonl(INADDR_ANY)),
-  sourceAddr(htonl(INADDR_ANY)),
-  useIGMPv3(false)
+: streamAddrM(htonl(INADDR_ANY)),
+  sourceAddrM(htonl(INADDR_ANY)),
+  useIGMPv3M(false)
 {
-  debug("cIptvUdpSocket::cIptvUdpSocket()\n");
+  debug("cIptvUdpSocket::%s()", __FUNCTION__);
 }
 
 cIptvUdpSocket::~cIptvUdpSocket()
 {
-  debug("cIptvUdpSocket::~cIptvUdpSocket()\n");
+  debug("cIptvUdpSocket::%s()", __FUNCTION__);
 }
 
-bool cIptvUdpSocket::OpenSocket(const int Port)
+bool cIptvUdpSocket::OpenSocket(const int portP)
 {
-  debug("cIptvUdpSocket::OpenSocket()\n");
-  streamAddr = htonl(INADDR_ANY);
-  sourceAddr = htonl(INADDR_ANY);
-  useIGMPv3 = false;
-  return cIptvSocket::OpenSocket(Port, true);
+  debug("cIptvUdpSocket::%s()", __FUNCTION__);
+  streamAddrM = htonl(INADDR_ANY);
+  sourceAddrM = htonl(INADDR_ANY);
+  useIGMPv3M = false;
+  return cIptvSocket::OpenSocket(portP, true);
 }
 
-bool cIptvUdpSocket::OpenSocket(const int Port, const char *StreamAddr, const char *SourceAddr, bool UseIGMPv3)
+bool cIptvUdpSocket::OpenSocket(const int portP, const char *streamAddrP, const char *sourceAddrP, bool useIGMPv3P)
 {
-  debug("cIptvUdpSocket::OpenSocket()\n");
-  CheckAddress(StreamAddr, &streamAddr);
-  CheckAddress(SourceAddr, &sourceAddr);
-  useIGMPv3 = UseIGMPv3;
-  return cIptvSocket::OpenSocket(Port, true);
+  debug("cIptvUdpSocket::%s(%d, %s, %s, %d)", __FUNCTION__, portP, streamAddrP, sourceAddrP, useIGMPv3P);
+  CheckAddress(streamAddrP, &streamAddrM);
+  CheckAddress(sourceAddrP, &sourceAddrM);
+  useIGMPv3M = useIGMPv3P;
+  return cIptvSocket::OpenSocket(portP, true);
 }
 
 void cIptvUdpSocket::CloseSocket(void)
 {
-  debug("cIptvUdpSocket::CloseSocket()\n");
-  streamAddr = htonl(INADDR_ANY);
-  sourceAddr = htonl(INADDR_ANY);
-  useIGMPv3 = false;
+  debug("cIptvUdpSocket::%s()", __FUNCTION__);
+  streamAddrM = htonl(INADDR_ANY);
+  sourceAddrM = htonl(INADDR_ANY);
+  useIGMPv3M = false;
   cIptvSocket::CloseSocket();
 }
 
 bool cIptvUdpSocket::JoinMulticast(void)
 {
-  debug("cIptvUdpSocket::JoinMulticast()\n");
+  debug("cIptvUdpSocket::%s()", __FUNCTION__);
   // Check if socket exists
-  if (!isActive && (socketDesc >= 0)) {
+  if (!isActiveM && (socketDescM >= 0)) {
      // Join a new multicast group
-     if (useIGMPv3) {
+     if (useIGMPv3M) {
         // Source-specific multicast (SSM) is used
         struct group_source_req gsr;
         struct sockaddr_in *grp;
@@ -167,33 +164,33 @@ bool cIptvUdpSocket::JoinMulticast(void)
         gsr.gsr_interface = 0; // if_nametoindex("any") ?
         grp = (struct sockaddr_in*)&gsr.gsr_group;
         grp->sin_family = AF_INET;
-        grp->sin_addr.s_addr = streamAddr;
+        grp->sin_addr.s_addr = streamAddrM;
         grp->sin_port = 0;
         src = (struct sockaddr_in*)&gsr.gsr_source;
         src->sin_family = AF_INET;
-        src->sin_addr.s_addr = sourceAddr;
+        src->sin_addr.s_addr = sourceAddrM;
         src->sin_port = 0;
-        ERROR_IF_RET(setsockopt(socketDesc, SOL_IP, MCAST_JOIN_SOURCE_GROUP, &gsr, sizeof(gsr)) < 0, "setsockopt(MCAST_JOIN_SOURCE_GROUP)", return false);
+        ERROR_IF_RET(setsockopt(socketDescM, SOL_IP, MCAST_JOIN_SOURCE_GROUP, &gsr, sizeof(gsr)) < 0, "setsockopt(MCAST_JOIN_SOURCE_GROUP)", return false);
         }
      else {
         struct ip_mreq mreq;
-        mreq.imr_multiaddr.s_addr = streamAddr;
+        mreq.imr_multiaddr.s_addr = streamAddrM;
         mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-        ERROR_IF_RET(setsockopt(socketDesc, SOL_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0, "setsockopt(IP_ADD_MEMBERSHIP)", return false);
+        ERROR_IF_RET(setsockopt(socketDescM, SOL_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0, "setsockopt(IP_ADD_MEMBERSHIP)", return false);
         }
      // Update multicasting flag
-     isActive = true;
+     isActiveM = true;
      }
   return true;
 }
 
 bool cIptvUdpSocket::DropMulticast(void)
 {
-  debug("cIptvUdpSocket::DropMulticast()\n");
+  debug("cIptvUdpSocket::%s()", __FUNCTION__);
   // Check if socket exists
-  if (isActive && (socketDesc >= 0)) {
+  if (isActiveM && (socketDescM >= 0)) {
      // Drop the existing multicast group
-     if (useIGMPv3) {
+     if (useIGMPv3M) {
         // Source-specific multicast (SSM) is used
         struct group_source_req gsr;
         struct sockaddr_in *grp;
@@ -201,57 +198,57 @@ bool cIptvUdpSocket::DropMulticast(void)
         gsr.gsr_interface = 0; // if_nametoindex("any") ?
         grp = (struct sockaddr_in*)&gsr.gsr_group;
         grp->sin_family = AF_INET;
-        grp->sin_addr.s_addr = streamAddr;
+        grp->sin_addr.s_addr = streamAddrM;
         grp->sin_port = 0;
         src = (struct sockaddr_in*)&gsr.gsr_source;
         src->sin_family = AF_INET;
-        src->sin_addr.s_addr = sourceAddr;
+        src->sin_addr.s_addr = sourceAddrM;
         src->sin_port = 0;
-        ERROR_IF_RET(setsockopt(socketDesc, SOL_IP, MCAST_LEAVE_SOURCE_GROUP, &gsr, sizeof(gsr)) < 0, "setsockopt(MCAST_LEAVE_SOURCE_GROUP)", return false);
+        ERROR_IF_RET(setsockopt(socketDescM, SOL_IP, MCAST_LEAVE_SOURCE_GROUP, &gsr, sizeof(gsr)) < 0, "setsockopt(MCAST_LEAVE_SOURCE_GROUP)", return false);
         }
      else {
         struct ip_mreq mreq;
-        mreq.imr_multiaddr.s_addr = streamAddr;
+        mreq.imr_multiaddr.s_addr = streamAddrM;
         mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-        ERROR_IF_RET(setsockopt(socketDesc, SOL_IP, IP_DROP_MEMBERSHIP, &mreq, sizeof(mreq)) < 0, "setsockopt(IP_DROP_MEMBERSHIP)", return false);
+        ERROR_IF_RET(setsockopt(socketDescM, SOL_IP, IP_DROP_MEMBERSHIP, &mreq, sizeof(mreq)) < 0, "setsockopt(IP_DROP_MEMBERSHIP)", return false);
         }
      // Update multicasting flag
-     isActive = false;
+     isActiveM = false;
      }
   return true;
 }
 
 
-int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
+int cIptvUdpSocket::Read(unsigned char *bufferAddrP, unsigned int bufferLenP)
 {
-  //debug("cIptvUdpSocket::Read()\n");
+  //debug("cIptvUdpSocket::%s()", __FUNCTION__);
   // Error out if socket not initialized
-  if (socketDesc <= 0) {
+  if (socketDescM <= 0) {
      error("Invalid socket in cIptvUdpSocket::%s()\n", __FUNCTION__);
      return -1;
      }
   int len = 0;
   // Read data from socket in a loop
   do {
-    socklen_t addrlen = sizeof(sockAddr);
+    socklen_t addrlen = sizeof(sockAddrM);
     struct msghdr msgh;
     struct iovec iov;
     char cbuf[256];
     len = 0;
     // Initialize iov and msgh structures
     memset(&msgh, 0, sizeof(struct msghdr));
-    iov.iov_base = BufferAddr;
-    iov.iov_len = BufferLen;
+    iov.iov_base = bufferAddrP;
+    iov.iov_len = bufferLenP;
     msgh.msg_control = cbuf;
     msgh.msg_controllen = sizeof(cbuf);
-    msgh.msg_name = &sockAddr;
+    msgh.msg_name = &sockAddrM;
     msgh.msg_namelen = addrlen;
     msgh.msg_iov  = &iov;
     msgh.msg_iovlen = 1;
     msgh.msg_flags = 0;
 
-    if (isActive && socketDesc && BufferAddr && (BufferLen > 0))
-       len = (int)recvmsg(socketDesc, &msgh, MSG_DONTWAIT);
+    if (isActiveM && socketDescM && bufferAddrP && (bufferLenP > 0))
+       len = (int)recvmsg(socketDescM, &msgh, MSG_DONTWAIT);
     else
        break;
     if (len > 0) {
@@ -260,36 +257,36 @@ int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
        for (struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msgh); cmsg != NULL; cmsg = CMSG_NXTHDR(&msgh, cmsg)) {
            if ((cmsg->cmsg_level == SOL_IP) && (cmsg->cmsg_type == IP_PKTINFO)) {
               struct in_pktinfo *i = (struct in_pktinfo *)CMSG_DATA(cmsg);
-              if ((i->ipi_addr.s_addr == streamAddr) || (htonl(INADDR_ANY) == streamAddr)) {
+              if ((i->ipi_addr.s_addr == streamAddrM) || (htonl(INADDR_ANY) == streamAddrM)) {
 #endif // __FreeBSD__
-                 if (BufferAddr[0] == TS_SYNC_BYTE)
+                 if (bufferAddrP[0] == TS_SYNC_BYTE)
                     return len;
                  else if (len > 3) {
                     // http://tools.ietf.org/html/rfc3550
                     // http://tools.ietf.org/html/rfc2250
                     // version
-                    unsigned int v = (BufferAddr[0] >> 6) & 0x03;
+                    unsigned int v = (bufferAddrP[0] >> 6) & 0x03;
                     // extension bit
-                    unsigned int x = (BufferAddr[0] >> 4) & 0x01;
+                    unsigned int x = (bufferAddrP[0] >> 4) & 0x01;
                     // cscr count
-                    unsigned int cc = BufferAddr[0] & 0x0F;
+                    unsigned int cc = bufferAddrP[0] & 0x0F;
                     // payload type: MPEG2 TS = 33
-                    //unsigned int pt = readBuffer[1] & 0x7F;
+                    //unsigned int pt = bufferAddrP[1] & 0x7F;
                     // header lenght
                     unsigned int headerlen = (3 + cc) * (unsigned int)sizeof(uint32_t);
                     // check if extension
                     if (x) {
                        // extension header length
-                       unsigned int ehl = (((BufferAddr[headerlen + 2] & 0xFF) << 8) |
-                                           (BufferAddr[headerlen + 3] & 0xFF));
+                       unsigned int ehl = (((bufferAddrP[headerlen + 2] & 0xFF) << 8) |
+                                           (bufferAddrP[headerlen + 3] & 0xFF));
                        // update header length
                        headerlen += (ehl + 1) * (unsigned int)sizeof(uint32_t);
                        }
                     // Check that rtp is version 2 and payload contains multiple of TS packet data
                     if ((v == 2) && (((len - headerlen) % TS_SIZE) == 0) &&
-                        (BufferAddr[headerlen] == TS_SYNC_BYTE)) {
+                        (bufferAddrP[headerlen] == TS_SYNC_BYTE)) {
                        // Set argument point to payload in read buffer
-                       memmove(BufferAddr, &BufferAddr[headerlen], (len - headerlen));
+                       memmove(bufferAddrP, &bufferAddrP[headerlen], (len - headerlen));
                        return (len - headerlen);
                        }
                     }
@@ -308,42 +305,42 @@ int cIptvUdpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
 // TCP socket class
 cIptvTcpSocket::cIptvTcpSocket()
 {
-  debug("cIptvTcpSocket::cIptvTcpSocket()\n");
+  debug("cIptvTcpSocket::%s()", __FUNCTION__);
 }
 
 cIptvTcpSocket::~cIptvTcpSocket()
 {
-  debug("cIptvTcpSocket::~cIptvTcpSocket()\n");
+  debug("cIptvTcpSocket::%s()", __FUNCTION__);
 }
 
-bool cIptvTcpSocket::OpenSocket(const int Port, const char *StreamAddr)
+bool cIptvTcpSocket::OpenSocket(const int portP, const char *streamAddrP)
 {
-  debug("cIptvTcpSocket::OpenSocket()\n");
+  debug("cIptvTcpSocket::%s(%s, %s)", __FUNCTION__, portP, streamAddrP);
   // Socket must be opened before setting the host address
-  return (cIptvSocket::OpenSocket(Port, false) && CheckAddress(StreamAddr, &sockAddr.sin_addr.s_addr));
+  return (cIptvSocket::OpenSocket(portP, false) && CheckAddress(streamAddrP, &sockAddrM.sin_addr.s_addr));
 }
 
 void cIptvTcpSocket::CloseSocket(void)
 {
-  debug("cIptvTcpSocket::CloseSocket()\n");
+  debug("cIptvTcpSocket::%s()", __FUNCTION__);
   cIptvSocket::CloseSocket();
 }
 
 bool cIptvTcpSocket::ConnectSocket(void)
 {
-  debug("cIptvTcpSocket::ConnectSocket()\n");
-  if (!isActive && (socketDesc >= 0)) {
-     int retval = connect(socketDesc, (struct sockaddr *)&sockAddr, sizeof(sockAddr));
+  debug("cIptvTcpSocket::%s()", __FUNCTION__);
+  if (!isActiveM && (socketDescM >= 0)) {
+     int retval = connect(socketDescM, (struct sockaddr *)&sockAddrM, sizeof(sockAddrM));
      // Non-blocking sockets always report in-progress error when connected
      ERROR_IF_RET(retval < 0 && errno != EINPROGRESS, "connect()", return false);
      // Select with 800ms timeout on the socket completion, check if it is writable
-     retval = select_single_desc(socketDesc, 800000, true);
+     retval = select_single_desc(socketDescM, 800000, true);
      if (retval < 0)
         return retval;
      // Select has returned. Get socket errors if there are any
      retval = 0;
      socklen_t len = sizeof(retval);
-     getsockopt(socketDesc, SOL_SOCKET, SO_ERROR, &retval, &len);
+     getsockopt(socketDescM, SOL_SOCKET, SO_ERROR, &retval, &len);
      // If not any errors, then socket must be ready and connected
      if (retval != 0) {
         char tmp[64];
@@ -355,41 +352,41 @@ bool cIptvTcpSocket::ConnectSocket(void)
   return true;
 }
 
-int cIptvTcpSocket::Read(unsigned char* BufferAddr, unsigned int BufferLen)
+int cIptvTcpSocket::Read(unsigned char *bufferAddrP, unsigned int bufferLenP)
 {
-  //debug("cIptvTcpSocket::Read()\n");
+  //debug("cIptvTcpSocket::%s()", __FUNCTION__);
   // Error out if socket not initialized
-  if (socketDesc <= 0) {
+  if (socketDescM <= 0) {
      error("Invalid socket in cIptvTcpSocket::%s()\n", __FUNCTION__);
      return -1;
      }
   int len = 0;
-  socklen_t addrlen = sizeof(sockAddr);
+  socklen_t addrlen = sizeof(sockAddrM);
   // Read data from socket
-  if (isActive && socketDesc && BufferAddr && (BufferLen > 0))
-     len = (int)recvfrom(socketDesc, BufferAddr, BufferLen, MSG_DONTWAIT,
-                         (struct sockaddr *)&sockAddr, &addrlen);
+  if (isActiveM && socketDescM && bufferAddrP && (bufferLenP > 0))
+     len = (int)recvfrom(socketDescM, bufferAddrP, bufferLenP, MSG_DONTWAIT,
+                         (struct sockaddr *)&sockAddrM, &addrlen);
   return len;
 }
 
-bool cIptvTcpSocket::ReadChar(char* BufferAddr, unsigned int TimeoutMs)
+bool cIptvTcpSocket::ReadChar(char *bufferAddrP, unsigned int timeoutMsP)
 {
-  //debug("cIptvTcpSocket::ReadChar()\n");
+  //debug("cIptvTcpSocket::%s()", __FUNCTION__);
   // Error out if socket not initialized
-  if (socketDesc <= 0) {
+  if (socketDescM <= 0) {
      error("Invalid socket in cIptvTcpSocket::%s()\n", __FUNCTION__);
      return false;
      }
-  socklen_t addrlen = sizeof(sockAddr);
+  socklen_t addrlen = sizeof(sockAddrM);
   // Wait 500ms for data
-  int retval = select_single_desc(socketDesc, 1000 * TimeoutMs, false);
+  int retval = select_single_desc(socketDescM, 1000 * timeoutMsP, false);
   // Check if error
   if (retval < 0)
      return false;
   // Check if data available
   else if (retval) {
-     retval = (int)recvfrom(socketDesc, BufferAddr, 1, MSG_DONTWAIT,
-                            (struct sockaddr *)&sockAddr, &addrlen);
+     retval = (int)recvfrom(socketDescM, bufferAddrP, 1, MSG_DONTWAIT,
+                            (struct sockaddr *)&sockAddrM, &addrlen);
      if (retval <= 0)
         return false;
      }
@@ -397,15 +394,15 @@ bool cIptvTcpSocket::ReadChar(char* BufferAddr, unsigned int TimeoutMs)
   return true;
 }
 
-bool cIptvTcpSocket::Write(const char* BufferAddr, unsigned int BufferLen)
+bool cIptvTcpSocket::Write(const char *bufferAddrP, unsigned int bufferLenP)
 {
-  //debug("cIptvTcpSocket::Write()\n");
+  //debug("cIptvTcpSocket::%s()", __FUNCTION__);
   // Error out if socket not initialized
-  if (socketDesc <= 0) {
+  if (socketDescM <= 0) {
      error("Invalid socket in cIptvTcpSocket::%s()\n", __FUNCTION__);
      return false;
      }
-  ERROR_IF_RET(send(socketDesc, BufferAddr, BufferLen, 0) < 0, "send()", return false);
+  ERROR_IF_RET(send(socketDescM, bufferAddrP, bufferLenP, 0) < 0, "send()", return false);
 
   return true;
 }

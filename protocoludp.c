@@ -24,12 +24,12 @@ cIptvProtocolUdp::cIptvProtocolUdp()
   streamAddrM(strdup("")),
   streamPortM(0)
 {
-  debug("cIptvProtocolUdp::cIptvProtocolUdp()\n");
+  debug("cIptvProtocolUdp::%s()", __FUNCTION__);
 }
 
 cIptvProtocolUdp::~cIptvProtocolUdp()
 {
-  debug("cIptvProtocolUdp::~cIptvProtocolUdp()\n");
+  debug("cIptvProtocolUdp::%s()", __FUNCTION__);
   // Drop the multicast group and close the socket
   cIptvProtocolUdp::Close();
   // Free allocated memory
@@ -39,7 +39,7 @@ cIptvProtocolUdp::~cIptvProtocolUdp()
 
 bool cIptvProtocolUdp::Open(void)
 {
-  debug("cIptvProtocolUdp::Open(): '%s'\n", streamAddrM);
+  debug("cIptvProtocolUdp::%s(%s)", __FUNCTION__, streamAddrM);
   OpenSocket(streamPortM, streamAddrM, sourceAddrM, isIGMPv3M);
   if (!isempty(streamAddrM)) {
      // Join a new multicast group
@@ -50,7 +50,7 @@ bool cIptvProtocolUdp::Open(void)
 
 bool cIptvProtocolUdp::Close(void)
 {
-  debug("cIptvProtocolUdp::Close(): '%s'\n", streamAddrM);
+  debug("cIptvProtocolUdp::%s(%s)", __FUNCTION__, streamAddrM);
   if (!isempty(streamAddrM)) {
      // Drop the multicast group
      OpenSocket(streamPortM, streamAddrM, sourceAddrM, isIGMPv3M);
@@ -72,7 +72,7 @@ int cIptvProtocolUdp::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
 
 bool cIptvProtocolUdp::Set(const char* locationP, const int parameterP, const int indexP)
 {
-  debug("cIptvProtocolUdp::Set('%s', %d, %d)\n", locationP, parameterP, indexP);
+  debug("cIptvProtocolUdp::%s(%s, %d, %d)", __FUNCTION__, locationP, parameterP, indexP);
   if (!isempty(locationP)) {
      // Drop the multicast group
      if (!isempty(streamAddrM)) {
@@ -105,7 +105,7 @@ bool cIptvProtocolUdp::Set(const char* locationP, const int parameterP, const in
 
 cString cIptvProtocolUdp::GetInformation(void)
 {
-  //debug("cIptvProtocolUdp::GetInformation()");
+  //debug("cIptvProtocolUdp::%s()", __FUNCTION__);
   if (isIGMPv3M)
      return cString::sprintf("udp://%s@%s:%d", sourceAddrM, streamAddrM, streamPortM);
   return cString::sprintf("udp://%s:%d", streamAddrM, streamPortM);

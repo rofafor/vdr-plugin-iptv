@@ -16,7 +16,7 @@ cIptvTransponderParameters::cIptvTransponderParameters(const char *parametersP)
   protocolM(eProtocolUDP),
   parameterM(0)
 {
-  debug("cIptvTransponderParameters::cIptvTransponderParameters('%s')\n", parametersP);
+  debug("cIptvTransponderParameters::%s(%s)", __FUNCTION__, parametersP);
 
   memset(&addressM, 0, sizeof(addressM));
   Parse(parametersP);
@@ -24,7 +24,7 @@ cIptvTransponderParameters::cIptvTransponderParameters(const char *parametersP)
 
 cString cIptvTransponderParameters::ToString(char typeP) const
 {
-  debug("cIptvTransponderParameters::ToString(%c)\n", typeP);
+  debug("cIptvTransponderParameters::%s(%c)", __FUNCTION__, typeP);
 
   const char *protocolstr;
 
@@ -51,7 +51,7 @@ cString cIptvTransponderParameters::ToString(char typeP) const
 
 bool cIptvTransponderParameters::Parse(const char *strP)
 {
-  debug("cIptvTransponderParameters::Parse('%s'\n", strP);
+  debug("cIptvTransponderParameters::%s(%s)", __FUNCTION__, strP);
   bool result = false;
 
   if (strP && *strP) {
@@ -138,7 +138,7 @@ cIptvSourceParam::cIptvSourceParam(char sourceP, const char *descriptionP)
     dataM(),
     itpM()
 {
-  debug("cIptvSourceParam::cIptvSourceParam(%c, '%s')\n", sourceP, descriptionP);
+  debug("cIptvSourceParam::%s(%c, %s)", __FUNCTION__, sourceP, descriptionP);
 
   protocolsM[cIptvTransponderParameters::eProtocolUDP]  = tr("UDP");
   protocolsM[cIptvTransponderParameters::eProtocolCURL] = tr("CURL");
@@ -149,7 +149,7 @@ cIptvSourceParam::cIptvSourceParam(char sourceP, const char *descriptionP)
 
 void cIptvSourceParam::SetData(cChannel *channelP)
 {
-  debug("cIptvSourceParam::SetData('%s')\n", channelP->Parameters());
+  debug("cIptvSourceParam::%s(%s)", __FUNCTION__, channelP->Parameters());
   dataM = *channelP;
   nidM = dataM.Nid();
   tidM = dataM.Tid();
@@ -160,7 +160,7 @@ void cIptvSourceParam::SetData(cChannel *channelP)
 
 void cIptvSourceParam::GetData(cChannel *channelP)
 {
-  debug("cIptvSourceParam::GetData('%s')\n", channelP->Parameters());
+  debug("cIptvSourceParam::%s(%s)", __FUNCTION__, channelP->Parameters());
   dataM.SetTransponderData(channelP->Source(), channelP->Frequency(), dataM.Srate(), itpM.ToString(Source()), true);
   dataM.SetId(nidM, tidM, channelP->Sid(), ridM);
   *channelP = dataM;
@@ -168,7 +168,7 @@ void cIptvSourceParam::GetData(cChannel *channelP)
 
 cOsdItem *cIptvSourceParam::GetOsdItem(void)
 {
-  debug("cIptvSourceParam::GetOsdItem()\n");
+  debug("cIptvSourceParam::%s()", __FUNCTION__);
   switch (paramM++) {
     case  0: return new cMenuEditIntItem( tr("Nid"),              &nidM, 0);
     case  1: return new cMenuEditIntItem( tr("Tid"),              &tidM, 0);

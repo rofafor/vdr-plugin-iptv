@@ -16,25 +16,25 @@ cSidScanner::cSidScanner(void)
   nidFoundM(false),
   tidFoundM(false)
 {
-  debug("cSidScanner::cSidScanner()\n");
+  debug("cSidScanner::%s()", __FUNCTION__);
   Set(0x00, 0x00);  // PAT
   Set(0x10, 0x40);  // NIT
 }
 
 cSidScanner::~cSidScanner()
 {
-  debug("cSidScanner::~cSidScanner()\n");
+  debug("cSidScanner::%s()", __FUNCTION__);
 }
 
 void cSidScanner::SetStatus(bool onP)
 {
-  debug("cSidScanner::SetStatus(%d)\n", onP);
+  debug("cSidScanner::%s(%d)", __FUNCTION__, onP);
   cFilter::SetStatus(onP);
 }
 
 void cSidScanner::SetChannel(const tChannelID &channelIdP)
 {
-  debug("cSidScanner::SetChannel('%s')\n", *channelIdP.ToString());
+  debug("cSidScanner::%s(%s)", __FUNCTION__, *channelIdP.ToString());
   channelIdM = channelIdP;
   sidFoundM = false;
   nidFoundM = false;
@@ -45,10 +45,10 @@ void cSidScanner::Process(u_short pidP, u_char tidP, const u_char *dataP, int le
 {
   int newSid = -1, newNid = -1, newTid = -1;
 
-  //debug("cSidScanner::Process()\n");
+  //debug("cSidScanner::%s()", __FUNCTION__);
   if (channelIdM.Valid()) {
      if ((pidP == 0x00) && (tidP == 0x00)) {
-        debug("cSidScanner::Process(): Pid=%d Tid=%02X\n", pidP, tidP);
+        debug("cSidScanner::%s(%d, %02X)", __FUNCTION__, pidP, tidP);
         SI::PAT pat(dataP, false);
         if (!pat.CheckCRCAndParse())
            return;
@@ -56,7 +56,7 @@ void cSidScanner::Process(u_short pidP, u_char tidP, const u_char *dataP, int le
         for (SI::Loop::Iterator it; pat.associationLoop.getNext(assoc, it); ) {
             if (!assoc.isNITPid()) {
                if (assoc.getServiceId() != channelIdM.Sid()) {
-                  debug("cSidScanner::Process(): Sid=%d\n", assoc.getServiceId());
+                  debug("cSidScanner::%s(): sid=%d", __FUNCTION__, assoc.getServiceId());
                   newSid = assoc.getServiceId();
                   }
                sidFoundM = true;
@@ -65,21 +65,21 @@ void cSidScanner::Process(u_short pidP, u_char tidP, const u_char *dataP, int le
             }
         }
      else if ((pidP == 0x10) && (tidP == 0x40)) {
-        debug("cSidScanner::Process(): Pid=%d Tid=%02X\n", pidP, tidP);
+        debug("cSidScanner::%s(%d, %02X)", __FUNCTION__, pidP, tidP);
         SI::NIT nit(dataP, false);
         if (!nit.CheckCRCAndParse())
            return;
         SI::NIT::TransportStream ts;
         for (SI::Loop::Iterator it; nit.transportStreamLoop.getNext(ts, it); ) {
             if (ts.getTransportStreamId() != channelIdM.Tid()) {
-               debug("cSidScanner::Process(): TSid=%d\n", ts.getTransportStreamId());
+               debug("cSidScanner::%s(): tsid=%d", __FUNCTION__, ts.getTransportStreamId());
                newTid = ts.getTransportStreamId();
                }
             tidFoundM = true;
             break; // default to the first one
             }
         if (nit.getNetworkId() != channelIdM.Nid()) {
-           debug("cSidScanner::Process(): Nid=%d\n", ts.getTransportStreamId());
+           debug("cSidScanner::%s(): nid=%d\n", __FUNCTION__, ts.getTransportStreamId());
            newNid = nit.getNetworkId();
            }
         nidFoundM = true; 

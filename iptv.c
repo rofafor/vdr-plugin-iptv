@@ -54,7 +54,7 @@ public:
 cPluginIptv::cPluginIptv(void)
 : deviceCountM(1)
 {
-  //debug("cPluginIptv::cPluginIptv()\n");
+  //debug("cPluginIptv::%s()", __FUNCTION__);
   // Initialize any member variables here.
   // DON'T DO ANYTHING ELSE THAT MAY HAVE SIDE EFFECTS, REQUIRE GLOBAL
   // VDR OBJECTS TO EXIST OR PRODUCE ANY OUTPUT!
@@ -62,20 +62,20 @@ cPluginIptv::cPluginIptv(void)
 
 cPluginIptv::~cPluginIptv()
 {
-  //debug("cPluginIptv::~cPluginIptv()\n");
+  //debug("cPluginIptv::%s()", __FUNCTION__);
   // Clean up after yourself!
 }
 
 const char *cPluginIptv::CommandLineHelp(void)
 {
-  debug("cPluginIptv::CommandLineHelp()\n");
+  debug("cPluginIptv::%s()", __FUNCTION__);
   // Return a string that describes all known command line options.
   return "  -d <num>, --devices=<number> number of devices to be created\n";
 }
 
 bool cPluginIptv::ProcessArgs(int argc, char *argv[])
 {
-  debug("cPluginIptv::ProcessArgs()\n");
+  debug("cPluginIptv::%s()", __FUNCTION__);
   // Implement command line argument processing here if applicable.
   static const struct option long_options[] = {
     { "devices", required_argument, NULL, 'd' },
@@ -97,7 +97,7 @@ bool cPluginIptv::ProcessArgs(int argc, char *argv[])
 
 bool cPluginIptv::Initialize(void)
 {
-  debug("cPluginIptv::Initialize()\n");
+  debug("cPluginIptv::%s()", __FUNCTION__);
   // Initialize any background activities the plugin shall perform.
   IptvConfig.SetConfigDirectory(cPlugin::ResourceDirectory(PLUGIN_NAME_I18N));
   return cIptvDevice::Initialize(deviceCountM);
@@ -105,7 +105,7 @@ bool cPluginIptv::Initialize(void)
 
 bool cPluginIptv::Start(void)
 {
-  debug("cPluginIptv::Start()\n");
+  debug("cPluginIptv::%s()", __FUNCTION__);
   // Start any background activities the plugin shall perform.
   if (curl_global_init(CURL_GLOBAL_ALL) == CURLE_OK) {
      curl_version_info_data *data = curl_version_info(CURLVERSION_NOW);
@@ -116,61 +116,61 @@ bool cPluginIptv::Start(void)
 
 void cPluginIptv::Stop(void)
 {
-  debug("cPluginIptv::Stop()\n");
+  debug("cPluginIptv::%s()", __FUNCTION__);
   // Stop any background activities the plugin is performing.
   curl_global_cleanup();
 }
 
 void cPluginIptv::Housekeeping(void)
 {
-  //debug("cPluginIptv::Housekeeping()\n");
+  //debug("cPluginIptv::%s()", __FUNCTION__);
   // Perform any cleanup or other regular tasks.
 }
 
 void cPluginIptv::MainThreadHook(void)
 {
-  //debug("cPluginIptv::MainThreadHook()\n");
+  //debug("cPluginIptv::%s()", __FUNCTION__);
   // Perform actions in the context of the main program thread.
   // WARNING: Use with great care - see PLUGINS.html!
 }
 
 cString cPluginIptv::Active(void)
 {
-  //debug("cPluginIptv::Active()\n");
+  //debug("cPluginIptv::%s()", __FUNCTION__);
   // Return a message string if shutdown should be postponed
   return NULL;
 }
 
 time_t cPluginIptv::WakeupTime(void)
 {
-  //debug("cPluginIptv::WakeupTime()\n");
+  //debug("cPluginIptv::%s()", __FUNCTION__);
   // Return custom wakeup time for shutdown script
   return 0;
 }
 
 cOsdObject *cPluginIptv::MainMenuAction(void)
 {
-  //debug("cPluginIptv::MainMenuAction()\n");
+  //debug("cPluginIptv::%s()", __FUNCTION__);
   // Perform the action when selected from the main VDR menu.
   return NULL;
 }
 
 cMenuSetupPage *cPluginIptv::SetupMenu(void)
 {
-  debug("cPluginIptv::SetupMenu()\n");
+  debug("cPluginIptv::%s()", __FUNCTION__);
   // Return a setup menu in case the plugin supports one.
   return new cIptvPluginSetup();
 }
 
 int cPluginIptv::ParseFilters(const char *valueP, int *filtersP)
 {
-  debug("cPluginIptv::ParseFilters(%s)\n", valueP);
+  debug("cPluginIptv::%s(%s)", __FUNCTION__, valueP);
   char buffer[256];
   int n = 0;
   while (valueP && *valueP && (n < SECTION_FILTER_TABLE_SIZE)) {
     strn0cpy(buffer, valueP, sizeof(buffer));
     int i = atoi(buffer);
-    //debug("cPluginIptv::ParseFilters(): Filters[%d]=%d\n", n, i);
+    //debug("cPluginIptv::%s(): filters[%d]=%d", __FUNCTION__, n, i);
     if (i >= 0)
        filtersP[n++] = i;
     if ((valueP = strchr(valueP, ' ')) != NULL)
@@ -181,7 +181,7 @@ int cPluginIptv::ParseFilters(const char *valueP, int *filtersP)
 
 bool cPluginIptv::SetupParse(const char *nameP, const char *valueP)
 {
-  debug("cPluginIptv::SetupParse()\n");
+  debug("cPluginIptv::%s()", __FUNCTION__);
   // Parse your own setup parameters and store their values.
   if (!strcasecmp(nameP, "TsBufferSize"))
      IptvConfig.SetTsBufferSize(atoi(valueP));
@@ -206,7 +206,7 @@ bool cPluginIptv::SetupParse(const char *nameP, const char *valueP)
 
 bool cPluginIptv::Service(const char *idP, void *dataP)
 {
-  debug("cPluginIptv::Service()\n");
+  debug("cPluginIptv::%s()", __FUNCTION__);
   if (strcmp(idP,"IptvService-v1.0") == 0) {
      if (dataP) {
         IptvService_v1_0 *data = reinterpret_cast<IptvService_v1_0*>(dataP);
@@ -223,7 +223,7 @@ bool cPluginIptv::Service(const char *idP, void *dataP)
 
 const char **cPluginIptv::SVDRPHelpPages(void)
 {
-  debug("cPluginIptv::SVDRPHelpPages()\n");
+  debug("cPluginIptv::%s()", __FUNCTION__);
   static const char *HelpPages[] = {
     "INFO [ <page> ]\n"
     "    Print IPTV device information and statistics.\n"
@@ -238,7 +238,7 @@ const char **cPluginIptv::SVDRPHelpPages(void)
 
 cString cPluginIptv::SVDRPCommand(const char *commandP, const char *optionP, int &replyCodeP)
 {
-  debug("cPluginIptv::SVDRPCommand('%s', %s')\n", commandP, optionP);
+  debug("cPluginIptv::%s(%s, %s)", __FUNCTION__, commandP, optionP);
   if (strcasecmp(commandP, "INFO") == 0) {
      cIptvDevice *device = cIptvDevice::GetIptvDevice(cDevice::ActualDevice()->CardIndex());
      if (device) {

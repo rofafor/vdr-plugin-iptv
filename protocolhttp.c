@@ -23,12 +23,12 @@ cIptvProtocolHttp::cIptvProtocolHttp()
   streamPathM(strdup("/")),
   streamPortM(0)
 {
-  debug("cIptvProtocolHttp::cIptvProtocolHttp()\n");
+  debug("cIptvProtocolHttp::%s()", __FUNCTION__);
 }
 
 cIptvProtocolHttp::~cIptvProtocolHttp()
 {
-  debug("cIptvProtocolHttp::~cIptvProtocolHttp()\n");
+  debug("cIptvProtocolHttp::%s()", __FUNCTION__);
   // Close the socket
   cIptvProtocolHttp::Close();
   // Free allocated memory
@@ -38,9 +38,9 @@ cIptvProtocolHttp::~cIptvProtocolHttp()
 
 bool cIptvProtocolHttp::Connect(void)
 {
-  debug("cIptvProtocolHttp::Connect()\n");
+  debug("cIptvProtocolHttp::%s()", __FUNCTION__);
   // Check that stream address is valid
-  if (!isActive && !isempty(streamAddrM) && !isempty(streamPathM)) {
+  if (!isActiveM && !isempty(streamAddrM) && !isempty(streamPathM)) {
      // Ensure that socket is valid and connect
      OpenSocket(streamPortM, streamAddrM);
      if (!ConnectSocket()) {
@@ -55,7 +55,7 @@ bool cIptvProtocolHttp::Connect(void)
                                        "Connection: Close\r\n"
                                        "\r\n", streamPathM, streamAddrM,
                                        PLUGIN_NAME_I18N, VERSION);
-     debug("Sending http request: %s\n", *buffer);
+     debug("cIptvProtocolHttp::%s(): requesting: %s", __FUNCTION__, *buffer);
      if (!Write(*buffer, (unsigned int)strlen(*buffer))) {
         CloseSocket();
         return false;
@@ -66,19 +66,19 @@ bool cIptvProtocolHttp::Connect(void)
         return false;
         }
      // Update active flag
-     isActive = true;
+     isActiveM = true;
      }
   return true;
 }
 
 bool cIptvProtocolHttp::Disconnect(void)
 {
-  debug("cIptvProtocolHttp::Disconnect()\n");
-  if (isActive) {
+  debug("cIptvProtocolHttp::%s()", __FUNCTION__);
+  if (isActiveM) {
      // Close the socket
      CloseSocket();
      // Update active flag
-     isActive = false;
+     isActiveM = false;
      }
   return true;
 }
@@ -86,7 +86,7 @@ bool cIptvProtocolHttp::Disconnect(void)
 bool cIptvProtocolHttp::GetHeaderLine(char* destP, unsigned int destLenP,
                                       unsigned int &recvLenP)
 {
-  debug("cIptvProtocolHttp::GetHeaderLine()\n");
+  debug("cIptvProtocolHttp::%s()", __FUNCTION__);
   bool linefeed = false;
   bool newline = false;
   char *bufptr = destP;
@@ -127,7 +127,7 @@ bool cIptvProtocolHttp::GetHeaderLine(char* destP, unsigned int destLenP,
 
 bool cIptvProtocolHttp::ProcessHeaders(void)
 {
-  debug("cIptvProtocolHttp::ProcessHeaders()\n");
+  debug("cIptvProtocolHttp::%s()", __FUNCTION__);
   unsigned int lineLength = 0;
   int version = 0, response = 0;
   bool responseFound = false;
@@ -138,7 +138,7 @@ bool cIptvProtocolHttp::ProcessHeaders(void)
   snprintf(fmt, sizeof(fmt), "HTTP/1.%%%zui %%%zui ", sizeof(version) - 1, sizeof(response) - 1);
 
   while (!responseFound || lineLength != 0) {
-    memset(buf, '\0', sizeof(buf));
+    memset(buf, 0, sizeof(buf));
     if (!GetHeaderLine(buf, sizeof(buf), lineLength))
        return false;
     if (!responseFound && sscanf(buf, fmt, &version, &response) != 2) {
@@ -158,14 +158,14 @@ bool cIptvProtocolHttp::ProcessHeaders(void)
 
 bool cIptvProtocolHttp::Open(void)
 {
-  debug("cIptvProtocolHttp::Open()\n");
+  debug("cIptvProtocolHttp::%s()", __FUNCTION__);
   // Connect the socket
   return Connect();
 }
 
 bool cIptvProtocolHttp::Close(void)
 {
-  debug("cIptvProtocolHttp::Close()\n");
+  debug("cIptvProtocolHttp::%s()", __FUNCTION__);
   // Disconnect the current stream
   Disconnect();
   return true;
@@ -178,7 +178,7 @@ int cIptvProtocolHttp::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
 
 bool cIptvProtocolHttp::Set(const char* locationP, const int parameterP, const int indexP)
 {
-  debug("cIptvProtocolHttp::Set('%s', %d, %d)\n", locationP, parameterP, indexP);
+  debug("cIptvProtocolHttp::%s(%s, %d, %d)", __FUNCTION__, locationP, parameterP, indexP);
   if (!isempty(locationP)) {
      // Disconnect the current socket
      Disconnect();
@@ -192,7 +192,6 @@ bool cIptvProtocolHttp::Set(const char* locationP, const int parameterP, const i
      else
         streamPathM = strcpyrealloc(streamPathM, "/");
      streamPortM = parameterP;
-     //debug("http://%s:%d%s\n", streamAddrM, streamPortM, streamPathM);
      // Re-connect the socket
      Connect();
      }
@@ -201,6 +200,6 @@ bool cIptvProtocolHttp::Set(const char* locationP, const int parameterP, const i
 
 cString cIptvProtocolHttp::GetInformation(void)
 {
-  //debug("cIptvProtocolHttp::GetInformation()");
+  //debug("cIptvProtocolHttp::%s()", __FUNCTION__);
   return cString::sprintf("http://%s:%d%s", streamAddrM, streamPortM, streamPathM);
 }

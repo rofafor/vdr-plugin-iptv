@@ -15,17 +15,17 @@
 
 class cIptvSocket {
 private:
-  int socketPort;
+  int socketPortM;
 
 protected:
-  int socketDesc;
-  struct sockaddr_in sockAddr;
-  bool isActive;
+  int socketDescM;
+  struct sockaddr_in sockAddrM;
+  bool isActiveM;
 
 protected:
-  bool OpenSocket(const int Port, const bool isUdp);
+  bool OpenSocket(const int portP, const bool isUdpP);
   void CloseSocket(void);
-  bool CheckAddress(const char *Addr, in_addr_t *InAddr);
+  bool CheckAddress(const char *addrP, in_addr_t *inAddrP);
 
 public:
   cIptvSocket();
@@ -34,16 +34,16 @@ public:
 
 class cIptvUdpSocket : public cIptvSocket {
 private:
-  in_addr_t streamAddr;
-  in_addr_t sourceAddr;
-  bool useIGMPv3;
+  in_addr_t streamAddrM;
+  in_addr_t sourceAddrM;
+  bool useIGMPv3M;
 
 public:
   cIptvUdpSocket();
   virtual ~cIptvUdpSocket();
-  virtual int Read(unsigned char* BufferAddr, unsigned int BufferLen);
+  virtual int Read(unsigned char* bufferAddrP, unsigned int bufferLenP);
   bool OpenSocket(const int Port);
-  bool OpenSocket(const int Port, const char *StreamAddr, const char *SourceAddr, bool UseIGMPv3);
+  bool OpenSocket(const int Port, const char *streamAddrP, const char *sourceAddrP, bool useIGMPv3P);
   void CloseSocket(void);
   bool JoinMulticast(void);
   bool DropMulticast(void);
@@ -53,12 +53,12 @@ class cIptvTcpSocket : public cIptvSocket {
 public:
   cIptvTcpSocket();
   virtual ~cIptvTcpSocket();
-  virtual int Read(unsigned char* BufferAddr, unsigned int BufferLen);
-  bool OpenSocket(const int Port, const char *StreamAddr);
+  virtual int Read(unsigned char* bufferAddrP, unsigned int bufferLenP);
+  bool OpenSocket(const int portP, const char *streamAddrP);
   void CloseSocket(void);
   bool ConnectSocket(void);
-  bool ReadChar(char* BufferAddr, unsigned int TimeoutMs);
-  bool Write(const char* BufferAddr, unsigned int BufferLen);
+  bool ReadChar(char* bufferAddrP, unsigned int timeoutMsP);
+  bool Write(const char* bufferAddrP, unsigned int bufferLenP);
 };
 
 #endif // __IPTV_SOCKET_H
