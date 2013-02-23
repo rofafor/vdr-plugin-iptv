@@ -18,13 +18,13 @@ public:
   cString GetSectionStatistic();
 
 protected:
-  void AddSectionStatistic(long Bytes, long Calls);
+  void AddSectionStatistic(long bytesP, long callsP);
 
 private:
-  long filteredData;
-  long numberOfCalls;
-  cTimeMs timer;
-  cMutex mutex;
+  long filteredDataM;
+  long numberOfCallsM;
+  cTimeMs timerM;
+  cMutex mutexM;
 };
 
 // Pid statistics
@@ -35,19 +35,19 @@ public:
   cString GetPidStatistic();
 
 protected:
-  void AddPidStatistic(u_short Pid, long Payload);
+  void AddPidStatistic(u_short pidP, long payloadP);
 
 private:
   struct pidStruct {
     u_short pid;
     long DataAmount;
   };
-  pidStruct mostActivePids[IPTV_STATS_ACTIVE_PIDS_COUNT];
-  cTimeMs timer;
-  cMutex mutex;
+  pidStruct mostActivePidsM[IPTV_STATS_ACTIVE_PIDS_COUNT];
+  cTimeMs timerM;
+  cMutex mutexM;
 
 private:
-  static int SortPids(const void* data1, const void* data2);
+  static int SortPids(const void* data1P, const void* data2P);
 };
 
 // Streamer statistics
@@ -58,12 +58,12 @@ public:
   cString GetStreamerStatistic();
 
 protected:
-  void AddStreamerStatistic(long Bytes);
+  void AddStreamerStatistic(long bytesP);
 
 private:
-  long dataBytes;
-  cTimeMs timer;
-  cMutex mutex;
+  long dataBytesM;
+  cTimeMs timerM;
+  cMutex mutexM;
 };
 
 // Buffer statistics
@@ -74,14 +74,14 @@ public:
   cString GetBufferStatistic();
 
 protected:
-  void AddBufferStatistic(long Bytes, long Used);
+  void AddBufferStatistic(long bytesP, long usedP);
 
 private:
-  long dataBytes;
-  long freeSpace;
-  long usedSpace;
-  cTimeMs timer;
-  cMutex mutex;
+  long dataBytesM;
+  long freeSpaceM;
+  long usedSpaceM;
+  cTimeMs timerM;
+  cMutex mutexM;
 };
 
 #endif // __IPTV_STATISTICS_H

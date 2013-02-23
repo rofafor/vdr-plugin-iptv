@@ -26,8 +26,8 @@ static const char DESCRIPTION[] = trNOOP("Experience the IPTV");
 
 class cPluginIptv : public cPlugin {
 private:
-  unsigned int deviceCount;
-  int ParseFilters(const char *Value, int *Values);
+  unsigned int deviceCountM;
+  int ParseFilters(const char *valueP, int *filtersP);
 public:
   cPluginIptv(void);
   virtual ~cPluginIptv();
@@ -52,7 +52,7 @@ public:
   };
 
 cPluginIptv::cPluginIptv(void)
-: deviceCount(1)
+: deviceCountM(1)
 {
   //debug("cPluginIptv::cPluginIptv()\n");
   // Initialize any member variables here.
@@ -86,7 +86,7 @@ bool cPluginIptv::ProcessArgs(int argc, char *argv[])
   while ((c = getopt_long(argc, argv, "d:", long_options, NULL)) != -1) {
     switch (c) {
       case 'd':
-           deviceCount = atoi(optarg);
+           deviceCountM = atoi(optarg);
            break;
       default:
            return false;
@@ -100,7 +100,7 @@ bool cPluginIptv::Initialize(void)
   debug("cPluginIptv::Initialize()\n");
   // Initialize any background activities the plugin shall perform.
   IptvConfig.SetConfigDirectory(cPlugin::ResourceDirectory(PLUGIN_NAME_I18N));
-  return cIptvDevice::Initialize(deviceCount);
+  return cIptvDevice::Initialize(deviceCountM);
 }
 
 bool cPluginIptv::Start(void)
@@ -162,40 +162,40 @@ cMenuSetupPage *cPluginIptv::SetupMenu(void)
   return new cIptvPluginSetup();
 }
 
-int cPluginIptv::ParseFilters(const char *Value, int *Filters)
+int cPluginIptv::ParseFilters(const char *valueP, int *filtersP)
 {
-  debug("cPluginIptv::ParseFilters(): Value=%s\n", Value);
+  debug("cPluginIptv::ParseFilters(%s)\n", valueP);
   char buffer[256];
   int n = 0;
-  while (Value && *Value && (n < SECTION_FILTER_TABLE_SIZE)) {
-    strn0cpy(buffer, Value, sizeof(buffer));
+  while (valueP && *valueP && (n < SECTION_FILTER_TABLE_SIZE)) {
+    strn0cpy(buffer, valueP, sizeof(buffer));
     int i = atoi(buffer);
     //debug("cPluginIptv::ParseFilters(): Filters[%d]=%d\n", n, i);
     if (i >= 0)
-       Filters[n++] = i;
-    if ((Value = strchr(Value, ' ')) != NULL)
-       Value++;
+       filtersP[n++] = i;
+    if ((valueP = strchr(valueP, ' ')) != NULL)
+       valueP++;
     }
   return n;
 }
 
-bool cPluginIptv::SetupParse(const char *Name, const char *Value)
+bool cPluginIptv::SetupParse(const char *nameP, const char *valueP)
 {
   debug("cPluginIptv::SetupParse()\n");
   // Parse your own setup parameters and store their values.
-  if (!strcasecmp(Name, "TsBufferSize"))
-     IptvConfig.SetTsBufferSize(atoi(Value));
-  else if (!strcasecmp(Name, "TsBufferPrefill"))
-     IptvConfig.SetTsBufferPrefillRatio(atoi(Value));
-  else if (!strcasecmp(Name, "ExtProtocolBasePort"))
-     IptvConfig.SetExtProtocolBasePort(atoi(Value));
-  else if (!strcasecmp(Name, "SectionFiltering"))
-     IptvConfig.SetSectionFiltering(atoi(Value));
-  else if (!strcasecmp(Name, "DisabledFilters")) {
+  if (!strcasecmp(nameP, "TsBufferSize"))
+     IptvConfig.SetTsBufferSize(atoi(valueP));
+  else if (!strcasecmp(nameP, "TsBufferPrefill"))
+     IptvConfig.SetTsBufferPrefillRatio(atoi(valueP));
+  else if (!strcasecmp(nameP, "ExtProtocolBasePort"))
+     IptvConfig.SetExtProtocolBasePort(atoi(valueP));
+  else if (!strcasecmp(nameP, "SectionFiltering"))
+     IptvConfig.SetSectionFiltering(atoi(valueP));
+  else if (!strcasecmp(nameP, "DisabledFilters")) {
      int DisabledFilters[SECTION_FILTER_TABLE_SIZE];
      for (unsigned int i = 0; i < ARRAY_SIZE(DisabledFilters); ++i)
          DisabledFilters[i] = -1;
-     unsigned int DisabledFiltersCount = ParseFilters(Value, DisabledFilters);
+     unsigned int DisabledFiltersCount = ParseFilters(valueP, DisabledFilters);
      for (unsigned int i = 0; i < DisabledFiltersCount; ++i)
          IptvConfig.SetDisabledFilters(i, DisabledFilters[i]);
      }
@@ -204,12 +204,12 @@ bool cPluginIptv::SetupParse(const char *Name, const char *Value)
   return true;
 }
 
-bool cPluginIptv::Service(const char *Id, void *Data)
+bool cPluginIptv::Service(const char *idP, void *dataP)
 {
   debug("cPluginIptv::Service()\n");
-  if (strcmp(Id,"IptvService-v1.0") == 0) {
-     if (Data) {
-        IptvService_v1_0 *data = reinterpret_cast<IptvService_v1_0*>(Data);
+  if (strcmp(idP,"IptvService-v1.0") == 0) {
+     if (dataP) {
+        IptvService_v1_0 *data = reinterpret_cast<IptvService_v1_0*>(dataP);
         cIptvDevice *dev = cIptvDevice::GetIptvDevice(data->cardIndex);
         if (!dev)
            return false;
@@ -236,26 +236,26 @@ const char **cPluginIptv::SVDRPHelpPages(void)
   return HelpPages;
 }
 
-cString cPluginIptv::SVDRPCommand(const char *Command, const char *Option, int &ReplyCode)
+cString cPluginIptv::SVDRPCommand(const char *commandP, const char *optionP, int &replyCodeP)
 {
-  debug("cPluginIptv::SVDRPCommand(): Command=%s Option=%s\n", Command, Option);
-  if (strcasecmp(Command, "INFO") == 0) {
+  debug("cPluginIptv::SVDRPCommand('%s', %s')\n", commandP, optionP);
+  if (strcasecmp(commandP, "INFO") == 0) {
      cIptvDevice *device = cIptvDevice::GetIptvDevice(cDevice::ActualDevice()->CardIndex());
      if (device) {
         int page = IPTV_DEVICE_INFO_ALL;
-        if (Option) {
-           page = atoi(Option);
+        if (optionP) {
+           page = atoi(optionP);
            if ((page < IPTV_DEVICE_INFO_ALL) || (page > IPTV_DEVICE_INFO_FILTERS))
               page = IPTV_DEVICE_INFO_ALL;
            }
         return device->GetInformation(page);
         }
      else {
-        ReplyCode = 550; // Requested action not taken
+        replyCodeP = 550; // Requested action not taken
         return cString("IPTV information not available!");
         }
      }
-  else if (strcasecmp(Command, "MODE") == 0) {
+  else if (strcasecmp(commandP, "MODE") == 0) {
      unsigned int mode = !IptvConfig.GetUseBytes();
      IptvConfig.SetUseBytes(mode);
      return cString::sprintf("IPTV information mode is: %s\n", mode ? "bytes" : "bits");

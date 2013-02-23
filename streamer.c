@@ -11,17 +11,17 @@
 #include "common.h"
 #include "streamer.h"
 
-cIptvStreamer::cIptvStreamer(cRingBufferLinear* RingBuffer, unsigned int PacketLen)
+cIptvStreamer::cIptvStreamer(cRingBufferLinear* ringBufferP, unsigned int packetLenP)
 : cThread("IPTV streamer"),
-  ringBuffer(RingBuffer),
-  packetBufferLen(PacketLen),
-  protocol(NULL)
+  ringBufferM(ringBufferP),
+  packetBufferLenM(packetLenP),
+  protocolM(NULL)
 {
-  debug("cIptvStreamer::cIptvStreamer(%d)\n", packetBufferLen);
+  debug("cIptvStreamer::cIptvStreamer(%d)\n", packetBufferLenM);
   // Allocate packet buffer
-  packetBuffer = MALLOC(unsigned char, packetBufferLen);
-  if (packetBuffer)
-     memset(packetBuffer, 0, packetBufferLen);
+  packetBufferM = MALLOC(unsigned char, packetBufferLenM);
+  if (packetBufferM)
+     memset(packetBufferM, 0, packetBufferLenM);
   else
      error("MALLOC() failed for packet buffer");
 }
@@ -31,10 +31,10 @@ cIptvStreamer::~cIptvStreamer()
   debug("cIptvStreamer::~cIptvStreamer()\n");
   // Close the protocol
   Close();
-  protocol = NULL;
-  ringBuffer = NULL;
+  protocolM = NULL;
+  ringBufferM = NULL;
   // Free allocated memory
-  free(packetBuffer);
+  free(packetBufferM);
 }
 
 void cIptvStreamer::Action(void)
@@ -43,20 +43,20 @@ void cIptvStreamer::Action(void)
   // Increase priority
   //SetPriority(-1);
   // Do the thread loop
-  while (packetBuffer && Running()) {
+  while (packetBufferM && Running()) {
         int length = -1;
-        if (protocol)
-           length = protocol->Read(packetBuffer, min((unsigned int)ringBuffer->Free(), packetBufferLen));
+        if (protocolM)
+           length = protocolM->Read(packetBufferM, min((unsigned int)ringBufferM->Free(), packetBufferLenM));
         if (length > 0) {
            AddStreamerStatistic(length);
-           if (ringBuffer) {
-              int p = ringBuffer->Put(packetBuffer, length);
+           if (ringBufferM) {
+              int p = ringBufferM->Put(packetBufferM, length);
               if (p != length)
-                 ringBuffer->ReportOverflow(length - p);
+                 ringBufferM->ReportOverflow(length - p);
               }
            }
         else
-           sleep.Wait(10); // to avoid busy loop and reduce cpu load
+           sleepM.Wait(10); // to avoid busy loop and reduce cpu load
         }
   debug("cIptvStreamer::Action(): Exiting\n");
 }
@@ -65,7 +65,7 @@ bool cIptvStreamer::Open(void)
 {
   debug("cIptvStreamer::Open()\n");
   // Open the protocol
-  if (protocol && !protocol->Open())
+  if (protocolM && !protocolM->Open())
      return false;
   // Start thread
   Start();
@@ -76,31 +76,31 @@ bool cIptvStreamer::Close(void)
 {
   debug("cIptvStreamer::Close()\n");
   // Stop thread
-  sleep.Signal();
+  sleepM.Signal();
   if (Running())
      Cancel(3);
   // Close the protocol
-  if (protocol)
-     protocol->Close();
+  if (protocolM)
+     protocolM->Close();
   return true;
 }
 
-bool cIptvStreamer::Set(const char* Location, const int Parameter, const int Index, cIptvProtocolIf* Protocol)
+bool cIptvStreamer::Set(const char* locationP, const int parameterP, const int indexP, cIptvProtocolIf* protocolP)
 {
-  debug("cIptvStreamer::Set(): %s:%d\n", Location, Parameter);
-  if (!isempty(Location)) {
+  debug("cIptvStreamer::Set('%s', %d, %d)\n", locationP, parameterP, indexP);
+  if (!isempty(locationP)) {
      // Update protocol and set location and parameter; Close the existing one if changed
-     if (protocol != Protocol) {
-        if (protocol)
-           protocol->Close();
-        protocol = Protocol;
-        if (protocol) {
-           protocol->Set(Location, Parameter, Index);
-           protocol->Open();
+     if (protocolM != protocolP) {
+        if (protocolM)
+           protocolM->Close();
+        protocolM = protocolP;
+        if (protocolM) {
+           protocolM->Set(locationP, parameterP, indexP);
+           protocolM->Open();
            }
         }
-     else if (protocol)
-        protocol->Set(Location, Parameter, Index);
+     else if (protocolM)
+        protocolM->Set(locationP, parameterP, indexP);
      }
   return true;
 }
@@ -108,8 +108,8 @@ bool cIptvStreamer::Set(const char* Location, const int Parameter, const int Ind
 cString cIptvStreamer::GetInformation(void)
 {
   //debug("cIptvStreamer::GetInformation()");
-  cString info;
-  if (protocol)
-     info = protocol->GetInformation();
-  return info;
+  cString s;
+  if (protocolM)
+     s = protocolM->GetInformation();
+  return s;
 }

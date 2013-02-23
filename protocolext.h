@@ -14,10 +14,10 @@
 
 class cIptvProtocolExt : public cIptvUdpSocket, public cIptvProtocolIf {
 private:
-  int pid;
-  cString scriptFile;
-  int scriptParameter;
-  int streamPort;
+  int pidM;
+  cString scriptFileM;
+  int scriptParameterM;
+  int streamPortM;
 
 private:
   void TerminateScript(void);
@@ -26,8 +26,8 @@ private:
 public:
   cIptvProtocolExt();
   virtual ~cIptvProtocolExt();
-  int Read(unsigned char* BufferAddr, unsigned int BufferLen);
-  bool Set(const char* Location, const int Parameter, const int Index);
+  int Read(unsigned char* bufferAddrP, unsigned int bufferLenP);
+  bool Set(const char* locationP, const int parameterP, const int indexP);
   bool Open(void);
   bool Close(void);
   cString GetInformation(void);

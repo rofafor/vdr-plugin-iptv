@@ -14,30 +14,30 @@
 class cIptvConfig
 {
 private:
-  unsigned int tsBufferSize;
-  unsigned int tsBufferPrefillRatio;
-  unsigned int extProtocolBasePort;
-  unsigned int useBytes;
-  unsigned int sectionFiltering;
-  int disabledFilters[SECTION_FILTER_TABLE_SIZE];
-  char configDirectory[PATH_MAX];
+  unsigned int tsBufferSizeM;
+  unsigned int tsBufferPrefillRatioM;
+  unsigned int extProtocolBasePortM;
+  unsigned int useBytesM;
+  unsigned int sectionFilteringM;
+  int disabledFiltersM[SECTION_FILTER_TABLE_SIZE];
+  char configDirectoryM[PATH_MAX];
 
 public:
   cIptvConfig();
-  unsigned int GetTsBufferSize(void) const { return tsBufferSize; }
-  unsigned int GetTsBufferPrefillRatio(void) const { return tsBufferPrefillRatio; }
-  unsigned int GetExtProtocolBasePort(void) const { return extProtocolBasePort; }
-  unsigned int GetUseBytes(void) const { return useBytes; }
-  unsigned int GetSectionFiltering(void) const { return sectionFiltering; }
-  const char *GetConfigDirectory(void) const { return configDirectory; }
+  unsigned int GetTsBufferSize(void) const { return tsBufferSizeM; }
+  unsigned int GetTsBufferPrefillRatio(void) const { return tsBufferPrefillRatioM; }
+  unsigned int GetExtProtocolBasePort(void) const { return extProtocolBasePortM; }
+  unsigned int GetUseBytes(void) const { return useBytesM; }
+  unsigned int GetSectionFiltering(void) const { return sectionFilteringM; }
+  const char *GetConfigDirectory(void) const { return configDirectoryM; }
   unsigned int GetDisabledFiltersCount(void) const;
-  int GetDisabledFilters(unsigned int Index) const;
-  void SetTsBufferSize(unsigned int Size) { tsBufferSize = Size; }
-  void SetTsBufferPrefillRatio(unsigned int Ratio) { tsBufferPrefillRatio = Ratio; }
-  void SetExtProtocolBasePort(unsigned int PortNumber) { extProtocolBasePort = PortNumber; }
-  void SetUseBytes(unsigned int On) { useBytes = On; }
-  void SetSectionFiltering(unsigned int On) { sectionFiltering = On; }
-  void SetDisabledFilters(unsigned int Index, int Number);
+  int GetDisabledFilters(unsigned int indexP) const;
+  void SetTsBufferSize(unsigned int sizeP) { tsBufferSizeM = sizeP; }
+  void SetTsBufferPrefillRatio(unsigned int ratioP) { tsBufferPrefillRatioM = ratioP; }
+  void SetExtProtocolBasePort(unsigned int portNumberP) { extProtocolBasePortM = portNumberP; }
+  void SetUseBytes(unsigned int onOffP) { useBytesM = onOffP; }
+  void SetSectionFiltering(unsigned int onOffP) { sectionFilteringM = onOffP; }
+  void SetDisabledFilters(unsigned int indexP, int numberP);
   void SetConfigDirectory(const char *directoryP);
 };
 

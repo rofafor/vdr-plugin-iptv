@@ -18,19 +18,19 @@
 
 class cIptvStreamer : public cThread, public cIptvStreamerStatistics {
 private:
-  cRingBufferLinear* ringBuffer;
-  cCondWait sleep;
-  unsigned char* packetBuffer;
-  unsigned int packetBufferLen;
-  cIptvProtocolIf* protocol;
+  cRingBufferLinear* ringBufferM;
+  cCondWait sleepM;
+  unsigned char* packetBufferM;
+  unsigned int packetBufferLenM;
+  cIptvProtocolIf* protocolM;
 
 protected:
   virtual void Action(void);
 
 public:
-  cIptvStreamer(cRingBufferLinear* RingBuffer, unsigned int PacketLen);
+  cIptvStreamer(cRingBufferLinear* ringBufferP, unsigned int packetLenP);
   virtual ~cIptvStreamer();
-  bool Set(const char* Location, const int Parameter, const int Index, cIptvProtocolIf* Protocol);
+  bool Set(const char* locationP, const int parameterP, const int indexP, cIptvProtocolIf* protocolP);
   bool Open(void);
   bool Close(void);
   cString GetInformation(void);

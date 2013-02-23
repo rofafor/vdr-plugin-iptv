@@ -14,13 +14,13 @@
 #define PIDSCANNER_PID_DELTA_COUNT 100   /* minimum count of pid samples for audio/video only pid detection */
 
 cPidScanner::cPidScanner(void)
-: timeout(0),
-  channelId(tChannelID::InvalidID),
-  process(true),
-  Vpid(0xFFFF),
-  Apid(0xFFFF),
-  numVpids(0),
-  numApids(0)
+: timeoutM(0),
+  channelIdM(tChannelID::InvalidID),
+  processM(true),
+  vPidM(0xFFFF),
+  aPidM(0xFFFF),
+  numVpidsM(0),
+  numApidsM(0)
 {
   debug("cPidScanner::cPidScanner()\n");
 }
@@ -30,90 +30,90 @@ cPidScanner::~cPidScanner()
   debug("cPidScanner::~cPidScanner()\n");
 }
 
-void cPidScanner::SetChannel(const tChannelID &ChannelId)
+void cPidScanner::SetChannel(const tChannelID &channelIdP)
 {
-  debug("cPidScanner::SetChannel(): %s\n", *ChannelId.ToString());
-  channelId = ChannelId;
-  Vpid = 0xFFFF;
-  numVpids = 0;
-  Apid = 0xFFFF;
-  numApids = 0;
-  process = true;
-  timeout.Set(PIDSCANNER_TIMEOUT_IN_MS);
+  debug("cPidScanner::SetChannel(): %s\n", *channelIdP.ToString());
+  channelIdM = channelIdP;
+  vPidM = 0xFFFF;
+  numVpidsM = 0;
+  aPidM = 0xFFFF;
+  numApidsM = 0;
+  processM = true;
+  timeoutM.Set(PIDSCANNER_TIMEOUT_IN_MS);
 }
 
-void cPidScanner::Process(const uint8_t* buf)
+void cPidScanner::Process(const uint8_t* bufP)
 {
   //debug("cPidScanner::Process()\n");
-  if (!process)
+  if (!processM)
      return;
 
   // Stop scanning after defined timeout
-  if (timeout.TimedOut()) {
+  if (timeoutM.TimedOut()) {
      debug("cPidScanner::Process: Timed out determining pids\n");
-     process = false;
+     processM = false;
   }
 
   // Verify TS packet
-  if (buf[0] != 0x47) {
-     error("Not TS packet: 0x%X\n", buf[0]);
+  if (bufP[0] != 0x47) {
+     error("Not TS packet: 0x%X\n", bufP[0]);
      return;
      }
 
   // Found TS packet
-  int pid = ts_pid(buf);
-  int xpid = (buf[1] << 8 | buf[2]);
+  int pid = ts_pid(bufP);
+  int xpid = (bufP[1] << 8 | bufP[2]);
 
   // Check if payload available
-  uint8_t count = payload(buf);
+  uint8_t count = payload(bufP);
   if (count == 0)
      return;
 
   if (xpid & 0x4000) {
      // Stream start (Payload Unit Start Indicator)
-     uchar *d = (uint8_t*)buf;
+     uchar *d = (uint8_t*)bufP;
      d += 4;
      // pointer to payload
-     if (buf[3] & 0x20)
+     if (bufP[3] & 0x20)
         d += d[0] + 1;
      // Skip adaption field
-     if (buf[3] & 0x10) {
+     if (bufP[3] & 0x10) {
         // Payload present
         if ((d[0] == 0) && (d[1] == 0) && (d[2] == 1)) {
            // PES packet start
            int sid = d[3];
            // Stream ID
            if ((sid >= 0xC0) && (sid <= 0xDF)) {
-              if (pid < Apid) {
-                 debug("cPidScanner::Process: Found lower Apid: 0x%X instead of 0x%X\n", pid, Apid);
-                 Apid = pid;
-                 numApids = 1;
+              if (pid < aPidM) {
+                 debug("cPidScanner::Process: Found lower Apid: 0x%X instead of 0x%X\n", pid, aPidM);
+                 aPidM = pid;
+                 numApidsM = 1;
                  }
-              else if (pid == Apid) {
-                 ++numApids;
-                 debug("cPidScanner::Process: Incrementing Apids, now at %d\n", numApids);
+              else if (pid == aPidM) {
+                 ++numApidsM;
+                 debug("cPidScanner::Process: Incrementing Apids, now at %d\n", numApidsM);
                  }
               }
            else if ((sid >= 0xE0) && (sid <= 0xEF)) {
-              if (pid < Vpid) {
-                 debug("cPidScanner::Process: Found lower Vpid: 0x%X instead of 0x%X\n", pid, Vpid);
-                 Vpid = pid;
-                 numVpids = 1;
+              if (pid < vPidM) {
+                 debug("cPidScanner::Process: Found lower Vpid: 0x%X instead of 0x%X\n", pid, vPidM);
+                 vPidM = pid;
+                 numVpidsM = 1;
                  }
-              else if (pid == Vpid) {
-                 ++numVpids;
-                 debug("cPidScanner::Process: Incrementing Vpids, now at %d\n", numVpids);
+              else if (pid == vPidM) {
+                 ++numVpidsM;
+                 debug("cPidScanner::Process: Incrementing Vpids, now at %d\n", numVpidsM);
                  }
               }
            }
-        if (((numVpids >= PIDSCANNER_VPID_COUNT) && (numApids >= PIDSCANNER_APID_COUNT)) ||
-            (abs(numApids - numVpids) >= PIDSCANNER_PID_DELTA_COUNT)) {
+        if (((numVpidsM >= PIDSCANNER_VPID_COUNT) && (numApidsM >= PIDSCANNER_APID_COUNT)) ||
+            (abs(numApidsM - numVpidsM) >= PIDSCANNER_PID_DELTA_COUNT)) {
            // Lock channels for pid updates
            if (!Channels.Lock(true, 10)) {
-              timeout.Set(PIDSCANNER_TIMEOUT_IN_MS);
+              timeoutM.Set(PIDSCANNER_TIMEOUT_IN_MS);
               return;
               }
-           cChannel *IptvChannel = Channels.GetByChannelID(channelId);
+           cChannel *IptvChannel = Channels.GetByChannelID(channelIdM);
            if (IptvChannel) {
               int Apids[MAXAPIDS + 1] = { 0 }; // these lists are zero-terminated
               int Atypes[MAXAPIDS + 1] = { 0 };
@@ -127,18 +127,18 @@ void cPidScanner::Process(const uint8_t* buf)
               int Ppid = IptvChannel->Ppid();
               int Tpid = IptvChannel->Tpid();
               bool foundApid = false;
-              if (numVpids < PIDSCANNER_VPID_COUNT)
-                 Vpid = 0; // No detected video pid
-              else if (numApids < PIDSCANNER_APID_COUNT)
-                 Apid = 0; // No detected audio pid
+              if (numVpidsM < PIDSCANNER_VPID_COUNT)
+                 vPidM = 0; // No detected video pid
+              else if (numApidsM < PIDSCANNER_APID_COUNT)
+                 aPidM = 0; // No detected audio pid
               for (unsigned int i = 0; i < MAXAPIDS; ++i) {
                   Apids[i] = IptvChannel->Apid(i);
                   Atypes[i] = IptvChannel->Atype(i);
-                  if (Apids[i] && (Apids[i] == Apid))
+                  if (Apids[i] && (Apids[i] == aPidM))
                      foundApid = true;
                   }
               if (!foundApid) {
-                 Apids[0] = Apid;
+                 Apids[0] = aPidM;
                  Atypes[0] = 4;
                  }
               for (unsigned int i = 0; i < MAXDPIDS; ++i) {
@@ -147,11 +147,11 @@ void cPidScanner::Process(const uint8_t* buf)
                   }
               for (unsigned int i = 0; i < MAXSPIDS; ++i)
                   Spids[i] = IptvChannel->Spid(i);
-              debug("cPidScanner::Process(): Vpid=0x%04X, Apid=0x%04X\n", Vpid, Apid);
-              IptvChannel->SetPids(Vpid, Ppid, Vtype, Apids, Atypes, ALangs, Dpids, Dtypes, DLangs, Spids, SLangs, Tpid);
+              debug("cPidScanner::Process(): Vpid=0x%04X, Apid=0x%04X\n", vPidM, aPidM);
+              IptvChannel->SetPids(vPidM, Ppid, Vtype, Apids, Atypes, ALangs, Dpids, Dtypes, DLangs, Spids, SLangs, Tpid);
               }
            Channels.Unlock();
-           process = false;
+           processM = false;
            }
         }
      }

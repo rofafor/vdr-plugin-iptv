@@ -14,16 +14,16 @@
 
 class cIptvProtocolUdp : public cIptvUdpSocket, public cIptvProtocolIf {
 private:
-  bool isIGMPv3;
-  char* sourceAddr;
-  char* streamAddr;
-  int streamPort;
+  bool isIGMPv3M;
+  char* sourceAddrM;
+  char* streamAddrM;
+  int streamPortM;
 
 public:
   cIptvProtocolUdp();
   virtual ~cIptvProtocolUdp();
-  int Read(unsigned char* BufferAddr, unsigned int BufferLen);
-  bool Set(const char* Location, const int Parameter, const int Index);
+  int Read(unsigned char* bufferAddrP, unsigned int bufferLenP);
+  bool Set(const char* locationP, const int parameterP, const int indexP);
   bool Open(void);
   bool Close(void);
   cString GetInformation(void);

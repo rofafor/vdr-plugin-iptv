@@ -10,38 +10,38 @@
 cIptvConfig IptvConfig;
 
 cIptvConfig::cIptvConfig(void)
-: tsBufferSize(2),
-  tsBufferPrefillRatio(0),
-  extProtocolBasePort(4321),
-  useBytes(1),
-  sectionFiltering(1)
+: tsBufferSizeM(2),
+  tsBufferPrefillRatioM(0),
+  extProtocolBasePortM(4321),
+  useBytesM(1),
+  sectionFilteringM(1)
 {
-  for (unsigned int i = 0; i < ARRAY_SIZE(disabledFilters); ++i)
-      disabledFilters[i] = -1;
-  memset(configDirectory, '\0', sizeof(configDirectory));
+  for (unsigned int i = 0; i < ARRAY_SIZE(disabledFiltersM); ++i)
+      disabledFiltersM[i] = -1;
+  memset(configDirectoryM, '\0', sizeof(configDirectoryM));
 }
 
 unsigned int cIptvConfig::GetDisabledFiltersCount(void) const
 {
   unsigned int n = 0;
-  while ((n < ARRAY_SIZE(disabledFilters) && (disabledFilters[n] != -1)))
+  while ((n < ARRAY_SIZE(disabledFiltersM) && (disabledFiltersM[n] != -1)))
         n++;
   return n;
 }
 
-int cIptvConfig::GetDisabledFilters(unsigned int Index) const
+int cIptvConfig::GetDisabledFilters(unsigned int indexP) const
 {
-  return (Index < ARRAY_SIZE(disabledFilters)) ? disabledFilters[Index] : -1;
+  return (indexP < ARRAY_SIZE(disabledFiltersM)) ? disabledFiltersM[indexP] : -1;
 }
 
-void cIptvConfig::SetDisabledFilters(unsigned int Index, int Number)
+void cIptvConfig::SetDisabledFilters(unsigned int indexP, int numberP)
 {
-  if (Index < ARRAY_SIZE(disabledFilters))
-     disabledFilters[Index] = Number;
+  if (indexP < ARRAY_SIZE(disabledFiltersM))
+     disabledFiltersM[indexP] = numberP;
 }
 
 void cIptvConfig::SetConfigDirectory(const char *directoryP)
 {
   debug("cIptvConfig::SetConfigDirectory(%s)\n", directoryP);
-  ERROR_IF(!realpath(directoryP, configDirectory), "Cannot canonicalize configuration directory");
+  ERROR_IF(!realpath(directoryP, configDirectoryM), "Cannot canonicalize configuration directory");
 }

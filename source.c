@@ -10,25 +10,25 @@
 
 // --- cIptvTransponderParameters --------------------------------------------
 
-cIptvTransponderParameters::cIptvTransponderParameters(const char *Parameters)
-: sidscan(0),
-  pidscan(0),
-  protocol(eProtocolUDP),
-  parameter(0)
+cIptvTransponderParameters::cIptvTransponderParameters(const char *parametersP)
+: sidScanM(0),
+  pidScanM(0),
+  protocolM(eProtocolUDP),
+  parameterM(0)
 {
-  debug("cIptvTransponderParameters::cIptvTransponderParameters(): Parameters=%s\n", Parameters);
+  debug("cIptvTransponderParameters::cIptvTransponderParameters('%s')\n", parametersP);
 
-  memset(&address, 0, sizeof(address));
-  Parse(Parameters);
+  memset(&addressM, 0, sizeof(addressM));
+  Parse(parametersP);
 }
 
-cString cIptvTransponderParameters::ToString(char Type) const
+cString cIptvTransponderParameters::ToString(char typeP) const
 {
-  debug("cIptvTransponderParameters::ToString() Type=%c\n", Type);
+  debug("cIptvTransponderParameters::ToString(%c)\n", typeP);
 
   const char *protocolstr;
 
-  switch (protocol) {
+  switch (protocolM) {
     case eProtocolEXT:
          protocolstr = "EXT";
          break;
@@ -46,17 +46,17 @@ cString cIptvTransponderParameters::ToString(char Type) const
          protocolstr = "UDP";
          break;
   }
-  return cString::sprintf("S=%d|P=%d|F=%s|U=%s|A=%d", sidscan, pidscan, protocolstr, address, parameter);
+  return cString::sprintf("S=%d|P=%d|F=%s|U=%s|A=%d", sidScanM, pidScanM, protocolstr, addressM, parameterM);
 }
 
-bool cIptvTransponderParameters::Parse(const char *s)
+bool cIptvTransponderParameters::Parse(const char *strP)
 {
-  debug("cIptvTransponderParameters::Parse(): s=%s\n", s);
+  debug("cIptvTransponderParameters::Parse('%s'\n", strP);
   bool result = false;
 
-  if (s && *s) {
+  if (strP && *strP) {
      const char *delim = "|";
-     char *str = strdup(s);
+     char *str = strdup(strP);
      char *saveptr = NULL;
      char *token = NULL;
      bool found_s = false;
@@ -72,41 +72,41 @@ bool cIptvTransponderParameters::Parse(const char *s)
           ++data;
           switch (*token) {
             case 'S':
-                 sidscan = (int)strtol(data, (char **)NULL, 10);
+                 sidScanM = (int)strtol(data, (char **)NULL, 10);
                  found_s = true;
                  break;
             case 'P':
-                 pidscan = (int)strtol(data, (char **)NULL, 10);
+                 pidScanM = (int)strtol(data, (char **)NULL, 10);
                  found_p = true;
                  break;
             case 'F':
                  if (strstr(data, "UDP")) {
-                    protocol = eProtocolUDP;
+                    protocolM = eProtocolUDP;
                     found_f = true;
                     }
                  else if (strstr(data, "CURL")) {
-                    protocol = eProtocolCURL;
+                    protocolM = eProtocolCURL;
                     found_f = true;
                     }
                  else if (strstr(data, "HTTP")) {
-                    protocol = eProtocolHTTP;
+                    protocolM = eProtocolHTTP;
                     found_f = true;
                     }
                  else if (strstr(data, "FILE")) {
-                    protocol = eProtocolFILE;
+                    protocolM = eProtocolFILE;
                     found_f = true;
                     }
                  else if (strstr(data, "EXT")) {
-                    protocol = eProtocolEXT;
+                    protocolM = eProtocolEXT;
                     found_f = true;
                     }
                  break;
             case 'U':
-                 strn0cpy(address, data, sizeof(address));
+                 strn0cpy(addressM, data, sizeof(addressM));
                  found_u = true;
                  break;
             case 'A':
-                 parameter = (int)strtol(data, (char **)NULL, 10);
+                 parameterM = (int)strtol(data, (char **)NULL, 10);
                  found_a = true;
                  break;
             default:
@@ -129,55 +129,55 @@ bool cIptvTransponderParameters::Parse(const char *s)
 
 // --- cIptvSourceParam ------------------------------------------------------
 
-cIptvSourceParam::cIptvSourceParam(char Source, const char *Description)
-  : cSourceParam(Source, Description),
-    param(0),
-    nid(0),
-    tid(0),
-    rid(0),
-    data(),
-    itp()
+cIptvSourceParam::cIptvSourceParam(char sourceP, const char *descriptionP)
+  : cSourceParam(sourceP, descriptionP),
+    paramM(0),
+    nidM(0),
+    tidM(0),
+    ridM(0),
+    dataM(),
+    itpM()
 {
-  debug("cIptvSourceParam::cIptvSourceParam(): Source=%c Description=%s\n", Source, Description);
+  debug("cIptvSourceParam::cIptvSourceParam(%c, '%s')\n", sourceP, descriptionP);
 
-  protocols[cIptvTransponderParameters::eProtocolUDP]  = tr("UDP");
-  protocols[cIptvTransponderParameters::eProtocolCURL] = tr("CURL");
-  protocols[cIptvTransponderParameters::eProtocolHTTP] = tr("HTTP");
-  protocols[cIptvTransponderParameters::eProtocolFILE] = tr("FILE");
-  protocols[cIptvTransponderParameters::eProtocolEXT]  = tr("EXT");
+  protocolsM[cIptvTransponderParameters::eProtocolUDP]  = tr("UDP");
+  protocolsM[cIptvTransponderParameters::eProtocolCURL] = tr("CURL");
+  protocolsM[cIptvTransponderParameters::eProtocolHTTP] = tr("HTTP");
+  protocolsM[cIptvTransponderParameters::eProtocolFILE] = tr("FILE");
+  protocolsM[cIptvTransponderParameters::eProtocolEXT]  = tr("EXT");
 }
 
-void cIptvSourceParam::SetData(cChannel *Channel)
+void cIptvSourceParam::SetData(cChannel *channelP)
 {
-  debug("cIptvSourceParam::SetData(): Channel=%s)\n", Channel->Parameters());
-  data = *Channel;
-  nid = data.Nid();
-  tid = data.Tid();
-  rid = data.Rid();
-  itp.Parse(data.Parameters());
-  param = 0;
+  debug("cIptvSourceParam::SetData('%s')\n", channelP->Parameters());
+  dataM = *channelP;
+  nidM = dataM.Nid();
+  tidM = dataM.Tid();
+  ridM = dataM.Rid();
+  itpM.Parse(dataM.Parameters());
+  paramM = 0;
 }
 
-void cIptvSourceParam::GetData(cChannel *Channel)
+void cIptvSourceParam::GetData(cChannel *channelP)
 {
-  debug("cIptvSourceParam::GetData(): Channel=%s\n", Channel->Parameters());
-  data.SetTransponderData(Channel->Source(), Channel->Frequency(), data.Srate(), itp.ToString(Source()), true);
-  data.SetId(nid, tid, Channel->Sid(), rid);
-  *Channel = data;
+  debug("cIptvSourceParam::GetData('%s')\n", channelP->Parameters());
+  dataM.SetTransponderData(channelP->Source(), channelP->Frequency(), dataM.Srate(), itpM.ToString(Source()), true);
+  dataM.SetId(nidM, tidM, channelP->Sid(), ridM);
+  *channelP = dataM;
 }
 
 cOsdItem *cIptvSourceParam::GetOsdItem(void)
 {
   debug("cIptvSourceParam::GetOsdItem()\n");
-  switch (param++) {
-    case  0: return new cMenuEditIntItem( tr("Nid"),              &nid, 0);
-    case  1: return new cMenuEditIntItem( tr("Tid"),              &tid, 0);
-    case  2: return new cMenuEditIntItem( tr("Rid"),              &rid, 0);
-    case  3: return new cMenuEditBoolItem(tr("Scan section ids"), &itp.sidscan);
-    case  4: return new cMenuEditBoolItem(tr("Scan pids"),        &itp.pidscan);
-    case  5: return new cMenuEditStraItem(tr("Protocol"),         &itp.protocol,  ELEMENTS(protocols), protocols);
-    case  6: return new cMenuEditStrItem( tr("Address"),           itp.address,   sizeof(itp.address));
-    case  7: return new cMenuEditIntItem( tr("Parameter"),        &itp.parameter, 0,                   0xFFFF);
+  switch (paramM++) {
+    case  0: return new cMenuEditIntItem( tr("Nid"),              &nidM, 0);
+    case  1: return new cMenuEditIntItem( tr("Tid"),              &tidM, 0);
+    case  2: return new cMenuEditIntItem( tr("Rid"),              &ridM, 0);
+    case  3: return new cMenuEditBoolItem(tr("Scan section ids"), &itpM.sidScanM);
+    case  4: return new cMenuEditBoolItem(tr("Scan pids"),        &itpM.pidScanM);
+    case  5: return new cMenuEditStraItem(tr("Protocol"),         &itpM.protocolM,  ELEMENTS(protocolsM), protocolsM);
+    case  6: return new cMenuEditStrItem( tr("Address"),           itpM.addressM,   sizeof(itpM.addressM));
+    case  7: return new cMenuEditIntItem( tr("Parameter"),        &itpM.parameterM, 0,                    0xFFFF);
     default: return NULL;
     }
   return NULL;

@@ -13,10 +13,10 @@
 
 class cIptvProtocolFile : public cIptvProtocolIf {
 private:
-  char* fileLocation;
-  int fileDelay;
-  FILE* fileStream;
-  bool isActive;
+  char* fileLocationM;
+  int fileDelayM;
+  FILE* fileStreamM;
+  bool isActiveM;
 
 private:
   bool OpenFile(void);
@@ -25,8 +25,8 @@ private:
 public:
   cIptvProtocolFile();
   virtual ~cIptvProtocolFile();
-  int Read(unsigned char* BufferAddr, unsigned int BufferLen);
-  bool Set(const char* Location, const int Parameter, const int Index);
+  int Read(unsigned char* bufferAddrP, unsigned int bufferLenP);
+  bool Set(const char* locationP, const int parameterP, const int indexP);
   bool Open(void);
   bool Close(void);
   cString GetInformation(void);

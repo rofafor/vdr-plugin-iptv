@@ -24,10 +24,10 @@
 #endif
 
 cIptvProtocolExt::cIptvProtocolExt()
-: pid(-1),
-  scriptFile(""),
-  scriptParameter(0),
-  streamPort(0)
+: pidM(-1),
+  scriptFileM(""),
+  scriptParameterM(0),
+  streamPortM(0)
 {
   debug("cIptvProtocolExt::cIptvProtocolExt()\n");
 }
@@ -43,22 +43,22 @@ void cIptvProtocolExt::ExecuteScript(void)
 {
   debug("cIptvProtocolExt::ExecuteScript()\n");
   // Check if already executing
-  if (isActive || isempty(scriptFile))
+  if (isActive || isempty(scriptFileM))
      return;
-  if (pid > 0) {
+  if (pidM > 0) {
      error("Cannot execute script!");
      return;
      }
   // Let's fork
-  ERROR_IF_RET((pid = fork()) == -1, "fork()", return);
+  ERROR_IF_RET((pidM = fork()) == -1, "fork()", return);
   // Check if child process
-  if (pid == 0) {
+  if (pidM == 0) {
      // Close all dup'ed filedescriptors
      int MaxPossibleFileDescriptors = getdtablesize();
      for (int i = STDERR_FILENO + 1; i < MaxPossibleFileDescriptors; i++)
          close(i);
      // Execute the external script
-     cString cmd = cString::sprintf("%s %d %d", *scriptFile, scriptParameter, streamPort);
+     cString cmd = cString::sprintf("%s %d %d", *scriptFileM, scriptParameterM, streamPortM);
      debug("cIptvProtocolExt::ExecuteScript(child): %s\n", *cmd);
      // Create a new session for a process group
      ERROR_IF_RET(setsid() == -1, "setsid()", _exit(-1));
@@ -69,38 +69,38 @@ void cIptvProtocolExt::ExecuteScript(void)
      _exit(0);
      }
   else {
-     debug("cIptvProtocolExt::ExecuteScript(): pid=%d\n", pid);
+     debug("cIptvProtocolExt::ExecuteScript(): pid=%d\n", pidM);
      }
 }
 
 void cIptvProtocolExt::TerminateScript(void)
 {
-  debug("cIptvProtocolExt::TerminateScript(): pid=%d\n", pid);
-  if (!isActive || isempty(scriptFile))
+  debug("cIptvProtocolExt::TerminateScript(): pid=%d\n", pidM);
+  if (!isActive || isempty(scriptFileM))
      return;
-  if (pid > 0) {
+  if (pidM > 0) {
      const unsigned int timeoutms = 100;
      unsigned int waitms = 0;
      bool waitOver = false;
      // Signal and wait for termination
-     int retval = killpg(pid, SIGINT);
+     int retval = killpg(pidM, SIGINT);
      ERROR_IF_RET(retval < 0, "kill()", waitOver = true);
      while (!waitOver) {
        retval = 0;
        waitms += timeoutms;
        if ((waitms % 2000) == 0) {
-          error("Script '%s' won't terminate - killing it!", *scriptFile);
-          killpg(pid, SIGKILL);
+          error("Script '%s' won't terminate - killing it!", *scriptFileM);
+          killpg(pidM, SIGKILL);
           }
        // Clear wait status to make sure child exit status is accessible
        // and wait for child termination
 #ifdef __FreeBSD__
        int waitStatus = 0;
-       retval = waitpid(pid, &waitStatus, WNOHANG);
+       retval = waitpid(pidM, &waitStatus, WNOHANG);
 #else  // __FreeBSD__
        siginfo_t waitStatus;
        memset(&waitStatus, '\0', sizeof(waitStatus));
-       retval = waitid(P_PID, pid, &waitStatus, (WNOHANG | WEXITED));
+       retval = waitid(P_PID, pidM, &waitStatus, (WNOHANG | WEXITED));
 #endif // __FreeBSD__
        ERROR_IF_RET(retval < 0, "waitid()", waitOver = true);
        // These are the acceptable conditions under which child exit is
@@ -108,17 +108,17 @@ void cIptvProtocolExt::TerminateScript(void)
 #ifdef __FreeBSD__
        if (retval > 0 && (WIFEXITED(waitStatus) || WIFSIGNALED(waitStatus))) {
 #else  // __FreeBSD__
-       if (!retval && waitStatus.si_pid && (waitStatus.si_pid == pid) &&
+       if (!retval && waitStatus.si_pid && (waitStatus.si_pid == pidM) &&
           ((waitStatus.si_code == CLD_EXITED) || (waitStatus.si_code == CLD_KILLED))) {
 #endif // __FreeBSD__
-          debug("Child (%d) exited as expected\n", pid);
+          debug("Child (%d) exited as expected\n", pidM);
           waitOver = true;
           }
        // Unsuccessful wait, avoid busy looping
        if (!waitOver)
           cCondWait::SleepMs(timeoutms);
        }
-     pid = -1;
+     pidM = -1;
      }
 }
 
@@ -126,10 +126,10 @@ bool cIptvProtocolExt::Open(void)
 {
   debug("cIptvProtocolExt::Open()\n");
   // Reject empty script files
-  if (!strlen(*scriptFile))
+  if (!strlen(*scriptFileM))
      return false;
   // Create the listening socket
-  OpenSocket(streamPort);
+  OpenSocket(streamPortM);
   // Execute the external script
   ExecuteScript();
   isActive = true;
@@ -147,25 +147,25 @@ bool cIptvProtocolExt::Close(void)
   return true;
 }
 
-int cIptvProtocolExt::Read(unsigned char* BufferAddr, unsigned int BufferLen)
+int cIptvProtocolExt::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
 {
-  return cIptvUdpSocket::Read(BufferAddr, BufferLen);
+  return cIptvUdpSocket::Read(bufferAddrP, bufferLenP);
 }
 
-bool cIptvProtocolExt::Set(const char* Location, const int Parameter, const int Index)
+bool cIptvProtocolExt::Set(const char* locationP, const int parameterP, const int indexP)
 {
-  debug("cIptvProtocolExt::Set(): Location=%s Parameter=%d Index=%d\n", Location, Parameter, Index);
-  if (!isempty(Location)) {
+  debug("cIptvProtocolExt::Set('%s', %d, %d)\n", locationP, parameterP, indexP);
+  if (!isempty(locationP)) {
      struct stat stbuf;
      // Update script file and parameter
-     scriptFile = cString::sprintf("%s/%s", IptvConfig.GetConfigDirectory(), Location);
-     if ((stat(*scriptFile, &stbuf) != 0) || (strstr(*scriptFile, "..") != 0)) {
-        error("Non-existent or relative path script '%s'", *scriptFile);
+     scriptFileM = cString::sprintf("%s/%s", IptvConfig.GetConfigDirectory(), locationP);
+     if ((stat(*scriptFileM, &stbuf) != 0) || (strstr(*scriptFileM, "..") != 0)) {
+        error("Non-existent or relative path script '%s'", *scriptFileM);
         return false;
         }
-     scriptParameter = Parameter;
+     scriptParameterM = parameterP;
      // Update listen port
-     streamPort = IptvConfig.GetExtProtocolBasePort() + Index;
+     streamPortM = IptvConfig.GetExtProtocolBasePort() + indexP;
      }
   return true;
 }
@@ -173,5 +173,5 @@ bool cIptvProtocolExt::Set(const char* Location, const int Parameter, const int 
 cString cIptvProtocolExt::GetInformation(void)
 {
   //debug("cIptvProtocolExt::GetInformation()");
-  return cString::sprintf("ext://%s:%d", *scriptFile, scriptParameter);
+  return cString::sprintf("ext://%s:%d", *scriptFileM, scriptParameterM);
 }

@@ -24,41 +24,41 @@ private:
     DMX_MAX_SECFEED_SIZE = (DMX_MAX_SECTION_SIZE + TS_SIZE)
   };
 
-  int pusi_seen;
-  int feedcc;
-  int doneq;
+  int pusiSeenM;
+  int feedCcM;
+  int doneqM;
 
-  uint8_t *secbuf;
-  uint8_t secbuf_base[DMX_MAX_SECFEED_SIZE];
-  uint16_t secbufp;
-  uint16_t seclen;
-  uint16_t tsfeedp;
-  uint16_t pid;
+  uint8_t *secBufM;
+  uint8_t secBufBaseM[DMX_MAX_SECFEED_SIZE];
+  uint16_t secBufpM;
+  uint16_t secLenM;
+  uint16_t tsFeedpM;
+  uint16_t pidM;
 
-  int devid;
+  int devIdM;
 
-  uint8_t filter_value[DMX_MAX_FILTER_SIZE];
-  uint8_t filter_mask[DMX_MAX_FILTER_SIZE];
-  uint8_t filter_mode[DMX_MAX_FILTER_SIZE];
+  uint8_t filterValueM[DMX_MAX_FILTER_SIZE];
+  uint8_t filterMaskM[DMX_MAX_FILTER_SIZE];
+  uint8_t filterModeM[DMX_MAX_FILTER_SIZE];
 
-  uint8_t maskandmode[DMX_MAX_FILTER_SIZE];
-  uint8_t maskandnotmode[DMX_MAX_FILTER_SIZE];
+  uint8_t maskAndModeM[DMX_MAX_FILTER_SIZE];
+  uint8_t maskAndNotModeM[DMX_MAX_FILTER_SIZE];
 
-  cRingBufferLinear *ringbuffer;
+  cRingBufferLinear *ringbufferM;
 
-  inline uint16_t GetLength(const uint8_t *Data);
+  inline uint16_t GetLength(const uint8_t *dataP);
   void New(void);
   int Filter(void);
   inline int Feed(void);
-  int CopyDump(const uint8_t *buf, uint8_t len);
+  int CopyDump(const uint8_t *bufP, uint8_t lenP);
 
 public:
   // constructor & destructor
-  cIptvSectionFilter(int DeviceIndex, uint16_t Pid, uint8_t Tid, uint8_t Mask);
+  cIptvSectionFilter(int deviceIndexP, uint16_t pidP, uint8_t tidP, uint8_t maskP);
   virtual ~cIptvSectionFilter();
-  void Process(const uint8_t* Data);
-  int Read(void *Buffer, size_t Length);
-  uint16_t GetPid(void) const { return pid; }
+  void Process(const uint8_t* dataP);
+  int Read(void *bufferP, size_t lengthP);
+  uint16_t GetPid(void) const { return pidM; }
 };
 
 #endif // __IPTV_SECTIONFILTER_H

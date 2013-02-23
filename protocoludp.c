@@ -19,10 +19,10 @@
 #include "socket.h"
 
 cIptvProtocolUdp::cIptvProtocolUdp()
-: isIGMPv3(false),
-  sourceAddr(strdup("")),
-  streamAddr(strdup("")),
-  streamPort(0)
+: isIGMPv3M(false),
+  sourceAddrM(strdup("")),
+  streamAddrM(strdup("")),
+  streamPortM(0)
 {
   debug("cIptvProtocolUdp::cIptvProtocolUdp()\n");
 }
@@ -33,15 +33,15 @@ cIptvProtocolUdp::~cIptvProtocolUdp()
   // Drop the multicast group and close the socket
   cIptvProtocolUdp::Close();
   // Free allocated memory
-  free(streamAddr);
-  free(sourceAddr);
+  free(streamAddrM);
+  free(sourceAddrM);
 }
 
 bool cIptvProtocolUdp::Open(void)
 {
-  debug("cIptvProtocolUdp::Open(): streamAddr=%s\n", streamAddr);
-  OpenSocket(streamPort, streamAddr, sourceAddr, isIGMPv3);
-  if (!isempty(streamAddr)) {
+  debug("cIptvProtocolUdp::Open(): '%s'\n", streamAddrM);
+  OpenSocket(streamPortM, streamAddrM, sourceAddrM, isIGMPv3M);
+  if (!isempty(streamAddrM)) {
      // Join a new multicast group
      JoinMulticast();
      }
@@ -50,53 +50,53 @@ bool cIptvProtocolUdp::Open(void)
 
 bool cIptvProtocolUdp::Close(void)
 {
-  debug("cIptvProtocolUdp::Close(): streamAddr=%s\n", streamAddr);
-  if (!isempty(streamAddr)) {
+  debug("cIptvProtocolUdp::Close(): '%s'\n", streamAddrM);
+  if (!isempty(streamAddrM)) {
      // Drop the multicast group
-     OpenSocket(streamPort, streamAddr, sourceAddr, isIGMPv3);
+     OpenSocket(streamPortM, streamAddrM, sourceAddrM, isIGMPv3M);
      DropMulticast();
      }
   // Close the socket
   CloseSocket();
   // Do NOT reset stream and source addresses
-  //sourceAddr = strcpyrealloc(sourceAddr, "");
-  //streamAddr = strcpyrealloc(streamAddr, "");
-  //streamPort = 0;
+  //sourceAddrM = strcpyrealloc(sourceAddrM, "");
+  //streamAddrM = strcpyrealloc(streamAddrM, "");
+  //streamPortM = 0;
   return true;
 }
 
-int cIptvProtocolUdp::Read(unsigned char* BufferAddr, unsigned int BufferLen)
+int cIptvProtocolUdp::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
 {
-  return cIptvUdpSocket::Read(BufferAddr, BufferLen);
+  return cIptvUdpSocket::Read(bufferAddrP, bufferLenP);
 }
 
-bool cIptvProtocolUdp::Set(const char* Location, const int Parameter, const int Index)
+bool cIptvProtocolUdp::Set(const char* locationP, const int parameterP, const int indexP)
 {
-  debug("cIptvProtocolUdp::Set(): Location=%s Parameter=%d Index=%d\n", Location, Parameter, Index);
-  if (!isempty(Location)) {
+  debug("cIptvProtocolUdp::Set('%s', %d, %d)\n", locationP, parameterP, indexP);
+  if (!isempty(locationP)) {
      // Drop the multicast group
-     if (!isempty(streamAddr)) {
-        OpenSocket(streamPort, streamAddr, sourceAddr, isIGMPv3);
+     if (!isempty(streamAddrM)) {
+        OpenSocket(streamPortM, streamAddrM, sourceAddrM, isIGMPv3M);
         DropMulticast();
         }
      // Update stream address and port
-     streamAddr = strcpyrealloc(streamAddr, Location);
+     streamAddrM = strcpyrealloc(streamAddrM, locationP);
      // <group address> or <source address>@<group address>
-     char *p = strstr(streamAddr, "@");
+     char *p = strstr(streamAddrM, "@");
      if (p) {
         *p = 0;
-        sourceAddr = strcpyrealloc(sourceAddr, streamAddr);
-        streamAddr = strcpyrealloc(streamAddr, p + 1);
-        isIGMPv3 = true;
+        sourceAddrM = strcpyrealloc(sourceAddrM, streamAddrM);
+        streamAddrM = strcpyrealloc(streamAddrM, p + 1);
+        isIGMPv3M = true;
         }
      else {
-        sourceAddr = strcpyrealloc(sourceAddr, streamAddr);
-        isIGMPv3 = false;
+        sourceAddrM = strcpyrealloc(sourceAddrM, streamAddrM);
+        isIGMPv3M = false;
         }
-     streamPort = Parameter;
+     streamPortM = parameterP;
      // Join a new multicast group
-     if (!isempty(streamAddr)) {
-        OpenSocket(streamPort, streamAddr, sourceAddr, isIGMPv3);
+     if (!isempty(streamAddrM)) {
+        OpenSocket(streamPortM, streamAddrM, sourceAddrM, isIGMPv3M);
         JoinMulticast();
         }
      }
@@ -106,7 +106,7 @@ bool cIptvProtocolUdp::Set(const char* Location, const int Parameter, const int 
 cString cIptvProtocolUdp::GetInformation(void)
 {
   //debug("cIptvProtocolUdp::GetInformation()");
-  if (isIGMPv3)
-     return cString::sprintf("udp://%s@%s:%d", sourceAddr, streamAddr, streamPort);
-  return cString::sprintf("udp://%s:%d", streamAddr, streamPort);
+  if (isIGMPv3M)
+     return cString::sprintf("udp://%s@%s:%d", sourceAddrM, streamAddrM, streamPortM);
+  return cString::sprintf("udp://%s:%d", streamAddrM, streamPortM);
 }

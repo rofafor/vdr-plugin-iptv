@@ -14,21 +14,21 @@
 
 class cIptvProtocolHttp : public cIptvTcpSocket, public cIptvProtocolIf {
 private:
-  char* streamAddr;
-  char* streamPath;
-  int streamPort;
+  char* streamAddrM;
+  char* streamPathM;
+  int streamPortM;
 
 private:
   bool Connect(void);
   bool Disconnect(void);
-  bool GetHeaderLine(char* dest, unsigned int destLen, unsigned int &recvLen);
+  bool GetHeaderLine(char* destP, unsigned int destLenP, unsigned int &recvLenP);
   bool ProcessHeaders(void);
 
 public:
   cIptvProtocolHttp();
   virtual ~cIptvProtocolHttp();
-  int Read(unsigned char* BufferAddr, unsigned int BufferLen);
-  bool Set(const char* Location, const int Parameter, const int Index);
+  int Read(unsigned char* bufferAddrP, unsigned int bufferLenP);
+  bool Set(const char* locationP, const int parameterP, const int indexP);
   bool Open(void);
   bool Close(void);
   cString GetInformation(void);

@@ -13,19 +13,19 @@
 
 class cSidScanner : public cFilter {
 private:
-  tChannelID channelId;
-  bool sidFound;
-  bool nidFound;
-  bool tidFound;
+  tChannelID channelIdM;
+  bool sidFoundM;
+  bool nidFoundM;
+  bool tidFoundM;
 
 protected:
-  virtual void Process(u_short Pid, u_char Tid, const u_char *Data, int Length);
-  virtual void SetStatus(bool On);
+  virtual void Process(u_short pidP, u_char tidP, const u_char *dataP, int lengthP);
+  virtual void SetStatus(bool onP);
 
 public:
   cSidScanner(void);
   ~cSidScanner();
-  void SetChannel(const tChannelID &ChannelId);
+  void SetChannel(const tChannelID &channelIdP);
   void Open() { SetStatus(true); }
   void Close() { SetStatus(false); }
 };

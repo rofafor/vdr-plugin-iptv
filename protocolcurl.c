@@ -404,7 +404,7 @@ bool cIptvProtocolCurl::Close(void)
   return true;
 }
 
-int cIptvProtocolCurl::Read(unsigned char* BufferAddr, unsigned int BufferLen)
+int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
 {
   //debug("cIptvProtocolCurl::Read()\n");
   int len = 0;
@@ -462,11 +462,11 @@ int cIptvProtocolCurl::Read(unsigned char* BufferAddr, unsigned int BufferLen)
         }
 
      // ... and try to empty it
-     unsigned char *p = GetData(&BufferLen);
-     if (p && (BufferLen > 0)) {
-        memcpy(BufferAddr, p, BufferLen);
-        DelData(BufferLen);
-        len = BufferLen;
+     unsigned char *p = GetData(&bufferLenP);
+     if (p && (bufferLenP > 0)) {
+        memcpy(bufferAddrP, p, bufferLenP);
+        DelData(bufferLenP);
+        len = bufferLenP;
         //debug("cIptvProtocolCurl::Read(): get %d bytes\n", len);
         }
      }
@@ -474,14 +474,14 @@ int cIptvProtocolCurl::Read(unsigned char* BufferAddr, unsigned int BufferLen)
   return len;
 }
 
-bool cIptvProtocolCurl::Set(const char* Location, const int Parameter, const int Index)
+bool cIptvProtocolCurl::Set(const char* locationP, const int parameterP, const int indexP)
 {
-  debug("cIptvProtocolCurl::Set(): Location=%s Parameter=%d Index=%d\n", Location, Parameter, Index);
-  if (!isempty(Location)) {
+  debug("cIptvProtocolCurl::Set('%s', %d, %d)\n", locationP, parameterP, indexP);
+  if (!isempty(locationP)) {
      // Disconnect
      Disconnect();
      // Update stream URL: colons (%3A) and pipes (%7C) shall be decoded
-     char *s = strdup(Location);
+     char *s = strdup(locationP);
      strreplace(s, "%3A", ":");
      strreplace(s, "%7C", "|");
      streamUrlM = s;
@@ -497,7 +497,7 @@ bool cIptvProtocolCurl::Set(const char* Location, const int Parameter, const int
      else
         modeM = eModeUnknown;
      // Update stream parameter
-     streamParamM = Parameter;
+     streamParamM = parameterP;
      //debug("%s [%d]\n", *streamUrlM, streamParamM);
      // Reconnect
      Connect();

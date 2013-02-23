@@ -34,32 +34,31 @@ private:
   enum {
     eMaxSecFilterCount = 32
   };
-  unsigned int deviceIndex;
-  int dvrFd;
-  bool isPacketDelivered;
-  bool isOpenDvr;
-  bool isBuffering;
-  bool sidScanEnabled;
-  bool pidScanEnabled;
-  cRingBufferLinear *tsBuffer;
-  int tsBufferPrefill;
-  tChannelID channelId;
-  cIptvProtocolUdp *pUdpProtocol;
-  cIptvProtocolCurl *pCurlProtocol;
-  cIptvProtocolHttp *pHttpProtocol;
-  cIptvProtocolFile *pFileProtocol;
-  cIptvProtocolExt *pExtProtocol;
-  cIptvStreamer *pIptvStreamer;
-  cPidScanner *pPidScanner;
-  cSidScanner *pSidScanner;
-  cMutex mutex;
-  cIptvSectionFilter *secfilters[eMaxSecFilterCount];
+  unsigned int deviceIndexM;
+  int dvrFdM;
+  bool isPacketDeliveredM;
+  bool isOpenDvrM;
+  bool sidScanEnabledM;
+  bool pidScanEnabledM;
+  cRingBufferLinear *tsBufferM;
+  mutable int tsBufferPrefillM;
+  tChannelID channelIdM;
+  cIptvProtocolUdp *pUdpProtocolM;
+  cIptvProtocolCurl *pCurlProtocolM;
+  cIptvProtocolHttp *pHttpProtocolM;
+  cIptvProtocolFile *pFileProtocolM;
+  cIptvProtocolExt *pExtProtocolM;
+  cIptvStreamer *pIptvStreamerM;
+  cPidScanner *pPidScannerM;
+  cSidScanner *pSidScannerM;
+  cMutex mutexM;
+  cIptvSectionFilter *secFiltersM[eMaxSecFilterCount];
 
   // constructor & destructor
 public:
-  cIptvDevice(unsigned int DeviceIndex);
+  cIptvDevice(unsigned int deviceIndexP);
   virtual ~cIptvDevice();
-  cString GetInformation(unsigned int Page = IPTV_DEVICE_INFO_ALL);
+  cString GetInformation(unsigned int pageP = IPTV_DEVICE_INFO_ALL);
 
   // copy and assignment constructors
 private:
@@ -74,9 +73,9 @@ private:
   // for channel parsing & buffering
 private:
   void ResetBuffering(void);
-  void CheckBuffering(void);
-  bool DeleteFilter(unsigned int Index);
-  bool IsBlackListed(u_short Pid, u_char Tid, u_char Mask) const;
+  bool IsBuffering(void) const;
+  bool DeleteFilter(unsigned int indexP);
+  bool IsBlackListed(u_short pidP, u_char tidP, u_char maskP) const;
 
   // for channel info
 public:
@@ -87,30 +86,30 @@ public:
 
   // for channel selection
 public:
-  virtual bool ProvidesSource(int Source) const;
-  virtual bool ProvidesTransponder(const cChannel *Channel) const;
-  virtual bool ProvidesChannel(const cChannel *Channel, int Priority = -1, bool *NeedsDetachReceivers = NULL) const;
+  virtual bool ProvidesSource(int sourceP) const;
+  virtual bool ProvidesTransponder(const cChannel *channelP) const;
+  virtual bool ProvidesChannel(const cChannel *channelP, int priorityP = -1, bool *needsDetachReceiversP = NULL) const;
   virtual bool ProvidesEIT(void) const;
   virtual int NumProvidedSystems(void) const;
 protected:
-  virtual bool SetChannelDevice(const cChannel *Channel, bool LiveView);
+  virtual bool SetChannelDevice(const cChannel *channelP, bool liveViewP);
 
   // for recording
 protected:
-  virtual bool SetPid(cPidHandle *Handle, int Type, bool On);
+  virtual bool SetPid(cPidHandle *handleP, int typeP, bool onP);
   virtual bool OpenDvr(void);
   virtual void CloseDvr(void);
-  virtual bool GetTSPacket(uchar *&Data);
+  virtual bool GetTSPacket(uchar *&dataP);
 
   // for section filtering
 public:
-  virtual int OpenFilter(u_short Pid, u_char Tid, u_char Mask);
-  virtual int ReadFilter(int Handle, void *Buffer, size_t Length);
-  virtual void CloseFilter(int Handle);
+  virtual int OpenFilter(u_short pidP, u_char tidP, u_char maskP);
+  virtual int ReadFilter(int handleP, void *bufferP, size_t lengthP);
+  virtual void CloseFilter(int handleP);
 
   // for transponder lock
 public:
-  virtual bool HasLock(int) const;
+  virtual bool HasLock(int timeoutMsP) const;
 
   // for common interface
 public:

@@ -17,11 +17,11 @@ class cIptvTransponderParameters
   friend class cIptvSourceParam;
 
 private:
-  int sidscan;
-  int pidscan;
-  int protocol;
-  char address[NAME_MAX];
-  int parameter;
+  int sidScanM;
+  int pidScanM;
+  int protocolM;
+  char addressM[NAME_MAX];
+  int parameterM;
 
 public:
   enum {
@@ -32,36 +32,36 @@ public:
     eProtocolEXT,
     eProtocolCount
   };
-  cIptvTransponderParameters(const char *Parameters = NULL);
-  int SidScan(void) const { return sidscan; }
-  int PidScan(void) const { return pidscan; }
-  int Protocol(void) const { return protocol; }
-  const char *Address(void) const { return address; }
-  int Parameter(void) const { return parameter; }
-  void SetSidScan(int SidScan) { sidscan = SidScan; }
-  void SetPidScan(int PidScan) { pidscan = PidScan; }
-  void SetProtocol(int Protocol) { protocol = Protocol; }
-  void SetAddress(const char *Address) { strncpy(address, Address, sizeof(address)); }
-  void SetParameter(int Parameter) { parameter = Parameter; }
-  cString ToString(char Type) const;
-  bool Parse(const char *s);
+  cIptvTransponderParameters(const char *parametersP = NULL);
+  int SidScan(void) const { return sidScanM; }
+  int PidScan(void) const { return pidScanM; }
+  int Protocol(void) const { return protocolM; }
+  const char *Address(void) const { return addressM; }
+  int Parameter(void) const { return parameterM; }
+  void SetSidScan(int sidScanP) { sidScanM = sidScanP; }
+  void SetPidScan(int pidScanP) { pidScanM = pidScanP; }
+  void SetProtocol(int protocolP) { protocolM = protocolP; }
+  void SetAddress(const char *addressP) { strncpy(addressM, addressP, sizeof(addressM)); }
+  void SetParameter(int parameterP) { parameterM = parameterP; }
+  cString ToString(char typeP) const;
+  bool Parse(const char *strP);
 };
 
 class cIptvSourceParam : public cSourceParam
 {
 private:
-  int param;
-  int nid;
-  int tid;
-  int rid;
-  cChannel data;
-  cIptvTransponderParameters itp;
-  const char *protocols[cIptvTransponderParameters::eProtocolCount];
+  int paramM;
+  int nidM;
+  int tidM;
+  int ridM;
+  cChannel dataM;
+  cIptvTransponderParameters itpM;
+  const char *protocolsM[cIptvTransponderParameters::eProtocolCount];
 
 public:
-  cIptvSourceParam(char Source, const char *Description);
-  virtual void SetData(cChannel *Channel);
-  virtual void GetData(cChannel *Channel);
+  cIptvSourceParam(char sourceP, const char *descriptionP);
+  virtual void SetData(cChannel *channelP);
+  virtual void GetData(cChannel *channelP);
   virtual cOsdItem *GetOsdItem(void);
 };
 

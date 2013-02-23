@@ -13,19 +13,19 @@
 
 class cPidScanner {
 private:
-  cTimeMs timeout;
-  tChannelID channelId;
-  bool process;
-  int Vpid;
-  int Apid;
-  int numVpids;
-  int numApids;
+  cTimeMs timeoutM;
+  tChannelID channelIdM;
+  bool processM;
+  int vPidM;
+  int aPidM;
+  int numVpidsM;
+  int numApidsM;
 
 public:
   cPidScanner(void);
   ~cPidScanner();
-  void SetChannel(const tChannelID &ChannelId);
-  void Process(const uint8_t* buf);
+  void SetChannel(const tChannelID &channelIdP);
+  void Process(const uint8_t* bufP);
 };
 
 #endif // __PIDSCANNER_H
