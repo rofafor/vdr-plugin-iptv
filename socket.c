@@ -315,7 +315,7 @@ cIptvTcpSocket::~cIptvTcpSocket()
 
 bool cIptvTcpSocket::OpenSocket(const int portP, const char *streamAddrP)
 {
-  debug("cIptvTcpSocket::%s(%s, %s)", __FUNCTION__, portP, streamAddrP);
+  debug("cIptvTcpSocket::%s(%d, %s)", __FUNCTION__, portP, streamAddrP);
   // Socket must be opened before setting the host address
   return (cIptvSocket::OpenSocket(portP, false) && CheckAddress(streamAddrP, &sockAddrM.sin_addr.s_addr));
 }
