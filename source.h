@@ -58,6 +58,9 @@ private:
   cIptvTransponderParameters itpM;
   const char *protocolsM[cIptvTransponderParameters::eProtocolCount];
 
+private:
+  static const char *allowedProtocolCharsS;
+
 public:
   cIptvSourceParam(char sourceP, const char *descriptionP);
   virtual void SetData(cChannel *channelP);

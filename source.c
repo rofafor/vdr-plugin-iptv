@@ -129,6 +129,8 @@ bool cIptvTransponderParameters::Parse(const char *strP)
 
 // --- cIptvSourceParam ------------------------------------------------------
 
+const char *cIptvSourceParam::allowedProtocolCharsS = " abcdefghijklmnopqrstuvwxyz0123456789-.,#~\\^$[]()*+?{}/%@&=";
+
 cIptvSourceParam::cIptvSourceParam(char sourceP, const char *descriptionP)
   : cSourceParam(sourceP, descriptionP),
     paramM(0),
@@ -175,9 +177,9 @@ cOsdItem *cIptvSourceParam::GetOsdItem(void)
     case  2: return new cMenuEditIntItem( tr("Rid"),              &ridM, 0);
     case  3: return new cMenuEditBoolItem(tr("Scan section ids"), &itpM.sidScanM);
     case  4: return new cMenuEditBoolItem(tr("Scan pids"),        &itpM.pidScanM);
-    case  5: return new cMenuEditStraItem(tr("Protocol"),         &itpM.protocolM,  ELEMENTS(protocolsM), protocolsM);
-    case  6: return new cMenuEditStrItem( tr("Address"),           itpM.addressM,   sizeof(itpM.addressM));
-    case  7: return new cMenuEditIntItem( tr("Parameter"),        &itpM.parameterM, 0,                    0xFFFF);
+    case  5: return new cMenuEditStraItem(tr("Protocol"),         &itpM.protocolM,  ELEMENTS(protocolsM),  protocolsM);
+    case  6: return new cMenuEditStrItem( tr("Address"),           itpM.addressM,   sizeof(itpM.addressM), allowedProtocolCharsS);
+    case  7: return new cMenuEditIntItem( tr("Parameter"),        &itpM.parameterM, 0,                     0xFFFF);
     default: return NULL;
     }
   return NULL;
