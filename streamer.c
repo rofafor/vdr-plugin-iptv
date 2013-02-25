@@ -14,6 +14,7 @@
 cIptvStreamer::cIptvStreamer(cRingBufferLinear* ringBufferP, unsigned int packetLenP)
 : cThread("IPTV streamer"),
   ringBufferM(ringBufferP),
+  sleepM(),
   packetBufferLenM(packetLenP),
   protocolM(NULL)
 {

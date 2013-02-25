@@ -74,6 +74,7 @@ cIptvDevice::~cIptvDevice()
      DELETE_POINTER(pSidScannerM);
      }
   // Destroy all filters
+  cMutexLock MutexLock(&mutexM);
   for (int i = 0; i < eMaxSecFilterCount; ++i)
       DeleteFilter(i);
   // Close dvr fifo
@@ -143,6 +144,7 @@ cString cIptvDevice::GetFiltersInformation(void)
   unsigned int count = 0;
   cString s("Active section filters:\n");
   // loop through active section filters
+  cMutexLock MutexLock(&mutexM);
   for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
       if (secFiltersM[i]) {
          s = cString::sprintf("%sFilter %d: %s Pid=0x%02X (%s)\n", *s, i,
@@ -321,7 +323,7 @@ bool cIptvDevice::IsBlackListed(u_short pidP, u_char tidP, u_char maskP) const
   // loop through section filter table
   for (int i = 0; i < SECTION_FILTER_TABLE_SIZE; ++i) {
       int index = IptvConfig.GetDisabledFilters(i);
-      // check if matches
+      // Check if matches
       if ((index >= 0) && (index < SECTION_FILTER_TABLE_SIZE) &&
           (section_filter_table[index].pid == pidP) && (section_filter_table[index].tid == tidP) &&
           (section_filter_table[index].mask == maskP)) {
@@ -418,7 +420,7 @@ bool cIptvDevice::HasInternalCam(void)
 void cIptvDevice::ResetBuffering(void)
 {
   debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
-  // pad prefill to multiple of TS_SIZE
+  // Pad prefill to multiple of TS_SIZE
   tsBufferPrefillM = (unsigned int)MEGABYTE(IptvConfig.GetTsBufferSize()) *
                     IptvConfig.GetTsBufferPrefillRatio() / 100;
   tsBufferPrefillM -= (tsBufferPrefillM % TS_SIZE);

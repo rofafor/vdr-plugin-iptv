@@ -264,22 +264,22 @@ int cIptvUdpSocket::Read(unsigned char *bufferAddrP, unsigned int bufferLenP)
                  else if (len > 3) {
                     // http://tools.ietf.org/html/rfc3550
                     // http://tools.ietf.org/html/rfc2250
-                    // version
+                    // Version
                     unsigned int v = (bufferAddrP[0] >> 6) & 0x03;
-                    // extension bit
+                    // Extension bit
                     unsigned int x = (bufferAddrP[0] >> 4) & 0x01;
-                    // cscr count
+                    // CSCR count
                     unsigned int cc = bufferAddrP[0] & 0x0F;
-                    // payload type: MPEG2 TS = 33
+                    // Payload type: MPEG2 TS = 33
                     //unsigned int pt = bufferAddrP[1] & 0x7F;
-                    // header lenght
+                    // Header lenght
                     unsigned int headerlen = (3 + cc) * (unsigned int)sizeof(uint32_t);
-                    // check if extension
+                    // Check if extension
                     if (x) {
-                       // extension header length
+                       // Extension header length
                        unsigned int ehl = (((bufferAddrP[headerlen + 2] & 0xFF) << 8) |
                                            (bufferAddrP[headerlen + 3] & 0xFF));
-                       // update header length
+                       // Update header length
                        headerlen += (ehl + 1) * (unsigned int)sizeof(uint32_t);
                        }
                     // Check that rtp is version 2 and payload contains multiple of TS packet data

@@ -29,7 +29,6 @@ private:
   };
   enum {
     eConnectTimeoutS       = 5,  // in seconds
-    eSelectTimeoutMs       = 10, // in milliseconds
     eMaxDownloadSpeedMBits = 20  // in megabits per second
   };
 
