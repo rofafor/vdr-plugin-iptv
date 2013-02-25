@@ -89,11 +89,11 @@ Configuration:
 
 - channels.conf
 
-  TV4;IPTV:60:S=1|P=0|F=EXT|U=iptvstream.sh|A=0:I:0:0:680:0:0:4:0:0:0
-  TV3;IPTV:50:S=0|P=1|F=FILE|U=/video/stream.ts|A=5:I:0:514:670:2321:0:3:0:0:0
-  TV2;IPTV:40:S=0|P=1|F=HTTP|U=127.0.0.1/TS/2|A=3000:I:0:513:660:2321:0:2:0:0:0
-  TV1;IPTV:30:S=1|P=0|F=CURL|U=http%3A//foo%3Abar@127.0.0.1%3A3000/TS/2|A=0:I:0:512:650:2321:0:1:0:0:0
-  TV1;IPTV:20:S=1|P=0|F=UDP|U=127.0.0.1@127.0.0.1|A=1234:I:0:512:650:2321:0:1:0:0:0
+  TV4;IPTV:60:S=1|P=0|F=EXT|U=iptvstream.sh|A=0:I:0:0:680:0:0:6:0:0:0
+  TV3;IPTV:50:S=0|P=1|F=FILE|U=/video/stream.ts|A=5:I:0:514:670:2321:0:5:0:0:0
+  TV2;IPTV:40:S=0|P=1|F=HTTP|U=127.0.0.1/TS/2|A=3000:I:0:513:660:2321:0:4:0:0:0
+  TV1;IPTV:30:S=1|P=0|F=CURL|U=http%3A//foo%3Abar@127.0.0.1%3A3000/TS/2|A=0:I:0:512:650:2321:0:3:0:0:0
+  TV1;IPTV:20:S=1|P=0|F=UDP|U=127.0.0.1@127.0.0.1|A=1234:I:0:512:650:2321:0:2:0:0:0
   TV1;IPTV:10:S=1|P=0|F=UDP|U=127.0.0.1|A=1234:I:0:512:650:2321:0:1:0:0:0
            ^  ^   ^   ^     ^           ^      ^
            |  |   |   |     |           |      Source type ("I")

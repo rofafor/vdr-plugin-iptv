@@ -339,11 +339,11 @@ int cIptvDevice::OpenFilter(u_short pidP, u_char tidP, u_char maskP)
   // Check if disabled by user
   if (!IptvConfig.GetSectionFiltering())
      return -1;
+  // Lock
+  cMutexLock MutexLock(&mutexM);
   // Blacklist check, refuse certain filters
   if (IsBlackListed(pidP, tidP, maskP))
      return -1;
-  // Lock
-  cMutexLock MutexLock(&mutexM);
   // Search the next free filter slot
   for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
       if (!secFiltersM[i]) {

@@ -265,9 +265,9 @@ bool cIptvProtocolCurl::Connect()
      iptv_curl_easy_setopt(handleM, CURLOPT_USERAGENT, *cString::sprintf("vdr-%s/%s", PLUGIN_NAME_I18N, VERSION));
 
      // Set URL
-     //char *p = curl_easy_unescape(handleM, *streamUrlM, 0, NULL);
-     //streamUrlM = p;
-     //curl_free(p);
+     char *p = curl_easy_unescape(handleM, *streamUrlM, 0, NULL);
+     streamUrlM = p;
+     curl_free(p);
      iptv_curl_easy_setopt(handleM, CURLOPT_URL, *streamUrlM);
 
      // Protocol specific initializations
@@ -491,12 +491,8 @@ bool cIptvProtocolCurl::Set(const char* locationP, const int parameterP, const i
   if (!isempty(locationP)) {
      // Disconnect
      Disconnect();
-     // Update stream URL: colons (%3A) and pipes (%7C) shall be decoded
-     char *s = strdup(locationP);
-     strreplace(s, "%3A", ":");
-     strreplace(s, "%7C", "|");
-     streamUrlM = s;
-     free(s);
+     // Update stream URL
+     streamUrlM = locationP;
      if (startswith(*streamUrlM, "rtsp") || startswith(*streamUrlM, "RTSP"))
         modeM = eModeRtsp;
      else if (startswith(*streamUrlM, "https") || startswith(*streamUrlM, "HTTPS"))
