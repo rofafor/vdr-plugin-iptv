@@ -41,9 +41,7 @@ cIptvDevice::cIptvDevice(unsigned int indexP)
   // Start section handler for iptv device
   StartSectionHandler();
   // Sid scanner must be created after the section handler
-  pSidScannerM = new cSidScanner();
-  if (pSidScannerM)
-     AttachFilter(pSidScannerM);
+  AttachFilter(pSidScannerM = new cSidScanner());
   // Check if dvr fifo exists
   struct stat sb;
   cString filename = cString::sprintf(IPTV_DVR_FILENAME, deviceIndexM);
@@ -58,8 +56,6 @@ cIptvDevice::cIptvDevice(unsigned int indexP)
 cIptvDevice::~cIptvDevice()
 {
   debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
-  // Stop section handler of iptv device
-  StopSectionHandler();
   DELETE_POINTER(pIptvStreamerM);
   DELETE_POINTER(pUdpProtocolM);
   DELETE_POINTER(pCurlProtocolM);
@@ -68,11 +64,9 @@ cIptvDevice::~cIptvDevice()
   DELETE_POINTER(pExtProtocolM);
   DELETE_POINTER(tsBufferM);
   DELETE_POINTER(pPidScannerM);
-  // Detach and destroy sid filter
-  if (pSidScannerM) {
-     Detach(pSidScannerM);
-     DELETE_POINTER(pSidScannerM);
-     }
+  DELETE_POINTER(pSidScannerM);
+  // Stop section handler of iptv device
+  StopSectionHandler();
   // Destroy all filters
   cMutexLock MutexLock(&mutexM);
   for (int i = 0; i < eMaxSecFilterCount; ++i)

@@ -17,17 +17,17 @@ private:
   bool sidFoundM;
   bool nidFoundM;
   bool tidFoundM;
+  bool isActiveM;
 
 protected:
   virtual void Process(u_short pidP, u_char tidP, const u_char *dataP, int lengthP);
-  virtual void SetStatus(bool onP);
 
 public:
   cSidScanner(void);
   ~cSidScanner();
   void SetChannel(const tChannelID &channelIdP);
-  void Open() { SetStatus(true); }
-  void Close() { SetStatus(false); }
+  void Open() { isActiveM = true; }
+  void Close() { isActiveM = false; }
 };
 
 #endif // __SIDSCANNER_H

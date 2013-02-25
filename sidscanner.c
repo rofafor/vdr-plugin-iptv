@@ -14,7 +14,8 @@ cSidScanner::cSidScanner(void)
 : channelIdM(tChannelID::InvalidID),
   sidFoundM(false),
   nidFoundM(false),
-  tidFoundM(false)
+  tidFoundM(false),
+  isActiveM(false)
 {
   debug("cSidScanner::%s()", __FUNCTION__);
   Set(0x00, 0x00);  // PAT
@@ -24,12 +25,6 @@ cSidScanner::cSidScanner(void)
 cSidScanner::~cSidScanner()
 {
   debug("cSidScanner::%s()", __FUNCTION__);
-}
-
-void cSidScanner::SetStatus(bool onP)
-{
-  debug("cSidScanner::%s(%d)", __FUNCTION__, onP);
-  cFilter::SetStatus(onP);
 }
 
 void cSidScanner::SetChannel(const tChannelID &channelIdP)
@@ -46,6 +41,8 @@ void cSidScanner::Process(u_short pidP, u_char tidP, const u_char *dataP, int le
   int newSid = -1, newNid = -1, newTid = -1;
 
   //debug("cSidScanner::%s()", __FUNCTION__);
+  if (!isActiveM)
+     return;
   if (channelIdM.Valid()) {
      if ((pidP == 0x00) && (tidP == 0x00)) {
         debug("cSidScanner::%s(%d, %02X)", __FUNCTION__, pidP, tidP);
