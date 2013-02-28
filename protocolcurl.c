@@ -279,7 +279,7 @@ bool cIptvProtocolCurl::Connect()
             // Request server options
             uri = cString::sprintf("%s", *streamUrlM);
             iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_STREAM_URI, *uri);
-            iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, CURL_RTSPREQ_OPTIONS);
+            iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_OPTIONS);
             iptv_curl_easy_perform(handleM);
 
             // Request session description - SDP is delivered in message body and not in the header!
@@ -287,7 +287,7 @@ bool cIptvProtocolCurl::Connect()
             iptv_curl_easy_setopt(handleM, CURLOPT_WRITEDATA, this);
             uri = cString::sprintf("%s", *streamUrlM);
             iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_STREAM_URI, *uri);
-            iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, CURL_RTSPREQ_DESCRIBE);
+            iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_DESCRIBE);
             iptv_curl_easy_perform(handleM);
             iptv_curl_easy_setopt(handleM, CURLOPT_WRITEFUNCTION, NULL);
             iptv_curl_easy_setopt(handleM, CURLOPT_WRITEDATA, NULL);
@@ -297,7 +297,7 @@ bool cIptvProtocolCurl::Connect()
             transport = "RTP/AVP/TCP;unicast;interleaved=0-1";
             iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_STREAM_URI, *uri);
             iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_TRANSPORT, *transport);
-            iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, CURL_RTSPREQ_SETUP);
+            iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_SETUP);
             iptv_curl_easy_perform(handleM);
 
             // Start playing
@@ -305,13 +305,13 @@ bool cIptvProtocolCurl::Connect()
             range = "0.000-";
             iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_STREAM_URI, *uri);
             iptv_curl_easy_setopt(handleM, CURLOPT_RANGE, *range);
-            iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, CURL_RTSPREQ_PLAY);
+            iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_PLAY);
             iptv_curl_easy_perform(handleM);
 
             // Start receiving
             iptv_curl_easy_setopt(handleM, CURLOPT_INTERLEAVEFUNCTION, cIptvProtocolCurl::WriteRtspCallback);
             iptv_curl_easy_setopt(handleM, CURLOPT_INTERLEAVEDATA, this);
-            iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, CURL_RTSPREQ_RECEIVE);
+            iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_RECEIVE);
             iptv_curl_easy_perform(handleM);
             }
             break;
@@ -420,12 +420,13 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
   int len = 0;
   if (ringBufferM) {
      // Fill up the buffer
+     mutexM.Lock();
      if (handleM && multiM) {
         switch (modeM) {
           case eModeRtsp:
                {
                CURLcode res = CURLE_OK;
-               iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, CURL_RTSPREQ_RECEIVE);
+               iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_RECEIVE);
                iptv_curl_easy_perform(handleM);
                // @todo - How to detect eof?
                }
@@ -443,14 +444,12 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
                } while (res == CURLM_CALL_MULTI_PERFORM);
 
                // Shall we continue filling up the buffer?
-               mutexM.Lock();
                if (pausedM && (ringBufferM->Free() > ringBufferM->Available())) {
                   debug("cIptvProtocolCurl::%s(continue): free=%d available=%d", __FUNCTION__,
                         ringBufferM->Free(), ringBufferM->Available());
                   pausedM = false;
                   curl_easy_pause(handleM, CURLPAUSE_CONT);
                   }
-               mutexM.Unlock();
 
                // Check if end of file
                if (running_handles == 0) {
@@ -471,6 +470,7 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
                break;
           }
         }
+     mutexM.Unlock();
 
      // ... and try to empty it
      unsigned char *p = GetData(&bufferLenP);
@@ -493,16 +493,18 @@ bool cIptvProtocolCurl::Set(const char* locationP, const int parameterP, const i
      Disconnect();
      // Update stream URL
      streamUrlM = locationP;
-     if (startswith(*streamUrlM, "rtsp") || startswith(*streamUrlM, "RTSP"))
+     cString protocol = ChangeCase(streamUrlM, false).Truncate(5);
+     if (startswith(*protocol, "rtsp"))
         modeM = eModeRtsp;
-     else if (startswith(*streamUrlM, "https") || startswith(*streamUrlM, "HTTPS"))
-        modeM = eModeHttp;
-     else if (startswith(*streamUrlM, "http") || startswith(*streamUrlM, "HTTP"))
+     else if (startswith(*protocol, "https"))
         modeM = eModeHttps;
-     else if (startswith(*streamUrlM, "file") || startswith(*streamUrlM, "FILE"))
+     else if (startswith(*protocol, "http"))
+        modeM = eModeHttp;
+     else if (startswith(*protocol, "file"))
         modeM = eModeFile;
      else
         modeM = eModeUnknown;
+     debug("cIptvProtocolCurl::%s(): %s (%d)", __FUNCTION__, *protocol, modeM);
      // Update stream parameter
      streamParamM = parameterP;
      // Reconnect

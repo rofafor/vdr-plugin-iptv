@@ -66,10 +66,11 @@
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 
-uint16_t ts_pid(const uint8_t *buf);
-uint8_t payload(const uint8_t *tsp);
-const char *id_pid(const u_short Pid);
-int select_single_desc(int descriptor, const int usecs, const bool selectWrite);
+uint16_t ts_pid(const uint8_t *bufP);
+uint8_t payload(const uint8_t *bufP);
+const char *id_pid(const u_short pidP);
+int select_single_desc(int descriptorP, const int usecsP, const bool selectWriteP);
+cString ChangeCase(const cString &strP, bool upperP);
 
 struct section_filter_table_type {
   const char *description;

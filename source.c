@@ -5,6 +5,7 @@
  *
  */
 
+#include <ctype.h>
 #include "common.h"
 #include "source.h"
 
@@ -70,7 +71,7 @@ bool cIptvTransponderParameters::Parse(const char *strP)
        ++data;
        if (data && (*data == '=')) {
           ++data;
-          switch (*token) {
+          switch (toupper(*token)) {
             case 'S':
                  sidScanM = (int)strtol(data, (char **)NULL, 10);
                  found_s = true;
