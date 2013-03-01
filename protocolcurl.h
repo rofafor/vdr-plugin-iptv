@@ -54,7 +54,7 @@ private:
   bool PutData(unsigned char *dataP, int lenP);
   void DelData(int lenP);
   void ClearData(void);
-  unsigned char *GetData(unsigned int *lenP);
+  unsigned char *GetData(int &lenP);
 
 public:
   cIptvProtocolCurl();

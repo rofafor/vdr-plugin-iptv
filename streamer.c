@@ -46,8 +46,9 @@ void cIptvStreamer::Action(void)
   // Do the thread loop
   while (packetBufferM && Running()) {
         int length = -1;
-        if (protocolM)
-           length = protocolM->Read(packetBufferM, min((unsigned int)ringBufferM->Free(), packetBufferLenM));
+        unsigned int size = min((unsigned int)ringBufferM->Free(), packetBufferLenM);
+        if (protocolM && (size > 0))
+           length = protocolM->Read(packetBufferM, size);
         if (length > 0) {
            AddStreamerStatistic(length);
            if (ringBufferM) {

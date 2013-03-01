@@ -26,8 +26,8 @@ cIptvProtocolCurl::cIptvProtocolCurl()
   handleM(NULL),
   multiM(NULL),
   headerListM(NULL),
-  ringBufferM(new cRingBufferLinear(MEGABYTE(IptvConfig.GetTsBufferSize()), 7 * TS_SIZE,
-                                    false, *cString::sprintf("IPTV CURL"))),
+  ringBufferM(new cRingBufferLinear(MEGABYTE(IptvConfig.GetTsBufferSize()),
+                                    7 * TS_SIZE, false, "IPTV CURL")),
   rtspControlM(),
   modeM(eModeUnknown),
   connectedM(false),
@@ -65,7 +65,7 @@ size_t cIptvProtocolCurl::WriteRtspCallback(void *ptrP, size_t sizeP, size_t nme
   size_t len = sizeP * nmembP;
   unsigned char *p = (unsigned char *)ptrP;
   //debug("cIptvProtocolCurl::%s(%zu)", __FUNCTION__, len);
-  
+
   // Validate packet header ('$') and channel (0)
   if (obj && (p[0] == 0x24 ) && (p[1] == 0)) {
      int length = (p[2] << 8) | p[3];
@@ -121,7 +121,7 @@ size_t cIptvProtocolCurl::DescribeCallback(void *ptrP, size_t sizeP, size_t nmem
        free(s);
        }
     r = strtok(NULL, "\r\n");
-    }     
+    }
 
   if (!isempty(*control) && obj)
      obj->SetRtspControl(*control);
@@ -190,12 +190,12 @@ void cIptvProtocolCurl::ClearData()
      ringBufferM->Clear();
 }
 
-unsigned char *cIptvProtocolCurl::GetData(unsigned int *lenP)
+unsigned char *cIptvProtocolCurl::GetData(int &lenP)
 {
   cMutexLock MutexLock(&mutexM);
   //debug("cIptvProtocolCurl::%s()", __FUNCTION__);
   unsigned char *p = NULL;
-  *lenP = 0;
+  lenP = 0;
   if (ringBufferM) {
      int count = 0;
      p = ringBufferM->Get(count);
@@ -210,13 +210,13 @@ unsigned char *cIptvProtocolCurl::GetData(unsigned int *lenP)
                }
            error("IPTV skipped %d bytes to sync on TS packet\n", count);
            ringBufferM->Del(count);
-           *lenP = 0;
+           lenP = 0;
            return NULL;
            }
         }
 #endif
      count -= (count % TS_SIZE);
-     *lenP = count;
+     lenP = count;
      }
 
   return p;
@@ -473,11 +473,11 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
         }
 
      // ... and try to empty it
-     unsigned char *p = GetData(&bufferLenP);
-     if (p && (bufferLenP > 0)) {
-        memcpy(bufferAddrP, p, bufferLenP);
-        DelData(bufferLenP);
-        len = bufferLenP;
+     unsigned char *p = GetData(len);
+     if (p && (len > 0)) {
+        len = min(len, (int)bufferLenP);
+        memcpy(bufferAddrP, p, len);
+        DelData(len);
         //debug("cIptvProtocolCurl::%s(): get %d bytes", __FUNCTION__, len);
         }
      }

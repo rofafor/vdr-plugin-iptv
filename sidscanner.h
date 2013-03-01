@@ -26,8 +26,8 @@ public:
   cSidScanner(void);
   ~cSidScanner();
   void SetChannel(const tChannelID &channelIdP);
-  void Open() { isActiveM = true; }
-  void Close() { isActiveM = false; }
+  void Open()  { debug("cSidScanner::%s()", __FUNCTION__); isActiveM = true; }
+  void Close() { debug("cSidScanner::%s()", __FUNCTION__); isActiveM = false; }
 };
 
 #endif // __SIDSCANNER_H
