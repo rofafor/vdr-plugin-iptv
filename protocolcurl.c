@@ -420,7 +420,6 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
   int len = 0;
   if (ringBufferM) {
      // Fill up the buffer
-     mutexM.Lock();
      if (handleM && multiM) {
         switch (modeM) {
           case eModeRtsp:
@@ -444,12 +443,14 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
                } while (res == CURLM_CALL_MULTI_PERFORM);
 
                // Shall we continue filling up the buffer?
+               mutexM.Lock();
                if (pausedM && (ringBufferM->Free() > ringBufferM->Available())) {
                   debug("cIptvProtocolCurl::%s(continue): free=%d available=%d", __FUNCTION__,
                         ringBufferM->Free(), ringBufferM->Available());
                   pausedM = false;
                   curl_easy_pause(handleM, CURLPAUSE_CONT);
                   }
+               mutexM.Unlock();
 
                // Check if end of file
                if (running_handles == 0) {
@@ -470,7 +471,6 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
                break;
           }
         }
-     mutexM.Unlock();
 
      // ... and try to empty it
      unsigned char *p = GetData(&bufferLenP);

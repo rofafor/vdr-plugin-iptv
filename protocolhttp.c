@@ -55,8 +55,9 @@ bool cIptvProtocolHttp::Connect(void)
                                        "Connection: Close\r\n"
                                        "\r\n", streamPathM, streamAddrM,
                                        PLUGIN_NAME_I18N, VERSION);
-     debug("cIptvProtocolHttp::%s(): requesting: %s", __FUNCTION__, *buffer);
-     if (!Write(*buffer, (unsigned int)strlen(*buffer))) {
+     unsigned int len = strlen(*buffer);
+     debug("cIptvProtocolHttp::%s(): requesting %d: %s", __FUNCTION__, len, *buffer);
+     if (!Write(*buffer, len)) {
         CloseSocket();
         return false;
         }

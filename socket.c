@@ -56,12 +56,12 @@ bool cIptvSocket::OpenSocket(const int portP, const bool isUdpP)
      ERROR_IF_FUNC(fcntl(socketDescM, F_SETFL, O_NONBLOCK), "fcntl(O_NONBLOCK)",
                    CloseSocket(), return false);
      // Allow multiple sockets to use the same PORT number
-     ERROR_IF_FUNC(setsockopt(socketDescM, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0, "setsockopt(SO_REUSEADDR)",
-                   CloseSocket(), return false);
+     ERROR_IF_FUNC(setsockopt(socketDescM, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0,
+                   "setsockopt(SO_REUSEADDR)", CloseSocket(), return false);
 #ifndef __FreeBSD__
      // Allow packet information to be fetched
-     ERROR_IF_FUNC(setsockopt(socketDescM, SOL_IP, IP_PKTINFO, &yes, sizeof(yes)) < 0, "setsockopt(IP_PKTINFO)",
-                   CloseSocket(), return false);
+     ERROR_IF_FUNC(setsockopt(socketDescM, SOL_IP, IP_PKTINFO, &yes, sizeof(yes)) < 0,
+                   "setsockopt(IP_PKTINFO)", CloseSocket(), return false);
 #endif // __FreeBSD__
      // Bind socket
      memset(&sockAddrM, 0, sizeof(sockAddrM));
@@ -69,7 +69,8 @@ bool cIptvSocket::OpenSocket(const int portP, const bool isUdpP)
      sockAddrM.sin_port = htons((uint16_t)(portP & 0xFFFF));
      sockAddrM.sin_addr.s_addr = htonl(INADDR_ANY);
      if (isUdpP)
-        ERROR_IF_FUNC(bind(socketDescM, (struct sockaddr *)&sockAddrM, sizeof(sockAddrM)) < 0, "bind()", CloseSocket(), return false);
+        ERROR_IF_FUNC(bind(socketDescM, (struct sockaddr *)&sockAddrM, sizeof(sockAddrM)) < 0,
+                      "bind()", CloseSocket(), return false);
      // Update socket port
      socketPortM = portP;
      }
@@ -99,7 +100,8 @@ bool cIptvSocket::CheckAddress(const char *addrP, in_addr_t *inAddrP)
         struct hostent *host = gethostbyname(addrP);
         if (!host) {
            char tmp[64];
-           error("gethostbyname() failed: %s is not valid address: %s", addrP, strerror_r(h_errno, tmp, sizeof(tmp)));
+           error("gethostbyname() failed: %s is not valid address: %s", addrP,
+                 strerror_r(h_errno, tmp, sizeof(tmp)));
            return false;
            }
         *inAddrP = htonl(inet_addr(*host->h_addr_list));
