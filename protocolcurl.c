@@ -424,6 +424,7 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
         switch (modeM) {
           case eModeRtsp:
                {
+               cMutexLock MutexLock(&mutexM);
                CURLcode res = CURLE_OK;
                iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_RECEIVE);
                iptv_curl_easy_perform(handleM);
@@ -439,6 +440,7 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
                int running_handles;
 
                do {
+                 cMutexLock MutexLock(&mutexM);
                  res = curl_multi_perform(multiM, &running_handles);
                } while (res == CURLM_CALL_MULTI_PERFORM);
 
@@ -455,7 +457,9 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
                // Check if end of file
                if (running_handles == 0) {
                   int msgcount;
+                  mutexM.Lock();
                   CURLMsg *msg = curl_multi_info_read(multiM, &msgcount);
+                  mutexM.Unlock();
                   if (msg && (msg->msg == CURLMSG_DONE)) {
                      debug("cIptvProtocolCurl::%s(done): %s (%d)", __FUNCTION__,
                            curl_easy_strerror(msg->data.result), msg->data.result);

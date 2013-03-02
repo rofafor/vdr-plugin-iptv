@@ -164,9 +164,8 @@ void cIptvSourceParam::SetData(cChannel *channelP)
 void cIptvSourceParam::GetData(cChannel *channelP)
 {
   debug("cIptvSourceParam::%s(%s)", __FUNCTION__, channelP->Parameters());
-  dataM.SetTransponderData(channelP->Source(), channelP->Frequency(), dataM.Srate(), itpM.ToString(Source()), true);
-  dataM.SetId(nidM, tidM, channelP->Sid(), ridM);
-  *channelP = dataM;
+  channelP->SetTransponderData(channelP->Source(), channelP->Frequency(), dataM.Srate(), itpM.ToString(Source()), true);
+  channelP->SetId(nidM, tidM, channelP->Sid(), ridM);
 }
 
 cOsdItem *cIptvSourceParam::GetOsdItem(void)
