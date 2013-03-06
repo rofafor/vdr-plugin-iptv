@@ -194,7 +194,7 @@ VDR Plugin 'iptv' Revision History
 - Updated for vdr-1.7.38.
 - Added a new CURL protocol for HTTP/HTTPS.
 
-2013-xx-xx: Version 1.2.1
+2013-03-06: Version 1.2.1
 
 - Fixed bugs found in the CURL implementation (Thanks
   to Jeremy Hall).
