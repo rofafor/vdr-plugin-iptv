@@ -34,8 +34,10 @@ cIptvProtocolCurl::cIptvProtocolCurl()
   pausedM(false)
 {
   debug("cIptvProtocolCurl::%s()", __FUNCTION__);
-  if (ringBufferM)
+  if (ringBufferM) {
      ringBufferM->SetTimeouts(100, 0);
+     ringBufferM->SetIoThrottle();
+     }
   Connect();
 }
 
@@ -444,9 +446,9 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
                  res = curl_multi_perform(multiM, &running_handles);
                } while (res == CURLM_CALL_MULTI_PERFORM);
 
-               // Shall we continue filling up the buffer?
+               // Use 20% threshold before continuing to filling up the buffer.
                mutexM.Lock();
-               if (pausedM && (ringBufferM->Free() > ringBufferM->Available())) {
+               if (pausedM && (ringBufferM->Available() < (MEGABYTE(IptvConfig.GetTsBufferSize()) / 5))) {
                   debug("cIptvProtocolCurl::%s(continue): free=%d available=%d", __FUNCTION__,
                         ringBufferM->Free(), ringBufferM->Available());
                   pausedM = false;

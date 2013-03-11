@@ -20,7 +20,7 @@ private:
   int sidScanM;
   int pidScanM;
   int protocolM;
-  char addressM[NAME_MAX];
+  char addressM[NAME_MAX + 1];
   int parameterM;
 
 public:

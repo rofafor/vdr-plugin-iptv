@@ -27,7 +27,8 @@ cIptvDevice::cIptvDevice(unsigned int indexP)
   isyslog("creating IPTV device %d (CardIndex=%d)", deviceIndexM, CardIndex());
   tsBufferM = new cRingBufferLinear(bufsize + 1, TS_SIZE, false,
                                    *cString::sprintf("IPTV %d", deviceIndexM));
-  tsBufferM->SetTimeouts(10, 10);
+  tsBufferM->SetTimeouts(100, 100);
+  tsBufferM->SetIoThrottle();
   ResetBuffering();
   pUdpProtocolM = new cIptvProtocolUdp();
   pCurlProtocolM = new cIptvProtocolCurl();

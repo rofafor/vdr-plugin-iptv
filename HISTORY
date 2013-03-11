@@ -199,3 +199,7 @@ VDR Plugin 'iptv' Revision History
 - Fixed bugs found in the CURL implementation (Thanks
   to Jeremy Hall).
 - Fixed the channel editor.
+
+2013-xx-xx: Version 1.2.2
+
+- Enabled I/O throttling and tweaked buffer timeouts.
