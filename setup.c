@@ -124,6 +124,7 @@ cIptvPluginSetup::cIptvPluginSetup()
       disabledFilterIndexesM[i] = IptvConfig.GetDisabledFilters(i);
       disabledFilterNamesM[i] = tr(section_filter_table[i].description);
       }
+  SetMenuCategory(mcSetupPlugins);
   Setup();
   SetHelp(NULL, NULL, NULL, trVDR("Button$Info"));
 }
