@@ -93,7 +93,7 @@ bool cIptvSocket::CheckAddress(const char *addrP, in_addr_t *inAddrP)
 {
   if (inAddrP) {
      // First try only the IP address
-     *inAddrP = htonl(inet_addr(addrP));
+     *inAddrP = inet_addr(addrP);
      if (*inAddrP == htonl(INADDR_NONE)) {
         debug("cIptvSocket::%s(%s): cannot convert to address", __FUNCTION__, addrP);
         // It may be a host name, get the name
@@ -104,7 +104,7 @@ bool cIptvSocket::CheckAddress(const char *addrP, in_addr_t *inAddrP)
                  strerror_r(h_errno, tmp, sizeof(tmp)));
            return false;
            }
-        *inAddrP = htonl(inet_addr(*host->h_addr_list));
+        *inAddrP = inet_addr(*host->h_addr_list);
         }
      return true;
      }
