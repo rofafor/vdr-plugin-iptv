@@ -41,14 +41,8 @@ MP3 radio streams, mms video streams and so on.
 
 Installation:
 
-cd /put/your/path/here/VDR/PLUGINS/src
 tar -xzf /put/your/path/here/vdr-iptv-X.Y.Z.tgz
-ln -s iptv-X.Y.Z iptv
-cd /put/your/path/here/VDR
-cp -R PLUGINS/src/iptv/iptv /path/to/vdrresource/plugins/
-make
-make plugins
-./vdr -P iptv
+make -C iptv-X.Y.Z install
 
 Setup menu:
 

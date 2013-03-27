@@ -5,16 +5,13 @@
  *
  */
 
-#include <vdr/thread.h>
-#include <vdr/ringbuffer.h>
-
 #include "common.h"
 #include "streamer.h"
 
-cIptvStreamer::cIptvStreamer(cRingBufferLinear* ringBufferP, unsigned int packetLenP)
+cIptvStreamer::cIptvStreamer(cIptvDeviceIf &deviceP, unsigned int packetLenP)
 : cThread("IPTV streamer"),
-  ringBufferM(ringBufferP),
   sleepM(),
+  deviceM(&deviceP),
   packetBufferLenM(packetLenP),
   protocolM(NULL)
 {
@@ -33,7 +30,6 @@ cIptvStreamer::~cIptvStreamer()
   // Close the protocol
   Close();
   protocolM = NULL;
-  ringBufferM = NULL;
   // Free allocated memory
   free(packetBufferM);
 }
@@ -46,16 +42,12 @@ void cIptvStreamer::Action(void)
   // Do the thread loop
   while (packetBufferM && Running()) {
         int length = -1;
-        unsigned int size = min((unsigned int)ringBufferM->Free(), packetBufferLenM);
+        unsigned int size = min(deviceM->CheckData(), packetBufferLenM);
         if (protocolM && (size > 0))
            length = protocolM->Read(packetBufferM, size);
         if (length > 0) {
            AddStreamerStatistic(length);
-           if (ringBufferM) {
-              int p = ringBufferM->Put(packetBufferM, length);
-              if (p != length)
-                 ringBufferM->ReportOverflow(length - p);
-              }
+           deviceM->WriteData(packetBufferM, length);
            }
         else
            sleepM.Wait(10); // to avoid busy loop and reduce cpu load

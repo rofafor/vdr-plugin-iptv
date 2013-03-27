@@ -56,7 +56,7 @@ void cPidScanner::Process(const uint8_t* bufP)
 
   // Verify TS packet
   if (bufP[0] != 0x47) {
-     error("Not TS packet: 0x%X\n", bufP[0]);
+     error("Not TS packet: 0x%02X", bufP[0]);
      return;
      }
 

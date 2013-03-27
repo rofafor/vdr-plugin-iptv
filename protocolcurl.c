@@ -9,14 +9,18 @@
 #include "config.h"
 #include "protocolcurl.h"
 
+#ifdef CURLOPT_RTSPHEADER
+#define USE_RTSP
+#endif
+
 #define iptv_curl_easy_setopt(X, Y, Z) \
   if ((res = curl_easy_setopt((X), (Y), (Z))) != CURLE_OK) { \
-     error("curl_easy_setopt(%s, %s, %s) failed: %d\n", #X, #Y, #Z, res); \
+     error("curl_easy_setopt(%s, %s, %s) failed: %d", #X, #Y, #Z, res); \
      }
 
 #define iptv_curl_easy_perform(X) \
   if ((res = curl_easy_perform((X))) != CURLE_OK) { \
-     error("curl_easy_perform(%s) failed: %d\n", #X, res); \
+     error("curl_easy_perform(%s) failed: %d", #X, res); \
      }
 
 cIptvProtocolCurl::cIptvProtocolCurl()
@@ -210,7 +214,7 @@ unsigned char *cIptvProtocolCurl::GetData(int &lenP)
                   break;
                   }
                }
-           error("IPTV skipped %d bytes to sync on TS packet\n", count);
+           error("IPTV skipped %d bytes to sync on TS packet", count);
            ringBufferM->Del(count);
            lenP = 0;
            return NULL;
@@ -274,6 +278,7 @@ bool cIptvProtocolCurl::Connect()
 
      // Protocol specific initializations
      switch (modeM) {
+#ifdef USE_RTSP
        case eModeRtsp:
             {
             cString uri, control, transport, range;
@@ -317,7 +322,7 @@ bool cIptvProtocolCurl::Connect()
             iptv_curl_easy_perform(handleM);
             }
             break;
-
+#endif
        case eModeHttp:
        case eModeHttps:
             {
@@ -366,6 +371,7 @@ bool cIptvProtocolCurl::Disconnect()
   if (handleM && multiM) {
      // Mode specific tricks
      switch (modeM) {
+#ifdef USE_RTSP
        case eModeRtsp:
             {
             CURLcode res = CURLE_OK;
@@ -377,7 +383,7 @@ bool cIptvProtocolCurl::Disconnect()
             rtspControlM = "";
             }
             break;
-
+#endif
        case eModeHttp:
        case eModeHttps:
        case eModeFile:
@@ -424,6 +430,7 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
      // Fill up the buffer
      if (handleM && multiM) {
         switch (modeM) {
+#ifdef USE_RTSP
           case eModeRtsp:
                {
                cMutexLock MutexLock(&mutexM);
@@ -433,7 +440,7 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
                // @todo - How to detect eof?
                }
                break;
-
+#endif
           case eModeFile:
           case eModeHttp:
           case eModeHttps:

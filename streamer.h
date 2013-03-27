@@ -11,15 +11,15 @@
 #include <arpa/inet.h>
 
 #include <vdr/thread.h>
-#include <vdr/ringbuffer.h>
 
+#include "deviceif.h"
 #include "protocolif.h"
 #include "statistics.h"
 
 class cIptvStreamer : public cThread, public cIptvStreamerStatistics {
 private:
-  cRingBufferLinear* ringBufferM;
   cCondWait sleepM;
+  cIptvDeviceIf* deviceM;
   unsigned char* packetBufferM;
   unsigned int packetBufferLenM;
   cIptvProtocolIf* protocolM;
@@ -28,7 +28,7 @@ protected:
   virtual void Action(void);
 
 public:
-  cIptvStreamer(cRingBufferLinear* ringBufferP, unsigned int packetLenP);
+  cIptvStreamer(cIptvDeviceIf &deviceP, unsigned int packetLenP);
   virtual ~cIptvStreamer();
   bool Set(const char* locationP, const int parameterP, const int indexP, cIptvProtocolIf* protocolP);
   bool Open(void);

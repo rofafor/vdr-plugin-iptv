@@ -10,6 +10,7 @@
 
 #include <vdr/device.h>
 #include "common.h"
+#include "deviceif.h"
 #include "protocoludp.h"
 #include "protocolcurl.h"
 #include "protocolhttp.h"
@@ -21,7 +22,7 @@
 #include "sidscanner.h"
 #include "statistics.h"
 
-class cIptvDevice : public cDevice, public cIptvPidStatistics, public cIptvBufferStatistics {
+class cIptvDevice : public cDevice, public cIptvPidStatistics, public cIptvBufferStatistics, public cIptvDeviceIf {
   // static ones
 public:
   static unsigned int deviceCount;
@@ -31,9 +32,6 @@ public:
 
   // private parts
 private:
-  enum {
-    eMaxSecFilterCount = 32
-  };
   unsigned int deviceIndexM;
   int dvrFdM;
   bool isPacketDeliveredM;
@@ -49,10 +47,10 @@ private:
   cIptvProtocolFile *pFileProtocolM;
   cIptvProtocolExt *pExtProtocolM;
   cIptvStreamer *pIptvStreamerM;
+  cIptvSectionFilterHandler *pIptvSectionM;
   cPidScanner *pPidScannerM;
   cSidScanner *pSidScannerM;
   cMutex mutexM;
-  cIptvSectionFilter *secFiltersM[eMaxSecFilterCount];
 
   // constructor & destructor
 public:
@@ -74,8 +72,6 @@ private:
 private:
   void ResetBuffering(void);
   bool IsBuffering(void) const;
-  bool DeleteFilter(unsigned int indexP);
-  bool IsBlackListed(u_short pidP, u_char tidP, u_char maskP) const;
 
   // for channel info
 public:
@@ -104,7 +100,6 @@ protected:
   // for section filtering
 public:
   virtual int OpenFilter(u_short pidP, u_char tidP, u_char maskP);
-  virtual int ReadFilter(int handleP, void *bufferP, size_t lengthP);
   virtual void CloseFilter(int handleP);
 
   // for transponder lock
@@ -114,6 +109,11 @@ public:
   // for common interface
 public:
   virtual bool HasInternalCam(void);
+
+  // for internal device interface
+public:
+  virtual void WriteData(u_char *bufferP, int lengthP);
+  virtual unsigned int CheckData(void);
 };
 
 #endif // __IPTV_DEVICE_H

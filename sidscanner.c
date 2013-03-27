@@ -76,10 +76,10 @@ void cSidScanner::Process(u_short pidP, u_char tidP, const u_char *dataP, int le
             break; // default to the first one
             }
         if (nit.getNetworkId() != channelIdM.Nid()) {
-           debug("cSidScanner::%s(): nid=%d\n", __FUNCTION__, ts.getTransportStreamId());
+           debug("cSidScanner::%s(): nid=%d", __FUNCTION__, ts.getTransportStreamId());
            newNid = nit.getNetworkId();
            }
-        nidFoundM = true; 
+        nidFoundM = true;
         }
      }
   if ((newSid >= 0) || (newNid >= 0) || (newTid >= 0)) {

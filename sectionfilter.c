@@ -17,9 +17,9 @@ cIptvSectionFilter::cIptvSectionFilter(int deviceIndexP, uint16_t pidP, uint8_t 
   secLenM(0),
   tsFeedpM(0),
   pidM(pidP),
-  devIdM(deviceIndexP)
+  deviceIndexM(deviceIndexP)
 {
-  //debug("cIptvSectionFilter::%s(%d, %d)", __FUNCTION__, devIdM, pidM);
+  //debug("cIptvSectionFilter::%s(%d, %d)", __FUNCTION__, deviceIndexM, pidM);
   int i;
 
   memset(secBufBaseM,     0, sizeof(secBufBaseM));
@@ -46,30 +46,30 @@ cIptvSectionFilter::cIptvSectionFilter(int deviceIndexP, uint16_t pidP, uint8_t 
       }
   doneqM = doneq ? 1 : 0;
 
-  // Create filtering buffer
-  ringbufferM = new cRingBufferLinear(KILOBYTE(128), 0, false, *cString::sprintf("IPTV SECTION %d/%d", devIdM, pidM));
-  if (ringbufferM)
-     ringbufferM->SetTimeouts(10, 10);
-  else
-     error("Failed to allocate buffer for section filter (device=%d pid=%d): ", devIdM, pidM);
+  // Create sockets
+  socketM[0] = socketM[1] = -1;
+  if (socketpair(AF_UNIX, SOCK_DGRAM, 0, socketM) != 0) {
+     char tmp[64];
+     error("Opening section filter sockets failed (device=%d pid=%d): %s", deviceIndexM, pidM, strerror_r(errno, tmp, sizeof(tmp)));
+     }
+  else if ((fcntl(socketM[0], F_SETFL, O_NONBLOCK) != 0) || (fcntl(socketM[1], F_SETFL, O_NONBLOCK) != 0)) {
+     char tmp[64];
+     error("Setting section filter socket to non-blocking mode failed (device=%d pid=%d): %s", deviceIndexM, pidM, strerror_r(errno, tmp, sizeof(tmp)));
+     }
 }
 
 cIptvSectionFilter::~cIptvSectionFilter()
 {
-  //debug("cIptvSectionFilter::%s(%d, %d)", __FUNCTION__, devIdM, pidM);
-  DELETE_POINTER(ringbufferM);
+  //debug("cIptvSectionFilter::%s(%d, %d)", __FUNCTION__, deviceIndexM, pidM);
+  int tmp = socketM[1];
+  socketM[1] = -1;
+  if (tmp >= 0)
+     close(tmp);
+  tmp = socketM[0];
+  socketM[0] = -1;
+  if (tmp >= 0)
+     close(tmp);
   secBufM = NULL;
-}
-
-int cIptvSectionFilter::Read(void *Data, size_t Length)
-{
-  int count = 0;
-  uchar *p = ringbufferM->Get(count);
-  if (p && count > 0) {
-     memcpy(Data, p, count);
-     ringbufferM->Del(count);
-     }
-  return count;
 }
 
 inline uint16_t cIptvSectionFilter::GetLength(const uint8_t *dataP)
@@ -99,10 +99,10 @@ int cIptvSectionFilter::Filter(void)
      if (doneqM && !neq)
         return 0;
 
-     if (ringbufferM) {
-        int len = ringbufferM->Put(secBufM, secLenM);
-        if (len != secLenM)
-           ringbufferM->ReportOverflow(secLenM - len);
+     // There is no data in the read socket, more can be written
+     if ((socketM[0] >= 0) && (socketM[1] >= 0) /*&& !select_single_desc(socketM[0], 0, false)*/) {
+        ssize_t len = write(socketM[1], secBufM, secLenM);
+        ERROR_IF(len < 0, "write()");
         // Update statistics
         AddSectionStatistic(len, 1);
         }
@@ -210,3 +210,175 @@ void cIptvSectionFilter::Process(const uint8_t* dataP)
      CopyDump(&dataP[p], count);
      }
 }
+
+
+cIptvSectionFilterHandler::cIptvSectionFilterHandler(int deviceIndexP, unsigned int bufferLenP)
+: cThread("IPTV section handler", true),
+  mutexM(),
+  deviceIndexM(deviceIndexP),
+  processedM(false),
+  ringBufferM(new cRingBufferLinear(bufferLenP, TS_SIZE, false, *cString::sprintf("IPTV SECTION HANDLER %d", deviceIndexP)))
+{
+  debug("cIptvSectionFilterHandler::%s(%d)", __FUNCTION__, deviceIndexM);
+
+  // Initialize filter pointers
+  memset(filtersM, 0, sizeof(filtersM));
+
+  // Create input buffer
+  if (ringBufferM) {
+     ringBufferM->SetTimeouts(100, 100);
+     ringBufferM->SetIoThrottle();
+     }
+  else
+     error("Failed to allocate buffer for section filter handler (device=%d): ", deviceIndexM);
+
+  Start();
+}
+
+cIptvSectionFilterHandler::~cIptvSectionFilterHandler()
+{
+  debug("cIptvSectionFilterHandler::%s(%d)", __FUNCTION__, deviceIndexM);
+  // Stop thread
+  if (Running())
+     Cancel(3);
+
+  // Destroy all filters
+  cMutexLock MutexLock(&mutexM);
+  for (int i = 0; i < eMaxSecFilterCount; ++i)
+      Delete(i);
+}
+
+void cIptvSectionFilterHandler::Action(void)
+{
+  debug("cIptvSectionFilterHandler::%s(%d): entering", __FUNCTION__, deviceIndexM);
+  // Do the thread loop
+  while (Running()) {
+        // Read one TS packet
+        if (ringBufferM) {
+           int len = 0;
+           if (processedM) {
+              ringBufferM->Del(TS_SIZE);
+              processedM = false;
+              }
+           uchar *p = ringBufferM->Get(len);
+           if (p && (len >= TS_SIZE)) {
+              if (*p != TS_SYNC_BYTE) {
+                 for (int i = 1; i < len; ++i) {
+                     if (p[i] == TS_SYNC_BYTE) {
+                        len = i;
+                        break;
+                        }
+                     }
+                 ringBufferM->Del(len);
+                 debug("cIptvSectionFilterHandler::%s(%d): Skipped %d bytes to sync on TS packet", __FUNCTION__, deviceIndexM, len);
+                 continue;
+                 }
+              // Process TS packet through all filters
+              mutexM.Lock();
+              for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
+                  if (filtersM[i])
+                     filtersM[i]->Process(p);
+                  }
+              mutexM.Unlock();
+              processedM = true;
+              continue;
+              }
+           }
+        cCondWait::SleepMs(10); // to avoid busy loop and reduce cpu load
+        }
+  debug("cIptvSectionFilterHandler::%s(%d): exiting", __FUNCTION__, deviceIndexM);
+}
+
+cString cIptvSectionFilterHandler::GetInformation(void)
+{
+  //debug("cIptvSectionFilterHandler::%s(%d)", __FUNCTION__, deviceIndexM);
+  // loop through active section filters
+  cMutexLock MutexLock(&mutexM);
+  cString s = "";
+  unsigned int count = 0;
+  for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
+      if (filtersM[i]) {
+         s = cString::sprintf("%sFilter %d: %s Pid=0x%02X (%s)\n", *s, i,
+                              *filtersM[i]->GetSectionStatistic(), filtersM[i]->GetPid(),
+                              id_pid(filtersM[i]->GetPid()));
+         if (++count > IPTV_STATS_ACTIVE_FILTERS_COUNT)
+            break;
+         }
+      }
+  return s;
+}
+
+bool cIptvSectionFilterHandler::Delete(unsigned int indexP)
+{
+  //debug("cIptvSectionFilterHandler::%s(%d): index=%d", __FUNCTION__, deviceIndexM, indexP);
+  if ((indexP < eMaxSecFilterCount) && filtersM[indexP]) {
+     //debug("cIptvSectionFilterHandler::%s(%d): found %d", __FUNCTION__, deviceIndexM, indexP);
+     cIptvSectionFilter *tmp = filtersM[indexP];
+     filtersM[indexP] = NULL;
+     delete tmp;
+     return true;
+     }
+  return false;
+}
+
+bool cIptvSectionFilterHandler::IsBlackListed(u_short pidP, u_char tidP, u_char maskP) const
+{
+  //debug("cIptvSectionFilterHandler::%s(%d): pid=%d tid=%02X mask=%02X", __FUNCTION__, deviceIndexM, pidP, tidP, maskP);
+  // loop through section filter table
+  for (int i = 0; i < SECTION_FILTER_TABLE_SIZE; ++i) {
+      int index = IptvConfig.GetDisabledFilters(i);
+      // Check if matches
+      if ((index >= 0) && (index < SECTION_FILTER_TABLE_SIZE) &&
+          (section_filter_table[index].pid == pidP) && (section_filter_table[index].tid == tidP) &&
+          (section_filter_table[index].mask == maskP)) {
+         //debug("cIptvSectionFilterHandler::%s(%d): found %s", __FUNCTION__, deviceIndexM, section_filter_table[index].description);
+         return true;
+         }
+      }
+  return false;
+}
+
+int cIptvSectionFilterHandler::Open(u_short pidP, u_char tidP, u_char maskP)
+{
+  // Lock
+  cMutexLock MutexLock(&mutexM);
+  // Blacklist check, refuse certain filters
+  if (IsBlackListed(pidP, tidP, maskP))
+     return -1;
+  // Search the next free filter slot
+  for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
+      if (!filtersM[i]) {
+         //debug("cIptvSectionFilterHandler::%s(%d): pid=%d tid=%02X mask=%02X index=%d", __FUNCTION__, deviceIndexM, pidP, tidP, maskP, i);
+         filtersM[i] = new cIptvSectionFilter(deviceIndexM, pidP, tidP, maskP);
+         return filtersM[i]->GetFd();
+         }
+      }
+  // No free filter slot found
+  return -1;
+}
+
+void cIptvSectionFilterHandler::Close(int handleP)
+{
+  // Lock
+  cMutexLock MutexLock(&mutexM);
+  // Search the filter for deletion
+  for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
+      if (filtersM[i] && (handleP == filtersM[i]->GetFd())) {
+         //debug(""cIptvSectionFilterHandler::%s(%d): handle=%d", __FUNCTION__, deviceIndex, handleP);
+         Delete(i);
+         break;
+         }
+      }
+}
+
+void cIptvSectionFilterHandler::Write(uchar *bufferP, int lengthP)
+{
+  //debug("cIptvSectionFilterHandler::%s(%d): length=%d", __FUNCTION__, deviceIndexM, lengthP);
+  // Fill up the buffer
+  if (ringBufferM) {
+     int len = ringBufferM->Put(bufferP, lengthP);
+     if (len != lengthP)
+        ringBufferM->ReportOverflow(lengthP - len);
+     }
+}
+

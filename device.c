@@ -26,20 +26,21 @@ cIptvDevice::cIptvDevice(unsigned int indexP)
   bufsize -= (bufsize % TS_SIZE);
   isyslog("creating IPTV device %d (CardIndex=%d)", deviceIndexM, CardIndex());
   tsBufferM = new cRingBufferLinear(bufsize + 1, TS_SIZE, false,
-                                   *cString::sprintf("IPTV %d", deviceIndexM));
-  tsBufferM->SetTimeouts(100, 100);
-  tsBufferM->SetIoThrottle();
+                                   *cString::sprintf("IPTV TS %d", deviceIndexM));
+  if (tsBufferM) {
+     tsBufferM->SetTimeouts(100, 100);
+     tsBufferM->SetIoThrottle();
+     pIptvStreamerM = new cIptvStreamer(*this, tsBufferM->Free());
+     }
   ResetBuffering();
   pUdpProtocolM = new cIptvProtocolUdp();
   pCurlProtocolM = new cIptvProtocolCurl();
   pHttpProtocolM = new cIptvProtocolHttp();
   pFileProtocolM = new cIptvProtocolFile();
   pExtProtocolM = new cIptvProtocolExt();
-  pIptvStreamerM = new cIptvStreamer(tsBufferM, (100 * TS_SIZE));
   pPidScannerM = new cPidScanner();
-  // Initialize filter pointers
-  memset(secFiltersM, 0, sizeof(secFiltersM));
   // Start section handler for iptv device
+  pIptvSectionM = new cIptvSectionFilterHandler(deviceIndexM, bufsize + 1);
   StartSectionHandler();
   // Sid scanner must be created after the section handler
   AttachFilter(pSidScannerM = new cSidScanner());
@@ -68,10 +69,7 @@ cIptvDevice::~cIptvDevice()
   DELETE_POINTER(pSidScannerM);
   // Stop section handler of iptv device
   StopSectionHandler();
-  // Destroy all filters
-  cMutexLock MutexLock(&mutexM);
-  for (int i = 0; i < eMaxSecFilterCount; ++i)
-      DeleteFilter(i);
+  DELETE_POINTER(pIptvSectionM);
   // Close dvr fifo
   if (dvrFdM >= 0) {
      int fd = dvrFdM;
@@ -136,20 +134,7 @@ cString cIptvDevice::GetPidsInformation(void)
 cString cIptvDevice::GetFiltersInformation(void)
 {
   //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
-  unsigned int count = 0;
-  cString s("Active section filters:\n");
-  // loop through active section filters
-  cMutexLock MutexLock(&mutexM);
-  for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
-      if (secFiltersM[i]) {
-         s = cString::sprintf("%sFilter %d: %s Pid=0x%02X (%s)\n", *s, i,
-                              *secFiltersM[i]->GetSectionStatistic(), secFiltersM[i]->GetPid(),
-                              id_pid(secFiltersM[i]->GetPid()));
-         if (++count > IPTV_STATS_ACTIVE_FILTERS_COUNT)
-            break;
-         }
-      }
-  return s;
+  return cString::sprintf("Active section filters:\n%s", pIptvSectionM ? *pIptvSectionM->GetInformation() : "");
 }
 
 cString cIptvDevice::GetInformation(unsigned int pageP)
@@ -184,7 +169,7 @@ cString cIptvDevice::GetInformation(unsigned int pageP)
 
 cString cIptvDevice::DeviceType(void) const
 {
-  debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
   return "IPTV";
 }
 
@@ -300,80 +285,19 @@ bool cIptvDevice::SetPid(cPidHandle *handleP, int typeP, bool onP)
   return true;
 }
 
-bool cIptvDevice::DeleteFilter(unsigned int indexP)
-{
-  if ((indexP < eMaxSecFilterCount) && secFiltersM[indexP]) {
-     //debug("cIptvDevice::%s(%d): index=%d", __FUNCTION__, deviceIndexM, indexP);
-     cIptvSectionFilter *tmp = secFiltersM[indexP];
-     secFiltersM[indexP] = NULL;
-     delete tmp;
-     return true;
-     }
-  return false;
-}
-
-bool cIptvDevice::IsBlackListed(u_short pidP, u_char tidP, u_char maskP) const
-{
-  //debug("cIptvDevice::%s(%d): pid=%d tid=%02X mask=%02X", __FUNCTION__, deviceIndexM, pidP, tidP, maskP);
-  // loop through section filter table
-  for (int i = 0; i < SECTION_FILTER_TABLE_SIZE; ++i) {
-      int index = IptvConfig.GetDisabledFilters(i);
-      // Check if matches
-      if ((index >= 0) && (index < SECTION_FILTER_TABLE_SIZE) &&
-          (section_filter_table[index].pid == pidP) && (section_filter_table[index].tid == tidP) &&
-          (section_filter_table[index].mask == maskP)) {
-         //debug("cIptvDevice::%s(%d): found %s", __FUNCTION__, deviceIndexM, section_filter_table[index].description);
-         return true;
-         }
-      }
-  return false;
-}
-
 int cIptvDevice::OpenFilter(u_short pidP, u_char tidP, u_char maskP)
 {
-  // Check if disabled by user
-  if (!IptvConfig.GetSectionFiltering())
-     return -1;
-  // Lock
-  cMutexLock MutexLock(&mutexM);
-  // Blacklist check, refuse certain filters
-  if (IsBlackListed(pidP, tidP, maskP))
-     return -1;
-  // Search the next free filter slot
-  for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
-      if (!secFiltersM[i]) {
-         //debug("cIptvDevice::%s(%d): pid=%d tid=%02X mask=%02X index=%d", __FUNCTION__, deviceIndexM, pidP, tidP, maskP, i);
-         secFiltersM[i] = new cIptvSectionFilter(deviceIndexM, pidP, tidP, maskP);
-         if (secFiltersM[i])
-            return i;
-         break;
-         }
-      }
-  // No free filter slot found
+  debug("cIptvDevice::%s(%d): pid=%d tid=%d mask=%d", __FUNCTION__, deviceIndexM, pidP, tidP,  maskP);
+  if (pIptvSectionM && IptvConfig.GetSectionFiltering())
+     return pIptvSectionM->Open(pidP, tidP, maskP);
   return -1;
-}
-
-int cIptvDevice::ReadFilter(int handleP, void *bufferP, size_t lengthP)
-{
-  // Lock
-  cMutexLock MutexLock(&mutexM);
-  // ... and load
-  if (secFiltersM[handleP]) {
-     return secFiltersM[handleP]->Read(bufferP, lengthP);
-     //debug("cIptvDevice::%s(%d): handle=%d length=%d", __FUNCTION__, deviceIndexM, handleP, lengthP);
-     }
-  return 0;
 }
 
 void cIptvDevice::CloseFilter(int handleP)
 {
-  // Lock
-  cMutexLock MutexLock(&mutexM);
-  // ... and load
-  if (secFiltersM[handleP]) {
-     //debug("cIptvDevice::%s(%d): handle=%d", __FUNCTION__, deviceIndexM, handleP);
-     DeleteFilter(handleP);
-     }
+  debug("cIptvDevice::%s(%d): handle=%d", __FUNCTION__, deviceIndexM, handleP);
+  if (pIptvSectionM)
+     pIptvSectionM->Close(handleP);
 }
 
 bool cIptvDevice::OpenDvr(void)
@@ -431,6 +355,32 @@ bool cIptvDevice::IsBuffering(void) const
   return false;
 }
 
+void cIptvDevice::WriteData(uchar *bufferP, int lengthP)
+{
+  //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  int len;
+  // Send data to dvr fifo
+  if (dvrFdM >= 0)
+     len = write(dvrFdM, bufferP, lengthP);
+  // Fill up TS buffer
+  if (tsBufferM) {
+     len = tsBufferM->Put(bufferP, lengthP);
+     if (len != lengthP)
+        tsBufferM->ReportOverflow(lengthP - len);
+     }
+  // Filter the sections
+  if (pIptvSectionM && IptvConfig.GetSectionFiltering())
+     pIptvSectionM->Write(bufferP, lengthP);
+}
+
+unsigned int cIptvDevice::CheckData(void)
+{
+  //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  if (tsBufferM)
+     return (unsigned int)tsBufferM->Free();
+  return 0;
+}
+
 bool cIptvDevice::GetTSPacket(uchar *&Data)
 {
   //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
@@ -452,26 +402,13 @@ bool cIptvDevice::GetTSPacket(uchar *&Data)
                   }
                }
            tsBufferM->Del(Count);
-           error("Skipped %d bytes to sync on TS packet\n", Count);
+           error("Skipped %d bytes to sync on TS packet", Count);
            return false;
            }
         isPacketDeliveredM = true;
         Data = p;
         // Update pid statistics
         AddPidStatistic(ts_pid(p), payload(p));
-        // Send data also to dvr fifo
-        if (dvrFdM >= 0)
-           Count = (int)write(dvrFdM, p, TS_SIZE);
-        // Analyze incomplete streams with built-in pid analyzer
-        if (pidScanEnabledM && pPidScannerM)
-           pPidScannerM->Process(p);
-        // Lock
-        cMutexLock MutexLock(&mutexM);
-        // Run the data through all filters
-        for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
-            if (secFiltersM[i])
-               secFiltersM[i]->Process(p);
-            }
         return true;
         }
      }

@@ -204,3 +204,5 @@ VDR Plugin 'iptv' Revision History
 
 - Enabled I/O throttling and tweaked buffer timeouts.
 - Fixed a nasty network byte order bug.
+- Fixed and refactored the section filtering code.
+- Fixed a possible crash in the file protocol.

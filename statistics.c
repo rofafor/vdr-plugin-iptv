@@ -44,7 +44,7 @@ cString cIptvSectionStatistics::GetSectionStatistic()
 
 void cIptvSectionStatistics::AddSectionStatistic(long bytesP, long callsP)
 {
-  //debug("cIptvSectionStatistics::%s(%ld, %ld)", __FUNCTION__, bytesP, callsP); 
+  //debug("cIptvSectionStatistics::%s(%ld, %ld)", __FUNCTION__, bytesP, callsP);
   cMutexLock MutexLock(&mutexM);
   filteredDataM += bytesP;
   numberOfCallsM += callsP;

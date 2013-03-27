@@ -113,13 +113,13 @@ bool cIptvProtocolHttp::GetHeaderLine(char* destP, unsigned int destLenP,
        ++bufptr;
        // Check that buffer won't be exceeded
        if (recvLenP >= destLenP) {
-          error("Header wouldn't fit into buffer\n");
+          error("Header wouldn't fit into buffer");
           recvLenP = 0;
           return false;
           }
        }
     else {
-       error("No HTTP response received in 500ms\n");
+       error("No HTTP response received in 500ms");
        return false;
        }
     }
@@ -143,14 +143,14 @@ bool cIptvProtocolHttp::ProcessHeaders(void)
     if (!GetHeaderLine(buf, sizeof(buf), lineLength))
        return false;
     if (!responseFound && sscanf(buf, fmt, &version, &response) != 2) {
-       error("Expected HTTP header not found\n");
+       error("Expected HTTP header not found");
        continue;
        }
     else
        responseFound = true;
     // Allow only 'OK' and 'Partial Content'
     if ((response != 200) && (response != 206)) {
-       error("Invalid HTTP response (%d): %s\n", response, buf);
+       error("Invalid HTTP response (%d): %s", response, buf);
        return false;
        }
     }

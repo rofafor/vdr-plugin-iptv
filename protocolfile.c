@@ -60,7 +60,7 @@ int cIptvProtocolFile::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
 {
    //debug("cIptvProtocolFile::%s()", __FUNCTION__);
    // Check errors
-   if (ferror(fileStreamM)) {
+   if (!fileStreamM || ferror(fileStreamM)) {
       debug("cIptvProtocolFile::%s(): stream error", __FUNCTION__);
       return -1;
       }
