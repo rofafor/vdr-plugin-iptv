@@ -45,7 +45,7 @@ void cSidScanner::Process(u_short pidP, u_char tidP, const u_char *dataP, int le
      return;
   if (channelIdM.Valid()) {
      if ((pidP == 0x00) && (tidP == 0x00)) {
-        debug("cSidScanner::%s(%d, %02X)", __FUNCTION__, pidP, tidP);
+        //debug("cSidScanner::%s(%d, %02X)", __FUNCTION__, pidP, tidP);
         SI::PAT pat(dataP, false);
         if (!pat.CheckCRCAndParse())
            return;

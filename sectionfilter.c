@@ -348,8 +348,8 @@ int cIptvSectionFilterHandler::Open(u_short pidP, u_char tidP, u_char maskP)
   // Search the next free filter slot
   for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
       if (!filtersM[i]) {
-         //debug("cIptvSectionFilterHandler::%s(%d): pid=%d tid=%02X mask=%02X index=%d", __FUNCTION__, deviceIndexM, pidP, tidP, maskP, i);
          filtersM[i] = new cIptvSectionFilter(deviceIndexM, pidP, tidP, maskP);
+         debug("cIptvSectionFilterHandler::%s(%d): pid=%d tid=%02X mask=%02X handle=%d index=%d", __FUNCTION__, deviceIndexM, pidP, tidP, maskP, filtersM[i]->GetFd(), i);
          return filtersM[i]->GetFd();
          }
       }
@@ -364,7 +364,7 @@ void cIptvSectionFilterHandler::Close(int handleP)
   // Search the filter for deletion
   for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
       if (filtersM[i] && (handleP == filtersM[i]->GetFd())) {
-         //debug(""cIptvSectionFilterHandler::%s(%d): handle=%d", __FUNCTION__, deviceIndex, handleP);
+         debug("cIptvSectionFilterHandler::%s(%d): pid=%d handle=%d index=%d", __FUNCTION__, deviceIndexM, filtersM[i]->GetPid(), filtersM[i]->GetFd(), i);
          Delete(i);
          break;
          }

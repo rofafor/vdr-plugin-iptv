@@ -200,8 +200,14 @@ VDR Plugin 'iptv' Revision History
   to Jeremy Hall).
 - Fixed the channel editor.
 
-2013-xx-xx: Version 1.2.2
 
+==================================
+VDR Plugin 'iptv' Revision History
+==================================
+
+2013-04-01: Version 2.0.0
+
+- Updated for vdr-2.0.0.
 - Enabled I/O throttling and tweaked buffer timeouts.
 - Fixed a nasty network byte order bug.
 - Fixed and refactored the section filtering code.

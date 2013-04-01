@@ -287,7 +287,7 @@ bool cIptvDevice::SetPid(cPidHandle *handleP, int typeP, bool onP)
 
 int cIptvDevice::OpenFilter(u_short pidP, u_char tidP, u_char maskP)
 {
-  debug("cIptvDevice::%s(%d): pid=%d tid=%d mask=%d", __FUNCTION__, deviceIndexM, pidP, tidP,  maskP);
+  //debug("cIptvDevice::%s(%d): pid=%d tid=%d mask=%d", __FUNCTION__, deviceIndexM, pidP, tidP,  maskP);
   if (pIptvSectionM && IptvConfig.GetSectionFiltering())
      return pIptvSectionM->Open(pidP, tidP, maskP);
   return -1;
@@ -295,7 +295,7 @@ int cIptvDevice::OpenFilter(u_short pidP, u_char tidP, u_char maskP)
 
 void cIptvDevice::CloseFilter(int handleP)
 {
-  debug("cIptvDevice::%s(%d): handle=%d", __FUNCTION__, deviceIndexM, handleP);
+  //debug("cIptvDevice::%s(%d): handle=%d", __FUNCTION__, deviceIndexM, handleP);
   if (pIptvSectionM)
      pIptvSectionM->Close(handleP);
 }
