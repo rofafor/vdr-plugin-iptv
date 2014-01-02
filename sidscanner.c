@@ -71,15 +71,21 @@ void cSidScanner::Process(u_short pidP, u_char tidP, const u_char *dataP, int le
             if (ts.getTransportStreamId() != channelIdM.Tid()) {
                debug("cSidScanner::%s(): tsid=%d", __FUNCTION__, ts.getTransportStreamId());
                newTid = ts.getTransportStreamId();
+               tidFoundM = true;
                }
-            tidFoundM = true;
+            if (ts.getOriginalNetworkId() != channelIdM.Nid()) {
+               debug("cSidScanner::%s(): onid=%d", __FUNCTION__, ts.getOriginalNetworkId());
+               newNid = ts.getOriginalNetworkId();
+               nidFoundM = true;
+               }
             break; // default to the first one
             }
-        if (nit.getNetworkId() != channelIdM.Nid()) {
-           debug("cSidScanner::%s(): nid=%d", __FUNCTION__, ts.getTransportStreamId());
+        // fallback for network id if not found already
+        if (!nidFoundM && (nit.getNetworkId() != channelIdM.Nid())) {
+           debug("cSidScanner::%s(): nid=%d", __FUNCTION__, nit.getNetworkId());
            newNid = nit.getNetworkId();
+           nidFoundM = true;
            }
-        nidFoundM = true;
         }
      }
   if ((newSid >= 0) || (newNid >= 0) || (newTid >= 0)) {

@@ -15,12 +15,12 @@
 
 #define iptv_curl_easy_setopt(X, Y, Z) \
   if ((res = curl_easy_setopt((X), (Y), (Z))) != CURLE_OK) { \
-     error("curl_easy_setopt(%s, %s, %s) failed: %d", #X, #Y, #Z, res); \
+     error("curl_easy_setopt(%s, %s) failed: %s (%d)", #Y, #Z, curl_easy_strerror(res), res); \
      }
 
 #define iptv_curl_easy_perform(X) \
   if ((res = curl_easy_perform((X))) != CURLE_OK) { \
-     error("curl_easy_perform(%s) failed: %d", #X, res); \
+     error("curl_easy_perform() failed: %s (%d)", curl_easy_strerror(res), res); \
      }
 
 cIptvProtocolCurl::cIptvProtocolCurl()
@@ -264,7 +264,8 @@ bool cIptvProtocolCurl::Connect()
      iptv_curl_easy_setopt(handleM, CURLOPT_NETRC, (long)CURL_NETRC_OPTIONAL);
      iptv_curl_easy_setopt(handleM, CURLOPT_NETRC_FILE, *netrc);
 
-     // Set timeout
+     // Set timeouts
+     iptv_curl_easy_setopt(handleM, CURLOPT_TIMEOUT, (long)eConnectTimeoutS);
      iptv_curl_easy_setopt(handleM, CURLOPT_CONNECTTIMEOUT, (long)eConnectTimeoutS);
 
      // Set user-agent
@@ -345,6 +346,10 @@ bool cIptvProtocolCurl::Connect()
             break;
 
        case eModeFile:
+            // Set timeout
+            iptv_curl_easy_setopt(handleM, CURLOPT_TIMEOUT_MS, 10L);
+            break;
+
        case eModeUnknown:
        default:
             break;

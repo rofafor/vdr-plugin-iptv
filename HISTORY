@@ -212,3 +212,8 @@ VDR Plugin 'iptv' Revision History
 - Fixed a nasty network byte order bug.
 - Fixed and refactored the section filtering code.
 - Fixed a possible crash in the file protocol.
+
+2014-xx-xx: Versoin 2.0.1
+
+- Added missing CURL timeouts.
+- Improved section id scanner.

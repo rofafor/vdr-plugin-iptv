@@ -44,7 +44,8 @@
   do {                                                            \
      if (exp) {                                                   \
         char tmp[64];                                             \
-        error(errstr": %s", strerror_r(errno, tmp, sizeof(tmp))); \
+        error("[%s,%d]: "errstr": %s", __FILE__, __LINE__,        \
+              strerror_r(errno, tmp, sizeof(tmp)));               \
         func;                                                     \
         ret;                                                      \
         }                                                         \

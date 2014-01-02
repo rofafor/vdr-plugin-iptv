@@ -165,8 +165,7 @@ Notes:
   "disable_ca_updates" patch to the VDR in order to get rid of "Channel not
   available" messages.
 
-- EIT scanning functionality can be disabled for all IPTV channels by applying
-  the "disable_eitscan" patch to the VDR.
+- EIT scanning functionality is disabled by default.
 
 - Section id and pid scanners should be disabled after the correct data is
   found. This can be made via VDR's channel editor.
@@ -180,7 +179,12 @@ Notes:
   netrc configuration file for authentication:
   $(CONFDIR)/iptv/netrc
 
-- CURL implementation
+- You can quite easily figure out correct DVB triplet values by using the
+  multicat and dvbsnoop tools:
+  $ multicat -u -d 1620000000 @127.0.0.1:1234 /tmp/video.ts
+  $ dvbsnoop -s ts -if /tmp/video.ts -tssubdecode -hexdumpbuffer 0x12 | \
+    grep -m1 -A8 Service_ID | grep _ID
+
 Acknowledgements:
 
 - The IPTV section filtering code is derived from Linux kernel.
