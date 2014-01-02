@@ -58,6 +58,7 @@ bool cIptvTransponderParameters::Parse(const char *strP)
   if (strP && *strP) {
      const char *delim = "|";
      char *str = strdup(strP);
+     char *p = str;
      char *saveptr = NULL;
      char *token = NULL;
      bool found_s = false;
@@ -120,9 +121,9 @@ bool cIptvTransponderParameters::Parse(const char *strP)
      if (found_s && found_p && found_f && found_u && found_a)
         result = true;
      else
-        error("Invalid channel parameters: %s", str);
+        error("Invalid channel parameters: %s", p);
 
-     free(str);
+     free(p);
      }
 
   return (result);
