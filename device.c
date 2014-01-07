@@ -317,7 +317,7 @@ bool cIptvDevice::OpenDvr(void)
 void cIptvDevice::CloseDvr(void)
 {
   debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
-  if (sidScanEnabledM && pSidScannerM )
+  if (sidScanEnabledM && pSidScannerM)
      pSidScannerM->Close();
   if (pIptvStreamerM)
      pIptvStreamerM->Close();

@@ -73,7 +73,7 @@ size_t cIptvProtocolCurl::WriteRtspCallback(void *ptrP, size_t sizeP, size_t nme
   //debug("cIptvProtocolCurl::%s(%zu)", __FUNCTION__, len);
 
   // Validate packet header ('$') and channel (0)
-  if (obj && (p[0] == 0x24 ) && (p[1] == 0)) {
+  if (obj && (p[0] == 0x24) && (p[1] == 0)) {
      int length = (p[2] << 8) | p[3];
      if (length > 3) {
         // Skip interleave header
