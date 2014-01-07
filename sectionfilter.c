@@ -242,6 +242,8 @@ cIptvSectionFilterHandler::~cIptvSectionFilterHandler()
   if (Running())
      Cancel(3);
 
+  DELETE_POINTER(ringBufferM);
+
   // Destroy all filters
   cMutexLock MutexLock(&mutexM);
   for (int i = 0; i < eMaxSecFilterCount; ++i)

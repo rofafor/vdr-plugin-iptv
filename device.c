@@ -58,18 +58,18 @@ cIptvDevice::cIptvDevice(unsigned int indexP)
 cIptvDevice::~cIptvDevice()
 {
   debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
-  DELETE_POINTER(pIptvStreamerM);
-  DELETE_POINTER(pUdpProtocolM);
-  DELETE_POINTER(pCurlProtocolM);
-  DELETE_POINTER(pHttpProtocolM);
-  DELETE_POINTER(pFileProtocolM);
-  DELETE_POINTER(pExtProtocolM);
-  DELETE_POINTER(tsBufferM);
-  DELETE_POINTER(pPidScannerM);
-  DELETE_POINTER(pSidScannerM);
   // Stop section handler of iptv device
   StopSectionHandler();
   DELETE_POINTER(pIptvSectionM);
+  DELETE_POINTER(pSidScannerM);
+  DELETE_POINTER(pPidScannerM);
+  DELETE_POINTER(pIptvStreamerM);
+  DELETE_POINTER(pExtProtocolM);
+  DELETE_POINTER(pFileProtocolM);
+  DELETE_POINTER(pHttpProtocolM);
+  DELETE_POINTER(pCurlProtocolM);
+  DELETE_POINTER(pUdpProtocolM);
+  DELETE_POINTER(tsBufferM);
   // Close dvr fifo
   if (dvrFdM >= 0) {
      int fd = dvrFdM;
