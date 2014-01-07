@@ -235,6 +235,11 @@ int cIptvDevice::NumProvidedSystems(void) const
   return 1;
 }
 
+bool cIptvDevice::IsTunedToTransponder(const cChannel *channelP) const
+{
+  return channelP ? (channelP->GetChannelID() == channelIdM) : false;
+}
+
 bool cIptvDevice::SetChannelDevice(const cChannel *channelP, bool liveViewP)
 {
   cIptvProtocolIf *protocol;

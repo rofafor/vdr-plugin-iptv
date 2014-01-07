@@ -87,6 +87,7 @@ public:
   virtual bool ProvidesChannel(const cChannel *channelP, int priorityP = -1, bool *needsDetachReceiversP = NULL) const;
   virtual bool ProvidesEIT(void) const;
   virtual int NumProvidedSystems(void) const;
+  virtual bool IsTunedToTransponder(const cChannel *channelP) const;
 protected:
   virtual bool SetChannelDevice(const cChannel *channelP, bool liveViewP);
 
