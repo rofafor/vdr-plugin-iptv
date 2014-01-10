@@ -213,7 +213,9 @@ VDR Plugin 'iptv' Revision History
 - Fixed and refactored the section filtering code.
 - Fixed a possible crash in the file protocol.
 
-2014-xx-xx: Versoin 2.0.1
+2014-01-10: Versoin 2.0.1
 
 - Added missing CURL timeouts.
 - Improved section id scanner.
+- Added support for cDevice::IsTunedToTransponder().
+- Fixed a memory leak and some issues reported by scan-build.
