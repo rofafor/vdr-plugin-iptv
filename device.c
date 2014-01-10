@@ -20,7 +20,7 @@ cIptvDevice::cIptvDevice(unsigned int indexP)
   isOpenDvrM(false),
   sidScanEnabledM(false),
   pidScanEnabledM(false),
-  channelIdM(tChannelID::InvalidID)
+  channelM()
 {
   unsigned int bufsize = (unsigned int)MEGABYTE(IptvConfig.GetTsBufferSize());
   bufsize -= (bufsize % TS_SIZE);
@@ -214,7 +214,7 @@ bool cIptvDevice::ProvidesChannel(const cChannel *channelP, int priorityP, bool 
   if (channelP && ProvidesTransponder(channelP)) {
      result = hasPriority;
      if (Receiving()) {
-        if (channelP->GetChannelID() == channelIdM)
+        if (channelP->GetChannelID() == channelM.GetChannelID())
            result = true;
         else
            needsDetachReceivers = Receiving();
@@ -235,9 +235,14 @@ int cIptvDevice::NumProvidedSystems(void) const
   return 1;
 }
 
+const cChannel *cIptvDevice::GetCurrentlyTunedTransponder(void) const
+{
+  return &channelM;
+}
+
 bool cIptvDevice::IsTunedToTransponder(const cChannel *channelP) const
 {
-  return channelP ? (channelP->GetChannelID() == channelIdM) : false;
+  return channelP ? (channelP->GetChannelID() == channelM.GetChannelID()) : false;
 }
 
 bool cIptvDevice::SetChannelDevice(const cChannel *channelP, bool liveViewP)
@@ -275,11 +280,11 @@ bool cIptvDevice::SetChannelDevice(const cChannel *channelP, bool liveViewP)
   sidScanEnabledM = itp.SidScan() ? true : false;
   pidScanEnabledM = itp.PidScan() ? true : false;
   if (pIptvStreamerM->Set(itp.Address(), itp.Parameter(), deviceIndexM, protocol)) {
-     channelIdM = channelP->GetChannelID();
+     channelM = *channelP;
      if (sidScanEnabledM && pSidScannerM && IptvConfig.GetSectionFiltering())
-        pSidScannerM->SetChannel(channelIdM);
+        pSidScannerM->SetChannel(channelM.GetChannelID());
      if (pidScanEnabledM && pPidScannerM)
-        pPidScannerM->SetChannel(channelIdM);
+        pPidScannerM->SetChannel(channelM.GetChannelID());
      }
   return true;
 }

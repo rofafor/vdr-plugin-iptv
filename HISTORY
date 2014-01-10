@@ -217,5 +217,6 @@ VDR Plugin 'iptv' Revision History
 
 - Added missing CURL timeouts.
 - Improved section id scanner.
-- Added support for cDevice::IsTunedToTransponder().
+- Added support for cDevice::IsTunedToTransponder() and
+  cDevice::GetCurrentlyTunedTransponder().
 - Fixed a memory leak and some issues reported by scan-build.

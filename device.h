@@ -40,7 +40,7 @@ private:
   bool pidScanEnabledM;
   cRingBufferLinear *tsBufferM;
   mutable int tsBufferPrefillM;
-  tChannelID channelIdM;
+  cChannel channelM;
   cIptvProtocolUdp *pUdpProtocolM;
   cIptvProtocolCurl *pCurlProtocolM;
   cIptvProtocolHttp *pHttpProtocolM;
@@ -87,6 +87,7 @@ public:
   virtual bool ProvidesChannel(const cChannel *channelP, int priorityP = -1, bool *needsDetachReceiversP = NULL) const;
   virtual bool ProvidesEIT(void) const;
   virtual int NumProvidedSystems(void) const;
+  virtual const cChannel *GetCurrentlyTunedTransponder(void) const;
   virtual bool IsTunedToTransponder(const cChannel *channelP) const;
 protected:
   virtual bool SetChannelDevice(const cChannel *channelP, bool liveViewP);
