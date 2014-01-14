@@ -27,6 +27,7 @@ class cIptvDevice : public cDevice, public cIptvPidStatistics, public cIptvBuffe
 public:
   static unsigned int deviceCount;
   static bool Initialize(unsigned int DeviceCount);
+  static void Shutdown(void);
   static unsigned int Count(void);
   static cIptvDevice *GetIptvDevice(int CardIndex);
 

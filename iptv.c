@@ -118,6 +118,7 @@ void cPluginIptv::Stop(void)
 {
   debug("cPluginIptv::%s()", __FUNCTION__);
   // Stop any background activities the plugin is performing.
+  cIptvDevice::Shutdown();
   curl_global_cleanup();
 }
 

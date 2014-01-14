@@ -238,9 +238,7 @@ cIptvSectionFilterHandler::cIptvSectionFilterHandler(int deviceIndexP, unsigned 
 cIptvSectionFilterHandler::~cIptvSectionFilterHandler()
 {
   debug("cIptvSectionFilterHandler::%s(%d)", __FUNCTION__, deviceIndexM);
-  // Stop thread
-  if (Running())
-     Cancel(3);
+  Stop();
 
   DELETE_POINTER(ringBufferM);
 
@@ -248,6 +246,15 @@ cIptvSectionFilterHandler::~cIptvSectionFilterHandler()
   cMutexLock MutexLock(&mutexM);
   for (int i = 0; i < eMaxSecFilterCount; ++i)
       Delete(i);
+}
+
+bool cIptvSectionFilterHandler::Stop(void)
+{
+  debug("cIptvSectionFilterHandler::%s(%d): entering", __FUNCTION__, deviceIndexM);
+  // Stop thread
+  if (Running())
+     Cancel(3);
+  return true;
 }
 
 void cIptvSectionFilterHandler::Action(void)
@@ -383,4 +390,3 @@ void cIptvSectionFilterHandler::Write(uchar *bufferP, int lengthP)
         ringBufferM->ReportOverflow(lengthP - len);
      }
 }
-

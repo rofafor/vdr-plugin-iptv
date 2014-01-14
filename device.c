@@ -91,6 +91,15 @@ bool cIptvDevice::Initialize(unsigned int deviceCountP)
   return true;
 }
 
+void cIptvDevice::Shutdown(void)
+{
+  debug("cIptvDevice::%s()", __FUNCTION__);
+  for (int i = 0; i < IPTV_MAX_DEVICES; ++i) {
+      if (IptvDevicesS[i])
+         IptvDevicesS[i]->CloseDvr();
+      }
+}
+
 unsigned int cIptvDevice::Count(void)
 {
   unsigned int count = 0;
@@ -106,7 +115,7 @@ cIptvDevice *cIptvDevice::GetIptvDevice(int cardIndexP)
 {
   //debug("cIptvDevice::%s(%d)", __FUNCTION__, cardIndexP);
   for (unsigned int i = 0; i < IPTV_MAX_DEVICES; ++i) {
-      if ((IptvDevicesS[i] != NULL) && (IptvDevicesS[i]->CardIndex() == cardIndexP)) {
+      if (IptvDevicesS[i] && (IptvDevicesS[i]->CardIndex() == cardIndexP)) {
          //debug("cIptvDevice::%s(%d): found!", __FUNCTION__, cardIndexP);
          return IptvDevicesS[i];
          }
@@ -320,6 +329,8 @@ bool cIptvDevice::OpenDvr(void)
      pIptvStreamerM->Open();
   if (sidScanEnabledM && pSidScannerM && IptvConfig.GetSectionFiltering())
      pSidScannerM->Open();
+  if (pidScanEnabledM && pPidScannerM)
+     pPidScannerM->Open();
   isOpenDvrM = true;
   return true;
 }
@@ -327,6 +338,8 @@ bool cIptvDevice::OpenDvr(void)
 void cIptvDevice::CloseDvr(void)
 {
   debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  if (pidScanEnabledM && pPidScannerM)
+     pPidScannerM->Close();
   if (sidScanEnabledM && pSidScannerM)
      pSidScannerM->Close();
   if (pIptvStreamerM)
@@ -394,7 +407,7 @@ unsigned int cIptvDevice::CheckData(void)
 bool cIptvDevice::GetTSPacket(uchar *&Data)
 {
   //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
-  if (tsBufferM && !IsBuffering()) {
+  if (isOpenDvrM && tsBufferM && !IsBuffering()) {
      if (isPacketDeliveredM) {
         tsBufferM->Del(TS_SIZE);
         isPacketDeliveredM = false;

@@ -13,6 +13,12 @@
 
 class cPidScanner {
 private:
+  enum {
+    PIDSCANNER_APID_COUNT      = 5,    /* minimum count of audio pid samples for pid detection */
+    PIDSCANNER_VPID_COUNT      = 5,    /* minimum count of video pid samples for pid detection */
+    PIDSCANNER_PID_DELTA_COUNT = 100,  /* minimum count of pid samples for audio/video only pid detection */
+    PIDSCANNER_TIMEOUT_IN_MS   = 15000 /* 15s timeout for detection */
+  };
   cTimeMs timeoutM;
   tChannelID channelIdM;
   bool processM;
@@ -26,6 +32,8 @@ public:
   ~cPidScanner();
   void SetChannel(const tChannelID &channelIdP);
   void Process(const uint8_t* bufP);
+  void Open()  { debug("cPidScanner::%s()", __FUNCTION__); timeoutM.Set(PIDSCANNER_TIMEOUT_IN_MS); }
+  void Close() { debug("cPidScanner::%s()", __FUNCTION__); timeoutM.Set(0); }
 };
 
 #endif // __PIDSCANNER_H

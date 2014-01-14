@@ -39,7 +39,6 @@ void cPidScanner::SetChannel(const tChannelID &channelIdP)
   aPidM = 0xFFFF;
   numApidsM = 0;
   processM = true;
-  timeoutM.Set(PIDSCANNER_TIMEOUT_IN_MS);
 }
 
 void cPidScanner::Process(const uint8_t* bufP)

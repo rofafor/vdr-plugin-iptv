@@ -80,6 +80,7 @@ protected:
 public:
   cIptvSectionFilterHandler(int deviceIndexP, unsigned int bufferLenP);
   virtual ~cIptvSectionFilterHandler();
+  bool Stop(void);
   cString GetInformation(void);
   int Open(u_short pidP, u_char tidP, u_char maskP);
   void Close(int handleP);
