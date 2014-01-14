@@ -90,6 +90,8 @@ public:
   virtual int NumProvidedSystems(void) const;
   virtual const cChannel *GetCurrentlyTunedTransponder(void) const;
   virtual bool IsTunedToTransponder(const cChannel *channelP) const;
+  virtual bool MaySwitchTransponder(const cChannel *channelP) const;
+
 protected:
   virtual bool SetChannelDevice(const cChannel *channelP, bool liveViewP);
 

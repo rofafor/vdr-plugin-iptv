@@ -254,6 +254,11 @@ bool cIptvDevice::IsTunedToTransponder(const cChannel *channelP) const
   return channelP ? (channelP->GetChannelID() == channelM.GetChannelID()) : false;
 }
 
+bool cIptvDevice::MaySwitchTransponder(const cChannel *channelP) const
+{
+  return cDevice::MaySwitchTransponder(channelP);
+}
+
 bool cIptvDevice::SetChannelDevice(const cChannel *channelP, bool liveViewP)
 {
   cIptvProtocolIf *protocol;
