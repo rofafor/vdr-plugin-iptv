@@ -409,39 +409,66 @@ unsigned int cIptvDevice::CheckData(void)
   return 0;
 }
 
-bool cIptvDevice::GetTSPacket(uchar *&Data)
+uchar *cIptvDevice::GetData(int *availableP)
 {
   //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
   if (isOpenDvrM && tsBufferM && !IsBuffering()) {
-     if (isPacketDeliveredM) {
-        tsBufferM->Del(TS_SIZE);
-        isPacketDeliveredM = false;
-        // Update buffer statistics
-        AddBufferStatistic(TS_SIZE, tsBufferM->Available());
-        }
-     int Count = 0;
-     uchar *p = tsBufferM->Get(Count);
-     if (p && Count >= TS_SIZE) {
+     int count = 0;
+     if (isPacketDeliveredM)
+        SkipData(TS_SIZE);
+     uchar *p = tsBufferM->Get(count);
+     if (p && count >= TS_SIZE) {
         if (*p != TS_SYNC_BYTE) {
-           for (int i = 1; i < Count; i++) {
+           for (int i = 1; i < count; i++) {
                if (p[i] == TS_SYNC_BYTE) {
-                  Count = i;
+                  count = i;
                   break;
                   }
                }
-           tsBufferM->Del(Count);
-           error("Skipped %d bytes to sync on TS packet", Count);
-           return false;
+           tsBufferM->Del(count);
+           error("Skipped %d bytes to sync on TS packet", count);
+           return NULL;
            }
         isPacketDeliveredM = true;
-        Data = p;
+        if (availableP)
+           *availableP = count;
         // Update pid statistics
         AddPidStatistic(ts_pid(p), payload(p));
-        return true;
+        return p;
         }
+     }
+  return NULL;
+}
+
+void cIptvDevice::SkipData(int countP)
+{
+  //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  tsBufferM->Del(countP);
+  isPacketDeliveredM = false;
+  // Update buffer statistics
+  AddBufferStatistic(countP, tsBufferM->Available());
+}
+
+bool cIptvDevice::GetTSPacket(uchar *&dataP)
+{
+  //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  if (tsBufferM) {
+     if (cCamSlot *cs = CamSlot()) {
+        if (cs->WantsTsData()) {
+           int available;
+           dataP = GetData(&available);
+           if (dataP) {
+              dataP = cs->Decrypt(dataP, available);
+              SkipData(available);
+              }
+           return true;
+           }
+        }
+     dataP = GetData();
+     return true;
      }
   // Reduce cpu load by preventing busylooping
   cCondWait::SleepMs(10);
-  Data = NULL;
+  dataP = NULL;
   return true;
 }

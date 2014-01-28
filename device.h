@@ -96,6 +96,10 @@ protected:
   virtual bool SetChannelDevice(const cChannel *channelP, bool liveViewP);
 
   // for recording
+private:
+  uchar *GetData(int *availableP = NULL);
+  void SkipData(int countP);
+
 protected:
   virtual bool SetPid(cPidHandle *handleP, int typeP, bool onP);
   virtual bool OpenDvr(void);
