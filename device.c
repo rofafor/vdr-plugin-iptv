@@ -361,7 +361,7 @@ bool cIptvDevice::HasLock(int timeoutMsP) const
 bool cIptvDevice::HasInternalCam(void)
 {
   //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
-  return true;
+  return false;
 }
 
 void cIptvDevice::ResetBuffering(void)
