@@ -30,7 +30,8 @@ protected:
 public:
   cIptvStreamer(cIptvDeviceIf &deviceP, unsigned int packetLenP);
   virtual ~cIptvStreamer();
-  bool Set(const char* locationP, const int parameterP, const int indexP, cIptvProtocolIf* protocolP);
+  bool SetSource(const char* locationP, const int parameterP, const int indexP, cIptvProtocolIf* protocolP);
+  bool SetPid(int pidP, int typeP, bool onP);
   bool Open(void);
   bool Close(void);
   cString GetInformation(void);

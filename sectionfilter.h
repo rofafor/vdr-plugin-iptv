@@ -84,6 +84,7 @@ public:
   cString GetInformation(void);
   int Open(u_short pidP, u_char tidP, u_char maskP);
   void Close(int handleP);
+  int GetPid(int handleP);
   void Write(u_char *bufferP, int lengthP);
 };
 

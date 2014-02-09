@@ -28,7 +28,8 @@ public:
   cIptvProtocolHttp();
   virtual ~cIptvProtocolHttp();
   int Read(unsigned char* bufferAddrP, unsigned int bufferLenP);
-  bool Set(const char* locationP, const int parameterP, const int indexP);
+  bool SetSource(const char* locationP, const int parameterP, const int indexP);
+  bool SetPid(int pidP, int typeP, bool onP);
   bool Open(void);
   bool Close(void);
   cString GetInformation(void);

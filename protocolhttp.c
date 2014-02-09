@@ -177,7 +177,7 @@ int cIptvProtocolHttp::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
   return cIptvTcpSocket::Read(bufferAddrP, bufferLenP);
 }
 
-bool cIptvProtocolHttp::Set(const char* locationP, const int parameterP, const int indexP)
+bool cIptvProtocolHttp::SetSource(const char* locationP, const int parameterP, const int indexP)
 {
   debug("cIptvProtocolHttp::%s(%s, %d, %d)", __FUNCTION__, locationP, parameterP, indexP);
   if (!isempty(locationP)) {
@@ -196,6 +196,12 @@ bool cIptvProtocolHttp::Set(const char* locationP, const int parameterP, const i
      // Re-connect the socket
      Connect();
      }
+  return true;
+}
+
+bool cIptvProtocolHttp::SetPid(int pidP, int typeP, bool onP)
+{
+  //debug("cIptvProtocolHttp::%s(%d, %d, %d)", __FUNCTION__, pidP, typeP, onP);
   return true;
 }
 

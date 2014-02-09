@@ -503,7 +503,7 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
   return len;
 }
 
-bool cIptvProtocolCurl::Set(const char* locationP, const int parameterP, const int indexP)
+bool cIptvProtocolCurl::SetSource(const char* locationP, const int parameterP, const int indexP)
 {
   debug("cIptvProtocolCurl::%s(%s, %d, %d)", __FUNCTION__, locationP, parameterP, indexP);
   if (!isempty(locationP)) {
@@ -528,6 +528,12 @@ bool cIptvProtocolCurl::Set(const char* locationP, const int parameterP, const i
      // Reconnect
      Connect();
      }
+  return true;
+}
+
+bool cIptvProtocolCurl::SetPid(int pidP, int typeP, bool onP)
+{
+  //debug("cIptvProtocolCurl::%s(%d, %d, %d)", __FUNCTION__, pidP, typeP, onP);
   return true;
 }
 

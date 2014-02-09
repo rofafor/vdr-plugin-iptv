@@ -79,7 +79,7 @@ bool cIptvStreamer::Close(void)
   return true;
 }
 
-bool cIptvStreamer::Set(const char* locationP, const int parameterP, const int indexP, cIptvProtocolIf* protocolP)
+bool cIptvStreamer::SetSource(const char* locationP, const int parameterP, const int indexP, cIptvProtocolIf* protocolP)
 {
   debug("cIptvStreamer::%s(%s, %d, %d)", __FUNCTION__, locationP, parameterP, indexP);
   if (!isempty(locationP)) {
@@ -89,13 +89,21 @@ bool cIptvStreamer::Set(const char* locationP, const int parameterP, const int i
            protocolM->Close();
         protocolM = protocolP;
         if (protocolM) {
-           protocolM->Set(locationP, parameterP, indexP);
+           protocolM->SetSource(locationP, parameterP, indexP);
            protocolM->Open();
            }
         }
      else if (protocolM)
-        protocolM->Set(locationP, parameterP, indexP);
+        protocolM->SetSource(locationP, parameterP, indexP);
      }
+  return true;
+}
+
+bool cIptvStreamer::SetPid(int pidP, int typeP, bool onP)
+{
+  debug("cIptvStreamer::%s(%d, %d, %d)", __FUNCTION__, pidP, typeP, onP);
+  if (protocolM)
+     return protocolM->SetPid(pidP, typeP, onP);
   return true;
 }
 

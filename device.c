@@ -293,7 +293,7 @@ bool cIptvDevice::SetChannelDevice(const cChannel *channelP, bool liveViewP)
   }
   sidScanEnabledM = itp.SidScan() ? true : false;
   pidScanEnabledM = itp.PidScan() ? true : false;
-  if (pIptvStreamerM->Set(itp.Address(), itp.Parameter(), deviceIndexM, protocol)) {
+  if (pIptvStreamerM && pIptvStreamerM->SetSource(itp.Address(), itp.Parameter(), deviceIndexM, protocol)) {
      channelM = *channelP;
      if (sidScanEnabledM && pSidScannerM && IptvConfig.GetSectionFiltering())
         pSidScannerM->SetChannel(channelM.GetChannelID());
@@ -306,22 +306,30 @@ bool cIptvDevice::SetChannelDevice(const cChannel *channelP, bool liveViewP)
 bool cIptvDevice::SetPid(cPidHandle *handleP, int typeP, bool onP)
 {
   debug("cIptvDevice::%s(%d): pid=%d type=%d on=%d", __FUNCTION__, deviceIndexM, handleP->pid, typeP, onP);
+  if (pIptvStreamerM && handleP)
+     return pIptvStreamerM->SetPid(handleP->pid, typeP, onP);
   return true;
 }
 
 int cIptvDevice::OpenFilter(u_short pidP, u_char tidP, u_char maskP)
 {
   //debug("cIptvDevice::%s(%d): pid=%d tid=%d mask=%d", __FUNCTION__, deviceIndexM, pidP, tidP,  maskP);
-  if (pIptvSectionM && IptvConfig.GetSectionFiltering())
+  if (pIptvSectionM && IptvConfig.GetSectionFiltering()) {
+     if (pIptvStreamerM)
+        pIptvStreamerM->SetPid(pidP, ptOther, true);
      return pIptvSectionM->Open(pidP, tidP, maskP);
+     }
   return -1;
 }
 
 void cIptvDevice::CloseFilter(int handleP)
 {
   //debug("cIptvDevice::%s(%d): handle=%d", __FUNCTION__, deviceIndexM, handleP);
-  if (pIptvSectionM)
+  if (pIptvSectionM) {
+     if (pIptvStreamerM)
+        pIptvStreamerM->SetPid(pIptvSectionM->GetPid(handleP), ptOther, false);
      pIptvSectionM->Close(handleP);
+     }
 }
 
 bool cIptvDevice::OpenDvr(void)

@@ -380,6 +380,20 @@ void cIptvSectionFilterHandler::Close(int handleP)
       }
 }
 
+int cIptvSectionFilterHandler::GetPid(int handleP)
+{
+  // Lock
+  cMutexLock MutexLock(&mutexM);
+  // Search the filter for data
+  for (unsigned int i = 0; i < eMaxSecFilterCount; ++i) {
+      if (filtersM[i] && (handleP == filtersM[i]->GetFd())) {
+         debug("cIptvSectionFilterHandler::%s(%d): pid=%d handle=%d index=%d", __FUNCTION__, deviceIndexM, filtersM[i]->GetPid(), filtersM[i]->GetFd(), i);
+         return filtersM[i]->GetPid();
+         }
+      }
+  return -1;
+}
+
 void cIptvSectionFilterHandler::Write(uchar *bufferP, int lengthP)
 {
   //debug("cIptvSectionFilterHandler::%s(%d): length=%d", __FUNCTION__, deviceIndexM, lengthP);

@@ -95,7 +95,7 @@ bool cIptvProtocolFile::Close(void)
   return true;
 }
 
-bool cIptvProtocolFile::Set(const char* locationP, const int parameterP, const int indexP)
+bool cIptvProtocolFile::SetSource(const char* locationP, const int parameterP, const int indexP)
 {
   debug("cIptvProtocolFile::%s(%s, %d, %d)", __FUNCTION__, locationP, parameterP, indexP);
   if (!isempty(locationP)) {
@@ -107,6 +107,12 @@ bool cIptvProtocolFile::Set(const char* locationP, const int parameterP, const i
      // Open the file for input
      OpenFile();
      }
+  return true;
+}
+
+bool cIptvProtocolFile::SetPid(int pidP, int typeP, bool onP)
+{
+  //debug("cIptvProtocolFile::%s(%d, %d, %d)", __FUNCTION__, pidP, typeP, onP);
   return true;
 }
 

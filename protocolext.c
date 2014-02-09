@@ -152,7 +152,7 @@ int cIptvProtocolExt::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
   return cIptvUdpSocket::Read(bufferAddrP, bufferLenP);
 }
 
-bool cIptvProtocolExt::Set(const char* locationP, const int parameterP, const int indexP)
+bool cIptvProtocolExt::SetSource(const char* locationP, const int parameterP, const int indexP)
 {
   debug("cIptvProtocolExt::%s(%s, %d, %d)", __FUNCTION__, locationP, parameterP, indexP);
   if (!isempty(locationP)) {
@@ -167,6 +167,12 @@ bool cIptvProtocolExt::Set(const char* locationP, const int parameterP, const in
      // Update listen port
      streamPortM = IptvConfig.GetExtProtocolBasePort() + indexP;
      }
+  return true;
+}
+
+bool cIptvProtocolExt::SetPid(int pidP, int typeP, bool onP)
+{
+  //debug("cIptvProtocolExt::%s(%d, %d, %d)", __FUNCTION__, pidP, typeP, onP);
   return true;
 }
 

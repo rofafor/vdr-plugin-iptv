@@ -70,7 +70,7 @@ int cIptvProtocolUdp::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
   return cIptvUdpSocket::Read(bufferAddrP, bufferLenP);
 }
 
-bool cIptvProtocolUdp::Set(const char* locationP, const int parameterP, const int indexP)
+bool cIptvProtocolUdp::SetSource(const char* locationP, const int parameterP, const int indexP)
 {
   debug("cIptvProtocolUdp::%s(%s, %d, %d)", __FUNCTION__, locationP, parameterP, indexP);
   if (!isempty(locationP)) {
@@ -100,6 +100,12 @@ bool cIptvProtocolUdp::Set(const char* locationP, const int parameterP, const in
         JoinMulticast();
         }
      }
+  return true;
+}
+
+bool cIptvProtocolUdp::SetPid(int pidP, int typeP, bool onP)
+{
+  //debug("cIptvProtocolUdp::%s(%d, %d, %d)", __FUNCTION__, pidP, typeP, onP);
   return true;
 }
 

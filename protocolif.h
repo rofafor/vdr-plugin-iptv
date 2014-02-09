@@ -13,7 +13,8 @@ public:
   cIptvProtocolIf() {}
   virtual ~cIptvProtocolIf() {}
   virtual int Read(unsigned char* bufferAddrP, unsigned int bufferLenP) = 0;
-  virtual bool Set(const char* locationP, const int parameterP, const int indexP) = 0;
+  virtual bool SetSource(const char* locationP, const int parameterP, const int indexP) = 0;
+  virtual bool SetPid(int pidP, int typeP, bool onP) = 0;
   virtual bool Open(void) = 0;
   virtual bool Close(void) = 0;
   virtual cString GetInformation(void) = 0;
