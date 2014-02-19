@@ -115,7 +115,7 @@ cIptvPluginSetup::cIptvPluginSetup()
   debug("cIptvPluginSetup::%s()", __FUNCTION__);
   tsBufferSizeM = IptvConfig.GetTsBufferSize();
   tsBufferPrefillM = IptvConfig.GetTsBufferPrefillRatio();
-  extProtocolBasePortM = IptvConfig.GetExtProtocolBasePort();
+  protocolBasePortM = IptvConfig.GetProtocolBasePort();
   sectionFilteringM = IptvConfig.GetSectionFiltering();
   numDisabledFiltersM = IptvConfig.GetDisabledFiltersCount();
   if (numDisabledFiltersM > SECTION_FILTER_TABLE_SIZE)
@@ -136,20 +136,20 @@ void cIptvPluginSetup::Setup(void)
   Clear();
   helpM.Clear();
 
-  Add(new cMenuEditIntItem( tr("TS buffer size [MB]"), &tsBufferSizeM, 1, 4));
+  Add(new cMenuEditIntItem(tr("TS buffer size [MB]"), &tsBufferSizeM, 1, 4));
   helpM.Append(tr("Define a ringbuffer size for transport streams in megabytes.\n\nSmaller sizes help memory consumption, but are more prone to buffer overflows."));
 
-  Add(new cMenuEditIntItem( tr("TS buffer prefill ratio [%]"), &tsBufferPrefillM, 0, 40));
+  Add(new cMenuEditIntItem(tr("TS buffer prefill ratio [%]"), &tsBufferPrefillM, 0, 40));
   helpM.Append(tr("Define a prefill ratio of the ringbuffer for transport streams before data is transferred to VDR.\n\nThis is useful if streaming media over a slow or unreliable connection."));
 
-  Add(new cMenuEditIntItem( tr("EXT protocol base port"), &extProtocolBasePortM, 0, 0xFFF7));
-  helpM.Append(tr("Define a base port used by EXT protocol.\n\nThe port range is defined by the number of IPTV devices. This setting sets the port which is listened for connections from external applications when using the EXT protocol."));
+  Add(new cMenuEditIntItem(tr("Protocol base port"), &protocolBasePortM, 0, 0xFFFF - MAXDEVICES * 2));
+  helpM.Append(tr("Define a base port used by CURL/EXT protocol.\n\nThe port range is defined by the number of IPTV devices. This setting sets the port which is listened for connections from external applications when using the CURL/EXT protocol."));
 
   Add(new cMenuEditBoolItem(tr("Use section filtering"), &sectionFilteringM));
   helpM.Append(tr("Define whether the section filtering shall be used.\n\nSection filtering means that IPTV plugin tries to parse and provide VDR with secondary data about the currently active stream. VDR can then use this data for providing various functionalities such as automatic pid change detection and EPG etc.\nEnabling this feature does not affect streams that do not contain section data."));
 
   if (sectionFilteringM) {
-     Add(new cMenuEditIntItem( tr("Disable filters"), &numDisabledFiltersM, 0, SECTION_FILTER_TABLE_SIZE));
+     Add(new cMenuEditIntItem(tr("Disable filters"), &numDisabledFiltersM, 0, SECTION_FILTER_TABLE_SIZE));
      helpM.Append(tr("Define number of section filters to be disabled.\n\nCertain section filters might cause some unwanted behaviour to VDR such as time being falsely synchronized. By black-listing the filters here useful section data can be left intact for VDR to process."));
 
      for (int i = 0; i < numDisabledFiltersM; ++i) {
@@ -219,13 +219,13 @@ void cIptvPluginSetup::Store(void)
   // Store values into setup.conf
   SetupStore("TsBufferSize", tsBufferSizeM);
   SetupStore("TsBufferPrefill", tsBufferPrefillM);
-  SetupStore("ExtProtocolBasePort", extProtocolBasePortM);
+  SetupStore("ExtProtocolBasePort", protocolBasePortM);
   SetupStore("SectionFiltering", sectionFilteringM);
   StoreFilters("DisabledFilters", disabledFilterIndexesM);
   // Update global config
   IptvConfig.SetTsBufferSize(tsBufferSizeM);
   IptvConfig.SetTsBufferPrefillRatio(tsBufferPrefillM);
-  IptvConfig.SetExtProtocolBasePort(extProtocolBasePortM);
+  IptvConfig.SetProtocolBasePort(protocolBasePortM);
   IptvConfig.SetSectionFiltering(sectionFilteringM);
   for (int i = 0; i < SECTION_FILTER_TABLE_SIZE; ++i)
       IptvConfig.SetDisabledFilters(i, disabledFilterIndexesM[i]);

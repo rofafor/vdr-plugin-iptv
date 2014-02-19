@@ -53,10 +53,12 @@ Setup menu:
                                    stream ringbuffer before data is
                                    transferred to VDR.
                                    Valid range: 0...40
-- EXT protocol base port = 4321    Defines base port used in EXT protocol.
+- Protocol base port = 4321        Defines base port used in CURL/EXT
+                                   protocol. Two ports are defined for
+                                   each device.
                                    The port range is defined by the number
-                                   of IPTV devices (max. 8).
-                                   Valid range: 0...65527
+                                   of IPTV devices times two (max. 32).
+                                   Valid range: 0...65503
 - Use section filtering = 1        Defines whether section filtering shall
                                    be used.
                                    Valid range: 0...1
@@ -127,11 +129,11 @@ External streaming:
   script parameter is passed to the script and it can be used to select for
   example between different URLs.
 
-- When an EXT channel is opened the IPTV plugin opens an UDP listening port
-  on the localhost. The external script is responsible for supplying IPTV
-  plugin with MPEG2 TS data in UDP/RTP format to the listening port. The
-  data will be processed in VDR like a normal DVB broadcast. The listening
-  base port can be specified in the plugin configuration menu.
+- When an EXT or CURL/RTSP channel is opened the IPTV plugin opens an UDP
+  listening port on the localhost. The external script is responsible for
+  supplying IPTV plugin with MPEG2 TS data in UDP/RTP format to the listening
+  port. The data will be processed in VDR like a normal DVB broadcast. The
+  listening base port can be specified in the plugin configuration menu.
 
 - Each IPTV device has different listen port. The port number is specified
   as a base port number plus IPTV device index minus one. Maximum of 8 IPTV
@@ -175,8 +177,8 @@ Notes:
   IGMP v3 protocol:
   "U=<source address>@<group address>"
 
-- The CURL implementation supports only HTTP/HTTPS protocols and an optional
-  netrc configuration file for authentication:
+- The CURL implementation supports only RTSP/HTTP/HTTPS protocols and an
+  optional netrc configuration file for authentication:
   $(CONFDIR)/iptv/netrc
 
 - You can quite easily figure out correct DVB triplet values by using the

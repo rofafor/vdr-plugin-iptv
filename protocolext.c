@@ -165,7 +165,7 @@ bool cIptvProtocolExt::SetSource(const char* locationP, const int parameterP, co
         }
      scriptParameterM = parameterP;
      // Update listen port
-     streamPortM = IptvConfig.GetExtProtocolBasePort() + indexP;
+     streamPortM = IptvConfig.GetProtocolBasePort() + indexP * 2;
      }
   return true;
 }

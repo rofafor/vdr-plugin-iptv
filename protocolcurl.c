@@ -26,14 +26,16 @@
 cIptvProtocolCurl::cIptvProtocolCurl()
 : streamUrlM(""),
   streamParamM(0),
+  streamPortM(0),
   mutexM(),
   handleM(NULL),
   multiM(NULL),
   headerListM(NULL),
   ringBufferM(new cRingBufferLinear(MEGABYTE(IptvConfig.GetTsBufferSize()),
                                     7 * TS_SIZE, false, "IPTV CURL")),
-  rtspControlM(),
+  rtspControlM(""),
   modeM(eModeUnknown),
+  timeoutM(),
   connectedM(false),
   pausedM(false)
 {
@@ -114,17 +116,24 @@ size_t cIptvProtocolCurl::DescribeCallback(void *ptrP, size_t sizeP, size_t nmem
   size_t len = sizeP * nmembP;
   //debug("cIptvProtocolCurl::%s(%zu)", __FUNCTION__, len);
 
+  bool found = false;
   cString control = "";
   char *p = (char *)ptrP;
   char *r = strtok(p, "\r\n");
 
   while (r) {
     //debug("cIptvProtocolCurl::%s(%zu): %s", __FUNCTION__, len, r);
-    if (strstr(r, "a=control")) {
+    // Look for a media name: "video"
+    if (strstr(r, "m=video")) {
+       found = true;
+       }
+    // ... and find out its' attribute
+    if (found && strstr(r, "a=control")) {
        char *s = NULL;
-       if (sscanf(r, "a=control:%64ms", &s) == 1)
+       if (sscanf(r, "a=control:%255ms", &s) == 1)
           control = compactspace(s);
        free(s);
+       break;
        }
     r = strtok(NULL, "\r\n");
     }
@@ -155,8 +164,14 @@ size_t cIptvProtocolCurl::HeaderCallback(void *ptrP, size_t sizeP, size_t nmembP
 void cIptvProtocolCurl::SetRtspControl(const char *controlP)
 {
   cMutexLock MutexLock(&mutexM);
-  debug("cIptvProtocolCurl::%s(%s)", __FUNCTION__, controlP);
-  rtspControlM = controlP;
+  //debug("cIptvProtocolCurl::%s(%s)", __FUNCTION__, controlP);
+  cString protocol = ChangeCase(controlP, false).Truncate(7);
+  if (startswith(*protocol, "rtsp://")) {
+     streamUrlM = controlP;
+     rtspControlM = "";
+     }
+  else
+     rtspControlM = controlP;
 }
 
 bool cIptvProtocolCurl::PutData(unsigned char *dataP, int lenP)
@@ -238,10 +253,8 @@ bool cIptvProtocolCurl::Connect()
   // Initialize the curl session
   if (!handleM)
      handleM = curl_easy_init();
-  if (!multiM)
-     multiM = curl_multi_init();
 
-  if (handleM && multiM && !isempty(*streamUrlM)) {
+  if (handleM && !isempty(*streamUrlM)) {
      CURLcode res = CURLE_OK;
      cString netrc = cString::sprintf("%s/netrc", IptvConfig.GetConfigDirectory());
 
@@ -284,6 +297,10 @@ bool cIptvProtocolCurl::Connect()
             {
             cString uri, control, transport, range;
 
+            // Create the listening socket for UDP mode
+            if (!streamParamM)
+               OpenSocket(streamPortM);
+
             // Request server options
             uri = cString::sprintf("%s", *streamUrlM);
             iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_STREAM_URI, *uri);
@@ -301,8 +318,14 @@ bool cIptvProtocolCurl::Connect()
             iptv_curl_easy_setopt(handleM, CURLOPT_WRITEDATA, NULL);
 
             // Setup media stream
-            uri = cString::sprintf("%s/%s", *streamUrlM, *rtspControlM);
-            transport = "RTP/AVP/TCP;unicast;interleaved=0-1";
+            if (isempty(*rtspControlM))
+               uri = cString::sprintf("%s", *streamUrlM);
+            else
+               uri = cString::sprintf("%s/%s", *streamUrlM, *rtspControlM);
+            if (streamParamM)
+               transport = "RTP/AVP/TCP;unicast;interleaved=0-1";
+            else
+               transport = cString::sprintf("RTP/AVP;unicast;client_port=%d-%d", streamPortM, streamPortM + 1);
             iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_STREAM_URI, *uri);
             iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_TRANSPORT, *transport);
             iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_SETUP);
@@ -312,15 +335,20 @@ bool cIptvProtocolCurl::Connect()
             uri = cString::sprintf("%s/", *streamUrlM);
             range = "0.000-";
             iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_STREAM_URI, *uri);
-            iptv_curl_easy_setopt(handleM, CURLOPT_RANGE, *range);
+            //iptv_curl_easy_setopt(handleM, CURLOPT_RANGE, *range);
             iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_PLAY);
             iptv_curl_easy_perform(handleM);
 
             // Start receiving
-            iptv_curl_easy_setopt(handleM, CURLOPT_INTERLEAVEFUNCTION, cIptvProtocolCurl::WriteRtspCallback);
-            iptv_curl_easy_setopt(handleM, CURLOPT_INTERLEAVEDATA, this);
-            iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_RECEIVE);
-            iptv_curl_easy_perform(handleM);
+            if (streamParamM) {
+               iptv_curl_easy_setopt(handleM, CURLOPT_INTERLEAVEFUNCTION, cIptvProtocolCurl::WriteRtspCallback);
+               iptv_curl_easy_setopt(handleM, CURLOPT_INTERLEAVEDATA, this);
+               iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_RECEIVE);
+               iptv_curl_easy_perform(handleM);
+               }
+
+            // Don't add handle into multi set
+            isActiveM = true;
             }
             break;
 #endif
@@ -342,12 +370,26 @@ bool cIptvProtocolCurl::Connect()
             headerListM = curl_slist_append(headerListM, "Pragma: no-cache");
             headerListM = curl_slist_append(headerListM, "Expires: Mon, 26 Jul 1997 05:00:00 GMT");
             iptv_curl_easy_setopt(handleM, CURLOPT_HTTPHEADER, headerListM);
+
+            // Initialize multi set and add handle into it
+            if (!multiM)
+               multiM = curl_multi_init();
+            if (multiM)
+               curl_multi_add_handle(multiM, handleM);
             }
             break;
 
        case eModeFile:
+            {
             // Set timeout
             iptv_curl_easy_setopt(handleM, CURLOPT_TIMEOUT_MS, 10L);
+
+            // Initialize multi set and add handle into it
+            if (!multiM)
+               multiM = curl_multi_init();
+            if (multiM)
+               curl_multi_add_handle(multiM, handleM);
+            }
             break;
 
        case eModeUnknown:
@@ -355,9 +397,7 @@ bool cIptvProtocolCurl::Connect()
             break;
        }
 
-     // Add handle into multi set
-     curl_multi_add_handle(multiM, handleM);
-
+     timeoutM.Set(eKeepAliveIntervalMs);
      connectedM = true;
      return true;
      }
@@ -373,7 +413,14 @@ bool cIptvProtocolCurl::Disconnect()
      return true;
 
   // Terminate curl session
-  if (handleM && multiM) {
+  if (handleM) {
+     // Remove handle from multi set
+     if (multiM) {
+        curl_multi_remove_handle(multiM, handleM);
+        curl_multi_cleanup(multiM);
+        multiM = NULL;
+        }
+
      // Mode specific tricks
      switch (modeM) {
 #ifdef USE_RTSP
@@ -386,6 +433,9 @@ bool cIptvProtocolCurl::Disconnect()
             iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_TEARDOWN);
             iptv_curl_easy_perform(handleM);
             rtspControlM = "";
+            isActiveM = false;
+            // Close the listening socket
+            CloseSocket();
             }
             break;
 #endif
@@ -402,11 +452,8 @@ bool cIptvProtocolCurl::Disconnect()
         curl_slist_free_all(headerListM);
         headerListM = NULL;
         }
-     curl_multi_remove_handle(multiM, handleM);
      curl_easy_cleanup(handleM);
      handleM = NULL;
-     curl_multi_cleanup(multiM);
-     multiM = NULL;
      }
 
   ClearData();
@@ -433,55 +480,70 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
   int len = 0;
   if (ringBufferM) {
      // Fill up the buffer
-     if (handleM && multiM) {
+     if (handleM) {
         switch (modeM) {
 #ifdef USE_RTSP
           case eModeRtsp:
                {
                cMutexLock MutexLock(&mutexM);
                CURLcode res = CURLE_OK;
-               iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_RECEIVE);
-               iptv_curl_easy_perform(handleM);
-               // @todo - How to detect eof?
+
+               // Remember the heart beat
+               if (timeoutM.TimedOut()) {
+                  debug("cIptvProtocolCurl::%s(): KeepAlive", __FUNCTION__);
+                  cString uri = cString::sprintf("%s", *streamUrlM);
+                  iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_STREAM_URI, *uri);
+                  iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_OPTIONS);
+                  iptv_curl_easy_perform(handleM);
+                  timeoutM.Set(eKeepAliveIntervalMs);
+                  }
+
+               // Check whether UDP or TCP mode used
+               if (streamParamM) {
+                  iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_RECEIVE);
+                  iptv_curl_easy_perform(handleM);
+                  }
+               else
+                  return cIptvUdpSocket::Read(bufferAddrP, bufferLenP);
                }
                break;
 #endif
           case eModeFile:
           case eModeHttp:
           case eModeHttps:
-               {
-               CURLMcode res;
-               int running_handles;
+               if (multiM) {
+                  CURLMcode res;
+                  int running_handles;
 
-               do {
-                 cMutexLock MutexLock(&mutexM);
-                 res = curl_multi_perform(multiM, &running_handles);
-               } while (res == CURLM_CALL_MULTI_PERFORM);
+                  do {
+                    cMutexLock MutexLock(&mutexM);
+                    res = curl_multi_perform(multiM, &running_handles);
+                  } while (res == CURLM_CALL_MULTI_PERFORM);
 
-               // Use 20% threshold before continuing to filling up the buffer.
-               mutexM.Lock();
-               if (pausedM && (ringBufferM->Available() < (MEGABYTE(IptvConfig.GetTsBufferSize()) / 5))) {
-                  debug("cIptvProtocolCurl::%s(continue): free=%d available=%d", __FUNCTION__,
-                        ringBufferM->Free(), ringBufferM->Available());
-                  pausedM = false;
-                  curl_easy_pause(handleM, CURLPAUSE_CONT);
-                  }
-               mutexM.Unlock();
-
-               // Check if end of file
-               if (running_handles == 0) {
-                  int msgcount;
+                  // Use 20% threshold before continuing to filling up the buffer.
                   mutexM.Lock();
-                  CURLMsg *msg = curl_multi_info_read(multiM, &msgcount);
+                  if (pausedM && (ringBufferM->Available() < (MEGABYTE(IptvConfig.GetTsBufferSize()) / 5))) {
+                     debug("cIptvProtocolCurl::%s(continue): free=%d available=%d", __FUNCTION__,
+                           ringBufferM->Free(), ringBufferM->Available());
+                     pausedM = false;
+                     curl_easy_pause(handleM, CURLPAUSE_CONT);
+                     }
                   mutexM.Unlock();
-                  if (msg && (msg->msg == CURLMSG_DONE)) {
-                     debug("cIptvProtocolCurl::%s(done): %s (%d)", __FUNCTION__,
-                           curl_easy_strerror(msg->data.result), msg->data.result);
-                     Disconnect();
-                     Connect();
+
+                  // Check if end of file
+                  if (running_handles == 0) {
+                     int msgcount;
+                     mutexM.Lock();
+                     CURLMsg *msg = curl_multi_info_read(multiM, &msgcount);
+                     mutexM.Unlock();
+                     if (msg && (msg->msg == CURLMSG_DONE)) {
+                        debug("cIptvProtocolCurl::%s(done): %s (%d)", __FUNCTION__,
+                              curl_easy_strerror(msg->data.result), msg->data.result);
+                        Disconnect();
+                        Connect();
+                        }
                      }
                   }
-               }
                break;
 
           case eModeUnknown:
@@ -523,8 +585,10 @@ bool cIptvProtocolCurl::SetSource(const char* locationP, const int parameterP, c
      else
         modeM = eModeUnknown;
      debug("cIptvProtocolCurl::%s(): %s (%d)", __FUNCTION__, *protocol, modeM);
-     // Update stream parameter
-     streamParamM = parameterP;
+     // Update stream parameter - force UDP mode for RTSP
+     streamParamM = (modeM == eModeRtsp) ? 0 : parameterP;
+     // Update listen port
+     streamPortM = IptvConfig.GetProtocolBasePort() + indexP * 2;
      // Reconnect
      Connect();
      }

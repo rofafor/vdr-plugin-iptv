@@ -16,8 +16,9 @@
 #include <vdr/tools.h>
 
 #include "protocolif.h"
+#include "socket.h"
 
-class cIptvProtocolCurl : public cIptvProtocolIf {
+class cIptvProtocolCurl : public cIptvUdpSocket, public cIptvProtocolIf {
 private:
   enum eModeType {
     eModeUnknown = 0,
@@ -28,8 +29,9 @@ private:
     eModeCount
   };
   enum {
-    eConnectTimeoutS       = 5,  // in seconds
-    eMaxDownloadSpeedMBits = 20  // in megabits per second
+    eConnectTimeoutS       = 5,     // in seconds
+    eMaxDownloadSpeedMBits = 20,    // in megabits per second
+    eKeepAliveIntervalMs   = 300000 // in milliseconds
   };
 
   static size_t WriteCallback(void *ptrP, size_t sizeP, size_t nmembP, void *dataP);
@@ -39,6 +41,7 @@ private:
 
   cString streamUrlM;
   int streamParamM;
+  int streamPortM;
   cMutex mutexM;
   CURL *handleM;
   CURLM *multiM;
@@ -46,6 +49,7 @@ private:
   cRingBufferLinear *ringBufferM;
   cString rtspControlM;
   eModeType modeM;
+  cTimeMs timeoutM;
   bool connectedM;
   bool pausedM;
 

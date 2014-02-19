@@ -17,7 +17,7 @@ class cIptvPluginSetup : public cMenuSetupPage
 private:
   int tsBufferSizeM;
   int tsBufferPrefillM;
-  int extProtocolBasePortM;
+  int protocolBasePortM;
   int sectionFilteringM;
   int numDisabledFiltersM;
   int disabledFilterIndexesM[SECTION_FILTER_TABLE_SIZE];

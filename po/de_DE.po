@@ -77,13 +77,13 @@ msgid ""
 "This is useful if streaming media over a slow or unreliable connection."
 msgstr ""
 
-msgid "EXT protocol base port"
-msgstr "EXT Protokoll Basisport"
+msgid "Protocol base port"
+msgstr "Protokoll Basisport"
 
 msgid ""
-"Define a base port used by EXT protocol.\n"
+"Define a base port used by CURL/EXT protocol.\n"
 "\n"
-"The port range is defined by the number of IPTV devices. This setting sets the port which is listened for connections from external applications when using the EXT protocol."
+"The port range is defined by the number of IPTV devices. This setting sets the port which is listened for connections from external applications when using the CURL/EXT protocol."
 msgstr ""
 
 msgid "Use section filtering"

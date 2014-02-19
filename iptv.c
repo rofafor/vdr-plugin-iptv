@@ -109,7 +109,14 @@ bool cPluginIptv::Start(void)
   // Start any background activities the plugin shall perform.
   if (curl_global_init(CURL_GLOBAL_ALL) == CURLE_OK) {
      curl_version_info_data *data = curl_version_info(CURLVERSION_NOW);
-     info("Using CURL %s", data->version);
+     cString info = cString::sprintf("Using CURL %s", data->version);
+     for (int i = 0; data->protocols[i]; ++i) {
+         // Supported protocols: HTTP(S), RTSP, FILE
+         if (startswith(data->protocols[i], "http") || startswith(data->protocols[i], "rtsp") ||
+             startswith(data->protocols[i], "file"))
+            info = cString::sprintf("%s %s", *info, data->protocols[i]);
+         }
+     info("%s", *info);
      }
   return true;
 }
@@ -189,7 +196,7 @@ bool cPluginIptv::SetupParse(const char *nameP, const char *valueP)
   else if (!strcasecmp(nameP, "TsBufferPrefill"))
      IptvConfig.SetTsBufferPrefillRatio(atoi(valueP));
   else if (!strcasecmp(nameP, "ExtProtocolBasePort"))
-     IptvConfig.SetExtProtocolBasePort(atoi(valueP));
+     IptvConfig.SetProtocolBasePort(atoi(valueP));
   else if (!strcasecmp(nameP, "SectionFiltering"))
      IptvConfig.SetSectionFiltering(atoi(valueP));
   else if (!strcasecmp(nameP, "DisabledFilters")) {

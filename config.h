@@ -16,7 +16,7 @@ class cIptvConfig
 private:
   unsigned int tsBufferSizeM;
   unsigned int tsBufferPrefillRatioM;
-  unsigned int extProtocolBasePortM;
+  unsigned int protocolBasePortM;
   unsigned int useBytesM;
   unsigned int sectionFilteringM;
   int disabledFiltersM[SECTION_FILTER_TABLE_SIZE];
@@ -26,7 +26,7 @@ public:
   cIptvConfig();
   unsigned int GetTsBufferSize(void) const { return tsBufferSizeM; }
   unsigned int GetTsBufferPrefillRatio(void) const { return tsBufferPrefillRatioM; }
-  unsigned int GetExtProtocolBasePort(void) const { return extProtocolBasePortM; }
+  unsigned int GetProtocolBasePort(void) const { return protocolBasePortM; }
   unsigned int GetUseBytes(void) const { return useBytesM; }
   unsigned int GetSectionFiltering(void) const { return sectionFilteringM; }
   const char *GetConfigDirectory(void) const { return configDirectoryM; }
@@ -34,7 +34,7 @@ public:
   int GetDisabledFilters(unsigned int indexP) const;
   void SetTsBufferSize(unsigned int sizeP) { tsBufferSizeM = sizeP; }
   void SetTsBufferPrefillRatio(unsigned int ratioP) { tsBufferPrefillRatioM = ratioP; }
-  void SetExtProtocolBasePort(unsigned int portNumberP) { extProtocolBasePortM = portNumberP; }
+  void SetProtocolBasePort(unsigned int portNumberP) { protocolBasePortM = portNumberP; }
   void SetUseBytes(unsigned int onOffP) { useBytesM = onOffP; }
   void SetSectionFiltering(unsigned int onOffP) { sectionFilteringM = onOffP; }
   void SetDisabledFilters(unsigned int indexP, int numberP);

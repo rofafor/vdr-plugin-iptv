@@ -36,7 +36,7 @@ cIptvSocket::~cIptvSocket()
 
 bool cIptvSocket::OpenSocket(const int portP, const bool isUdpP)
 {
-  debug("cIptvSocket::%s()", __FUNCTION__);
+  debug("cIptvSocket::%s(%d, %d)", __FUNCTION__, portP, isUdpP);
   // If socket is there already and it is bound to a different port, it must
   // be closed first
   if (portP != socketPortM) {

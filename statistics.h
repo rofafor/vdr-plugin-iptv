@@ -35,12 +35,12 @@ public:
   cString GetPidStatistic();
 
 protected:
-  void AddPidStatistic(u_short pidP, long payloadP);
+  void AddPidStatistic(int pidP, long payloadP);
 
 private:
   struct pidStruct {
-    u_short pid;
-    long DataAmount;
+    int  pid;
+    long dataAmount;
   };
   pidStruct mostActivePidsM[IPTV_STATS_ACTIVE_PIDS_COUNT];
   cTimeMs timerM;
