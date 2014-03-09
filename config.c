@@ -19,6 +19,7 @@ cIptvConfig::cIptvConfig(void)
   for (unsigned int i = 0; i < ARRAY_SIZE(disabledFiltersM); ++i)
       disabledFiltersM[i] = -1;
   memset(configDirectoryM, 0, sizeof(configDirectoryM));
+  memset(resourceDirectoryM, 0, sizeof(resourceDirectoryM));
 }
 
 unsigned int cIptvConfig::GetDisabledFiltersCount(void) const
@@ -44,4 +45,10 @@ void cIptvConfig::SetConfigDirectory(const char *directoryP)
 {
   debug("cIptvConfig::%s(%s)", __FUNCTION__, directoryP);
   ERROR_IF(!realpath(directoryP, configDirectoryM), "Cannot canonicalize configuration directory");
+}
+
+void cIptvConfig::SetResourceDirectory(const char *directoryP)
+{
+  debug("cIptvConfig::%s(%s)", __FUNCTION__, directoryP);
+  ERROR_IF(!realpath(directoryP, resourceDirectoryM), "Cannot canonicalize resource directory");
 }

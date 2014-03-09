@@ -21,6 +21,7 @@ private:
   unsigned int sectionFilteringM;
   int disabledFiltersM[SECTION_FILTER_TABLE_SIZE];
   char configDirectoryM[PATH_MAX];
+  char resourceDirectoryM[PATH_MAX];
 
 public:
   cIptvConfig();
@@ -30,6 +31,7 @@ public:
   unsigned int GetUseBytes(void) const { return useBytesM; }
   unsigned int GetSectionFiltering(void) const { return sectionFilteringM; }
   const char *GetConfigDirectory(void) const { return configDirectoryM; }
+  const char *GetResourceDirectory(void) const { return resourceDirectoryM; }
   unsigned int GetDisabledFiltersCount(void) const;
   int GetDisabledFilters(unsigned int indexP) const;
   void SetTsBufferSize(unsigned int sizeP) { tsBufferSizeM = sizeP; }
@@ -39,6 +41,7 @@ public:
   void SetSectionFiltering(unsigned int onOffP) { sectionFilteringM = onOffP; }
   void SetDisabledFilters(unsigned int indexP, int numberP);
   void SetConfigDirectory(const char *directoryP);
+  void SetResourceDirectory(const char *directoryP);
 };
 
 extern cIptvConfig IptvConfig;

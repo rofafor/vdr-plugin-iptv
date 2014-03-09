@@ -158,7 +158,7 @@ bool cIptvProtocolExt::SetSource(const char* locationP, const int parameterP, co
   if (!isempty(locationP)) {
      struct stat stbuf;
      // Update script file and parameter
-     scriptFileM = cString::sprintf("%s/%s", IptvConfig.GetConfigDirectory(), locationP);
+     scriptFileM = cString::sprintf("%s/%s", IptvConfig.GetResourceDirectory(), locationP);
      if ((stat(*scriptFileM, &stbuf) != 0) || (strstr(*scriptFileM, "..") != 0)) {
         error("Non-existent or relative path script '%s'", *scriptFileM);
         return false;
