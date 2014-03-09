@@ -225,3 +225,7 @@ VDR Plugin 'iptv' Revision History
 
 - Made devices to shutdown already in cPluginManager::Stop()
   to prevent possible crashes while VDR shutdown.
+
+2014-03-09: Version 2.0.3
+
+- Fixed installation target bugs (Thanks to Alexander Grothe).

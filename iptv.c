@@ -21,7 +21,7 @@
 #define GITVERSION ""
 #endif
 
-       const char VERSION[]     = "2.0.2" GITVERSION;
+       const char VERSION[]     = "2.0.3" GITVERSION;
 static const char DESCRIPTION[] = trNOOP("Experience the IPTV");
 
 class cPluginIptv : public cPlugin {
@@ -99,7 +99,8 @@ bool cPluginIptv::Initialize(void)
 {
   debug("cPluginIptv::%s()", __FUNCTION__);
   // Initialize any background activities the plugin shall perform.
-  IptvConfig.SetConfigDirectory(cPlugin::ResourceDirectory(PLUGIN_NAME_I18N));
+  IptvConfig.SetConfigDirectory(cPlugin::ConfigDirectory(PLUGIN_NAME_I18N));
+  IptvConfig.SetResourceDirectory(cPlugin::ResourceDirectory(PLUGIN_NAME_I18N));
   return cIptvDevice::Initialize(deviceCountM);
 }
 

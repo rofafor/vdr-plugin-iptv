@@ -32,6 +32,7 @@ PKGCFG = $(if $(VDRDIR),$(shell pkg-config --variable=$(1) $(VDRDIR)/vdr.pc),$(s
 LIBDIR = $(call PKGCFG,libdir)
 LOCDIR = $(call PKGCFG,locdir)
 PLGCFG = $(call PKGCFG,plgcfg)
+RESDIR = $(call PKGCFG,resdir)
 CFGDIR = $(call PKGCFG,configdir)
 #
 TMPDIR ?= /tmp
@@ -147,7 +148,8 @@ install-lib: $(SOFILE)
 
 install-conf:
 	@mkdir -p $(DESTDIR)$(CFGDIR)/plugins/$(PLUGIN)
-	@cp -pn $(PLUGIN)/* $(DESTDIR)$(CFGDIR)/plugins/$(PLUGIN)/
+	@mkdir -p $(DESTDIR)$(RESDIR)/plugins/$(PLUGIN)
+	@cp -pn $(PLUGIN)/* $(DESTDIR)$(RESDIR)/plugins/$(PLUGIN)/
 
 install: install-lib install-i18n install-conf
 
