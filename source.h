@@ -51,8 +51,6 @@ class cIptvSourceParam : public cSourceParam
 {
 private:
   int paramM;
-  int nidM;
-  int tidM;
   int ridM;
   cChannel dataM;
   cIptvTransponderParameters itpM;

@@ -136,8 +136,6 @@ const char *cIptvSourceParam::allowedProtocolCharsS = " abcdefghijklmnopqrstuvwx
 cIptvSourceParam::cIptvSourceParam(char sourceP, const char *descriptionP)
   : cSourceParam(sourceP, descriptionP),
     paramM(0),
-    nidM(0),
-    tidM(0),
     ridM(0),
     dataM(),
     itpM()
@@ -155,8 +153,6 @@ void cIptvSourceParam::SetData(cChannel *channelP)
 {
   debug("cIptvSourceParam::%s(%s)", __FUNCTION__, channelP->Parameters());
   dataM = *channelP;
-  nidM = dataM.Nid();
-  tidM = dataM.Tid();
   ridM = dataM.Rid();
   itpM.Parse(dataM.Parameters());
   paramM = 0;
@@ -166,21 +162,19 @@ void cIptvSourceParam::GetData(cChannel *channelP)
 {
   debug("cIptvSourceParam::%s(%s)", __FUNCTION__, channelP->Parameters());
   channelP->SetTransponderData(channelP->Source(), channelP->Frequency(), dataM.Srate(), itpM.ToString(Source()), true);
-  channelP->SetId(nidM, tidM, channelP->Sid(), ridM);
+  channelP->SetId(channelP->Nid(), channelP->Tid(), channelP->Sid(), ridM);
 }
 
 cOsdItem *cIptvSourceParam::GetOsdItem(void)
 {
   debug("cIptvSourceParam::%s()", __FUNCTION__);
   switch (paramM++) {
-    case  0: return new cMenuEditIntItem( tr("Nid"),              &nidM, 0);
-    case  1: return new cMenuEditIntItem( tr("Tid"),              &tidM, 0);
-    case  2: return new cMenuEditIntItem( tr("Rid"),              &ridM, 0);
-    case  3: return new cMenuEditBoolItem(tr("Scan section ids"), &itpM.sidScanM);
-    case  4: return new cMenuEditBoolItem(tr("Scan pids"),        &itpM.pidScanM);
-    case  5: return new cMenuEditStraItem(tr("Protocol"),         &itpM.protocolM,  ELEMENTS(protocolsM),  protocolsM);
-    case  6: return new cMenuEditStrItem( tr("Address"),           itpM.addressM,   sizeof(itpM.addressM), allowedProtocolCharsS);
-    case  7: return new cMenuEditIntItem( tr("Parameter"),        &itpM.parameterM, 0,                     0xFFFF);
+    case  0: return new cMenuEditIntItem( tr("Rid"),              &ridM, 0);
+    case  1: return new cMenuEditBoolItem(tr("Scan section ids"), &itpM.sidScanM);
+    case  2: return new cMenuEditBoolItem(tr("Scan pids"),        &itpM.pidScanM);
+    case  3: return new cMenuEditStraItem(tr("Protocol"),         &itpM.protocolM,  ELEMENTS(protocolsM),  protocolsM);
+    case  4: return new cMenuEditStrItem( tr("Address"),           itpM.addressM,   sizeof(itpM.addressM), allowedProtocolCharsS);
+    case  5: return new cMenuEditIntItem( tr("Parameter"),        &itpM.parameterM, 0,                     0xFFFF);
     default: return NULL;
     }
   return NULL;

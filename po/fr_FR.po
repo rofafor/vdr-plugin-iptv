@@ -6,10 +6,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vdr-iptv 2.1.1\n"
+"Project-Id-Version: vdr-iptv 2.1.2\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2014-03-09 03:09+0200\n"
-"PO-Revision-Date: 2014-03-09 03:09+0200\n"
+"POT-Creation-Date: 2014-03-16 03:16+0200\n"
+"PO-Revision-Date: 2014-03-16 03:16+0200\n"
 "Last-Translator: NIVAL Michaël <mnival@club-internet.fr>\n"
 "Language-Team: French <vdr@linuxtv.org>\n"
 "Language: fr\n"
@@ -146,12 +146,6 @@ msgstr "FICHIER"
 
 msgid "EXT"
 msgstr "EXT"
-
-msgid "Nid"
-msgstr "Nid"
-
-msgid "Tid"
-msgstr "Tid"
 
 msgid "Rid"
 msgstr "Rid"

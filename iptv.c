@@ -13,15 +13,15 @@
 #include "device.h"
 #include "iptvservice.h"
 
-#if defined(APIVERSNUM) && APIVERSNUM < 20104
-#error "VDR-2.1.4 API version or greater is required!"
+#if defined(APIVERSNUM) && APIVERSNUM < 20106
+#error "VDR-2.1.6 API version or greater is required!"
 #endif
 
 #ifndef GITVERSION
 #define GITVERSION ""
 #endif
 
-       const char VERSION[]     = "2.1.1" GITVERSION;
+       const char VERSION[]     = "2.1.2" GITVERSION;
 static const char DESCRIPTION[] = trNOOP("Experience the IPTV");
 
 class cPluginIptv : public cPlugin {
