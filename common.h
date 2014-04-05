@@ -38,7 +38,7 @@
 #define IPTV_STATS_ACTIVE_PIDS_COUNT    10
 #define IPTV_STATS_ACTIVE_FILTERS_COUNT 10
 
-#define SECTION_FILTER_TABLE_SIZE       7
+#define SECTION_FILTER_TABLE_SIZE       5
 
 #define ERROR_IF_FUNC(exp, errstr, func, ret)                     \
   do {                                                            \

@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vdr-iptv 2.1.2\n"
+"Project-Id-Version: vdr-iptv 2.1.3\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2014-03-16 03:16+0200\n"
-"PO-Revision-Date: 2014-03-16 03:16+0200\n"
+"POT-Creation-Date: 2014-04-12 04:12+0300\n"
+"PO-Revision-Date: 2014-04-12 04:12+0200\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team: Italian <vdr@linuxtv.org>\n"
 "Language: it\n"
@@ -26,14 +26,8 @@ msgstr "NIT (0x40)"
 msgid "SDT (0x42)"
 msgstr "SDT (0x42)"
 
-msgid "EIT (0x4E/0x4F)"
-msgstr "EIT (0x4E/0x4F)"
-
-msgid "EIT (0x5X)"
-msgstr "EIT (0x5X)"
-
-msgid "EIT (0x6X)"
-msgstr "EIT (0x6X)"
+msgid "EIT (0x4E/0x4F/0x5X/0x6X)"
+msgstr "EIT (0x4E/0x4F/0x5X/0x6X)"
 
 msgid "TDT (0x70)"
 msgstr "TDT (0x70)"
