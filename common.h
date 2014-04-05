@@ -24,6 +24,8 @@
 
 #define ELEMENTS(x)                     (sizeof(x) / sizeof(x[0]))
 
+#define IPTV_BUFFER_SIZE                MEGABYTE(1)
+
 #define IPTV_DVR_FILENAME               "/tmp/vdr-iptv%d.dvr"
 
 #define IPTV_SOURCE_CHARACTER           'I'

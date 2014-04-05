@@ -113,8 +113,6 @@ eOSState cIptvMenuInfo::ProcessKey(eKeys keyP)
 cIptvPluginSetup::cIptvPluginSetup()
 {
   debug("cIptvPluginSetup::%s()", __FUNCTION__);
-  tsBufferSizeM = IptvConfig.GetTsBufferSize();
-  tsBufferPrefillM = IptvConfig.GetTsBufferPrefillRatio();
   protocolBasePortM = IptvConfig.GetProtocolBasePort();
   sectionFilteringM = IptvConfig.GetSectionFiltering();
   numDisabledFiltersM = IptvConfig.GetDisabledFiltersCount();
@@ -135,12 +133,6 @@ void cIptvPluginSetup::Setup(void)
 
   Clear();
   helpM.Clear();
-
-  Add(new cMenuEditIntItem(tr("TS buffer size [MB]"), &tsBufferSizeM, 1, 4));
-  helpM.Append(tr("Define a ringbuffer size for transport streams in megabytes.\n\nSmaller sizes help memory consumption, but are more prone to buffer overflows."));
-
-  Add(new cMenuEditIntItem(tr("TS buffer prefill ratio [%]"), &tsBufferPrefillM, 0, 40));
-  helpM.Append(tr("Define a prefill ratio of the ringbuffer for transport streams before data is transferred to VDR.\n\nThis is useful if streaming media over a slow or unreliable connection."));
 
   Add(new cMenuEditIntItem(tr("Protocol base port"), &protocolBasePortM, 0, 0xFFFF - MAXDEVICES * 2));
   helpM.Append(tr("Define a base port used by CURL/EXT protocol.\n\nThe port range is defined by the number of IPTV devices. This setting sets the port which is listened for connections from external applications when using the CURL/EXT protocol."));
@@ -217,14 +209,10 @@ void cIptvPluginSetup::StoreFilters(const char *nameP, int *valuesP)
 void cIptvPluginSetup::Store(void)
 {
   // Store values into setup.conf
-  SetupStore("TsBufferSize", tsBufferSizeM);
-  SetupStore("TsBufferPrefill", tsBufferPrefillM);
   SetupStore("ExtProtocolBasePort", protocolBasePortM);
   SetupStore("SectionFiltering", sectionFilteringM);
   StoreFilters("DisabledFilters", disabledFilterIndexesM);
   // Update global config
-  IptvConfig.SetTsBufferSize(tsBufferSizeM);
-  IptvConfig.SetTsBufferPrefillRatio(tsBufferPrefillM);
   IptvConfig.SetProtocolBasePort(protocolBasePortM);
   IptvConfig.SetSectionFiltering(sectionFilteringM);
   for (int i = 0; i < SECTION_FILTER_TABLE_SIZE; ++i)

@@ -192,7 +192,7 @@ cString cIptvBufferStatistics::GetBufferStatistic()
   uint64_t elapsed = timerM.Elapsed(); /* in milliseconds */
   timerM.Set();
   long bitrate = elapsed ? (long)(1000.0L * dataBytesM / KILOBYTE(1) / elapsed) : 0L;
-  long totalSpace = MEGABYTE(IptvConfig.GetTsBufferSize());
+  long totalSpace = IPTV_BUFFER_SIZE;
   float percentage = (float)((float)usedSpaceM / (float)totalSpace * 100.0);
   long totalKilos = totalSpace / KILOBYTE(1);
   long usedKilos = usedSpaceM / KILOBYTE(1);

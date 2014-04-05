@@ -53,30 +53,6 @@ msgstr "Bits/Bytes"
 msgid "IPTV information not available!"
 msgstr "IPTV informatie niet beschikbaar!"
 
-msgid "TS buffer size [MB]"
-msgstr "TS buffergrootte [MB]"
-
-msgid ""
-"Define a ringbuffer size for transport streams in megabytes.\n"
-"\n"
-"Smaller sizes help memory consumption, but are more prone to buffer overflows."
-msgstr ""
-"Stel de grootte van de ringbuffer vast voor transportstreams in megabytes.\n"
-"\n"
-"Bij lage waarden zapt VDR sneller maar kunnen leiden tot bufferoverschreidingen en dus dropouts."
-
-msgid "TS buffer prefill ratio [%]"
-msgstr "TS buffer-preload [%]"
-
-msgid ""
-"Define a prefill ratio of the ringbuffer for transport streams before data is transferred to VDR.\n"
-"\n"
-"This is useful if streaming media over a slow or unreliable connection."
-msgstr ""
-"Stel een 'prefil ratio' in voor de ringbuffer voor transportstreams voor de data naar VDR wordt verstuurd.\n"
-"\n"
-"Dit is aan te bevelen bij onbetrouwbare of langzame verbindingen."
-
 msgid "Protocol base port"
 msgstr "Protocol basispoort"
 

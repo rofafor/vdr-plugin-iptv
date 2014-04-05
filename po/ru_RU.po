@@ -54,24 +54,6 @@ msgstr "Биты / байт"
 msgid "IPTV information not available!"
 msgstr "IPTV информация отсутствует!"
 
-msgid "TS buffer size [MB]"
-msgstr "Размер TS буфера [MB]"
-
-msgid ""
-"Define a ringbuffer size for transport streams in megabytes.\n"
-"\n"
-"Smaller sizes help memory consumption, but are more prone to buffer overflows."
-msgstr ""
-
-msgid "TS buffer prefill ratio [%]"
-msgstr "Предварительный буфер TS [%]"
-
-msgid ""
-"Define a prefill ratio of the ringbuffer for transport streams before data is transferred to VDR.\n"
-"\n"
-"This is useful if streaming media over a slow or unreliable connection."
-msgstr ""
-
 msgid "Protocol base port"
 msgstr "Базисный порт протокола"
 

@@ -31,8 +31,7 @@ cIptvProtocolCurl::cIptvProtocolCurl()
   handleM(NULL),
   multiM(NULL),
   headerListM(NULL),
-  ringBufferM(new cRingBufferLinear(MEGABYTE(IptvConfig.GetTsBufferSize()),
-                                    7 * TS_SIZE, false, "IPTV CURL")),
+  ringBufferM(new cRingBufferLinear(IPTV_BUFFER_SIZE, 7 * TS_SIZE, false, "IPTV CURL")),
   rtspControlM(""),
   modeM(eModeUnknown),
   timeoutM(),
@@ -522,7 +521,7 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
 
                   // Use 20% threshold before continuing to filling up the buffer.
                   mutexM.Lock();
-                  if (pausedM && (ringBufferM->Available() < (MEGABYTE(IptvConfig.GetTsBufferSize()) / 5))) {
+                  if (pausedM && (ringBufferM->Available() < (IPTV_BUFFER_SIZE / 5))) {
                      debug("cIptvProtocolCurl::%s(continue): free=%d available=%d", __FUNCTION__,
                            ringBufferM->Free(), ringBufferM->Available());
                      pausedM = false;

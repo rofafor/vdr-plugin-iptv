@@ -22,7 +22,7 @@ cIptvDevice::cIptvDevice(unsigned int indexP)
   pidScanEnabledM(false),
   channelM()
 {
-  unsigned int bufsize = (unsigned int)MEGABYTE(IptvConfig.GetTsBufferSize());
+  unsigned int bufsize = (unsigned int)IPTV_BUFFER_SIZE;
   bufsize -= (bufsize % TS_SIZE);
   isyslog("creating IPTV device %d (CardIndex=%d)", deviceIndexM, CardIndex());
   tsBufferM = new cRingBufferLinear(bufsize + 1, TS_SIZE, false,
@@ -32,7 +32,6 @@ cIptvDevice::cIptvDevice(unsigned int indexP)
      tsBufferM->SetIoThrottle();
      pIptvStreamerM = new cIptvStreamer(*this, tsBufferM->Free());
      }
-  ResetBuffering();
   pUdpProtocolM = new cIptvProtocolUdp();
   pCurlProtocolM = new cIptvProtocolCurl();
   pHttpProtocolM = new cIptvProtocolHttp();
@@ -305,7 +304,7 @@ bool cIptvDevice::SetChannelDevice(const cChannel *channelP, bool liveViewP)
 
 bool cIptvDevice::SetPid(cPidHandle *handleP, int typeP, bool onP)
 {
-  debug("cIptvDevice::%s(%d): pid=%d type=%d on=%d", __FUNCTION__, deviceIndexM, handleP->pid, typeP, onP);
+  debug("cIptvDevice::%s(%d): pid=%d type=%d on=%d", __FUNCTION__, deviceIndexM, handleP ? handleP->pid : -1, typeP, onP);
   if (pIptvStreamerM && handleP)
      return pIptvStreamerM->SetPid(handleP->pid, typeP, onP);
   return true;
@@ -337,7 +336,6 @@ bool cIptvDevice::OpenDvr(void)
   debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
   isPacketDeliveredM = false;
   tsBufferM->Clear();
-  ResetBuffering();
   if (pIptvStreamerM)
      pIptvStreamerM->Open();
   if (sidScanEnabledM && pSidScannerM && IptvConfig.GetSectionFiltering())
@@ -363,31 +361,12 @@ void cIptvDevice::CloseDvr(void)
 bool cIptvDevice::HasLock(int timeoutMsP) const
 {
   //debug("cIptvDevice::%s(%d): timeoutMs=%d", __FUNCTION__, deviceIndexM, timeoutMsP);
-  return (!IsBuffering());
+  return (pIptvStreamerM && pIptvStreamerM->Active());
 }
 
 bool cIptvDevice::HasInternalCam(void)
 {
   //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
-  return false;
-}
-
-void cIptvDevice::ResetBuffering(void)
-{
-  debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
-  // Pad prefill to multiple of TS_SIZE
-  tsBufferPrefillM = (unsigned int)MEGABYTE(IptvConfig.GetTsBufferSize()) *
-                    IptvConfig.GetTsBufferPrefillRatio() / 100;
-  tsBufferPrefillM -= (tsBufferPrefillM % TS_SIZE);
-}
-
-bool cIptvDevice::IsBuffering(void) const
-{
-  //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
-  if (tsBufferPrefillM && tsBufferM && tsBufferM->Available() < tsBufferPrefillM)
-     return true;
-  else
-     tsBufferPrefillM = 0;
   return false;
 }
 
@@ -420,7 +399,7 @@ unsigned int cIptvDevice::CheckData(void)
 uchar *cIptvDevice::GetData(int *availableP)
 {
   //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
-  if (isOpenDvrM && tsBufferM && !IsBuffering()) {
+  if (isOpenDvrM && tsBufferM) {
      int count = 0;
      if (isPacketDeliveredM)
         SkipData(TS_SIZE);
@@ -434,7 +413,7 @@ uchar *cIptvDevice::GetData(int *availableP)
                   }
                }
            tsBufferM->Del(count);
-           error("Skipped %d bytes to sync on TS packet", count);
+           info("Skipped %d bytes to sync on TS packet", count);
            return NULL;
            }
         isPacketDeliveredM = true;

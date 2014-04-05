@@ -192,11 +192,7 @@ bool cPluginIptv::SetupParse(const char *nameP, const char *valueP)
 {
   debug("cPluginIptv::%s()", __FUNCTION__);
   // Parse your own setup parameters and store their values.
-  if (!strcasecmp(nameP, "TsBufferSize"))
-     IptvConfig.SetTsBufferSize(atoi(valueP));
-  else if (!strcasecmp(nameP, "TsBufferPrefill"))
-     IptvConfig.SetTsBufferPrefillRatio(atoi(valueP));
-  else if (!strcasecmp(nameP, "ExtProtocolBasePort"))
+  if (!strcasecmp(nameP, "ExtProtocolBasePort"))
      IptvConfig.SetProtocolBasePort(atoi(valueP));
   else if (!strcasecmp(nameP, "SectionFiltering"))
      IptvConfig.SetSectionFiltering(atoi(valueP));

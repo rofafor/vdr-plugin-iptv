@@ -40,7 +40,6 @@ private:
   bool sidScanEnabledM;
   bool pidScanEnabledM;
   cRingBufferLinear *tsBufferM;
-  mutable int tsBufferPrefillM;
   cChannel channelM;
   cIptvProtocolUdp *pUdpProtocolM;
   cIptvProtocolCurl *pCurlProtocolM;
@@ -68,11 +67,6 @@ private:
   cString GetGeneralInformation(void);
   cString GetPidsInformation(void);
   cString GetFiltersInformation(void);
-
-  // for channel parsing & buffering
-private:
-  void ResetBuffering(void);
-  bool IsBuffering(void) const;
 
   // for channel info
 public:

@@ -54,30 +54,6 @@ msgstr "Bits/Bytes"
 msgid "IPTV information not available!"
 msgstr "Information sur IPTV non disponible !"
 
-msgid "TS buffer size [MB]"
-msgstr "Taille du buffer TS [MB]"
-
-msgid ""
-"Define a ringbuffer size for transport streams in megabytes.\n"
-"\n"
-"Smaller sizes help memory consumption, but are more prone to buffer overflows."
-msgstr ""
-"Définit la taille du ringbuffer pour le transport du flux en megabytes.\n"
-"\n"
-"Une taille plus petite taille aide la consommation de mémoire, mais c'est sujet à plus de débordement de tampon."
-
-msgid "TS buffer prefill ratio [%]"
-msgstr "Taux du buffer de pré-remplissage TS [%]"
-
-msgid ""
-"Define a prefill ratio of the ringbuffer for transport streams before data is transferred to VDR.\n"
-"\n"
-"This is useful if streaming media over a slow or unreliable connection."
-msgstr ""
-"Définit le ratio de pré-remplissage du ringbuffer pour le transport du flux avant transfert dans VDR.\n"
-"\n"
-"Cette option est utile si le streaming est sur une connexion lente ou peu fiables."
-
 msgid "Protocol base port"
 msgstr "Port de base du protocole"
 

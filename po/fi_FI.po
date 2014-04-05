@@ -52,30 +52,6 @@ msgstr "Bitit/tavut"
 msgid "IPTV information not available!"
 msgstr "IPTV-tietoja ei saatavilla!"
 
-msgid "TS buffer size [MB]"
-msgstr "TS-puskurin koko [MB]"
-
-msgid ""
-"Define a ringbuffer size for transport streams in megabytes.\n"
-"\n"
-"Smaller sizes help memory consumption, but are more prone to buffer overflows."
-msgstr ""
-"Määritä rengaspuskurin koko TS-lähetteelle megatavuina.\n"
-"\n"
-"Pienempi rengaspuskuri vähentää muistinkulutusta, mutta on virhealttiimpi puskurin ylivuodolle."
-
-msgid "TS buffer prefill ratio [%]"
-msgstr "TS-puskurin esitäyttöaste [%]"
-
-msgid ""
-"Define a prefill ratio of the ringbuffer for transport streams before data is transferred to VDR.\n"
-"\n"
-"This is useful if streaming media over a slow or unreliable connection."
-msgstr ""
-"Määrittele TS-rengaspuskurin esitäyttöaste, jonka jälkeen lähetettä aletaan siirtämään eteenpäin VDR:lle.\n"
-"\n"
-"Puskurin esitäyttö parantaa suoratoistoa hitailla ja epäluotettavilla yhteyksillä."
-
 msgid "Protocol base port"
 msgstr "Protokollan perusportti"
 

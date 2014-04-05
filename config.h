@@ -14,8 +14,6 @@
 class cIptvConfig
 {
 private:
-  unsigned int tsBufferSizeM;
-  unsigned int tsBufferPrefillRatioM;
   unsigned int protocolBasePortM;
   unsigned int useBytesM;
   unsigned int sectionFilteringM;
@@ -25,8 +23,6 @@ private:
 
 public:
   cIptvConfig();
-  unsigned int GetTsBufferSize(void) const { return tsBufferSizeM; }
-  unsigned int GetTsBufferPrefillRatio(void) const { return tsBufferPrefillRatioM; }
   unsigned int GetProtocolBasePort(void) const { return protocolBasePortM; }
   unsigned int GetUseBytes(void) const { return useBytesM; }
   unsigned int GetSectionFiltering(void) const { return sectionFilteringM; }
@@ -34,8 +30,6 @@ public:
   const char *GetResourceDirectory(void) const { return resourceDirectoryM; }
   unsigned int GetDisabledFiltersCount(void) const;
   int GetDisabledFilters(unsigned int indexP) const;
-  void SetTsBufferSize(unsigned int sizeP) { tsBufferSizeM = sizeP; }
-  void SetTsBufferPrefillRatio(unsigned int ratioP) { tsBufferPrefillRatioM = ratioP; }
   void SetProtocolBasePort(unsigned int portNumberP) { protocolBasePortM = portNumberP; }
   void SetUseBytes(unsigned int onOffP) { useBytesM = onOffP; }
   void SetSectionFiltering(unsigned int onOffP) { sectionFilteringM = onOffP; }
