@@ -21,6 +21,9 @@
 cIptvSocket::cIptvSocket()
 : socketPortM(0),
   socketDescM(-1),
+  lastErrorReportM(0),
+  packetErrorsM(0),
+  sequenceNumberM(-1),
   isActiveM(false)
 {
   debug("cIptvSocket::%s()", __FUNCTION__);
@@ -86,6 +89,11 @@ void cIptvSocket::CloseSocket(void)
      socketDescM = -1;
      socketPortM = 0;
      memset(&sockAddrM, 0, sizeof(sockAddrM));
+     }
+  if (packetErrorsM) {
+     info("detected %d RTP packet errors", packetErrorsM);
+     packetErrorsM = 0;
+     lastErrorReportM = time(NULL);
      }
 }
 
@@ -274,6 +282,21 @@ int cIptvUdpSocket::Read(unsigned char *bufferAddrP, unsigned int bufferLenP)
                     unsigned int cc = bufferAddrP[0] & 0x0F;
                     // Payload type: MPEG2 TS = 33
                     //unsigned int pt = bufferAddrP[1] & 0x7F;
+                    // Sequence number
+                    int seq = ((bufferAddrP[2] & 0xFF) << 8) | (bufferAddrP[3] & 0xFF);
+                    if ((((sequenceNumberM + 1) % 0xFFFF) == 0) && (seq == 0xFFFF))
+                       sequenceNumberM = -1;
+                    else if ((sequenceNumberM >= 0) && (((sequenceNumberM + 1) % 0xFFFF) != seq)) {
+                       packetErrorsM++;
+                       if (time(NULL) - lastErrorReportM > eReportIntervalS) {
+                          info("detected %d RTP packet errors", packetErrorsM);
+                          packetErrorsM = 0;
+                          lastErrorReportM = time(NULL);
+                          }
+                       sequenceNumberM = seq;
+                       }
+                    else
+                       sequenceNumberM = seq;
                     // Header lenght
                     unsigned int headerlen = (3 + cc) * (unsigned int)sizeof(uint32_t);
                     // Check if extension
@@ -401,7 +424,7 @@ bool cIptvTcpSocket::Write(const char *bufferAddrP, unsigned int bufferLenP)
   //debug("cIptvTcpSocket::%s()", __FUNCTION__);
   // Error out if socket not initialized
   if (socketDescM <= 0) {
-     error("Invalid socket in cIptvTcpSocket::%s()", __FUNCTION__);
+     error("cIptvTcpSocket::%s(): Invalid socket", __FUNCTION__);
      return false;
      }
   ERROR_IF_RET(send(socketDescM, bufferAddrP, bufferLenP, 0) < 0, "send()", return false);

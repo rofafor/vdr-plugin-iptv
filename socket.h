@@ -18,8 +18,14 @@ private:
   int socketPortM;
 
 protected:
+  enum {
+    eReportIntervalS = 300 // in seconds
+  };
   int socketDescM;
   struct sockaddr_in sockAddrM;
+  time_t lastErrorReportM;
+  int packetErrorsM;
+  int sequenceNumberM;
   bool isActiveM;
 
 protected:
