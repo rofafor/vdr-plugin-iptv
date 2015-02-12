@@ -141,7 +141,7 @@ void cIptvPluginSetup::Setup(void)
   helpM.Append(tr("Define whether the section filtering shall be used.\n\nSection filtering means that IPTV plugin tries to parse and provide VDR with secondary data about the currently active stream. VDR can then use this data for providing various functionalities such as automatic pid change detection and EPG etc.\nEnabling this feature does not affect streams that do not contain section data."));
 
   if (sectionFilteringM) {
-     Add(new cMenuEditIntItem(tr("Disable filters"), &numDisabledFiltersM, 0, SECTION_FILTER_TABLE_SIZE));
+     Add(new cMenuEditIntItem(tr("Disabled filters"), &numDisabledFiltersM, 0, SECTION_FILTER_TABLE_SIZE));
      helpM.Append(tr("Define number of section filters to be disabled.\n\nCertain section filters might cause some unwanted behaviour to VDR such as time being falsely synchronized. By black-listing the filters here useful section data can be left intact for VDR to process."));
 
      for (int i = 0; i < numDisabledFiltersM; ++i) {

@@ -1,7 +1,8 @@
 # VDR plugin language source file.
-# Copyright (C) 2007-2014 Rolf Ahrenberg & Antti Seppala
+# Copyright (C) 2007-2015 Rolf Ahrenberg & Antti Seppala
 # This file is distributed under the same license as the iptv package.
 # Tobias <vdr@e-tobi.net>, 2007.
+# Frank Neumann, 2015.
 #
 msgid ""
 msgstr ""
@@ -9,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: <see README>\n"
 "POT-Creation-Date: 2014-05-10 05:10+0200\n"
 "PO-Revision-Date: 2014-05-10 05:10+0200\n"
-"Last-Translator: Tobias Grimm <tg@e-tobi.net>\n"
+"Last-Translator: Frank Neumann <fnu@yavdr.org>\n"
 "Language-Team: German <vdr@linuxtv.org>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -51,19 +52,22 @@ msgid "Bits/bytes"
 msgstr "Bits/Bytes"
 
 msgid "IPTV information not available!"
-msgstr "IPTV Informationen nicht verfügbar!"
+msgstr "Keine IPTV Informationen verfügbar!"
 
 msgid "Protocol base port"
-msgstr "Protokoll Basisport"
+msgstr "Basis Port Protokoll"
 
 msgid ""
 "Define a base port used by CURL/EXT protocol.\n"
 "\n"
 "The port range is defined by the number of IPTV devices. This setting sets the port which is listened for connections from external applications when using the CURL/EXT protocol."
 msgstr ""
+"Bestimme einen Basis Port für das CURL/EXT Protokoll.\n"
+"\n"
+"Der Bereich der Ports wird durch die Anzahl der IPTV Geräte festgelegt. Diese Einstellung bestimmt den Port auf den für Verbindungen gelauscht wird, wenn externe Applikationen das CURL/EXT Protokoll nutzen."
 
 msgid "Use section filtering"
-msgstr "Benutze Abschnittsfilterung"
+msgstr "Benutze Abschnittsfilter"
 
 msgid ""
 "Define whether the section filtering shall be used.\n"
@@ -71,22 +75,29 @@ msgid ""
 "Section filtering means that IPTV plugin tries to parse and provide VDR with secondary data about the currently active stream. VDR can then use this data for providing various functionalities such as automatic pid change detection and EPG etc.\n"
 "Enabling this feature does not affect streams that do not contain section data."
 msgstr ""
+"Legt fest ob Abschnittsfilter genutzt werden sollen.\n"
+"\n"
+"Mit Abschnittsfiltern versucht das IPTV Plugin Sekundärdaten der aktiven Quelle zu analysieren und VDR bereitzustellen. VDR kann mit diesen Daten verschiedene Funktionen, wie automatische PID Erkennung und EPG, bereitstellen.\n"
+"Die Nutzung dieser Fähigkeit hat keinen Einfluss auf Quellen, die keine Abschnittsdaten enthalten."
 
-msgid "Disable filters"
-msgstr "Deaktiviere Filter"
+msgid "Disabled filters"
+msgstr "Deaktivierte Filter"
 
 msgid ""
 "Define number of section filters to be disabled.\n"
 "\n"
 "Certain section filters might cause some unwanted behaviour to VDR such as time being falsely synchronized. By black-listing the filters here useful section data can be left intact for VDR to process."
 msgstr ""
+"Bestimme die Anzahl der Abschnittsfilter die deaktiviert werden sollen.\n"
+"\n"
+"Bestimmte Abschnittsfilter können unerwünschtes Verhalten mit VDR, z.B. falsche Zeit-Synchronisation, verursachen. Durch das Ausblenden einzelner Filter können nützliche Daten dieser Abschnitte für den VDR erhalten werden."
 
 #. TRANSLATORS: note the singular!
 msgid "Disable filter"
 msgstr "Deaktiviere Filter"
 
 msgid "Define an ill-behaving filter to be blacklisted."
-msgstr ""
+msgstr "Bestimme einen fehlerhaften Filter der ausgeblendet werden soll."
 
 msgid "Help"
 msgstr "Hilfe"
@@ -110,10 +121,10 @@ msgid "Rid"
 msgstr "Rid"
 
 msgid "Scan section ids"
-msgstr "Scanne Section IDS"
+msgstr "Suche Abschnitt IDs"
 
 msgid "Scan pids"
-msgstr "Scanne PIDS"
+msgstr "Suche PIDs"
 
 msgid "Protocol"
 msgstr "Protokoll"

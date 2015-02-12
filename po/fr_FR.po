@@ -80,7 +80,7 @@ msgstr ""
 "La section filtrage signifie que le plugin IPTV essayera d'analyser et de fournir à VDR des données secondaires disponible sur le flux. VDR peut alors utiliser ces données pour fournir des fonctionnalitées supplémentaires tel que la détection de changement de pid et d'EPG etc.\n"
 "L'activation de cette fonctionnalité n'a pas d'incidence sur les flux qui ne contiennent pas de données de la section."
 
-msgid "Disable filters"
+msgid "Disabled filters"
 msgstr "Désactiver les filtres"
 
 msgid ""

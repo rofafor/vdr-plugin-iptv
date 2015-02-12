@@ -78,7 +78,7 @@ msgstr ""
 "\n"
 "Bij sectiefiltering zal de IPTV plugin VDR van extra informatie over de stream voorzien. VDR kan dan bijvoorbeeld automatisch de PIDs wijzigen of de EPG tonen.Het gebruik van deze mogelijkheid heeft geen effect op streams die geen sectiedata bevatten."
 
-msgid "Disable filters"
+msgid "Disabled filters"
 msgstr "Deactiveer filter"
 
 msgid ""

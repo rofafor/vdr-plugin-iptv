@@ -79,7 +79,7 @@ msgstr ""
 "La sezioni filtri significa che il plugin IPTV prova a elaborare e fornire a VDR dati secondari sul flusso attualmente attivo. VDR può successivamente usare questi dati per fornire varie funzionalità come il rilevamento del cambio Pid automatico, EPG, etc.\n"
 "Abilitare questa funzione non influisce sui flussi che non contengono dati di sezione."
 
-msgid "Disable filters"
+msgid "Disabled filters"
 msgstr "Disabilita filtri"
 
 msgid ""

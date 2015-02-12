@@ -73,7 +73,7 @@ msgid ""
 "Enabling this feature does not affect streams that do not contain section data."
 msgstr ""
 
-msgid "Disable filters"
+msgid "Disabled filters"
 msgstr "Деактивировать фильтры"
 
 msgid ""

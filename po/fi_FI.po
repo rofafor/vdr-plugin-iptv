@@ -78,7 +78,7 @@ msgstr ""
 "IPTV-laajennos voi suodattaa lähetteestä VDR:lle tarjottavia sektioita, joita käytetään esim. ohjelmaoppaan ja ohjelmatunnisteiden (PID) päivittämiseen.\n"
 "Toiminto ei vaikuta lähetteeseen, jossa ei ole sektioita."
 
-msgid "Disable filters"
+msgid "Disabled filters"
 msgstr "Poista suodattimia käytöstä"
 
 msgid ""
