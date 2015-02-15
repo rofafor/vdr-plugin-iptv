@@ -82,9 +82,8 @@ msgid ""
 "Certain section filters might cause some unwanted behaviour to VDR such as time being falsely synchronized. By black-listing the filters here useful section data can be left intact for VDR to process."
 msgstr ""
 
-#. TRANSLATORS: note the singular!
-msgid "Disable filter"
-msgstr "Деактивировать фильтр"
+msgid "Filter"
+msgstr "фильтр"
 
 msgid "Define an ill-behaving filter to be blacklisted."
 msgstr "Неправильно работающий фильтр, занести в черный список."

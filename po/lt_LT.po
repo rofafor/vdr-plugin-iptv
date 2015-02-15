@@ -90,9 +90,8 @@ msgstr ""
 "\n"
 "Šitie paketų filtrai gali sutrikdyti sistemos darbą, pavyzdžiui gali atsirasti laiko asinchronizacija. Atjungiant čia filtrus, gali būti palikta tik naudinga paketinė informacija nepažeidžianti sistemos darbo."
 
-#. TRANSLATORS: note the singular!
-msgid "Disable filter"
-msgstr "Išjungti filtrą"
+msgid "Filter"
+msgstr "Filtrą"
 
 msgid "Define an ill-behaving filter to be blacklisted."
 msgstr "Nustatyti kad netinkamai veikiantis filtras būtu išjungtas."

@@ -92,9 +92,8 @@ msgstr ""
 "\n"
 "Bestimmte Abschnittsfilter können unerwünschtes Verhalten mit VDR, z.B. falsche Zeit-Synchronisation, verursachen. Durch das Ausblenden einzelner Filter können nützliche Daten dieser Abschnitte für den VDR erhalten werden."
 
-#. TRANSLATORS: note the singular!
-msgid "Disable filter"
-msgstr "Deaktiviere Filter"
+msgid "Filter"
+msgstr "Filter"
 
 msgid "Define an ill-behaving filter to be blacklisted."
 msgstr "Bestimme einen fehlerhaften Filter der ausgeblendet werden soll."

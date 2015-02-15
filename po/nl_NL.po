@@ -90,9 +90,8 @@ msgstr ""
 "\n"
 "Sommige sctiefilters kunnen ongewenste effecten veroorzaken. Door ze hier op te nemen blijft de data intact zodat VDR het kan blijven gebruiken."
 
-#. TRANSLATORS: note the singular!
-msgid "Disable filter"
-msgstr "Deactiveer filter"
+msgid "Filter"
+msgstr "Filter"
 
 msgid "Define an ill-behaving filter to be blacklisted."
 msgstr "Blacklist een probleem veroorzakend filter "

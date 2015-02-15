@@ -145,8 +145,7 @@ void cIptvPluginSetup::Setup(void)
      helpM.Append(tr("Define number of section filters to be disabled.\n\nCertain section filters might cause some unwanted behaviour to VDR such as time being falsely synchronized. By black-listing the filters here useful section data can be left intact for VDR to process."));
 
      for (int i = 0; i < numDisabledFiltersM; ++i) {
-         // TRANSLATORS: note the singular!
-         Add(new cMenuEditStraItem(tr("Disable filter"), &disabledFilterIndexesM[i], SECTION_FILTER_TABLE_SIZE, disabledFilterNamesM));
+         Add(new cMenuEditStraItem(*cString::sprintf(" %s %d", tr("Filter"), i + 1), &disabledFilterIndexesM[i], SECTION_FILTER_TABLE_SIZE, disabledFilterNamesM));
          helpM.Append(tr("Define an ill-behaving filter to be blacklisted."));
          }
      }

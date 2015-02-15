@@ -91,9 +91,8 @@ msgstr ""
 "\n"
 "Certe sezioni filtri potrebbero generare alcuni comportamenti indesiderati per VDR come la non sincronizzazione dell'ora. Inserendo qui i filtri nella lista nera i dati di sezione utili possono essere lasciati intatti per l'elaborazione da parte di VDR."
 
-#. TRANSLATORS: note the singular!
-msgid "Disable filter"
-msgstr "Disabilita filtro"
+msgid "Filter"
+msgstr "Filtro"
 
 msgid "Define an ill-behaving filter to be blacklisted."
 msgstr "Definisci un filtro corrotto che sarà messo nella lista nera."

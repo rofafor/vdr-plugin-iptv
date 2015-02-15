@@ -90,9 +90,8 @@ msgstr ""
 "\n"
 "Tietyt sektiot saattavat aiheuttaa virheellistä toimintaa VDR:ssä, esimerkiksi asettavat väärän kellonajan, ja näiden poistaminen auttaa VDR:ää toimimaan kunnolla jäljelle jäävien sektioiden kanssa."
 
-#. TRANSLATORS: note the singular!
-msgid "Disable filter"
-msgstr "Poista suodatin käytöstä"
+msgid "Filter"
+msgstr "Suodatin"
 
 msgid "Define an ill-behaving filter to be blacklisted."
 msgstr "Määrittele käytöstä poistettava suodatin, joka lisätään mustalle listalle."
