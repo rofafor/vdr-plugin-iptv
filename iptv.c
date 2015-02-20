@@ -13,8 +13,8 @@
 #include "device.h"
 #include "iptvservice.h"
 
-#if defined(APIVERSNUM) && APIVERSNUM < 20106
-#error "VDR-2.1.6 API version or greater is required!"
+#if defined(APIVERSNUM) && APIVERSNUM < 20200
+#error "VDR-2.2.0 API version or greater is required!"
 #endif
 
 #ifndef GITVERSION
