@@ -30,6 +30,8 @@ private:
   };
   enum {
     eConnectTimeoutS       = 5,     // in seconds
+    eLowSpeedTimeoutS      = 3,     // in seconds
+    eLowSpeedLimitBytes    = 100,   // in bytes per second
     eMaxDownloadSpeedMBits = 20,    // in megabits per second
     eKeepAliveIntervalMs   = 300000 // in milliseconds
   };

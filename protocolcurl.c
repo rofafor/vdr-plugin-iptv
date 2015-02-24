@@ -277,8 +277,9 @@ bool cIptvProtocolCurl::Connect()
      iptv_curl_easy_setopt(handleM, CURLOPT_NETRC_FILE, *netrc);
 
      // Set timeouts
-     iptv_curl_easy_setopt(handleM, CURLOPT_TIMEOUT, (long)eConnectTimeoutS);
      iptv_curl_easy_setopt(handleM, CURLOPT_CONNECTTIMEOUT, (long)eConnectTimeoutS);
+     iptv_curl_easy_setopt(handleM, CURLOPT_LOW_SPEED_LIMIT, (long)eLowSpeedLimitBytes);
+     iptv_curl_easy_setopt(handleM, CURLOPT_LOW_SPEED_TIME, (long)eLowSpeedTimeoutS);
 
      // Set user-agent
      iptv_curl_easy_setopt(handleM, CURLOPT_USERAGENT, *cString::sprintf("vdr-%s/%s", PLUGIN_NAME_I18N, VERSION));
