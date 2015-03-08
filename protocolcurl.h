@@ -36,6 +36,7 @@ private:
     eKeepAliveIntervalMs   = 300000 // in milliseconds
   };
 
+  static int DebugCallback(CURL *handleP, curl_infotype typeP, char *dataP, size_t sizeP, void *userPtrP);
   static size_t WriteCallback(void *ptrP, size_t sizeP, size_t nmembP, void *dataP);
   static size_t WriteRtspCallback(void *ptrP, size_t sizeP, size_t nmembP, void *dataP);
   static size_t DescribeCallback(void *ptrP, size_t sizeP, size_t nmembP, void *dataP);

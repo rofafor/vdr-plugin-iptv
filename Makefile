@@ -2,17 +2,9 @@
 # Makefile for IPTV plugin
 #
 
-# Debugging on/off
-
-#IPTV_DEBUG = 1
-
 # Default shell for EXT protocol
 
 #IPTV_EXTSHELL = /bin/bash
-
-# Strip debug symbols?  Set eg. to /bin/true if not
-
-STRIP = strip
 
 # The official name of this plugin.
 # This name will be used in the '-P...' option of VDR to load the plugin.
@@ -41,6 +33,7 @@ TMPDIR ?= /tmp
 
 export CFLAGS   = $(call PKGCFG,cflags)
 export CXXFLAGS = $(call PKGCFG,cxxflags)
+STRIP           ?= /bin/true
 
 ### The version number of VDR's plugin API:
 
@@ -68,10 +61,6 @@ LIBS = $(shell curl-config --libs)
 INCLUDES +=
 
 DEFINES += -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
-
-ifdef IPTV_DEBUG
-DEFINES += -DDEBUG
-endif
 
 ifdef IPTV_EXTSHELL
 DEFINES += -DEXTSHELL='"$(IPTV_EXTSHELL)"'
@@ -139,9 +128,7 @@ install-i18n: $(I18Nmsgs)
 
 $(SOFILE): $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(OBJS) $(LIBS) -o $@
-ifndef IPTV_DEBUG
 	@$(STRIP) $@
-endif
 
 install-lib: $(SOFILE)
 	install -D $^ $(DESTDIR)$(LIBDIR)/$^.$(APIVERSION)

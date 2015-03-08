@@ -26,7 +26,7 @@
 #define debug6(x...)  void( IptvConfig.IsTraceMode(cIptvConfig::eTraceModeDebug6)  ? dsyslog("IPTV6: " x)  : void() )
 // 0x0040: TBD
 #define debug7(x...)  void( IptvConfig.IsTraceMode(cIptvConfig::eTraceModeDebug7)  ? dsyslog("IPTV7: " x)  : void() )
-// 0x0080: TBD
+// 0x0080: CURL
 #define debug8(x...)  void( IptvConfig.IsTraceMode(cIptvConfig::eTraceModeDebug8)  ? dsyslog("IPTV8: " x)  : void() )
 // 0x0100: TBD
 #define debug9(x...)  void( IptvConfig.IsTraceMode(cIptvConfig::eTraceModeDebug9)  ? dsyslog("IPTV9: " x)  : void() )

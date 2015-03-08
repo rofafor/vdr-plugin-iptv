@@ -55,6 +55,35 @@ cIptvProtocolCurl::~cIptvProtocolCurl()
   DELETE_POINTER(ringBufferM);
 }
 
+int cIptvProtocolCurl::DebugCallback(CURL *handleP, curl_infotype typeP, char *dataP, size_t sizeP, void *userPtrP)
+{
+  cIptvProtocolCurl *obj = reinterpret_cast<cIptvProtocolCurl *>(dataP);
+
+  if (obj) {
+     switch (typeP) {
+       case CURLINFO_TEXT:
+            debug8("%s INFO %.*s", __PRETTY_FUNCTION__, (int)sizeP, dataP);
+            break;
+       case CURLINFO_HEADER_IN:
+            debug8("%s HEAD <<< %.*s", __PRETTY_FUNCTION__,  (int)sizeP, dataP);
+            break;
+       case CURLINFO_HEADER_OUT:
+            debug8("%s HEAD >>>\n%.*s", __PRETTY_FUNCTION__, (int)sizeP, dataP);
+            break;
+       case CURLINFO_DATA_IN:
+            debug8("%s DATA <<< %zu", __PRETTY_FUNCTION__,  sizeP);
+            break;
+       case CURLINFO_DATA_OUT:
+            debug8("%s DATA >>> %zu", __PRETTY_FUNCTION__, sizeP);
+            break;
+       default:
+            break;
+       }
+     }
+
+  return 0;
+}
+
 size_t cIptvProtocolCurl::WriteCallback(void *ptrP, size_t sizeP, size_t nmembP, void *dataP)
 {
   cIptvProtocolCurl *obj = reinterpret_cast<cIptvProtocolCurl *>(dataP);
@@ -258,10 +287,10 @@ bool cIptvProtocolCurl::Connect()
      CURLcode res = CURLE_OK;
      cString netrc = cString::sprintf("%s/netrc", IptvConfig.GetConfigDirectory());
 
-#ifdef DEBUG
      // Verbose output
      iptv_curl_easy_setopt(handleM, CURLOPT_VERBOSE, 1L);
-#endif
+     iptv_curl_easy_setopt(handleM, CURLOPT_DEBUGFUNCTION, cIptvProtocolCurl::DebugCallback);
+     iptv_curl_easy_setopt(handleM, CURLOPT_DEBUGDATA, this);
 
      // Set callbacks
      iptv_curl_easy_setopt(handleM, CURLOPT_WRITEFUNCTION, cIptvProtocolCurl::WriteCallback);
