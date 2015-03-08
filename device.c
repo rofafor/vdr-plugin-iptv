@@ -24,7 +24,7 @@ cIptvDevice::cIptvDevice(unsigned int indexP)
 {
   unsigned int bufsize = (unsigned int)IPTV_BUFFER_SIZE;
   bufsize -= (bufsize % TS_SIZE);
-  isyslog("creating IPTV device %d (CardIndex=%d)", deviceIndexM, CardIndex());
+  info("Creating IPTV device %d (CardIndex=%d)", deviceIndexM, CardIndex());
   tsBufferM = new cRingBufferLinear(bufsize + 1, TS_SIZE, false,
                                    *cString::sprintf("IPTV TS %d", deviceIndexM));
   if (tsBufferM) {
@@ -50,13 +50,13 @@ cIptvDevice::cIptvDevice(unsigned int indexP)
   if (S_ISFIFO(sb.st_mode)) {
      dvrFdM = open(filename, O_RDWR | O_NONBLOCK);
      if (dvrFdM >= 0)
-        dsyslog("IPTV device %d redirecting input stream to '%s'", deviceIndexM, *filename);
+        info("IPTV device %d redirecting input stream to '%s'", deviceIndexM, *filename);
      }
 }
 
 cIptvDevice::~cIptvDevice()
 {
-  debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug1("%s [device %d]", __PRETTY_FUNCTION__, deviceIndexM);
   // Stop section handler of iptv device
   StopSectionHandler();
   DELETE_POINTER(pIptvSectionM);
@@ -79,7 +79,7 @@ cIptvDevice::~cIptvDevice()
 
 bool cIptvDevice::Initialize(unsigned int deviceCountP)
 {
-  debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceCountP);
+  debug1("%s (%u)", __PRETTY_FUNCTION__, deviceCountP);
   new cIptvSourceParam(IPTV_SOURCE_CHARACTER, "IPTV");
   if (deviceCountP > IPTV_MAX_DEVICES)
      deviceCountP = IPTV_MAX_DEVICES;
@@ -92,7 +92,7 @@ bool cIptvDevice::Initialize(unsigned int deviceCountP)
 
 void cIptvDevice::Shutdown(void)
 {
-  debug("cIptvDevice::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
   for (int i = 0; i < IPTV_MAX_DEVICES; ++i) {
       if (IptvDevicesS[i])
          IptvDevicesS[i]->CloseDvr();
@@ -102,7 +102,7 @@ void cIptvDevice::Shutdown(void)
 unsigned int cIptvDevice::Count(void)
 {
   unsigned int count = 0;
-  debug("cIptvDevice::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
   for (unsigned int i = 0; i < IPTV_MAX_DEVICES; ++i) {
       if (IptvDevicesS[i] != NULL)
          count++;
@@ -112,10 +112,10 @@ unsigned int cIptvDevice::Count(void)
 
 cIptvDevice *cIptvDevice::GetIptvDevice(int cardIndexP)
 {
-  //debug("cIptvDevice::%s(%d)", __FUNCTION__, cardIndexP);
+  debug16("%s (%d)", __PRETTY_FUNCTION__, cardIndexP);
   for (unsigned int i = 0; i < IPTV_MAX_DEVICES; ++i) {
       if (IptvDevicesS[i] && (IptvDevicesS[i]->CardIndex() == cardIndexP)) {
-         //debug("cIptvDevice::%s(%d): found!", __FUNCTION__, cardIndexP);
+         debug16("%s (%d) Found", __PRETTY_FUNCTION__, cardIndexP);
          return IptvDevicesS[i];
          }
       }
@@ -124,7 +124,7 @@ cIptvDevice *cIptvDevice::GetIptvDevice(int cardIndexP)
 
 cString cIptvDevice::GetGeneralInformation(void)
 {
-  //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug16("%s [device %d]", __PRETTY_FUNCTION__, deviceIndexM);
   return cString::sprintf("IPTV device: %d\nCardIndex: %d\nStream: %s\nStream bitrate: %s\n%sChannel: %s",
                           deviceIndexM, CardIndex(),
                           pIptvStreamerM ? *pIptvStreamerM->GetInformation() : "",
@@ -135,13 +135,13 @@ cString cIptvDevice::GetGeneralInformation(void)
 
 cString cIptvDevice::GetPidsInformation(void)
 {
-  //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug16("%s [device %d]", __PRETTY_FUNCTION__, deviceIndexM);
   return GetPidStatistic();
 }
 
 cString cIptvDevice::GetFiltersInformation(void)
 {
-  //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug16("%s [device %d]", __PRETTY_FUNCTION__, deviceIndexM);
   return cString::sprintf("Active section filters:\n%s", pIptvSectionM ? *pIptvSectionM->GetInformation() : "");
 }
 
@@ -177,37 +177,37 @@ cString cIptvDevice::GetInformation(unsigned int pageP)
 
 cString cIptvDevice::DeviceType(void) const
 {
-  //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug16("%s [device %d]", __PRETTY_FUNCTION__, deviceIndexM);
   return "IPTV";
 }
 
 cString cIptvDevice::DeviceName(void) const
 {
-  debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug1("%s [device %d]", __PRETTY_FUNCTION__, deviceIndexM);
   return cString::sprintf("IPTV %d", deviceIndexM);
 }
 
 int cIptvDevice::SignalStrength(void) const
 {
-  debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug1("%s [device %d]", __PRETTY_FUNCTION__, deviceIndexM);
   return (100);
 }
 
 int cIptvDevice::SignalQuality(void) const
 {
-  debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug1("%s [device %d]", __PRETTY_FUNCTION__, deviceIndexM);
   return (100);
 }
 
 bool cIptvDevice::ProvidesSource(int sourceP) const
 {
-  debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug1("%s [device %d]", __PRETTY_FUNCTION__, deviceIndexM);
   return (cSource::IsType(sourceP, IPTV_SOURCE_CHARACTER));
 }
 
 bool cIptvDevice::ProvidesTransponder(const cChannel *channelP) const
 {
-  debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug1("%s [device %d]", __PRETTY_FUNCTION__, deviceIndexM);
   return (ProvidesSource(channelP->Source()));
 }
 
@@ -217,7 +217,7 @@ bool cIptvDevice::ProvidesChannel(const cChannel *channelP, int priorityP, bool 
   bool hasPriority = (priorityP == IDLEPRIORITY) || (priorityP > this->Priority());
   bool needsDetachReceivers = false;
 
-  debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug1("%s [device %d]", __PRETTY_FUNCTION__, deviceIndexM);
 
   if (channelP && ProvidesTransponder(channelP)) {
      result = hasPriority;
@@ -263,7 +263,7 @@ bool cIptvDevice::SetChannelDevice(const cChannel *channelP, bool liveViewP)
   cIptvProtocolIf *protocol;
   cIptvTransponderParameters itp(channelP->Parameters());
 
-  debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug1("%s [device %d]", __PRETTY_FUNCTION__, deviceIndexM);
 
   if (isempty(itp.Address())) {
      error("Unrecognized IPTV address: %s", channelP->Parameters());
@@ -304,7 +304,7 @@ bool cIptvDevice::SetChannelDevice(const cChannel *channelP, bool liveViewP)
 
 bool cIptvDevice::SetPid(cPidHandle *handleP, int typeP, bool onP)
 {
-  debug("cIptvDevice::%s(%d): pid=%d type=%d on=%d", __FUNCTION__, deviceIndexM, handleP ? handleP->pid : -1, typeP, onP);
+  debug1("%s (%d, %d, %d) [device %d]", __PRETTY_FUNCTION__, handleP ? handleP->pid : -1, typeP, onP, deviceIndexM);
   if (pIptvStreamerM && handleP)
      return pIptvStreamerM->SetPid(handleP->pid, typeP, onP);
   return true;
@@ -312,7 +312,7 @@ bool cIptvDevice::SetPid(cPidHandle *handleP, int typeP, bool onP)
 
 int cIptvDevice::OpenFilter(u_short pidP, u_char tidP, u_char maskP)
 {
-  //debug("cIptvDevice::%s(%d): pid=%d tid=%d mask=%d", __FUNCTION__, deviceIndexM, pidP, tidP,  maskP);
+  debug16("%s (%d, %d, %d) [device %d]", __PRETTY_FUNCTION__, pidP, tidP, maskP, deviceIndexM);
   if (pIptvSectionM && IptvConfig.GetSectionFiltering()) {
      if (pIptvStreamerM)
         pIptvStreamerM->SetPid(pidP, ptOther, true);
@@ -323,7 +323,7 @@ int cIptvDevice::OpenFilter(u_short pidP, u_char tidP, u_char maskP)
 
 void cIptvDevice::CloseFilter(int handleP)
 {
-  //debug("cIptvDevice::%s(%d): handle=%d", __FUNCTION__, deviceIndexM, handleP);
+  debug16("%s (%d) [device %d]", __PRETTY_FUNCTION__, handleP, deviceIndexM);
   if (pIptvSectionM) {
      if (pIptvStreamerM)
         pIptvStreamerM->SetPid(pIptvSectionM->GetPid(handleP), ptOther, false);
@@ -333,7 +333,7 @@ void cIptvDevice::CloseFilter(int handleP)
 
 bool cIptvDevice::OpenDvr(void)
 {
-  debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug1("%s [device %d]", __PRETTY_FUNCTION__, deviceIndexM);
   isPacketDeliveredM = false;
   tsBufferM->Clear();
   if (pIptvStreamerM)
@@ -348,7 +348,7 @@ bool cIptvDevice::OpenDvr(void)
 
 void cIptvDevice::CloseDvr(void)
 {
-  debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug1("%s [device %d]", __PRETTY_FUNCTION__, deviceIndexM);
   if (pidScanEnabledM && pPidScannerM)
      pPidScannerM->Close();
   if (sidScanEnabledM && pSidScannerM)
@@ -360,19 +360,19 @@ void cIptvDevice::CloseDvr(void)
 
 bool cIptvDevice::HasLock(int timeoutMsP) const
 {
-  //debug("cIptvDevice::%s(%d): timeoutMs=%d", __FUNCTION__, deviceIndexM, timeoutMsP);
+  debug16("%s (%d) [device %d]", __PRETTY_FUNCTION__, timeoutMsP, deviceIndexM);
   return (pIptvStreamerM && pIptvStreamerM->Active());
 }
 
 bool cIptvDevice::HasInternalCam(void)
 {
-  //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug16("%s [device %d]", __PRETTY_FUNCTION__, deviceIndexM);
   return false;
 }
 
 void cIptvDevice::WriteData(uchar *bufferP, int lengthP)
 {
-  //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug16("%s (, %d) [device %d]", __PRETTY_FUNCTION__, lengthP, deviceIndexM);
   int len;
   // Send data to dvr fifo
   if (dvrFdM >= 0)
@@ -390,7 +390,7 @@ void cIptvDevice::WriteData(uchar *bufferP, int lengthP)
 
 unsigned int cIptvDevice::CheckData(void)
 {
-  //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug16("%s [device %d]", __PRETTY_FUNCTION__, deviceIndexM);
   if (tsBufferM)
      return (unsigned int)tsBufferM->Free();
   return 0;
@@ -398,7 +398,7 @@ unsigned int cIptvDevice::CheckData(void)
 
 uchar *cIptvDevice::GetData(int *availableP)
 {
-  //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug16("%s [device %d]", __PRETTY_FUNCTION__, deviceIndexM);
   if (isOpenDvrM && tsBufferM) {
      int count = 0;
      if (isPacketDeliveredM)
@@ -429,7 +429,7 @@ uchar *cIptvDevice::GetData(int *availableP)
 
 void cIptvDevice::SkipData(int countP)
 {
-  //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug16("%s (%d) [device %d]]", __PRETTY_FUNCTION__, countP, deviceIndexM);
   tsBufferM->Del(countP);
   isPacketDeliveredM = false;
   // Update buffer statistics
@@ -438,7 +438,7 @@ void cIptvDevice::SkipData(int countP)
 
 bool cIptvDevice::GetTSPacket(uchar *&dataP)
 {
-  //debug("cIptvDevice::%s(%d)", __FUNCTION__, deviceIndexM);
+  debug16("%s [device %d]", __PRETTY_FUNCTION__, deviceIndexM);
   if (tsBufferM) {
      if (cCamSlot *cs = CamSlot()) {
         if (cs->WantsTsData()) {

@@ -112,7 +112,7 @@ eOSState cIptvMenuInfo::ProcessKey(eKeys keyP)
 
 cIptvPluginSetup::cIptvPluginSetup()
 {
-  debug("cIptvPluginSetup::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
   protocolBasePortM = IptvConfig.GetProtocolBasePort();
   sectionFilteringM = IptvConfig.GetSectionFiltering();
   numDisabledFiltersM = IptvConfig.GetDisabledFiltersCount();
@@ -156,7 +156,7 @@ void cIptvPluginSetup::Setup(void)
 
 eOSState cIptvPluginSetup::ShowInfo(void)
 {
-  debug("cIptvPluginSetup::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
   if (HasSubMenu())
      return osContinue;
   return AddSubMenu(new cIptvMenuInfo());
@@ -201,7 +201,7 @@ void cIptvPluginSetup::StoreFilters(const char *nameP, int *valuesP)
       q += strlen(s);
       }
   *q = 0;
-  debug("cIptvPluginSetup::%s(%s, %s)", __FUNCTION__, nameP, buffer);
+  debug1("%s (%s, %s)", __PRETTY_FUNCTION__, nameP, buffer);
   SetupStore(nameP, buffer);
 }
 

@@ -15,8 +15,9 @@
 
 #include "common.h"
 #include "config.h"
-#include "protocoludp.h"
+#include "log.h"
 #include "socket.h"
+#include "protocoludp.h"
 
 cIptvProtocolUdp::cIptvProtocolUdp()
 : isIGMPv3M(false),
@@ -24,12 +25,12 @@ cIptvProtocolUdp::cIptvProtocolUdp()
   streamAddrM(strdup("")),
   streamPortM(0)
 {
-  debug("cIptvProtocolUdp::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
 }
 
 cIptvProtocolUdp::~cIptvProtocolUdp()
 {
-  debug("cIptvProtocolUdp::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
   // Drop the multicast group and close the socket
   cIptvProtocolUdp::Close();
   // Free allocated memory
@@ -39,7 +40,7 @@ cIptvProtocolUdp::~cIptvProtocolUdp()
 
 bool cIptvProtocolUdp::Open(void)
 {
-  debug("cIptvProtocolUdp::%s(%s)", __FUNCTION__, streamAddrM);
+  debug1("%s streamAddr='%s'", __PRETTY_FUNCTION__, streamAddrM);
   OpenSocket(streamPortM, streamAddrM, sourceAddrM, isIGMPv3M);
   if (!isempty(streamAddrM)) {
      // Join a new multicast group
@@ -50,7 +51,7 @@ bool cIptvProtocolUdp::Open(void)
 
 bool cIptvProtocolUdp::Close(void)
 {
-  debug("cIptvProtocolUdp::%s(%s)", __FUNCTION__, streamAddrM);
+  debug1("%s streamAddr='%s'", __PRETTY_FUNCTION__, streamAddrM);
   if (!isempty(streamAddrM)) {
      // Drop the multicast group
      OpenSocket(streamPortM, streamAddrM, sourceAddrM, isIGMPv3M);
@@ -72,7 +73,7 @@ int cIptvProtocolUdp::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
 
 bool cIptvProtocolUdp::SetSource(const char* locationP, const int parameterP, const int indexP)
 {
-  debug("cIptvProtocolUdp::%s(%s, %d, %d)", __FUNCTION__, locationP, parameterP, indexP);
+  debug1("%s (%s, %d, %d)", __PRETTY_FUNCTION__, locationP, parameterP, indexP);
   if (!isempty(locationP)) {
      // Drop the multicast group
      if (!isempty(streamAddrM)) {
@@ -105,13 +106,13 @@ bool cIptvProtocolUdp::SetSource(const char* locationP, const int parameterP, co
 
 bool cIptvProtocolUdp::SetPid(int pidP, int typeP, bool onP)
 {
-  //debug("cIptvProtocolUdp::%s(%d, %d, %d)", __FUNCTION__, pidP, typeP, onP);
+  debug16("%s (%d, %d, %d)", __PRETTY_FUNCTION__, pidP, typeP, onP);
   return true;
 }
 
 cString cIptvProtocolUdp::GetInformation(void)
 {
-  //debug("cIptvProtocolUdp::%s()", __FUNCTION__);
+  debug16("%s", __PRETTY_FUNCTION__);
   if (isIGMPv3M)
      return cString::sprintf("udp://%s@%s:%d", sourceAddrM, streamAddrM, streamPortM);
   return cString::sprintf("udp://%s:%d", streamAddrM, streamPortM);

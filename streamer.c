@@ -6,6 +6,7 @@
  */
 
 #include "common.h"
+#include "log.h"
 #include "streamer.h"
 
 cIptvStreamer::cIptvStreamer(cIptvDeviceIf &deviceP, unsigned int packetLenP)
@@ -15,7 +16,7 @@ cIptvStreamer::cIptvStreamer(cIptvDeviceIf &deviceP, unsigned int packetLenP)
   packetBufferLenM(packetLenP),
   protocolM(NULL)
 {
-  debug("cIptvStreamer::%s(%d)", __FUNCTION__, packetBufferLenM);
+  debug1("%s (, %d)", __PRETTY_FUNCTION__, packetBufferLenM);
   // Allocate packet buffer
   packetBufferM = MALLOC(unsigned char, packetBufferLenM);
   if (packetBufferM)
@@ -26,7 +27,7 @@ cIptvStreamer::cIptvStreamer(cIptvDeviceIf &deviceP, unsigned int packetLenP)
 
 cIptvStreamer::~cIptvStreamer()
 {
-  debug("cIptvStreamer::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
   // Close the protocol
   Close();
   protocolM = NULL;
@@ -36,7 +37,7 @@ cIptvStreamer::~cIptvStreamer()
 
 void cIptvStreamer::Action(void)
 {
-  debug("cIptvStreamer::%s(): entering", __FUNCTION__);
+  debug1("%s() Entering", __PRETTY_FUNCTION__);
   // Increase priority
   //SetPriority(-1);
   // Do the thread loop
@@ -52,12 +53,12 @@ void cIptvStreamer::Action(void)
         else
            sleepM.Wait(10); // to avoid busy loop and reduce cpu load
         }
-  debug("cIptvStreamer::%s(): exiting", __FUNCTION__);
+  debug1("%s Exiting", __PRETTY_FUNCTION__);
 }
 
 bool cIptvStreamer::Open(void)
 {
-  debug("cIptvStreamer::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
   // Open the protocol
   if (protocolM && !protocolM->Open())
      return false;
@@ -68,7 +69,7 @@ bool cIptvStreamer::Open(void)
 
 bool cIptvStreamer::Close(void)
 {
-  debug("cIptvStreamer::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
   // Stop thread
   sleepM.Signal();
   if (Running())
@@ -81,7 +82,7 @@ bool cIptvStreamer::Close(void)
 
 bool cIptvStreamer::SetSource(const char* locationP, const int parameterP, const int indexP, cIptvProtocolIf* protocolP)
 {
-  debug("cIptvStreamer::%s(%s, %d, %d)", __FUNCTION__, locationP, parameterP, indexP);
+  debug1("%s (%s, %d, %d, )", __PRETTY_FUNCTION__, locationP, parameterP, indexP);
   if (!isempty(locationP)) {
      // Update protocol and set location and parameter; Close the existing one if changed
      if (protocolM != protocolP) {
@@ -101,7 +102,7 @@ bool cIptvStreamer::SetSource(const char* locationP, const int parameterP, const
 
 bool cIptvStreamer::SetPid(int pidP, int typeP, bool onP)
 {
-  debug("cIptvStreamer::%s(%d, %d, %d)", __FUNCTION__, pidP, typeP, onP);
+  debug1("%s (%d, %d, %d)", __PRETTY_FUNCTION__, pidP, typeP, onP);
   if (protocolM)
      return protocolM->SetPid(pidP, typeP, onP);
   return true;
@@ -109,7 +110,7 @@ bool cIptvStreamer::SetPid(int pidP, int typeP, bool onP)
 
 cString cIptvStreamer::GetInformation(void)
 {
-  //debug("cIptvStreamer::%s()", __FUNCTION__);
+  debug16("%s", __PRETTY_FUNCTION__);
   cString s;
   if (protocolM)
      s = protocolM->GetInformation();

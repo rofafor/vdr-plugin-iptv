@@ -5,12 +5,14 @@
  *
  */
 
+#include "log.h"
 #include "config.h"
 
 cIptvConfig IptvConfig;
 
 cIptvConfig::cIptvConfig(void)
-: protocolBasePortM(4321),
+: traceModeM(eTraceModeNormal),
+  protocolBasePortM(4321),
   useBytesM(1),
   sectionFilteringM(1)
 {
@@ -41,12 +43,12 @@ void cIptvConfig::SetDisabledFilters(unsigned int indexP, int numberP)
 
 void cIptvConfig::SetConfigDirectory(const char *directoryP)
 {
-  debug("cIptvConfig::%s(%s)", __FUNCTION__, directoryP);
+  debug1("%s (%s)", __PRETTY_FUNCTION__, directoryP);
   ERROR_IF(!realpath(directoryP, configDirectoryM), "Cannot canonicalize configuration directory");
 }
 
 void cIptvConfig::SetResourceDirectory(const char *directoryP)
 {
-  debug("cIptvConfig::%s(%s)", __FUNCTION__, directoryP);
+  debug1("%s (%s)", __PRETTY_FUNCTION__, directoryP);
   ERROR_IF(!realpath(directoryP, resourceDirectoryM), "Cannot canonicalize resource directory");
 }

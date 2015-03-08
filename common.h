@@ -12,16 +12,6 @@
 #include <vdr/config.h>
 #include <vdr/i18n.h>
 
-#ifdef DEBUG
-#define debug(x...) dsyslog("IPTV: " x);
-#define info(x...)  isyslog("IPTV: " x);
-#define error(x...) esyslog("ERROR: " x);
-#else
-#define debug(x...) ;
-#define info(x...)  isyslog("IPTV: " x);
-#define error(x...) esyslog("ERROR: " x);
-#endif
-
 #define ELEMENTS(x)                     (sizeof(x) / sizeof(x[0]))
 
 #define IPTV_BUFFER_SIZE                MEGABYTE(1)
@@ -42,15 +32,15 @@
 
 #define SECTION_FILTER_TABLE_SIZE       5
 
-#define ERROR_IF_FUNC(exp, errstr, func, ret)                     \
-  do {                                                            \
-     if (exp) {                                                   \
-        char tmp[64];                                             \
-        error("[%s,%d]: "errstr": %s", __FILE__, __LINE__,        \
-              strerror_r(errno, tmp, sizeof(tmp)));               \
-        func;                                                     \
-        ret;                                                      \
-        }                                                         \
+#define ERROR_IF_FUNC(exp, errstr, func, ret)                       \
+  do {                                                              \
+     if (exp) {                                                     \
+        char tmp[64];                                               \
+        esyslog("[%s,%d]: "errstr": %s", __FILE__, __LINE__,        \
+                strerror_r(errno, tmp, sizeof(tmp)));               \
+        func;                                                       \
+        ret;                                                        \
+        }                                                           \
   } while (0)
 
 

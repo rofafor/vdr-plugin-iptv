@@ -11,6 +11,8 @@
 #include <vdr/channels.h>
 #include <vdr/filter.h>
 
+#include "log.h"
+
 class cSidScanner : public cFilter {
 private:
   tChannelID channelIdM;
@@ -26,8 +28,8 @@ public:
   cSidScanner(void);
   ~cSidScanner();
   void SetChannel(const tChannelID &channelIdP);
-  void Open()  { debug("cSidScanner::%s()", __FUNCTION__); isActiveM = true; }
-  void Close() { debug("cSidScanner::%s()", __FUNCTION__); isActiveM = false; }
+  void Open()  { debug1("%s", __PRETTY_FUNCTION__); isActiveM = true; }
+  void Close() { debug1("%s", __PRETTY_FUNCTION__); isActiveM = false; }
 };
 
 #endif // __SIDSCANNER_H

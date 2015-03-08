@@ -22,17 +22,17 @@ cPidScanner::cPidScanner(void)
   numVpidsM(0),
   numApidsM(0)
 {
-  debug("cPidScanner::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
 }
 
 cPidScanner::~cPidScanner()
 {
-  debug("cPidScanner::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
 }
 
 void cPidScanner::SetChannel(const tChannelID &channelIdP)
 {
-  debug("cPidScanner::%s(%s)", __FUNCTION__, *channelIdP.ToString());
+  debug1("%s (%s)", __PRETTY_FUNCTION__, *channelIdP.ToString());
   channelIdM = channelIdP;
   vPidM = 0xFFFF;
   numVpidsM = 0;
@@ -43,13 +43,13 @@ void cPidScanner::SetChannel(const tChannelID &channelIdP)
 
 void cPidScanner::Process(const uint8_t* bufP)
 {
-  //debug("cPidScanner::%s()", __FUNCTION__);
+  debug16("%s", __PRETTY_FUNCTION__);
   if (!processM)
      return;
 
   // Stop scanning after defined timeout
   if (timeoutM.TimedOut()) {
-     debug("cPidScanner::%s(): timed out determining pids", __FUNCTION__);
+     debug1("%s Timed out determining pids", __PRETTY_FUNCTION__);
      processM = false;
   }
 
@@ -84,24 +84,24 @@ void cPidScanner::Process(const uint8_t* bufP)
            // Stream ID
            if ((sid >= 0xC0) && (sid <= 0xDF)) {
               if (pid < aPidM) {
-                 debug("cPidScanner::%s(): found lower Apid: 0x%X instead of 0x%X", __FUNCTION__, pid, aPidM);
+                 debug1("%s Found lower Apid: 0x%X instead of 0x%X", __PRETTY_FUNCTION__, pid, aPidM);
                  aPidM = pid;
                  numApidsM = 1;
                  }
               else if (pid == aPidM) {
                  ++numApidsM;
-                 debug("cPidScanner::%s(): incrementing Apids, now at %d", __FUNCTION__, numApidsM);
+                 debug1("%s Incrementing Apids, now at %d", __PRETTY_FUNCTION__, numApidsM);
                  }
               }
            else if ((sid >= 0xE0) && (sid <= 0xEF)) {
               if (pid < vPidM) {
-                 debug("cPidScanner::%s(): found lower Vpid: 0x%X instead of 0x%X", __FUNCTION__, pid, vPidM);
+                 debug1("%s Found lower Vpid: 0x%X instead of 0x%X", __PRETTY_FUNCTION__, pid, vPidM);
                  vPidM = pid;
                  numVpidsM = 1;
                  }
               else if (pid == vPidM) {
                  ++numVpidsM;
-                 debug("cPidScanner::%s(): incrementing Vpids, now at %d", __FUNCTION__, numVpidsM);
+                 debug1("%s Incrementing Vpids, now at %d", __PRETTY_FUNCTION__, numVpidsM);
                  }
               }
            }
@@ -146,7 +146,7 @@ void cPidScanner::Process(const uint8_t* bufP)
                   }
               for (unsigned int i = 0; i < MAXSPIDS; ++i)
                   Spids[i] = IptvChannel->Spid(i);
-              debug("cPidScanner::%s(): vpid=0x%04X, apid=0x%04X", __FUNCTION__, vPidM, aPidM);
+              debug1("%s vpid=0x%04X, apid=0x%04X", __PRETTY_FUNCTION__, vPidM, aPidM);
               IptvChannel->SetPids(vPidM, Ppid, Vtype, Apids, Atypes, ALangs, Dpids, Dtypes, DLangs, Spids, SLangs, Tpid);
               }
            Channels.Unlock();

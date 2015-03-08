@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "config.h"
+#include "log.h"
 #include "protocolcurl.h"
 
 #ifdef CURLOPT_RTSPHEADER
@@ -38,7 +39,7 @@ cIptvProtocolCurl::cIptvProtocolCurl()
   connectedM(false),
   pausedM(false)
 {
-  debug("cIptvProtocolCurl::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
   if (ringBufferM) {
      ringBufferM->SetTimeouts(100, 0);
      ringBufferM->SetIoThrottle();
@@ -48,7 +49,7 @@ cIptvProtocolCurl::cIptvProtocolCurl()
 
 cIptvProtocolCurl::~cIptvProtocolCurl()
 {
-  debug("cIptvProtocolCurl::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
   Disconnect();
   // Free allocated memory
   DELETE_POINTER(ringBufferM);
@@ -58,7 +59,7 @@ size_t cIptvProtocolCurl::WriteCallback(void *ptrP, size_t sizeP, size_t nmembP,
 {
   cIptvProtocolCurl *obj = reinterpret_cast<cIptvProtocolCurl *>(dataP);
   size_t len = sizeP * nmembP;
-  //debug("cIptvProtocolCurl::%s(%zu)", __FUNCTION__, len);
+  debug16("%s (, %zu, %zu, ) len=%zu", __PRETTY_FUNCTION__, sizeP, nmembP, len);
 
   if (obj && !obj->PutData((unsigned char *)ptrP, (int)len))
      return CURL_WRITEFUNC_PAUSE;
@@ -71,7 +72,7 @@ size_t cIptvProtocolCurl::WriteRtspCallback(void *ptrP, size_t sizeP, size_t nme
   cIptvProtocolCurl *obj = reinterpret_cast<cIptvProtocolCurl *>(dataP);
   size_t len = sizeP * nmembP;
   unsigned char *p = (unsigned char *)ptrP;
-  //debug("cIptvProtocolCurl::%s(%zu)", __FUNCTION__, len);
+  debug16("%s (, %zu, %zu, ) len=%zu", __PRETTY_FUNCTION__, sizeP, nmembP, len);
 
   // Validate packet header ('$') and channel (0)
   if (obj && (p[0] == 0x24) && (p[1] == 0)) {
@@ -113,7 +114,7 @@ size_t cIptvProtocolCurl::DescribeCallback(void *ptrP, size_t sizeP, size_t nmem
 {
   cIptvProtocolCurl *obj = reinterpret_cast<cIptvProtocolCurl *>(dataP);
   size_t len = sizeP * nmembP;
-  //debug("cIptvProtocolCurl::%s(%zu)", __FUNCTION__, len);
+  debug16("%s (, %zu, %zu, ) len=%zu", __PRETTY_FUNCTION__, sizeP, nmembP, len);
 
   bool found = false;
   cString control = "";
@@ -121,7 +122,7 @@ size_t cIptvProtocolCurl::DescribeCallback(void *ptrP, size_t sizeP, size_t nmem
   char *r = strtok(p, "\r\n");
 
   while (r) {
-    //debug("cIptvProtocolCurl::%s(%zu): %s", __FUNCTION__, len, r);
+    debug16("%s (, %zu, %zu, ) len=%zu r=%s", __PRETTY_FUNCTION__, sizeP, nmembP, len, r);
     // Look for a media name: "video"
     if (strstr(r, "m=video")) {
        found = true;
@@ -147,13 +148,13 @@ size_t cIptvProtocolCurl::HeaderCallback(void *ptrP, size_t sizeP, size_t nmembP
 {
   //cIptvProtocolCurl *obj = reinterpret_cast<cIptvProtocolCurl *>(dataP);
   size_t len = sizeP * nmembP;
-  //debug("cIptvProtocolCurl::%s(%zu)", __FUNCTION__, len);
+  debug16("%s (, %zu, %zu, ) len=%zu", __PRETTY_FUNCTION__, sizeP, nmembP, len);
 
   char *p = (char *)ptrP;
   char *r = strtok(p, "\r\n");
 
   while (r) {
-    //debug("cIptvProtocolCurl::%s(%zu): %s", __FUNCTION__, len, r);
+    debug16("%s (, %zu, %zu, ) len=%zu r=%s", __PRETTY_FUNCTION__, sizeP, nmembP, len, r);
     r = strtok(NULL, "\r\n");
     }
 
@@ -163,7 +164,7 @@ size_t cIptvProtocolCurl::HeaderCallback(void *ptrP, size_t sizeP, size_t nmembP
 void cIptvProtocolCurl::SetRtspControl(const char *controlP)
 {
   cMutexLock MutexLock(&mutexM);
-  //debug("cIptvProtocolCurl::%s(%s)", __FUNCTION__, controlP);
+  debug16("%s (%s)", __PRETTY_FUNCTION__, controlP);
   cString protocol = ChangeCase(controlP, false).Truncate(7);
   if (startswith(*protocol, "rtsp://")) {
      streamUrlM = controlP;
@@ -176,13 +177,13 @@ void cIptvProtocolCurl::SetRtspControl(const char *controlP)
 bool cIptvProtocolCurl::PutData(unsigned char *dataP, int lenP)
 {
   cMutexLock MutexLock(&mutexM);
-  //debug("cIptvProtocolCurl::%s(%d)", __FUNCTION__, lenP);
+  debug16("%s (, %d)", __PRETTY_FUNCTION__, lenP);
   if (pausedM)
      return false;
   if (ringBufferM && (lenP >= 0)) {
      // Should we pause the transfer ?
      if (ringBufferM->Free() < (2 * CURL_MAX_WRITE_SIZE)) {
-        debug("cIptvProtocolCurl::%s(pause): free=%d available=%d len=%d", __FUNCTION__,
+        debug1("%s Pause free=%d available=%d len=%d", __PRETTY_FUNCTION__,
               ringBufferM->Free(), ringBufferM->Available(), lenP);
         pausedM = true;
         return false;
@@ -198,14 +199,14 @@ bool cIptvProtocolCurl::PutData(unsigned char *dataP, int lenP)
 void cIptvProtocolCurl::DelData(int lenP)
 {
   cMutexLock MutexLock(&mutexM);
-  //debug("cIptvProtocolCurl::%s()", __FUNCTION__);
+  debug16("%s", __PRETTY_FUNCTION__);
   if (ringBufferM && (lenP >= 0))
      ringBufferM->Del(lenP);
 }
 
 void cIptvProtocolCurl::ClearData()
 {
-  //debug("cIptvProtocolCurl::%s()", __FUNCTION__);
+  debug16("%s", __PRETTY_FUNCTION__);
   if (ringBufferM)
      ringBufferM->Clear();
 }
@@ -213,7 +214,7 @@ void cIptvProtocolCurl::ClearData()
 unsigned char *cIptvProtocolCurl::GetData(int &lenP)
 {
   cMutexLock MutexLock(&mutexM);
-  //debug("cIptvProtocolCurl::%s()", __FUNCTION__);
+  debug16("%s", __PRETTY_FUNCTION__);
   unsigned char *p = NULL;
   lenP = 0;
   if (ringBufferM) {
@@ -245,7 +246,7 @@ unsigned char *cIptvProtocolCurl::GetData(int &lenP)
 bool cIptvProtocolCurl::Connect()
 {
   cMutexLock MutexLock(&mutexM);
-  debug("cIptvProtocolCurl::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
   if (connectedM)
      return true;
 
@@ -408,7 +409,7 @@ bool cIptvProtocolCurl::Connect()
 bool cIptvProtocolCurl::Disconnect()
 {
   cMutexLock MutexLock(&mutexM);
-  debug("cIptvProtocolCurl::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
   if (!connectedM)
      return true;
 
@@ -463,20 +464,20 @@ bool cIptvProtocolCurl::Disconnect()
 
 bool cIptvProtocolCurl::Open(void)
 {
-  debug("cIptvProtocolCurl::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
   return Connect();
 }
 
 bool cIptvProtocolCurl::Close(void)
 {
-  debug("cIptvProtocolCurl::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
   Disconnect();
   return true;
 }
 
 int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
 {
-  //debug("cIptvProtocolCurl::%s()", __FUNCTION__);
+  debug16("%s (, %u)", __PRETTY_FUNCTION__, bufferLenP);
   int len = 0;
   if (ringBufferM) {
      // Fill up the buffer
@@ -490,7 +491,7 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
 
                // Remember the heart beat
                if (timeoutM.TimedOut()) {
-                  debug("cIptvProtocolCurl::%s(): KeepAlive", __FUNCTION__);
+                  debug1("%s KeepAlive", __PRETTY_FUNCTION__);
                   cString uri = cString::sprintf("%s", *streamUrlM);
                   iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_STREAM_URI, *uri);
                   iptv_curl_easy_setopt(handleM, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_OPTIONS);
@@ -523,8 +524,8 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
                   // Use 20% threshold before continuing to filling up the buffer.
                   mutexM.Lock();
                   if (pausedM && (ringBufferM->Available() < (IPTV_BUFFER_SIZE / 5))) {
-                     debug("cIptvProtocolCurl::%s(continue): free=%d available=%d", __FUNCTION__,
-                           ringBufferM->Free(), ringBufferM->Available());
+                     debug1("%s Continue free=%d available=%d", __PRETTY_FUNCTION__,
+                            ringBufferM->Free(), ringBufferM->Available());
                      pausedM = false;
                      curl_easy_pause(handleM, CURLPAUSE_CONT);
                      }
@@ -537,8 +538,8 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
                      CURLMsg *msg = curl_multi_info_read(multiM, &msgcount);
                      mutexM.Unlock();
                      if (msg && (msg->msg == CURLMSG_DONE)) {
-                        debug("cIptvProtocolCurl::%s(done): %s (%d)", __FUNCTION__,
-                              curl_easy_strerror(msg->data.result), msg->data.result);
+                        debug1("%s Done %s (%d)", __PRETTY_FUNCTION__,
+                               curl_easy_strerror(msg->data.result), msg->data.result);
                         Disconnect();
                         Connect();
                         }
@@ -558,7 +559,7 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
         len = min(len, (int)bufferLenP);
         memcpy(bufferAddrP, p, len);
         DelData(len);
-        //debug("cIptvProtocolCurl::%s(): get %d bytes", __FUNCTION__, len);
+        debug16("%s Get %d bytes", __PRETTY_FUNCTION__, len);
         }
      }
 
@@ -567,7 +568,7 @@ int cIptvProtocolCurl::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
 
 bool cIptvProtocolCurl::SetSource(const char* locationP, const int parameterP, const int indexP)
 {
-  debug("cIptvProtocolCurl::%s(%s, %d, %d)", __FUNCTION__, locationP, parameterP, indexP);
+  debug1("%s (%s, %d, %d)", __PRETTY_FUNCTION__, locationP, parameterP, indexP);
   if (!isempty(locationP)) {
      // Disconnect
      Disconnect();
@@ -584,7 +585,7 @@ bool cIptvProtocolCurl::SetSource(const char* locationP, const int parameterP, c
         modeM = eModeFile;
      else
         modeM = eModeUnknown;
-     debug("cIptvProtocolCurl::%s(): %s (%d)", __FUNCTION__, *protocol, modeM);
+     debug1("%s (%s, %d, %d) protocol=%s mode=%d", __PRETTY_FUNCTION__, locationP, parameterP, indexP, *protocol, modeM);
      // Update stream parameter - force UDP mode for RTSP
      streamParamM = (modeM == eModeRtsp) ? 0 : parameterP;
      // Update listen port
@@ -597,12 +598,12 @@ bool cIptvProtocolCurl::SetSource(const char* locationP, const int parameterP, c
 
 bool cIptvProtocolCurl::SetPid(int pidP, int typeP, bool onP)
 {
-  //debug("cIptvProtocolCurl::%s(%d, %d, %d)", __FUNCTION__, pidP, typeP, onP);
+  debug16("%s (%d, %d, %d)", __PRETTY_FUNCTION__, pidP, typeP, onP);
   return true;
 }
 
 cString cIptvProtocolCurl::GetInformation(void)
 {
-  //debug("cIptvProtocolCurl::%s()", __FUNCTION__);
+  debug16("%s", __PRETTY_FUNCTION__);
   return cString::sprintf("%s [%d]", *streamUrlM, streamParamM);
 }

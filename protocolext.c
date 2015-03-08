@@ -17,6 +17,7 @@
 
 #include "common.h"
 #include "config.h"
+#include "log.h"
 #include "protocolext.h"
 
 #ifndef EXTSHELL
@@ -29,19 +30,19 @@ cIptvProtocolExt::cIptvProtocolExt()
   scriptParameterM(0),
   streamPortM(0)
 {
-  debug("cIptvProtocolExt::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
 }
 
 cIptvProtocolExt::~cIptvProtocolExt()
 {
-  debug("cIptvProtocolExt::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
   // Drop the socket connection
   cIptvProtocolExt::Close();
 }
 
 void cIptvProtocolExt::ExecuteScript(void)
 {
-  debug("cIptvProtocolExt::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
   // Check if already executing
   if (isActiveM || isempty(scriptFileM))
      return;
@@ -59,7 +60,7 @@ void cIptvProtocolExt::ExecuteScript(void)
          close(i);
      // Execute the external script
      cString cmd = cString::sprintf("%s %d %d", *scriptFileM, scriptParameterM, streamPortM);
-     debug("cIptvProtocolExt::%s(child): %s", __FUNCTION__, *cmd);
+     debug1("%s Child %s", __PRETTY_FUNCTION__, *cmd);
      // Create a new session for a process group
      ERROR_IF_RET(setsid() == -1, "setsid()", _exit(-1));
      if (execl(EXTSHELL, "sh", "-c", *cmd, (char *)NULL) == -1) {
@@ -69,13 +70,13 @@ void cIptvProtocolExt::ExecuteScript(void)
      _exit(0);
      }
   else {
-     debug("cIptvProtocolExt::%s(): pid=%d", __FUNCTION__, pidM);
+     debug1("%s pid=%d", __PRETTY_FUNCTION__, pidM);
      }
 }
 
 void cIptvProtocolExt::TerminateScript(void)
 {
-  debug("cIptvProtocolExt::%s(): pid=%d", __FUNCTION__, pidM);
+  debug1("%s pid=%d", __PRETTY_FUNCTION__, pidM);
   if (!isActiveM || isempty(scriptFileM))
      return;
   if (pidM > 0) {
@@ -111,7 +112,7 @@ void cIptvProtocolExt::TerminateScript(void)
        if (!retval && waitStatus.si_pid && (waitStatus.si_pid == pidM) &&
           ((waitStatus.si_code == CLD_EXITED) || (waitStatus.si_code == CLD_KILLED))) {
 #endif // __FreeBSD__
-          debug("cIptvProtocolExt::%s(): child (%d) exited as expected", __FUNCTION__, pidM);
+          debug1("%s Child (%d) exited as expected", __PRETTY_FUNCTION__, pidM);
           waitOver = true;
           }
        // Unsuccessful wait, avoid busy looping
@@ -124,7 +125,7 @@ void cIptvProtocolExt::TerminateScript(void)
 
 bool cIptvProtocolExt::Open(void)
 {
-  debug("cIptvProtocolExt::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
   // Reject empty script files
   if (!strlen(*scriptFileM))
      return false;
@@ -138,7 +139,7 @@ bool cIptvProtocolExt::Open(void)
 
 bool cIptvProtocolExt::Close(void)
 {
-  debug("cIptvProtocolExt::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
   // Terminate the external script
   TerminateScript();
   isActiveM = false;
@@ -154,7 +155,7 @@ int cIptvProtocolExt::Read(unsigned char* bufferAddrP, unsigned int bufferLenP)
 
 bool cIptvProtocolExt::SetSource(const char* locationP, const int parameterP, const int indexP)
 {
-  debug("cIptvProtocolExt::%s(%s, %d, %d)", __FUNCTION__, locationP, parameterP, indexP);
+  debug1("%s (%s, %d, %d)", __PRETTY_FUNCTION__, locationP, parameterP, indexP);
   if (!isempty(locationP)) {
      struct stat stbuf;
      // Update script file and parameter
@@ -172,12 +173,12 @@ bool cIptvProtocolExt::SetSource(const char* locationP, const int parameterP, co
 
 bool cIptvProtocolExt::SetPid(int pidP, int typeP, bool onP)
 {
-  //debug("cIptvProtocolExt::%s(%d, %d, %d)", __FUNCTION__, pidP, typeP, onP);
+  debug16("%s (%d, %d, %d)", __PRETTY_FUNCTION__, pidP, typeP, onP);
   return true;
 }
 
 cString cIptvProtocolExt::GetInformation(void)
 {
-  //debug("cIptvProtocolExt::%s()", __FUNCTION__);
+  debug16("%s", __PRETTY_FUNCTION__);
   return cString::sprintf("ext://%s:%d", *scriptFileM, scriptParameterM);
 }

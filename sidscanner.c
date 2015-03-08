@@ -17,19 +17,19 @@ cSidScanner::cSidScanner(void)
   tidFoundM(false),
   isActiveM(false)
 {
-  debug("cSidScanner::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
   Set(0x00, 0x00);  // PAT
   Set(0x10, 0x40);  // NIT
 }
 
 cSidScanner::~cSidScanner()
 {
-  debug("cSidScanner::%s()", __FUNCTION__);
+  debug1("%s", __PRETTY_FUNCTION__);
 }
 
 void cSidScanner::SetChannel(const tChannelID &channelIdP)
 {
-  debug("cSidScanner::%s(%s)", __FUNCTION__, *channelIdP.ToString());
+  debug1("%s (%s)", __PRETTY_FUNCTION__, *channelIdP.ToString());
   channelIdM = channelIdP;
   sidFoundM = false;
   nidFoundM = false;
@@ -40,12 +40,12 @@ void cSidScanner::Process(u_short pidP, u_char tidP, const u_char *dataP, int le
 {
   int newSid = -1, newNid = -1, newTid = -1;
 
-  //debug("cSidScanner::%s()", __FUNCTION__);
+  debug16("%s (%d, %02X, , %d)", __PRETTY_FUNCTION__, pidP, tidP, lengthP);
   if (!isActiveM)
      return;
   if (channelIdM.Valid()) {
      if ((pidP == 0x00) && (tidP == 0x00)) {
-        //debug("cSidScanner::%s(%d, %02X)", __FUNCTION__, pidP, tidP);
+        debug16("%s (%d, %02X, , %d) pat", __PRETTY_FUNCTION__, pidP, tidP, lengthP);
         SI::PAT pat(dataP, false);
         if (!pat.CheckCRCAndParse())
            return;
@@ -53,7 +53,7 @@ void cSidScanner::Process(u_short pidP, u_char tidP, const u_char *dataP, int le
         for (SI::Loop::Iterator it; pat.associationLoop.getNext(assoc, it); ) {
             if (!assoc.isNITPid()) {
                if (assoc.getServiceId() != channelIdM.Sid()) {
-                  debug("cSidScanner::%s(): sid=%d", __FUNCTION__, assoc.getServiceId());
+                  debug1("%s (%d, %02X, , %d) sid=%d", __PRETTY_FUNCTION__, pidP, tidP, lengthP, assoc.getServiceId());
                   newSid = assoc.getServiceId();
                   }
                sidFoundM = true;
@@ -62,19 +62,19 @@ void cSidScanner::Process(u_short pidP, u_char tidP, const u_char *dataP, int le
             }
         }
      else if ((pidP == 0x10) && (tidP == 0x40)) {
-        debug("cSidScanner::%s(%d, %02X)", __FUNCTION__, pidP, tidP);
+        debug1("%s (%d, %02X, , %d)", __PRETTY_FUNCTION__, pidP, tidP, lengthP);
         SI::NIT nit(dataP, false);
         if (!nit.CheckCRCAndParse())
            return;
         SI::NIT::TransportStream ts;
         for (SI::Loop::Iterator it; nit.transportStreamLoop.getNext(ts, it); ) {
             if (ts.getTransportStreamId() != channelIdM.Tid()) {
-               debug("cSidScanner::%s(): tsid=%d", __FUNCTION__, ts.getTransportStreamId());
+               debug1("%s (%d, %02X, , %d) tsid=%d", __PRETTY_FUNCTION__, pidP, tidP, lengthP, ts.getTransportStreamId());
                newTid = ts.getTransportStreamId();
                tidFoundM = true;
                }
             if (ts.getOriginalNetworkId() != channelIdM.Nid()) {
-               debug("cSidScanner::%s(): onid=%d", __FUNCTION__, ts.getOriginalNetworkId());
+               debug1("%s (%d, %02X, , %d) onid=%d", __PRETTY_FUNCTION__, pidP, tidP, lengthP, ts.getOriginalNetworkId());
                newNid = ts.getOriginalNetworkId();
                nidFoundM = true;
                }
@@ -82,7 +82,7 @@ void cSidScanner::Process(u_short pidP, u_char tidP, const u_char *dataP, int le
             }
         // fallback for network id if not found already
         if (!nidFoundM && (nit.getNetworkId() != channelIdM.Nid())) {
-           debug("cSidScanner::%s(): nid=%d", __FUNCTION__, nit.getNetworkId());
+           debug1("%s (%d, %02X, , %d) nid=%d", __PRETTY_FUNCTION__, pidP, tidP, lengthP, nit.getNetworkId());
            newNid = nit.getNetworkId();
            nidFoundM = true;
            }

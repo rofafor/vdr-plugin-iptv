@@ -11,6 +11,8 @@
 #include <vdr/tools.h>
 #include <vdr/channels.h>
 
+#include "log.h"
+
 class cPidScanner {
 private:
   enum {
@@ -32,8 +34,8 @@ public:
   ~cPidScanner();
   void SetChannel(const tChannelID &channelIdP);
   void Process(const uint8_t* bufP);
-  void Open()  { debug("cPidScanner::%s()", __FUNCTION__); timeoutM.Set(PIDSCANNER_TIMEOUT_IN_MS); }
-  void Close() { debug("cPidScanner::%s()", __FUNCTION__); timeoutM.Set(0); }
+  void Open()  { debug1("%s", __PRETTY_FUNCTION__); timeoutM.Set(PIDSCANNER_TIMEOUT_IN_MS); }
+  void Close() { debug1("%s", __PRETTY_FUNCTION__); timeoutM.Set(0); }
 };
 
 #endif // __PIDSCANNER_H
