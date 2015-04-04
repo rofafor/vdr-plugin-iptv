@@ -263,8 +263,12 @@ VDR Plugin 'iptv' Revision History
 
 - Updated for vdr-2.2.0.
 - Updated German translations (Thanks to Frank Neumann).
-- Updated Lithuanian translations (Thanks to Valdemaras Pipiras).
+- Updated Lithuanian translations (Thanks to Valdemaras
+  Pipiras).
 
-2015-XX-XX: Version 2.2.1
+2015-04-04: Version 2.2.1
 
-- Fixed CURL timeout and added a stale connection detection (Thanks to Daniel Ribeiro).
+- Fixed CURL timeout and added a stale connection
+  detection (Thanks to Daniel Ribeiro).
+- Got rid of IPTV_DEBUG.
+- Added support for tracing modes.
