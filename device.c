@@ -125,12 +125,13 @@ cIptvDevice *cIptvDevice::GetIptvDevice(int cardIndexP)
 cString cIptvDevice::GetGeneralInformation(void)
 {
   debug16("%s [device %d]", __PRETTY_FUNCTION__, deviceIndexM);
+  LOCK_CHANNELS_READ;
   return cString::sprintf("IPTV device: %d\nCardIndex: %d\nStream: %s\nStream bitrate: %s\n%sChannel: %s",
                           deviceIndexM, CardIndex(),
                           pIptvStreamerM ? *pIptvStreamerM->GetInformation() : "",
                           pIptvStreamerM ? *pIptvStreamerM->GetStreamerStatistic() : "",
                           *GetBufferStatistic(),
-                          *Channels.GetByNumber(cDevice::CurrentChannel())->ToText());
+                          *Channels->GetByNumber(cDevice::CurrentChannel())->ToText());
 }
 
 cString cIptvDevice::GetPidsInformation(void)

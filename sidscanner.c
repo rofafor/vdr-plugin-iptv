@@ -89,13 +89,17 @@ void cSidScanner::Process(u_short pidP, u_char tidP, const u_char *dataP, int le
         }
      }
   if ((newSid >= 0) || (newNid >= 0) || (newTid >= 0)) {
-     if (!Channels.Lock(true, 10))
+     cStateKey StateKey;
+     cChannels *Channels = cChannels::GetChannelsWrite(StateKey, 10);
+     if (!Channels)
         return;
-     cChannel *IptvChannel = Channels.GetByChannelID(channelIdM);
+     bool ChannelsModified = false;
+     cChannel *IptvChannel = Channels->GetByChannelID(channelIdM);
      if (IptvChannel)
-        IptvChannel->SetId((newNid < 0) ? IptvChannel->Nid() : newNid, (newTid < 0) ? IptvChannel->Tid() : newTid,
-                           (newSid < 0) ? IptvChannel->Sid() : newSid, IptvChannel->Rid());
-     Channels.Unlock();
+        ChannelsModified |= IptvChannel->SetId(Channels, (newNid < 0) ? IptvChannel->Nid() : newNid,
+                                               (newTid < 0) ? IptvChannel->Tid() : newTid,
+                                               (newSid < 0) ? IptvChannel->Sid() : newSid, IptvChannel->Rid());
+     StateKey.Remove(ChannelsModified);
      }
   if (sidFoundM && nidFoundM && tidFoundM) {
      SetChannel(tChannelID::InvalidID);

@@ -108,11 +108,13 @@ void cPidScanner::Process(const uint8_t* bufP)
         if (((numVpidsM >= PIDSCANNER_VPID_COUNT) && (numApidsM >= PIDSCANNER_APID_COUNT)) ||
             (abs(numApidsM - numVpidsM) >= PIDSCANNER_PID_DELTA_COUNT)) {
            // Lock channels for pid updates
-           if (!Channels.Lock(true, 10)) {
-              timeoutM.Set(PIDSCANNER_TIMEOUT_IN_MS);
+           timeoutM.Set(PIDSCANNER_TIMEOUT_IN_MS);
+           cStateKey StateKey;
+           cChannels *Channels = cChannels::GetChannelsWrite(StateKey, 10);
+           if (!Channels)
               return;
-              }
-           cChannel *IptvChannel = Channels.GetByChannelID(channelIdM);
+           bool ChannelsModified = false;
+           cChannel *IptvChannel = Channels->GetByChannelID(channelIdM);
            if (IptvChannel) {
               int Apids[MAXAPIDS + 1] = { 0 }; // these lists are zero-terminated
               int Atypes[MAXAPIDS + 1] = { 0 };
@@ -147,9 +149,9 @@ void cPidScanner::Process(const uint8_t* bufP)
               for (unsigned int i = 0; i < MAXSPIDS; ++i)
                   Spids[i] = IptvChannel->Spid(i);
               debug1("%s vpid=0x%04X, apid=0x%04X", __PRETTY_FUNCTION__, vPidM, aPidM);
-              IptvChannel->SetPids(vPidM, Ppid, Vtype, Apids, Atypes, ALangs, Dpids, Dtypes, DLangs, Spids, SLangs, Tpid);
+              ChannelsModified |= IptvChannel->SetPids(vPidM, Ppid, Vtype, Apids, Atypes, ALangs, Dpids, Dtypes, DLangs, Spids, SLangs, Tpid);
               }
-           Channels.Unlock();
+           StateKey.Remove(ChannelsModified);
            processM = false;
            }
         }
