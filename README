@@ -46,13 +46,6 @@ make -C iptv-X.Y.Z install
 
 Setup menu:
 
-- TS buffer size [MB] = 2          Defines ringbuffer size for transport
-                                   stream in MB.
-                                   Valid range: 1...4
-- TS buffer prefill ratio [%] = 0  Defines prefill ratio for transport
-                                   stream ringbuffer before data is
-                                   transferred to VDR.
-                                   Valid range: 0...40
 - Protocol base port = 4321        Defines base port used in CURL/EXT
                                    protocol. Two ports are defined for
                                    each device.
