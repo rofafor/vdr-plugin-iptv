@@ -32,17 +32,16 @@
 
 #define SECTION_FILTER_TABLE_SIZE       5
 
-#define ERROR_IF_FUNC(exp, errstr, func, ret)                       \
-  do {                                                              \
-     if (exp) {                                                     \
-        char tmp[64];                                               \
-        esyslog("[%s,%d]: "errstr": %s", __FILE__, __LINE__,        \
-                strerror_r(errno, tmp, sizeof(tmp)));               \
-        func;                                                       \
-        ret;                                                        \
-        }                                                           \
+#define ERROR_IF_FUNC(exp, errstr, func, ret)                  \
+  do {                                                         \
+     if (exp) {                                                \
+        char tmp[64];                                          \
+        esyslog("[%s,%d]: " errstr ": %s", __FILE__, __LINE__, \
+                strerror_r(errno, tmp, sizeof(tmp)));          \
+        func;                                                  \
+        ret;                                                   \
+        }                                                      \
   } while (0)
-
 
 #define ERROR_IF_RET(exp, errstr, ret) ERROR_IF_FUNC(exp, errstr, ,ret);
 
