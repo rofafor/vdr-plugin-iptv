@@ -1,15 +1,15 @@
 # VDR plugin language source file.
-# Copyright (C) 2007-2015 Rolf Ahrenberg & Antti Seppala
+# Copyright (C) 2007-2018 Rolf Ahrenberg & Antti Seppala
 # This file is distributed under the same license as the iptv package.
 # Tobias <vdr@e-tobi.net>, 2007.
 # Frank Neumann, 2015.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vdr-iptv 2.3.0\n"
+"Project-Id-Version: vdr-iptv 2.4.0\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2017-06-24 06:24+0300\n"
-"PO-Revision-Date: 2017-06-24 06:24+0300\n"
+"POT-Creation-Date: 2018-04-15 04:15+0300\n"
+"PO-Revision-Date: 2018-04-15 04:15+0300\n"
 "Last-Translator: Frank Neumann <fnu@yavdr.org>\n"
 "Language-Team: German <vdr@linuxtv.org>\n"
 "Language: de\n"

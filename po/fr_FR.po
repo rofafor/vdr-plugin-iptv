@@ -1,15 +1,15 @@
 # French translations for iptv package.
-# Copyright (C) 2007-2015 Rolf Ahrenberg & Antti Seppala
+# Copyright (C) 2007-2018 Rolf Ahrenberg & Antti Seppala
 # This file is distributed under the same license as the iptv package.
 # Bruno ROUSSEL <bruno.roussel@free.fr>, 2007.
 # NIVAL Michaël <mnival@club-internet.fr>, 2008.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vdr-iptv 2.3.0\n"
+"Project-Id-Version: vdr-iptv 2.4.0\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2017-06-24 06:24+0300\n"
-"PO-Revision-Date: 2017-06-24 06:24+0300\n"
+"POT-Creation-Date: 2018-04-15 04:15+0300\n"
+"PO-Revision-Date: 2018-04-15 04:15+0300\n"
 "Last-Translator: NIVAL Michaël <mnival@club-internet.fr>\n"
 "Language-Team: French <vdr@linuxtv.org>\n"
 "Language: fr\n"
