@@ -192,7 +192,7 @@ void cIptvPluginSetup::StoreFilters(const char *nameP, int *valuesP)
   char *q = buffer;
   for (int i = 0; i < SECTION_FILTER_TABLE_SIZE; ++i) {
       char s[3];
-      if (valuesP[i] < 0)
+      if ((valuesP[i] < 0) || (valuesP[i] >= SECTION_FILTER_TABLE_SIZE))
          break;
       if (q > buffer)
          *q++ = ' ';
