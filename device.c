@@ -46,12 +46,13 @@ cIptvDevice::cIptvDevice(unsigned int indexP)
   // Check if dvr fifo exists
   struct stat sb;
   cString filename = cString::sprintf(IPTV_DVR_FILENAME, deviceIndexM);
-  stat(filename, &sb);
-  if (S_ISFIFO(sb.st_mode)) {
-     dvrFdM = open(filename, O_RDWR | O_NONBLOCK);
-     if (dvrFdM >= 0)
-        info("IPTV device %d redirecting input stream to '%s'", deviceIndexM, *filename);
+  if (stat(filename, &sb) == 0) {
+     if (S_ISFIFO(sb.st_mode)) {
+	dvrFdM = open(filename, O_RDWR | O_NONBLOCK);
+	if (dvrFdM >= 0)
+	   info("IPTV device %d redirecting input stream to '%s'", deviceIndexM, *filename);
      }
+  }
 }
 
 cIptvDevice::~cIptvDevice()
