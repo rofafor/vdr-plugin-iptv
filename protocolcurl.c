@@ -280,8 +280,10 @@ bool cIptvProtocolCurl::Connect()
      return true;
 
   // Initialize the curl session
-  if (!handleM)
+  if (!handleM) {
      handleM = curl_easy_init();
+     connectedM = true;
+     }
 
   if (handleM && !isempty(*streamUrlM)) {
      CURLcode res = CURLE_OK;
@@ -428,7 +430,6 @@ bool cIptvProtocolCurl::Connect()
        }
 
      timeoutM.Set(eKeepAliveIntervalMs);
-     connectedM = true;
      return true;
      }
 
