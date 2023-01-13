@@ -73,8 +73,14 @@ bool cIptvSocket::OpenSocket(const int portP, const bool isUdpP)
      sockAddrM.sin_port = htons((uint16_t)(portP & 0xFFFF));
      sockAddrM.sin_addr.s_addr = htonl(INADDR_ANY);
      if (isUdpP)
-        ERROR_IF_FUNC(bind(socketDescM, (struct sockaddr *)&sockAddrM, sizeof(sockAddrM)) < 0,
+        {
+	   int rcvbuf = 4 * 1024 * 1024;
+
+	   ERROR_IF_FUNC(bind(socketDescM, (struct sockaddr *)&sockAddrM, sizeof(sockAddrM)) < 0,
                       "bind()", CloseSocket(), return false);
+
+	   ERROR_IF_RET(setsockopt(socketDescM, SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof(int)) < 0, "setsockopt(SO_RCVBUF)", return false);
+	}
      // Update socket port
      socketPortM = portP;
      }
@@ -184,11 +190,13 @@ bool cIptvUdpSocket::JoinMulticast(void)
         ERROR_IF_RET(setsockopt(socketDescM, SOL_IP, MCAST_JOIN_SOURCE_GROUP, &gsr, sizeof(gsr)) < 0, "setsockopt(MCAST_JOIN_SOURCE_GROUP)", return false);
         }
      else {
-        struct ip_mreq mreq;
-        mreq.imr_multiaddr.s_addr = streamAddrM;
-        mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-        ERROR_IF_RET(setsockopt(socketDescM, SOL_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0, "setsockopt(IP_ADD_MEMBERSHIP)", return false);
-        }
+        if (IN_MULTICAST(ntohl(streamAddrM))) {
+	   struct ip_mreq mreq;
+	   mreq.imr_multiaddr.s_addr = streamAddrM;
+	   mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+	   ERROR_IF_RET(setsockopt(socketDescM, SOL_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0, "setsockopt(IP_ADD_MEMBERSHIP)", return false);
+	}
+     }
      // Update multicasting flag
      isActiveM = true;
      }
@@ -218,11 +226,13 @@ bool cIptvUdpSocket::DropMulticast(void)
         ERROR_IF_RET(setsockopt(socketDescM, SOL_IP, MCAST_LEAVE_SOURCE_GROUP, &gsr, sizeof(gsr)) < 0, "setsockopt(MCAST_LEAVE_SOURCE_GROUP)", return false);
         }
      else {
-        struct ip_mreq mreq;
-        mreq.imr_multiaddr.s_addr = streamAddrM;
-        mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-        ERROR_IF_RET(setsockopt(socketDescM, SOL_IP, IP_DROP_MEMBERSHIP, &mreq, sizeof(mreq)) < 0, "setsockopt(IP_DROP_MEMBERSHIP)", return false);
+        if (IN_MULTICAST(ntohl(streamAddrM))) {
+	   struct ip_mreq mreq;
+	   mreq.imr_multiaddr.s_addr = streamAddrM;
+	   mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+	   ERROR_IF_RET(setsockopt(socketDescM, SOL_IP, IP_DROP_MEMBERSHIP, &mreq, sizeof(mreq)) < 0, "setsockopt(IP_DROP_MEMBERSHIP)", return false);
         }
+     }
      // Update multicasting flag
      isActiveM = false;
      }
