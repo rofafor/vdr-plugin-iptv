@@ -78,7 +78,6 @@ protected:
 
 private:
   long dataBytesM;
-  long freeSpaceM;
   long usedSpaceM;
   cTimeMs timerM;
   cMutex mutexM;

@@ -79,22 +79,22 @@ bool cPluginIptv::ProcessArgs(int argc, char *argv[])
   debug1("%s", __PRETTY_FUNCTION__);
   // Implement command line argument processing here if applicable.
   static const struct option long_options[] = {
-    { "devices", required_argument, NULL, 'd' },
-    { "trace",    required_argument, NULL, 't' },
-    { NULL,      no_argument,       NULL,  0  }
+    { "devices",	required_argument, NULL, 'd' },
+    { "trace", 		required_argument, NULL, 't' },
+    { NULL,		no_argument,       NULL,  0  }
     };
 
   int c;
-  while ((c = getopt_long(argc, argv, "d:", long_options, NULL)) != -1) {
+  while ((c = getopt_long(argc, argv, "d:t:", long_options, NULL)) != -1) {
     switch (c) {
       case 'd':
-           deviceCountM = atoi(optarg);
-           break;
+	   deviceCountM = atoi(optarg);
+	   break;
       case 't':
-           IptvConfig.SetTraceMode(strtol(optarg, NULL, 0));
-           break;
+	   IptvConfig.SetTraceMode(atoi(optarg));
+	   break;
       default:
-           return false;
+	   return false;
       }
     }
   return true;

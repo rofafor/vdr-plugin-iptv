@@ -173,7 +173,6 @@ void cIptvStreamerStatistics::AddStreamerStatistic(long bytesP)
 // Buffer statistics class
 cIptvBufferStatistics::cIptvBufferStatistics()
 : dataBytesM(0),
-  freeSpaceM(0),
   usedSpaceM(0),
   timerM(),
   mutexM()
